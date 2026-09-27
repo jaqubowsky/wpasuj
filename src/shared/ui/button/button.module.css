@@ -56,10 +56,8 @@
 }
 
 .button[data-size="small"] {
-  height: 40px;
+  height: var(--size-target);
   padding: 0 14px;
-  border-radius: 12px;
-  font-size: 15px;
 }
 
 .button[data-block] {

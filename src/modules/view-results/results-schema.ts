@@ -7,6 +7,7 @@ export const resultsSchema = z.object({
   respondents: z.array(
     z.object({
       name: z.string(),
+      normalisedName: z.string(),
       savedAt: z.number(),
       slots: z.array(z.object({ date: z.iso.date(), hour: z.int().min(0).max(23) })),
     }),

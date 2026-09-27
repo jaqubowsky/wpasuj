@@ -1,6 +1,6 @@
 # 09: Design-system fixes from the acceptance of ticket 01
 
-Status: ready-for-agent
+Status: done
 Blocked by: 04-answer-poll.md, 05-view-results.md
 
 ## Parent
@@ -27,9 +27,9 @@ Every shared component matches the brief's type table, target sizes and motion r
 
 ## Acceptance criteria
 
-- [ ] Avatar test: "Ola" and "ola" with the same key get the same tint
-- [ ] Computed-style e2e: the small button (if kept) and every chip, tab and button are ≥44px tall
-- [ ] Computed-style e2e: question labels 18px Bricolage 700, stepper labels 13px 500, title input 30px phone / 40px desktop
-- [ ] Reduced-motion e2e (`reducedMotion: 'reduce'`): a pressed button has no transform
-- [ ] Screenshot of an invalid, focused input shows a ring
-- [ ] `components-*` screenshots at 390 and 1440 in the CI artifact
+- [x] Avatar test: "Ola" and "ola" with the same key get the same tint (`src/shared/ui/avatar/avatar.test.tsx` "keeps a person's tint through a case-only rename"; callers in `results-provider.test.tsx`)
+- [x] Computed-style e2e: the small button (if kept) and every chip, tab and button are ≥44px tall (`e2e/design-system.spec.ts` "every button, chip and tab is at least 44px tall"; small button kept, decision 39)
+- [x] Computed-style e2e: question labels 18px Bricolage 700, stepper labels 13px 500, title input 30px phone / 40px desktop (`e2e/design-system.spec.ts` "the create form's questions…", "the answer's name question…")
+- [x] Reduced-motion e2e (`reducedMotion: 'reduce'`): a pressed button has no transform (`e2e/design-system.spec.ts` "with reduced motion")
+- [x] Screenshot of an invalid, focused input shows a ring (`components-invalid-focus-*` from "an invalid input shows the focus ring while focused")
+- [x] `components-*` screenshots at 390 and 1440 in the CI artifact (`e2e/design-system.spec.ts` "the components page shows every component"; CI uploads `e2e/screenshots/`)
