@@ -1,7 +1,7 @@
 # 12: Cleanup of accepted notes
 
 Status: ready-for-agent
-Blocked by: 25-create-and-cant-feedback.md
+Blocked by: 35-poll-page-v3.md, 36-finalised-poll.md, 37-overnight-hours.md
 
 ## Parent
 
