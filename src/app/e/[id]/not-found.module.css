@@ -1,0 +1,31 @@
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding-top: var(--space-6);
+}
+
+.create {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: var(--size-button);
+  margin-top: var(--space-3);
+  padding: 0 var(--space-6);
+  border-radius: var(--radius-control);
+  background: var(--ink);
+  color: #fff;
+  font: 600 16px/20px var(--font-sans);
+  text-decoration: none;
+  transition: transform var(--duration-fill) var(--ease-out);
+}
+
+.create:active {
+  transform: scale(0.97);
+}
+
+.create:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
