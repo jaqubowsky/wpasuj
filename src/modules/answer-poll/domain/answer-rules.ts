@@ -1,5 +1,6 @@
 import { addDays } from "@/shared/dates/iso-date";
 import type { Slot } from "../server/answer-schema";
+import { nameKey } from "./name-rules";
 
 const maxParticipants = 30;
 
@@ -21,4 +22,10 @@ export function refusalOf({ takesOrganiserName, nameHeldByOther, newcomer, parti
   if (nameHeldByOther !== undefined) return { reason: "name-taken" as const, ...nameHeldByOther };
   if (newcomer && participantCount >= maxParticipants) return { reason: "full" as const };
   return undefined;
+}
+
+type NameClaim = { name: string; organiserName: string; organiserDevice: boolean; ownsName?: boolean };
+
+export function takesOrganiserName({ name, organiserName, organiserDevice, ownsName }: NameClaim) {
+  return nameKey(name) === nameKey(organiserName) && !organiserDevice && !ownsName;
 }

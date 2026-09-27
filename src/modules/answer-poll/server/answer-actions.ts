@@ -5,7 +5,7 @@ import { participants, slots } from "@/shared/db/schema";
 import { hashToken, newToken, tokenCookieOptions } from "@/shared/token-cookie";
 import { and, count, eq } from "drizzle-orm";
 import { cookies } from "next/headers";
-import { fitsPoll, refusalOf } from "../domain/answer-rules";
+import { fitsPoll, refusalOf, takesOrganiserName } from "../domain/answer-rules";
 import { answerSchema, nameSchema, type AnswerInput, type Slot } from "./answer-schema";
 import { findLivePoll, isOrganiserDevice, participantByToken, slotsOf } from "./answer-queries";
 import { nameKey } from "../domain/name-rules";
@@ -48,8 +48,13 @@ export async function saveAnswer(pollId: string, answer: AnswerInput): Promise<S
   const [{ participantCount }] = db.select({ participantCount: count() }).from(participants).where(eq(participants.pollId, pollId)).all();
   const ownsName = holder !== undefined && holder.id === participant?.id;
   const nameHeldByOther = holder && !ownsName ? { name: holder.name, hours: slotsOf(holder.id).length } : undefined;
-  const takesOrganiserName = normalisedName === nameKey(poll.organiserName) && !ownsName && !(await isOrganiserDevice(poll));
-  const refusal = refusalOf({ takesOrganiserName, nameHeldByOther, newcomer: !participant, participantCount });
+  const organiserDevice = await isOrganiserDevice(poll);
+  const refusal = refusalOf({
+    takesOrganiserName: takesOrganiserName({ name, organiserName: poll.organiserName, organiserDevice, ownsName }),
+    nameHeldByOther,
+    newcomer: !participant,
+    participantCount,
+  });
   if (refusal) return { ok: false, ...refusal };
 
   const now = new Date();
@@ -75,7 +80,7 @@ export async function claimName(pollId: string, name: string): Promise<ClaimResu
   const parsed = nameSchema.safeParse(name);
   if (!parsed.success) return { ok: false, reason: "invalid" };
   if (poll.finalDate !== null) return { ok: false, reason: "closed" };
-  if (nameKey(parsed.data) === nameKey(poll.organiserName) && !(await isOrganiserDevice(poll))) return { ok: false, reason: "organiser-name" };
+  if (takesOrganiserName({ name: parsed.data, organiserName: poll.organiserName, organiserDevice: await isOrganiserDevice(poll) })) return { ok: false, reason: "organiser-name" };
 
   const cookieStore = await cookies();
   const heldToken = cookieStore.get(pollId)?.value;
