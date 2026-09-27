@@ -17,6 +17,7 @@ Two tracks. MVP: 06, 07, 09 and 10 in parallel; then 13 alone; then 12; then 08.
 - `tickets/13-module-layers.md` (after 06, 07, 09, 10; alone)
 - `tickets/12-cleanup.md` (after 13)
 - `tickets/08-acceptance.md` (after 12, 13)
+- `tickets/24-readme.md` (after 08)
 - `tickets/15-story-frame.md` … `tickets/23-landing-seo-perf.md` (in order, after 14)
 
 ## Landed
