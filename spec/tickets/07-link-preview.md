@@ -1,6 +1,6 @@
 # 07: Link preview
 
-Status: ready-for-agent
+Status: done
 Blocked by: 05-view-results.md
 
 ## Parent
@@ -23,6 +23,6 @@ Pasting a poll link into a chat app shows a card that asks the question: "{imię
 
 ## Acceptance criteria
 
-- [ ] A test `GET`s the image: PNG, 1200×630, under 1 MB
-- [ ] A test reads the poll page's `og:image` and finds an absolute URL to that image built on `SITE_URL`
-- [ ] The rendered PNG saved in the `screenshots` artifact beside `og.html` for comparison, with Polish letters (ą, ę, ł, ż) rendered
+- [x] A test `GET`s the image: PNG, 1200×630, under 1 MB (`e2e/link-preview.spec.ts`, "the card is a 1200×630 PNG under 1 MB")
+- [x] A test reads the poll page's `og:image` and finds an absolute URL to that image built on `SITE_URL` (`e2e/link-preview.spec.ts`, "the poll page asks the question and points og:image at its card on SITE_URL")
+- [x] The rendered PNG saved in the `screenshots` artifact beside `og.html` for comparison, with Polish letters (ą, ę, ł, ż) rendered (`link-preview.png` beside `link-preview-mockup.png`, title "Wędrówka: żubry i łąka")
