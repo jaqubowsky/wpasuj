@@ -72,6 +72,25 @@ test("at its step the link scene drops the preview and the reply into the chat, 
   await expect(story(page).getByText("Zaznaczcie tu, zajmie wam to 20 sekund")).toBeHidden();
 });
 
+test("the second scene fills in the create form and shows only at its step", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "the story pins from 1280px");
+  await page.goto("/");
+  await story(page).scrollIntoViewIfNeeded();
+
+  await scrollThroughStory(page, 1.65 / steps.length);
+
+  await expect(story(page).getByText("Planszówki u Michała").filter({ visible: true })).toBeVisible();
+  await expect(story(page).getByText("Utwórz i wyślij na grupę")).toBeVisible();
+  await expect(story(page).getByText("Ej, planszówki w weekend? Kiedy możecie?").filter({ visible: true })).toHaveCount(0);
+  await expect(caption(page, steps[1].heading)).toBeVisible();
+  await settleAnimations(page);
+  await page.screenshot({ path: `e2e/screenshots/landing-story-2-${testInfo.project.name}.png` });
+
+  await scrollThroughStory(page, 2.5 / steps.length);
+
+  await expect(story(page).getByText("Utwórz i wyślij na grupę")).toBeHidden();
+});
+
 test("below 1280px the story is a still sequence, since the caption column is too narrow to pin", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("desktop"), "a laptop width");
   await page.setViewportSize({ width: 1100, height: 768 });
@@ -112,4 +131,16 @@ test("on the phone the story is a sequence of every step", async ({ page }, test
   await expect(story(page).getByText("Ej, planszówki w weekend? Kiedy możecie?").first()).toBeVisible();
   await expect(story(page).getByText("Zaznaczcie tu, zajmie wam to 20 sekund")).toBeVisible();
   await story(page).screenshot({ path: `e2e/screenshots/landing-story-${testInfo.project.name}.png` });
+});
+
+test("on the phone the create form shows filled in", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("phone"), "the sequence is the phone layout");
+  await page.goto("/#jak-to-dziala");
+  const stepTwo = story(page).locator(":scope > div").nth(1);
+
+  await stepTwo.scrollIntoViewIfNeeded();
+
+  await expect(stepTwo.getByText("Planszówki u Michała")).toBeVisible();
+  await expect(stepTwo.getByText("Utwórz i wyślij na grupę")).toBeVisible();
+  await stepTwo.screenshot({ path: `e2e/screenshots/landing-story-2-${testInfo.project.name}.png`, style: "header { visibility: hidden; }" });
 });
