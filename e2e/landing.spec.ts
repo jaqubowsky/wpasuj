@@ -101,7 +101,8 @@ test.describe("with reduced motion", () => {
   test.use({ reducedMotion: "reduce" });
 
   test("nothing animates and nothing is moved", async ({ page }, testInfo) => {
-    await page.goto("/");
+    await page.goto("/#jak-to-dziala");
+    await expect(page.getByRole("region", { name: "Jak to działa" })).toBeAttached();
     await expect(page.getByRole("heading", { name: "Zrobione pod paczkę znajomych, nie pod firmę." })).toBeAttached();
 
     for (const y of [0.25, 0.5, 0.75, 1]) {

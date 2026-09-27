@@ -1,6 +1,6 @@
 import type { Page, TestInfo } from "@playwright/test";
 
-export async function saveScreenshot(page: Page, testInfo: TestInfo, screen: string) {
+export async function settleAnimations(page: Page) {
   await page.evaluate(() =>
     Promise.all(
       document
@@ -9,6 +9,10 @@ export async function saveScreenshot(page: Page, testInfo: TestInfo, screen: str
         .map((animation) => animation.finished),
     ),
   );
+}
+
+export async function saveScreenshot(page: Page, testInfo: TestInfo, screen: string) {
+  await settleAnimations(page);
   const viewport = page.viewportSize()!;
   const height = await page.evaluate(() => document.documentElement.scrollHeight);
   await page.setViewportSize({ width: viewport.width, height: Math.max(height, viewport.height) });
