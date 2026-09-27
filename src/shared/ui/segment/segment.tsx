@@ -14,7 +14,7 @@ const steps: Record<string, number> = { ArrowRight: 1, ArrowLeft: -1 };
 export function Segment<Option extends string>({ label, options, selected, onSelect, panels }: SegmentProps<Option>) {
   const id = useId();
   const tabId = (option: Option) => `${id}-tab-${options.indexOf(option)}`;
-  const panelId = `${id}-panel`;
+  const panelId = (option: Option) => `${id}-panel-${options.indexOf(option)}`;
 
   function moveWithArrows(event: KeyboardEvent<HTMLButtonElement>, index: number) {
     const step = steps[event.key];
@@ -34,7 +34,7 @@ export function Segment<Option extends string>({ label, options, selected, onSel
             type="button"
             role="tab"
             aria-selected={option === selected}
-            aria-controls={option === selected ? panelId : undefined}
+            aria-controls={panelId(option)}
             tabIndex={option === selected ? 0 : -1}
             onClick={() => onSelect(option)}
             onKeyDown={(event) => moveWithArrows(event, index)}
@@ -43,9 +43,11 @@ export function Segment<Option extends string>({ label, options, selected, onSel
           </button>
         ))}
       </div>
-      <div id={panelId} role="tabpanel" aria-labelledby={tabId(selected)}>
-        {panels[selected]}
-      </div>
+      {options.map((option) => (
+        <div key={option} id={panelId(option)} role="tabpanel" aria-labelledby={tabId(option)} hidden={option !== selected}>
+          {panels[option]}
+        </div>
+      ))}
     </>
   );
 }

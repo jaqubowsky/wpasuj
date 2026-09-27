@@ -8,5 +8,8 @@ export function fakeCookies() {
     set: (name: string, value: string, options: Omit<Cookie, "name" | "value"> = {}) => {
       jar.set(name, { name, value, ...options });
     },
+    delete: (name: string) => {
+      jar.delete(name);
+    },
   };
 }

@@ -1,21 +1,6 @@
-import { expect, test, type Locator, type Page } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+import { centreOf, touchDrag } from "./pointer";
 import { saveScreenshot } from "./screenshot";
-
-async function centreOf(locator: Locator) {
-  const box = await locator.boundingBox();
-  if (!box) throw new Error("not visible");
-  return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
-}
-
-async function touchDrag(page: Page, from: { x: number; y: number }, to: { x: number; y: number }) {
-  const session = await page.context().newCDPSession(page);
-  await session.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [from] });
-  for (let step = 1; step <= 10; step++) {
-    const point = { x: from.x + ((to.x - from.x) * step) / 10, y: from.y + ((to.y - from.y) * step) / 10 };
-    await session.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [point] });
-  }
-  await session.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
-}
 
 function cell(page: Page, name: string) {
   return page.getByRole("button", { name, exact: true });

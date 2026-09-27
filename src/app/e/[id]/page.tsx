@@ -1,3 +1,5 @@
+import { findMyAnswer } from "@/modules/answer-poll";
+import { AnswerBody, AnswerLead, AnswerProvider } from "@/modules/answer-poll/client";
 import { findPoll } from "@/modules/create-poll";
 import { Avatar } from "@/shared/ui/avatar/avatar";
 import { Text } from "@/shared/ui/text/text";
@@ -12,6 +14,8 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
   const { id } = await params;
   const poll = findPoll(id, new Date());
   if (!poll) notFound();
+  const mine = await findMyAnswer(id);
+  const hours = Array.from({ length: poll.lastHour - poll.firstHour }, (_, index) => poll.firstHour + index);
 
   return (
     <div className={frame.frame}>
@@ -25,7 +29,13 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
           {poll.title}
         </Text>
         <div className={styles.tabs}>
-          <PollTabs />
+          <AnswerProvider pollId={id} dates={poll.dates} hours={hours} mine={mine}>
+            <PollTabs
+              opening={mine ? "Wszyscy" : "Moje"}
+              leads={{ Moje: <AnswerLead />, Wszyscy: null }}
+              bodies={{ Moje: <AnswerBody />, Wszyscy: null }}
+            />
+          </AnswerProvider>
         </div>
       </main>
     </div>
