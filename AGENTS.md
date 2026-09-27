@@ -40,13 +40,13 @@ Each module in `src/modules/` has `domain/` (pure functions and tests, no import
 Tailwind v4 utilities written inline in `className`; `src/app/` is the reference (`app-header.tsx`, `page-frame.tsx`, `e/[id]/not-found.tsx`).
 
 - `src/app/tokens.css` is the `@theme static` with the default theme reset: a small scale, not one token per place of use. It holds the only colours, radii, shadows, fonts, weights, breakpoint (`lg:` = 1024px), easings and durations, plus:
-  - type: `text-xs` … `text-6xl`, each with its paired line height (the table in `spec/brief.md`, "Type"). A desktop size is a responsive variant (`text-3xl lg:text-4xl`); `leading-none` is the one extra line height
+  - type: `text-xs` … `text-7xl`, each with its paired line height (the table in `spec/brief.md`, "Type"). A desktop size is a responsive variant (`text-3xl lg:text-4xl`); `leading-none` is the one extra line height
   - spacing: one `--spacing: 4px`, so every spacing and size utility is a multiple of 4px: `p-7` is 28px, `h-13` is 52px, `gap-1.5` is 6px, `m-0` works. Half steps (`0.5`, `1.5` … `4.5`) exist for 2px offsets; a value off both rounds to the nearest 4px
   - tracking: `tracking-tight` (−0.01em), `tracking-tighter` (−0.02em), `tracking-tightest` (−0.03em)
   - container widths: `max-w-narrow` (720px), `max-w-wide` (1280px), and `@grid-fit:` / `@max-grid-fit:` (600px) for the day-hour grid's container query
 - `npm run lint` refuses any bracketed size, spacing, type or tracking (`mt-[6px]`, `text-[15px]`, `[font-size:84px]`) through `shadcn/no-arbitrary-values`; its `allow` list in `eslint.config.mjs` names the brackets that stay (radii, shadows and motion, which are out of the scale; grid templates; a few composite values built from `--spacing()`), and a new one goes there only on a host decision. Selector brackets (`data-[…]:`, `has-[…]:`, `@min-[600px]:`) are variants, not values, and stay free
 - Colours come only from tokens: `shadcn/no-raw-colors` and `no-arbitrary-values` reject `bg-[#f00]`, `bg-[red]` and palette classes; a colour inside a shadow is `var(--color-…)`
-- `better-tailwindcss/no-unknown-classes` fails anything the theme cannot generate (`text-7xl`, `md:`, a removed token). It does not see a `(--name)` shorthand whose variable is gone, so grep `tokens.css` before writing one
+- `better-tailwindcss/no-unknown-classes` fails anything the theme cannot generate (`text-8xl`, `md:`, a removed token). It does not see a `(--name)` shorthand whose variable is gone, so grep `tokens.css` before writing one
 - No inline `style` except CSS custom properties (`style={{ "--date-count": n }}` read by `grid-cols-[repeat(var(--date-count),…)]`); the Open Graph image is exempt because Satori reads only inline styles
 - Shared components in `src/shared/ui/` own their look: `shadcn/no-restyle` rejects `className` on them
 - Class lists combine through `cn()` from `@/shared/ui/cn` (`clsx` plus `tailwind-merge` taught the theme's names); lint rejects a template string, `+` or `.join()` in `className`
