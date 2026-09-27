@@ -14,11 +14,13 @@ Points `spec/brief.md` leaves open, taken by the host. A container that meets an
 10. Cell is one component: a toggle button (`pressed`, `state`) on the answer grid, or a heat cell (`heat`, `everyone`, `best`) on results
 11. Avatar picks its tint from the name as given; callers pass the name they show
 12. The `text` Button has no edge ring, as its README describes; the preview's ring comes only from the `.wp-button` cascade
-13. "Pokaż cały miesiąc" opens six weeks from this week's Monday, with no month paging; the first day of each month carries the month's short name
-14. Where the link is copied instead of shared, the create page shows "Link skopiowany" for 1.5 s before it moves to the poll; a clipboard the browser refuses still moves to the poll
-15. A poll is gone once all its dates are more than 60 days before today in its zone; the create action's cleanup takes today in `Etc/GMT+12`, where the date changes last, so it never deletes a poll its own zone still shows
-16. The gone page says "Tej ankiety już nie ma", one line on why (deleted, or its dates long past) and links to `/` with "Zrób nową ankietę"
-17. The last name used on a device lives in `localStorage` under `last-name` (`src/shared/last-name.ts`), read by create and answer alike
-18. Segment tabs are 44px tall, the brief's minimum target, where the design system draws 40px
-19. Selected dates carry their text in `ink` on `accent` (5.3:1), not white (3.3:1), because the brief requires WCAG AA for every text pair; the mockup's white loses
-20. Button has no link form; the gone page's "Zrób nową ankietę" link keeps its own styles in `not-found.module.css`
+13. Demo routes under `src/app/dev/` answer 404 unless `DEMO_ROUTES=1`, which `.env.development` and the Playwright web server set, because e2e runs the production build
+14. On phone-webkit the grid's touch zones are proven by computed `touch-action` and snap; the real touch drag and swipes run on phone-chromium through CDP, because Playwright cannot move a touch in WebKit
+15. "Pokaż cały miesiąc" opens six weeks from this week's Monday, with no month paging; the first day of each month carries the month's short name
+16. Where the link is copied instead of shared, the create page shows "Link skopiowany" for 1.5 s before it moves to the poll; a clipboard the browser refuses still moves to the poll
+17. A poll is gone once all its dates are more than 60 days before today in its zone; the create action's cleanup takes today in `Etc/GMT+12`, where the date changes last, so it never deletes a poll its own zone still shows
+18. The gone page says "Tej ankiety już nie ma", one line on why (deleted, or its dates long past) and links to `/` with "Zrób nową ankietę"
+19. The last name used on a device lives in `localStorage` under `last-name` (`src/shared/last-name.ts`), read by create and answer alike
+20. Segment tabs are 44px tall, the brief's minimum target, where the design system draws 40px
+21. Selected dates carry their text in `ink` on `accent` (5.3:1), not white (3.3:1), because the brief requires WCAG AA for every text pair; the mockup's white loses
+22. Button has no link form; the gone page's "Zrób nową ankietę" link keeps its own styles in `not-found.module.css`
