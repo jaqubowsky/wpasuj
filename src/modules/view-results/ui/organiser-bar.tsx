@@ -38,7 +38,7 @@ export function OrganiserBar({ onDelete, ...input }: OrganiserBarProps) {
                 <Button block onClick={bar.copyOrganiserLink}>
                   Link organizatora
                 </Button>
-                <p className="m-[0] mt-2 text-label text-muted">
+                <p className="m-0 mt-2 text-sm text-muted">
                   Otwórz go na swoim drugim urządzeniu. Nie wysyłaj go na grupę: kto go ma, może ustalić termin i usunąć ankietę.
                 </p>
               </div>
@@ -65,7 +65,7 @@ export function OrganiserBar({ onDelete, ...input }: OrganiserBarProps) {
           </Card>
         </div>
       )}
-      <p className="m-[0] text-label text-muted empty:hidden" role="status">
+      <p className="m-0 text-sm text-muted empty:hidden" role="status">
         {bar.notice && notices[bar.notice]}
       </p>
     </div>

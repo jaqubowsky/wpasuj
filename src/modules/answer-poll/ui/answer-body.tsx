@@ -25,7 +25,7 @@ export function AnswerBody() {
       <Text as="h2" variant="heading">
         Kiedy możesz?
       </Text>
-      <p className="mt-2 mb-3 text-note text-muted">Kliknij godziny, kiedy możesz. Możesz też przeciągnąć.</p>
+      <p className="mt-2 mb-3 text-sm text-muted">Kliknij godziny, kiedy możesz. Możesz też przeciągnąć.</p>
       <DayHourGrid
         label="Kiedy możesz?"
         dates={answer.dates}
@@ -41,13 +41,13 @@ export function AnswerBody() {
         morphDates
       />
       {answer.holdsRow && !answer.justSaidCant && (
-        <p className="mt-4 mb-[0] text-note text-muted">
+        <p className="mt-4 mb-0 text-sm text-muted">
           {answer.canMakeIt ? "Gotowe." : "Nie możesz w żadnym terminie."} Zmieniasz zdanie? Po prostu kliknij.
         </p>
       )}
       <button
         type="button"
-        className="mx-auto mt-3 mb-[0] flex min-h-target cursor-pointer items-center gap-2 rounded-pill border-0 bg-transparent px-4 py-[0] font-sans text-note font-medium text-muted underline decoration-edge underline-offset-3 transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink aria-pressed:bg-ink aria-pressed:text-surface aria-pressed:no-underline motion-safe:active:scale-97"
+        className="mx-auto mt-3 mb-0 flex min-h-11 cursor-pointer items-center gap-2 rounded-pill border-0 bg-transparent px-4 py-0 font-sans text-sm font-medium text-muted underline decoration-edge underline-offset-3 transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink aria-pressed:bg-ink aria-pressed:text-surface aria-pressed:no-underline motion-safe:active:scale-97"
         aria-pressed={answer.saidCant}
         onClick={answer.saidCant ? answer.undoCant : answer.cantMakeAny}
       >
@@ -56,8 +56,8 @@ export function AnswerBody() {
       </button>
       {answer.justSaidCant && (
         <div className="mt-2 flex flex-col items-center text-center" data-answer-declined>
-          <p className="m-[0] text-caption font-medium">Nie możesz w żadnym terminie.</p>
-          {answer.saveState === "saved" && <p className="m-[0] mt-1 text-label text-muted">Organizator zobaczy Twoją odpowiedź.</p>}
+          <p className="m-0 text-sm font-medium">Nie możesz w żadnym terminie.</p>
+          {answer.saveState === "saved" && <p className="m-0 mt-1 text-sm text-muted">Organizator zobaczy Twoją odpowiedź.</p>}
           <Button variant="text" onClick={answer.undoCant}>
             Cofnij
           </Button>

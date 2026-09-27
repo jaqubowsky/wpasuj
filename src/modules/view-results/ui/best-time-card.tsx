@@ -33,11 +33,11 @@ export function BestTimeCard({ best, previousBest, others, respondentCount, cann
     <div className="grid gap-4">
       <section aria-label="Najlepiej">
         <Card tone="ink" label="Najlepiej">
-          <div key={label} className="data-changed:animate-[best-time-card-cross-fade_var(--duration-sheet)_var(--ease-out)] [&>p:first-child]:mt-[6px] [&>p:first-child]:mb-3" data-changed={(previousBest && longRunLabel(previousBest) !== label) || undefined}>
+          <div key={label} className="data-changed:animate-[best-time-card-cross-fade_var(--duration-sheet)_var(--ease-out)] [&>p:first-child]:mt-1.5 [&>p:first-child]:mb-3" data-changed={(previousBest && longRunLabel(previousBest) !== label) || undefined}>
             <Text as="p" variant="best-time">
               {label}
             </Text>
-            <p className="m-[0] flex flex-wrap justify-between gap-x-4 gap-y-1 text-footer">
+            <p className="m-0 flex flex-wrap justify-between gap-x-4 gap-y-1 text-sm">
               <span className="font-semibold text-heat-3">{share(best)} może</span>
               {cannot.length > 0 && <span>Nie może: {cannot.join(", ")}</span>}
             </p>
@@ -56,12 +56,12 @@ export function BestTimeCard({ best, previousBest, others, respondentCount, cann
           <Text as="h2" variant="meta">
             Też dobre
           </Text>
-          <ul className="m-[0] mt-2 flex list-none gap-2 p-[0] lg:flex-col lg:[&>li>*]:flex lg:[&>li>*]:items-baseline lg:[&>li>*]:justify-between" aria-label="Też dobre">
+          <ul className="m-0 mt-2 flex list-none gap-2 p-0 lg:flex-col lg:[&>li>*]:flex lg:[&>li>*]:items-baseline lg:[&>li>*]:justify-between" aria-label="Też dobre">
             {others.map((run) => (
               <li key={shortRunLabel(run)} className="flex-1">
                 <Card size="compact">
-                  <span className="block text-footer font-semibold">{shortRunLabel(run)}</span>
-                  <span className="block text-label text-muted">{share(run)}</span>
+                  <span className="block text-sm font-semibold">{shortRunLabel(run)}</span>
+                  <span className="block text-sm text-muted">{share(run)}</span>
                   {onSet && (
                     <Button variant="text" aria-label={`Ustal ten termin: ${shortRunLabel(run)}`} onClick={() => onSet(run)}>
                       Ustal ten termin

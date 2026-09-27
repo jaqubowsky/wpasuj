@@ -8,7 +8,7 @@ const problems: Record<Problem, string> = {
 
 export function OrganiserProblem({ problem }: { problem: Problem }) {
   return (
-    <p className="m-[0] text-footer text-accent-ink" role="alert">
+    <p className="m-0 text-sm text-accent-ink" role="alert">
       {problems[problem]}
     </p>
   );
