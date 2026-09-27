@@ -36,7 +36,7 @@ export function AnswerLead() {
           onChange={(event) => answer.rename(event.target.value)}
           error={problem?.kind === "invalid" ? "Wpisz swoje imię, żeby zapisać" : undefined}
         />
-        <div className="absolute top-[1px] right-[0]">
+        <div className="absolute top-px right-0">
           <Status state={answer.saveState} />
         </div>
       </div>
@@ -63,7 +63,7 @@ export function AnswerLead() {
         </div>
       )}
       {(problem?.kind === "closed" || problem?.kind === "full" || problem?.kind === "gone") && (
-        <p className="mt-4 mb-[0] text-note font-medium text-accent-ink" role="alert">
+        <p className="mt-4 mb-0 text-sm font-medium text-accent-ink" role="alert">
           {notices[problem.kind]}
         </p>
       )}

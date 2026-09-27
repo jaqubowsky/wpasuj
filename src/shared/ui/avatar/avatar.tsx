@@ -18,7 +18,7 @@ export function Avatar({ name, tintKey, pop }: AvatarProps) {
 
   return (
     <span
-      className="box-border inline-grid size-8 place-items-center rounded-pill font-sans text-label leading-none font-semibold normal-nums text-ink data-pop:animate-[avatar-pop_var(--duration-pop)_var(--ease-pop)_both] data-[tint=butter]:bg-tint-butter data-[tint=coral]:bg-tint-coral data-[tint=lilac]:bg-tint-lilac data-[tint=mint]:bg-tint-mint data-[tint=sky]:bg-tint-sky"
+      className="box-border inline-grid size-8 place-items-center rounded-pill font-sans text-sm leading-none font-semibold normal-nums text-ink data-pop:animate-[avatar-pop_var(--duration-pop)_var(--ease-pop)_both] data-[tint=butter]:bg-tint-butter data-[tint=coral]:bg-tint-coral data-[tint=lilac]:bg-tint-lilac data-[tint=mint]:bg-tint-mint data-[tint=sky]:bg-tint-sky"
       role="img"
       aria-label={name}
       data-tint={tintOf(tintKey)}

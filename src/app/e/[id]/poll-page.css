@@ -1,7 +1,7 @@
 @media (min-width: 1024px) {
   [data-page-frame]:has([role="tabpanel"]:not([hidden]) [data-results-side]) {
     max-width: 1120px;
-    padding: var(--spacing-8) var(--spacing-10) 0;
+    padding: calc(var(--spacing) * 8) calc(var(--spacing) * 10) 0;
   }
 
   [data-poll-main]:has([role="tabpanel"]:not([hidden]) [data-results-side]) {
@@ -9,7 +9,7 @@
     grid-template-columns: minmax(0, 1fr) 340px;
     grid-template-rows: auto auto auto 1fr;
     align-items: start;
-    gap: var(--spacing-5) var(--spacing-10);
+    gap: calc(var(--spacing) * 5) calc(var(--spacing) * 10);
   }
 
   [data-poll-main]:has([role="tabpanel"]:not([hidden]) [data-results-side]) :is([data-poll-tabs], [role="tabpanel"]:not([hidden]), [data-results-body]) {

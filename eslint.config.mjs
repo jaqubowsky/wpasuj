@@ -2,6 +2,7 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 import betterTailwindcss from "eslint-plugin-better-tailwindcss";
+import { plugin as shadcn } from "@shadcn/lint";
 import { readdirSync } from "node:fs";
 
 const modules = readdirSync("src/modules", { withFileTypes: true })
@@ -32,8 +33,11 @@ const eslintConfig = defineConfig([
   ...nextTs,
   {
     files: ["src/**/*.tsx"],
-    plugins: { "better-tailwindcss": betterTailwindcss },
-    settings: { "better-tailwindcss": { entryPoint: "src/app/globals.css" } },
+    plugins: { "better-tailwindcss": betterTailwindcss, shadcn },
+    settings: {
+      "better-tailwindcss": { entryPoint: "src/app/globals.css" },
+      shadcn: { componentImports: ["^@/shared/ui/"] },
+    },
     rules: {
       "better-tailwindcss/no-unknown-classes": "error",
       "better-tailwindcss/no-restricted-classes": [
@@ -42,18 +46,54 @@ const eslintConfig = defineConfig([
           restrict: [
             { pattern: "^(?!.*motion-safe:)(.*:)?-?scale-", message: "Put a scale behind motion-safe: so reduced motion keeps it still" },
             {
-              pattern: "\\[[^\\]]*(#|rgba?\\(|hsla?\\(|hwb\\(|lab\\(|lch\\(|oklab\\(|oklch\\(|color-mix\\(|color\\(|color:)",
-              message: "Colours come from tokens.css: use a colour token",
+              pattern: "^(.*:)?(shadow|inset-shadow|drop-shadow|\\[(box-shadow|text-shadow|filter):)\\S*(#|rgba?\\(|hsla?\\(|hwb\\(|lab\\(|lch\\(|oklab\\(|oklch\\(|color-mix\\(|color\\()",
+              message: "Colours come from tokens.css: use var(--color-<name>) inside a shadow",
             },
-            {
-              pattern: "^(.*:)?(bg|text|border|border-[trblxyse]|outline|ring|ring-offset|fill|stroke|decoration|accent|caret|divide|placeholder|from|via|to|shadow|inset-shadow)-\\[[a-z]+\\]$",
-              message: "Colours come from tokens.css: use a colour token",
-            },
-            { pattern: "^(.*:)?text-\\[(length:)?[\\d.]", message: "Type comes from tokens.css: use text-<role>" },
           ],
         },
       ],
+      "shadcn/no-arbitrary-values": [
+        "error",
+        {
+          allow: [
+            "shape",
+            "effects",
+            "motion",
+            "grid-cols",
+            "grid-rows",
+            "h-[800dvh]",
+            "h-[min(740px,82dvh)]",
+            "max-h-[60dvh]",
+            "[content-visibility:auto]",
+            "[contain-intrinsic-size:auto_640px]",
+            "[scrollbar-width:none]",
+            "content",
+            "@grid:[font-size:0]",
+            "[--hour-column:--spacing(12)]",
+            "scroll-pl-[calc(var(--hour-column)+--spacing(1.5))]",
+            "shadow-[--spacing(1.5)_0_0_var(--color-paper)]",
+            "pb-[calc(--spacing(*)+env(safe-area-inset-bottom))]",
+            "translate-x-[calc(var(--finger-column)*(100%+--spacing(1.5)))]",
+            "translate-y-[calc(var(--finger-row)*(100%+--spacing(1.5)))]",
+            "[transform:scaleY(var(--rail-fill))]",
+          ],
+        },
+      ],
+      "shadcn/no-raw-colors": "error",
+      "shadcn/no-inline-styles": "error",
+      "shadcn/no-restyle": "error",
+      "shadcn/require-static-classes": "error",
+      "no-restricted-syntax": [
+        "error",
+        { selector: "JSXAttribute[name.name='className'] TemplateLiteral", message: "Combine classes with cn() from @/shared/ui/cn" },
+        { selector: "JSXAttribute[name.name='className'] BinaryExpression[operator='+']", message: "Combine classes with cn() from @/shared/ui/cn" },
+        { selector: "JSXAttribute[name.name='className'] CallExpression[callee.property.name='join']", message: "Combine classes with cn() from @/shared/ui/cn" },
+      ],
     },
+  },
+  {
+    files: ["src/modules/view-results/server/link-preview-image.tsx"],
+    rules: { "shadcn/no-inline-styles": "off" },
   },
   {
     files: ["src/app/**"],
