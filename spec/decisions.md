@@ -20,3 +20,5 @@ Points `spec/brief.md` leaves open, taken by the host. A container that meets an
 16. The gone page says "Tej ankiety już nie ma", one line on why (deleted, or its dates long past) and links to `/` with "Zrób nową ankietę"
 17. The last name used on a device lives in `localStorage` under `last-name` (`src/shared/last-name.ts`), read by create and answer alike
 18. Segment tabs are 44px tall, the brief's minimum target, where the design system draws 40px
+19. Selected dates carry their text in `ink` on `accent` (5.3:1), not white (3.3:1), because the brief requires WCAG AA for every text pair; the mockup's white loses
+20. Button has no link form; the gone page's "Zrób nową ankietę" link keeps its own styles in `not-found.module.css`
