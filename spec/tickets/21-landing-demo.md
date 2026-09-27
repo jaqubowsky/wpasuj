@@ -1,7 +1,7 @@
 # 21: Live demo grid
 
 Status: done
-Blocked by: 27-tailwind-shared.md, 30-tailwind-landing.md
+Blocked by: 26-tailwind-base.md (written in Tailwind from the start, per the `AGENTS.md` Styling pattern)
 
 ## Parent
 
