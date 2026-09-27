@@ -1,4 +1,4 @@
 import "server-only";
 
-export { findMyAnswer } from "./answer-queries";
-export { nameKey } from "./name-rules";
+export { findMyAnswer } from "./server/answer-queries";
+export { nameKey } from "./domain/name-rules";

@@ -17,7 +17,7 @@ async function open(id: string, withToken: string) {
 beforeEach(async () => {
   cookieJar = fakeCookies();
   await openTestDatabase();
-  const { createPoll } = await import("@/modules/create-poll/create-poll-action");
+  const { createPoll } = await import("@/modules/create-poll/server/create-poll-action");
   const result = await createPoll({
     title: "Kino",
     dates: ["2030-10-16"],

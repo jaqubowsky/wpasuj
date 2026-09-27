@@ -59,7 +59,7 @@ it("answers with the poll's grid and every respondent's free hours", async () =>
   const response = await get(pollId);
 
   expect(response.status).toBe(200);
-  const { resultsSchema } = await import("@/modules/view-results/results-schema");
+  const { resultsSchema } = await import("@/modules/view-results/server/results-schema");
   expect(resultsSchema.parse(await response.json())).toEqual({
     dates: ["2030-10-19", "2030-10-20"],
     hours: [17, 18, 19],
@@ -86,7 +86,7 @@ it("carries the time the organiser set", async () => {
 
   const response = await get(pollId);
 
-  const { resultsSchema } = await import("@/modules/view-results/results-schema");
+  const { resultsSchema } = await import("@/modules/view-results/server/results-schema");
   expect(resultsSchema.parse(await response.json()).final).toEqual({ date: "2030-10-20", firstHour: 18, lastHour: 20 });
 });
 
