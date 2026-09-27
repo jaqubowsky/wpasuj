@@ -8,7 +8,7 @@ import { usePaintStroke, type GridCell, type PaintedRectangle } from "./use-pain
 
 export type { GridCell };
 
-type RenderedCell = GridCell & { label: string; tabIndex: 0 | -1; preview?: "adding" | "removing" };
+type RenderedCell = GridCell & { selected: boolean; label: string; tabIndex: 0 | -1; preview?: "adding" | "removing" };
 
 type DayHourGridProps = {
   label: string;
@@ -53,14 +53,10 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
         data-scrolls={dates.length > 4 || undefined}
         data-paints={onStroke && true}
         onKeyDown={keyboard.onKeyDown}
-        onPointerMove={
-          onStroke &&
-          ((event) => {
-            const cell = cellUnder(event);
-            if (cell) stroke.move(cell);
-          })
-        }
+        onPointerMove={onStroke && ((event) => stroke.move(cellUnder(event), event))}
         onPointerUp={stroke.end}
+        onPointerCancel={stroke.cancel}
+        onLostPointerCapture={stroke.cancel}
       >
         <div role="row" className={styles.row}>
           <div className={styles.corner} aria-hidden />
@@ -76,7 +72,14 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
               </>
             );
             return (
-              <div key={date} role="columnheader" className={styles.date} data-row={position.row} data-column={position.column}>
+              <div
+                key={date}
+                role="columnheader"
+                aria-colindex={position.column + 1}
+                className={styles.date}
+                data-row={position.row}
+                data-column={position.column}
+              >
                 {onDateTap ? (
                   <button
                     type="button"
@@ -98,7 +101,7 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
           const header = { row: rowIndex + 1, column: 0 };
           return (
             <div key={hour} role="row" className={styles.row}>
-              <div role="rowheader" className={styles.hour} data-row={header.row} data-column={header.column}>
+              <div role="rowheader" aria-colindex={header.column + 1} className={styles.hour} data-row={header.row} data-column={header.column}>
                 {onHourTap ? (
                   <button type="button" tabIndex={keyboard.tabIndexOf(header)} onFocus={() => keyboard.onFocus(header)} onClick={() => onHourTap(hour)}>
                     <Text variant="meta">{hour}:00</Text>
@@ -111,13 +114,15 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
               </div>
               {dates.map((date, columnIndex) => {
                 const cell = { date, hour };
+                const selected = isSelected(cell);
                 const position = { row: rowIndex + 1, column: columnIndex + 1 };
                 const day = dayOf(date);
                 return (
                   <div
                     key={date}
                     role="gridcell"
-                    aria-selected={isSelected(cell)}
+                    aria-colindex={position.column + 1}
+                    aria-selected={selected}
                     className={styles.cell}
                     data-row={position.row}
                     data-column={position.column}
@@ -127,12 +132,13 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
                     onPointerDown={(event) => {
                       if (!onStroke || event.button !== 0) return;
                       event.currentTarget.setPointerCapture(event.pointerId);
-                      stroke.start(cell, isSelected(cell));
+                      stroke.start(cell, selected, event);
                     }}
                     onClick={(event) => stroke.tap(cell, event.detail === 0 ? "keyboard" : "pointer")}
                   >
                     {renderCell({
                       ...cell,
+                      selected,
                       label: `${day.weekday} ${day.number}, ${hour}:00`,
                       tabIndex: keyboard.tabIndexOf(position),
                       preview: stroke.preview(cell),

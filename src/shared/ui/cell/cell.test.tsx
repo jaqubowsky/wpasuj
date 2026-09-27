@@ -4,21 +4,22 @@ import { describe, expect, it, vi } from "vitest";
 import { Cell } from "./cell";
 
 describe("Cell", () => {
-  it("is a toggle on the answer grid, free or mine", () => {
+  it("shows free or mine on the answer grid and leaves announcing it to the grid", () => {
     render(
       <>
-        <Cell pressed={false} aria-label="sb 19:00" />
-        <Cell pressed state="mine" aria-label="sb 20:00" />
+        <Cell aria-label="sb 19:00" />
+        <Cell state="mine" aria-label="sb 20:00" />
       </>,
     );
 
-    expect(screen.getByRole("button", { name: "sb 19:00", pressed: false })).not.toHaveAttribute("data-state");
-    expect(screen.getByRole("button", { name: "sb 20:00", pressed: true })).toHaveAttribute("data-state", "mine");
+    expect(screen.getByRole("button", { name: "sb 19:00" })).not.toHaveAttribute("data-state");
+    expect(screen.getByRole("button", { name: "sb 20:00" })).toHaveAttribute("data-state", "mine");
+    expect(screen.getByRole("button", { name: "sb 20:00" })).not.toHaveAttribute("aria-pressed");
   });
 
   it("asks to toggle on a tap", async () => {
     const onClick = vi.fn();
-    render(<Cell pressed={false} aria-label="sb 19:00" onClick={onClick} />);
+    render(<Cell aria-label="sb 19:00" onClick={onClick} />);
 
     await userEvent.click(screen.getByRole("button", { name: "sb 19:00" }));
 
@@ -28,8 +29,8 @@ describe("Cell", () => {
   it("previews a stroke that adds or removes", () => {
     render(
       <>
-        <Cell pressed={false} state="adding" aria-label="dodaję" />
-        <Cell pressed state="removing" aria-label="usuwam" />
+        <Cell state="adding" aria-label="dodaję" />
+        <Cell state="removing" aria-label="usuwam" />
       </>,
     );
 
