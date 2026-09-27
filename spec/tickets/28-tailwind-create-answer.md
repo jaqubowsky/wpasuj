@@ -1,6 +1,6 @@
 # 28: Tailwind in create-poll and answer-poll
 
-Status: claimed
+Status: done
 Blocked by: 26-tailwind-base.md, 33-architecture-gates.md
 
 ## Parent
@@ -22,5 +22,5 @@ Creating and answering a poll look and behave exactly as before, styled with the
 
 ## Acceptance criteria
 
-- [ ] Every screen and state this ticket touches, at 390 and 1440, matches its screenshot from the base commit within 0.5% of pixels; each screen's number is in the pull request body
-- [ ] No `*.module.css` left in Scope; `npm run lint`, `typecheck`, `test`, `build` and `e2e` green with the same test counts as the base
+- [x] Every screen and state this ticket touches, at 390 and 1440, matches its screenshot from the base commit within 0.5% of pixels; each screen's number is in the pull request body (all create-* and answer-* 0 px against 5a12859; create-filled at 390 compared on isolated runs)
+- [x] No `*.module.css` left in Scope; `npm run lint`, `typecheck`, `test`, `build` and `e2e` green with the same test counts as the base (332 tests; e2e 116 passed, 14 skipped, as on 5a12859)
