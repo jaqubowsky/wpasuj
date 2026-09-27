@@ -30,7 +30,7 @@ export function Landing({ hero }: { hero: ReactNode }) {
     <>
       <header className={styles.header}>
         <Text variant="wordmark">{productName}</Text>
-        <GoToFormButton formId={formId} />
+        <GoToFormButton formId={formId}>Utwórz ankietę</GoToFormButton>
       </header>
       <main>
         <section className={styles.hero} aria-labelledby="hero-heading">
@@ -47,7 +47,7 @@ export function Landing({ hero }: { hero: ReactNode }) {
           </div>
         </section>
         <LazyStory />
-        <LazyDemo />
+        <LazyDemo formId={formId} />
         <section className={styles.reasons} aria-labelledby="reasons-heading">
           <h2 id="reasons-heading" className={`${styles.heading} ${styles.rise}`}>
             Zrobione pod paczkę znajomych, nie pod firmę.
@@ -67,7 +67,7 @@ export function Landing({ hero }: { hero: ReactNode }) {
             To kiedy się widzicie?
           </h2>
           <div className={`${styles.start} ${styles.rise}`}>
-            <GoToFormButton formId={formId} />
+            <GoToFormButton formId={formId}>Utwórz ankietę</GoToFormButton>
             <Text variant="meta">Za darmo. Znajomi nie zakładają kont.</Text>
           </div>
         </section>
