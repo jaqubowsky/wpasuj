@@ -1,0 +1,90 @@
+.frame {
+  container-type: inline-size;
+}
+
+.grid {
+  --hour-column: 48px;
+
+  display: grid;
+  grid-template-columns: var(--hour-column) repeat(var(--date-count), minmax(56px, 1fr));
+  grid-template-rows: auto;
+  grid-auto-rows: var(--size-cell);
+  gap: var(--space-cell-gap);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: calc(var(--hour-column) + var(--space-cell-gap));
+  scrollbar-width: none;
+}
+
+.grid::-webkit-scrollbar {
+  display: none;
+}
+
+@container (max-width: 599px) {
+  .grid[data-scrolls] {
+    grid-template-columns: var(--hour-column) repeat(var(--date-count), calc((100cqi - var(--hour-column) - 4 * var(--space-cell-gap)) / 4));
+  }
+}
+
+.row {
+  display: contents;
+}
+
+.corner,
+.hour {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--paper);
+  box-shadow: var(--space-cell-gap) 0 0 var(--paper);
+  touch-action: pan-y;
+}
+
+.date {
+  scroll-snap-align: start;
+  touch-action: pan-x;
+}
+
+.date button,
+.hour button {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  min-height: var(--size-target);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-cell);
+  background: var(--track);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: transform var(--duration-fill) var(--ease-out);
+}
+
+.date button:active,
+.hour button:active {
+  transform: scale(0.96);
+}
+
+.date button:focus-visible,
+.hour button:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -2px;
+}
+
+.date button {
+  display: grid;
+  justify-items: center;
+  padding: var(--space-1) 0 var(--space-2);
+}
+
+.cell {
+  display: grid;
+  touch-action: none;
+}
+
+.cell > :first-child {
+  width: 100%;
+}
