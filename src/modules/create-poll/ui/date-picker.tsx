@@ -1,6 +1,7 @@
 import { dayNumber, fullDate, monthOnFirstDay, shortWeekday, summaryOfDates } from "@/shared/dates/format";
 import { Button } from "@/shared/ui/button/button";
 import { Chip } from "@/shared/ui/chip/chip";
+import { dateMorph } from "@/shared/morph";
 import type { Preset } from "../domain/date-presets";
 import type { DatePickerState } from "./use-date-selection";
 
@@ -39,6 +40,7 @@ export function DatePicker({ dates, picker }: DatePickerProps) {
             className="flex h-target cursor-pointer flex-col items-center justify-center rounded-cell border-0 bg-surface font-sans text-body font-medium text-ink tabular-nums shadow-[inset_0_0_0_1px_var(--color-edge)] transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink data-today:not-aria-pressed:shadow-[inset_0_0_0_2px_var(--color-ink)] aria-pressed:font-semibold aria-pressed:shadow-none aria-pressed:enabled:bg-accent disabled:cursor-default disabled:bg-transparent disabled:text-muted disabled:shadow-none motion-safe:active:scale-96"
             aria-label={fullDate(date)}
             aria-pressed={dates.includes(date)}
+            style={dates.includes(date) ? dateMorph(date) : undefined}
             data-today={date === picker.today || undefined}
             disabled={picker.isPast(date)}
             onClick={() => picker.tapDate(date)}

@@ -2,6 +2,7 @@
 
 import { useRef, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { Text } from "@/shared/ui/text/text";
+import { dateMorph } from "@/shared/morph";
 import { useGridKeyboard } from "./use-grid-keyboard";
 import { usePaintStroke, type GridCell, type PaintedRectangle } from "./use-paint-stroke";
 
@@ -19,6 +20,7 @@ type DayHourGridProps = {
   onDateTap?: (date: string) => void;
   onHourTap?: (hour: number) => void;
   onStroke?: (rectangle: PaintedRectangle) => void;
+  morphDates?: boolean;
 };
 
 const weekdays = ["nd", "pn", "wt", "śr", "cz", "pt", "sb"];
@@ -35,7 +37,7 @@ function cellUnder(event: PointerEvent): GridCell | undefined {
   return { date: slot.dataset.date, hour: Number(slot.dataset.hour) };
 }
 
-export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCellTap, onDateTap, onHourTap, onStroke }: DayHourGridProps) {
+export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCellTap, onDateTap, onHourTap, onStroke, morphDates }: DayHourGridProps) {
   const gridRef = useRef<HTMLDivElement>(null);
   const stroke = usePaintStroke({ dates, hours, onStroke, onTap: onCellTap });
   const keyboard = useGridKeyboard({ gridRef, dates, hours, onStroke, firstRow: onDateTap ? 0 : 1, firstColumn: onHourTap ? 0 : 1 });
@@ -76,6 +78,7 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
                 role="columnheader"
                 aria-colindex={position.column + 1}
                 className="snap-start touch-pan-x"
+                style={morphDates ? dateMorph(date) : undefined}
                 data-row={position.row}
                 data-column={position.column}
               >

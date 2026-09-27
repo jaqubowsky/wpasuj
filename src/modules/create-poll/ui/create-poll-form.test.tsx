@@ -1,6 +1,7 @@
-import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { isFreshPoll } from "@/shared/fresh-poll";
 import { CreatePollForm } from "./create-poll-form";
 
 const push = vi.fn();
@@ -11,23 +12,8 @@ vi.mock("../server/create-poll-action", () => ({ createPoll: (input: unknown) =>
 
 const thursdayMorning = new Date(2026, 9, 15, 9);
 
-function stubSharing(share?: (data: ShareData) => Promise<void>) {
-  const writeText = vi.fn(async () => {});
+function stubShareSheet(share: (data: ShareData) => Promise<void>) {
   Object.defineProperty(navigator, "share", { value: share, configurable: true });
-  Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
-  return writeText;
-}
-
-function refuseClipboard() {
-  Object.defineProperty(navigator, "clipboard", {
-    value: { writeText: async () => Promise.reject(new DOMException("denied", "NotAllowedError")) },
-    configurable: true,
-  });
-}
-
-async function createWithFakeTimeouts() {
-  vi.useFakeTimers({ toFake: ["Date", "setTimeout"], now: thursdayMorning });
-  await act(async () => fireEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" })));
 }
 
 async function fillIn(day: string) {
@@ -44,6 +30,7 @@ beforeEach(() => {
   vi.useFakeTimers({ toFake: ["Date"] });
   vi.setSystemTime(thursdayMorning);
   localStorage.clear();
+  sessionStorage.clear();
   push.mockReset();
   createPoll.mockReset();
 });
@@ -128,9 +115,9 @@ describe("Utwórz i wyślij na grupę", () => {
     expect(createPoll).not.toHaveBeenCalled();
   });
 
-  it("creates the poll, shares the invitation and lands on the poll", async () => {
+  it("creates the poll and lands on it marked as fresh, without opening the share sheet", async () => {
     const share = vi.fn(async () => {});
-    stubSharing(share);
+    stubShareSheet(share);
     createPoll.mockResolvedValue({ ok: true, id: "abcdefghij" });
     render(<CreatePollForm />);
 
@@ -149,51 +136,25 @@ describe("Utwórz i wyślij na grupę", () => {
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       organiserName: "Kuba",
     });
-    expect(share).toHaveBeenCalledWith({ text: `Kiedy możecie? Kino ${location.origin}/e/abcdefghij` });
     expect(push).toHaveBeenCalledWith("/e/abcdefghij");
+    expect(share).not.toHaveBeenCalled();
+    expect(isFreshPoll("abcdefghij")).toBe(true);
   });
 
-  it("copies the link where sharing is unavailable and says so", async () => {
-    const writeText = stubSharing();
-    createPoll.mockResolvedValue({ ok: true, id: "abcdefghij" });
+  it("answers the tap at once with Tworzę ankietę… and creates nothing on a second tap", async () => {
+    createPoll.mockReturnValue(new Promise(() => {}));
     render(<CreatePollForm />);
     await fillIn("Jutro");
 
-    await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
+    fireEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
 
-    expect(writeText).toHaveBeenCalledWith(`${location.origin}/e/abcdefghij`);
-    expect(screen.getByText("Link skopiowany")).toBeInTheDocument();
-    await waitFor(() => expect(push).toHaveBeenCalledWith("/e/abcdefghij"), { timeout: 2000 });
-  });
-
-  it("a second tap while Link skopiowany shows creates nothing", async () => {
-    stubSharing();
-    createPoll.mockResolvedValue({ ok: true, id: "abcdefghij" });
-    render(<CreatePollForm />);
-    await fillIn("Jutro");
-    await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
-    expect(screen.getByText("Link skopiowany")).toBeInTheDocument();
-
-    await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
-
-    await waitFor(() => expect(push).toHaveBeenCalledTimes(1), { timeout: 2000 });
-    expect(createPoll).toHaveBeenCalledTimes(1);
-  });
-
-  it("a second tap while the share sheet is open creates nothing", async () => {
-    stubSharing(() => new Promise(() => {}));
-    createPoll.mockResolvedValue({ ok: true, id: "abcdefghij" });
-    render(<CreatePollForm />);
-    await fillIn("Jutro");
-    await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
-
-    await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
-
+    const pending = screen.getByRole("button", { name: "Tworzę ankietę…" });
+    expect(pending).toHaveAttribute("aria-busy", "true");
+    fireEvent.click(pending);
     expect(createPoll).toHaveBeenCalledTimes(1);
   });
 
   it("prefills the name used last on this device", async () => {
-    stubSharing(async () => {});
     createPoll.mockResolvedValue({ ok: true, id: "abcdefghij" });
     const { unmount } = render(<CreatePollForm />);
     await fillIn("Jutro");
@@ -217,7 +178,6 @@ describe("Utwórz i wyślij na grupę", () => {
   });
 
   it("says something went wrong when creating throws and lets the organiser try again", async () => {
-    stubSharing(async () => {});
     createPoll.mockRejectedValueOnce(new Error("database is locked")).mockResolvedValueOnce({ ok: true, id: "abcdefghij" });
     render(<CreatePollForm />);
     await fillIn("Dziś");
@@ -226,39 +186,6 @@ describe("Utwórz i wyślij na grupę", () => {
     expect(screen.getByText("Coś poszło nie tak. Spróbuj jeszcze raz.")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
 
-    expect(push).toHaveBeenCalledWith("/e/abcdefghij");
-  });
-
-  it("says the link was not copied for 4 s, then lands on the poll", async () => {
-    Object.defineProperty(navigator, "share", { value: undefined, configurable: true });
-    refuseClipboard();
-    createPoll.mockResolvedValue({ ok: true, id: "abcdefghij" });
-    render(<CreatePollForm />);
-    await fillIn("Dziś");
-
-    await createWithFakeTimeouts();
-    await act(() => vi.advanceTimersByTimeAsync(3999));
-
-    expect(screen.getByText("Nie udało się skopiować linku. Skopiuj go z paska adresu.")).toBeInTheDocument();
-    expect(push).not.toHaveBeenCalled();
-    await act(() => vi.advanceTimersByTimeAsync(1));
-    expect(push).toHaveBeenCalledWith("/e/abcdefghij");
-  });
-
-  it("says to copy the link from the address bar when sharing and copying both fail", async () => {
-    Object.defineProperty(navigator, "share", {
-      value: async () => Promise.reject(new DOMException("denied", "NotAllowedError")),
-      configurable: true,
-    });
-    refuseClipboard();
-    createPoll.mockResolvedValue({ ok: true, id: "abcdefghij" });
-    render(<CreatePollForm />);
-    await fillIn("Dziś");
-
-    await createWithFakeTimeouts();
-
-    expect(screen.getByText("Nie udało się skopiować linku. Skopiuj go z paska adresu.")).toBeInTheDocument();
-    await act(() => vi.advanceTimersByTimeAsync(4000));
     expect(push).toHaveBeenCalledWith("/e/abcdefghij");
   });
 });

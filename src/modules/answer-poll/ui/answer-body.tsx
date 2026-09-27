@@ -38,6 +38,7 @@ export function AnswerBody() {
         onDateTap={answer.tapDate}
         onHourTap={answer.tapHour}
         onStroke={answer.stroke}
+        morphDates
       />
       {answer.holdsRow && !answer.justSaidCant && (
         <p className="mt-4 mb-[0] text-note text-muted">

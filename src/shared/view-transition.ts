@@ -1,8 +1,8 @@
 import { flushSync } from "react-dom";
 
-export function withViewTransition(update: () => void) {
+export function withViewTransition(update: () => void | Promise<void>) {
   if (!("startViewTransition" in document) || matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    update();
+    void update();
     return;
   }
   document.startViewTransition(() => flushSync(update));
