@@ -30,6 +30,7 @@ function renderPanel(mine?: Mine) {
 }
 
 const cell = (name: string) => screen.getByRole("button", { name });
+const slot = (name: string) => cell(name).closest("[role=gridcell]");
 const nameField = () => screen.getByRole("textbox", { name: "Jak masz na imię?" });
 
 async function afterQuiet() {
@@ -100,9 +101,9 @@ describe("the Moje lead and body", () => {
     rerender(panel({ name: "Ola", slots: [{ date: "2026-10-17", hour: 20 }] }));
 
     expect(nameField()).toHaveValue("Ola");
-    expect(cell("pt 16, 19:00")).toHaveAttribute("aria-pressed", "true");
-    expect(cell("sb 17, 21:00")).toHaveAttribute("aria-pressed", "true");
-    expect(cell("sb 17, 20:00")).toHaveAttribute("aria-pressed", "false");
+    expect(slot("pt 16, 19:00")).toHaveAttribute("aria-selected", "true");
+    expect(slot("sb 17, 21:00")).toHaveAttribute("aria-selected", "true");
+    expect(slot("sb 17, 20:00")).toHaveAttribute("aria-selected", "false");
   });
 
   it("renames a saved answer when the name changes", async () => {
@@ -121,7 +122,7 @@ describe("the Moje lead and body", () => {
     await afterQuiet();
 
     expect(saveAnswer).toHaveBeenLastCalledWith(pollId, { name: "Ola", slots: [] });
-    expect(cell("pt 16, 19:00")).toHaveAttribute("aria-pressed", "false");
+    expect(slot("pt 16, 19:00")).toHaveAttribute("aria-selected", "false");
     expect(await screen.findByText("Nie możesz w żadnym terminie. Zmieniasz zdanie? Po prostu kliknij.")).toBeInTheDocument();
   });
 
@@ -191,7 +192,7 @@ describe("the Moje lead and body", () => {
     await act(async () => finishClaim({ ok: true, name: "Ola", slots: [] }));
     await afterQuiet();
 
-    expect(cell("pt 16, 20:00")).toHaveAttribute("aria-pressed", "true");
+    expect(slot("pt 16, 20:00")).toHaveAttribute("aria-selected", "true");
     expect(saveAnswer).toHaveBeenLastCalledWith(pollId, {
       name: "Ola",
       slots: [

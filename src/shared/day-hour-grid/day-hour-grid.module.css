@@ -23,7 +23,7 @@
 
 @container (max-width: 599px) {
   .grid[data-scrolls] {
-    grid-template-columns: var(--hour-column) repeat(var(--date-count), calc((100cqi - var(--hour-column) - 4 * var(--space-cell-gap)) / 4));
+    grid-template-columns: var(--hour-column) repeat(var(--date-count), max(56px, calc((100cqi - var(--hour-column) - 5 * var(--space-cell-gap)) / 4.4)));
   }
 }
 
