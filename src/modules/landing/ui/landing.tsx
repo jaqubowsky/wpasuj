@@ -1,6 +1,8 @@
 import { productName } from "@/shared/brand";
 import { Text } from "@/shared/ui/text/text";
 import type { ReactNode } from "react";
+import { Faq } from "./faq/faq";
+import { Footer } from "./footer/footer";
 import { GoToFormButton } from "./go-to-form-button";
 import styles from "./landing.module.css";
 import { LazyDemo, LazyStory } from "./lazy-sections";
@@ -71,7 +73,9 @@ export function Landing({ hero }: { hero: ReactNode }) {
             <Text variant="meta">Za darmo. Znajomi nie zakładają kont.</Text>
           </div>
         </section>
+        <Faq />
       </main>
+      <Footer />
     </>
   );
 }
