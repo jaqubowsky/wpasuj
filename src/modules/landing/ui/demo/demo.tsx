@@ -1,24 +1,19 @@
 "use client";
 
-import { DayHourGrid, type GridCell } from "@/shared/day-hour-grid/day-hour-grid";
+import { DayHourGrid } from "@/shared/day-hour-grid/day-hour-grid";
 import { Avatar } from "@/shared/ui/avatar/avatar";
 import { Button } from "@/shared/ui/button/button";
 import { Card } from "@/shared/ui/card/card";
 import { Cell } from "@/shared/ui/cell/cell";
 import { Text } from "@/shared/ui/text/text";
-import { useState } from "react";
 import { demoDates, demoHours, demoPoll, friends, visitor } from "../../domain/demo-poll";
 import { GoToFormButton } from "../go-to-form-button";
 import "./demo.css";
-
-function sameSlot(a: GridCell, b: GridCell) {
-  return a.date === b.date && a.hour === b.hour;
-}
+import { useDemoSlots } from "./use-demo-slots";
 
 export function Demo({ formId }: { formId: string }) {
-  const [mine, setMine] = useState<GridCell[]>([]);
-  const poll = demoPoll(mine);
-  const isMine = (cell: GridCell) => mine.some((slot) => sameSlot(slot, cell));
+  const slots = useDemoSlots();
+  const poll = demoPoll(slots.mine);
 
   return (
     <section
@@ -51,7 +46,7 @@ export function Demo({ formId }: { formId: string }) {
             label="Twoje godziny"
             dates={demoDates}
             hours={demoHours}
-            isSelected={isMine}
+            isSelected={slots.isMine}
             renderCell={({ date, hour, selected, label, tabIndex, preview }) => {
               const { count, heat, everyone, best } = poll.cellAt({ date, hour });
               const marked = preview ? preview === "adding" : selected;
@@ -62,12 +57,8 @@ export function Demo({ formId }: { formId: string }) {
                 </Cell>
               );
             }}
-            onCellTap={(cell) => setMine(isMine(cell) ? mine.filter((slot) => !sameSlot(slot, cell)) : [...mine, cell])}
-            onStroke={({ dates, hours, mode }) => {
-              const painted = dates.flatMap((date) => hours.map((hour) => ({ date, hour })));
-              const rest = mine.filter((slot) => !painted.some((cell) => sameSlot(cell, slot)));
-              setMine(mode === "add" ? [...rest, ...painted] : rest);
-            }}
+            onCellTap={slots.tap}
+            onStroke={slots.stroke}
           />
         </div>
         <div className="flex flex-col gap-3">
@@ -99,7 +90,7 @@ export function Demo({ formId }: { formId: string }) {
           <p className="m-[0] px-[2px] py-1 text-caption text-muted">Liczba w kafelku to ile osób może. Kropka to Twoje godziny.</p>
           <GoToFormButton formId={formId}>Zrób taką ankietę dla swojej paczki</GoToFormButton>
           <div>
-            <Button variant="text" onClick={() => setMine([])}>
+            <Button variant="text" onClick={slots.clear}>
               Wyczyść moje godziny
             </Button>
           </div>
