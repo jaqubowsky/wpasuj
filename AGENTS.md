@@ -21,7 +21,7 @@ Declared in `package.json` by ticket 01; a change passes all of them:
 - `npm run build`
 - `npm run e2e` (Playwright: phone 390 in Chromium and WebKit, desktop 1440 in Chromium)
 
-Hooks (husky, installed by `npm ci`): pre-commit runs `eslint` on staged files through `lint-staged`; pre-push runs `typecheck`, `knip` and `test`. `e2e` runs in CI only.
+Hooks (husky, installed by `npm ci`): pre-commit runs `eslint` on staged files through `lint-staged`; pre-push runs `typecheck`, `knip` and `test`. `e2e` runs in CI only. In a fleet container npm runs with `ignore-scripts`, so run `npx husky` once after install (decision 52).
 
 ## Testing
 
