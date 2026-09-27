@@ -2,21 +2,21 @@
 
 The host keeps this file current and a fresh host session resumes from it. One line per ticket: its file in `spec/tickets/` and, while it runs, its container. What each seat may do lives in the repository's profile, never here.
 
-Every ticket whose blockers have landed runs at once, one container each, up to 4 containers (32 GB host, 6 GB per container). MVP: 34 (design token scale) once 25 and 30 land; then 35 (poll page in the approved look) and 37 (hours past midnight) in parallel; then 36 (finalised poll); then 12; then 31 and 32 in parallel with their fix tickets; then 08; then 24. Landing, beside it: 15, 21 and 22 after 26, written in Tailwind from the start (30 migrates only the skeleton's CSS); scenes 16 to 20 after 15, each in its own file under `story/scenes/`; 23 last. A merge is blocked only by a proven broken acceptance criterion of the ticket; notes go to 12 (MVP) or to `host-acceptance/notes-landing.md` (landing). One fix round and one recheck per ticket, then merge or a host decision. Each landing ticket is accepted by its screenshots beside the canvas renders in `~/.sandboxes/wpasuj/host-acceptance/landing-canvas/`.
+Every ticket whose blockers have landed runs at once, one container each, up to 4 containers (32 GB host, 6 GB per container). MVP: 34 (design token scale) once 25 and 30 land; then 35 (poll page in the approved look) and 37 (hours past midnight) in parallel; then 36 (finalised poll); then 12; then 31 and 32 in parallel with their fix tickets; 38 (production readiness) beside them, before 08; then 08; then 24. Landing, beside it: 15, 21 and 22 after 26, written in Tailwind from the start (30 migrates only the skeleton's CSS); scenes 16 to 20 after 15, each in its own file under `story/scenes/`; 23 last. A merge is blocked only by a proven broken acceptance criterion of the ticket; notes go to 12 (MVP) or to `host-acceptance/notes-landing.md` (landing). One fix round and one recheck per ticket, then merge or a host decision. Each landing ticket is accepted by its screenshots beside the canvas renders in `~/.sandboxes/wpasuj/host-acceptance/landing-canvas/`.
 
 ## Now
 
-- `tickets/30-tailwind-landing.md`: claude-wpasuj-t30-tailwind-landing, PR #35
+- `tickets/34-design-token-scale.md`: claude-wpasuj-t34-design-tokens, PR #37
+- `tickets/23-landing-seo-perf.md`: claude-wpasuj-t23-landing-seo-perf
+- `tickets/38-production-readiness.md`
 
 ## Next
 
-- `tickets/34-design-token-scale.md` (after 25, 30)
 - `tickets/35-poll-page-v3.md`, `tickets/37-overnight-hours.md` (after 34; in parallel)
 - `tickets/36-finalised-poll.md` (after 35)
-- `tickets/23-landing-seo-perf.md` (after 30)
 - `tickets/12-cleanup.md` (after 35, 36, 37)
 - `tickets/31-security-audit.md`, `tickets/32-architecture-audit.md` (after 12, 23, 34-37; in parallel)
-- `tickets/08-acceptance.md` (after 31, 32 and their fix tickets)
+- `tickets/08-acceptance.md` (after 31, 32 and their fix tickets, and 38)
 - `tickets/24-readme.md` (after 08)
 
 ## Landed
@@ -47,3 +47,4 @@ Every ticket whose blockers have landed runs at once, one container each, up to 
 - `tickets/19-story-heat.md`: PR #32
 - `tickets/20-story-best.md`: PR #33
 - `tickets/25-create-and-cant-feedback.md`: PR #34
+- `tickets/30-tailwind-landing.md`: PR #35
