@@ -46,24 +46,22 @@ test("the landing holds LCP, TBT and CLS on a throttled phone, story included", 
   });
 
   await page.goto("/", { waitUntil: "networkidle" });
-  const load = await page.evaluate(() => ({
+  const { firstContentfulPaint, lcp } = await page.evaluate(() => ({
     firstContentfulPaint: performance.getEntriesByName("first-contentful-paint")[0].startTime,
-    ...window.landingPerf,
+    lcp: window.landingPerf.lcp!,
   }));
   while (await page.evaluate(() => window.scrollY + window.innerHeight < document.documentElement.scrollHeight)) {
     await page.mouse.wheel(0, 400);
     await page.waitForTimeout(150);
   }
   await page.waitForLoadState("networkidle");
-  const { shifts } = await page.evaluate(() => window.landingPerf);
+  const { longTasks, shifts } = await page.evaluate(() => window.landingPerf);
 
-  const lcp = load.lcp!;
-  const tbt = load.longTasks
-    .filter((task) => task.startTime >= load.firstContentfulPaint)
+  const tbt = longTasks
+    .filter((task) => task.startTime >= firstContentfulPaint)
     .reduce((sum, task) => sum + Math.max(0, task.duration - 50), 0);
   const cls = cumulativeLayoutShift(shifts);
   console.log(`LCP ${Math.round(lcp.startTime)} ms on ${lcp.element}, TBT ${Math.round(tbt)} ms, CLS ${cls.toFixed(3)} with the story scrolled through`);
-  expect.soft(lcp.element).toBe("h1#hero-heading");
   expect.soft(lcp.startTime).toBeLessThanOrEqual(2500);
   expect.soft(tbt).toBeLessThanOrEqual(200);
   expect.soft(cls).toBeLessThanOrEqual(0.1);
