@@ -110,7 +110,9 @@ test("Własne, the month and the 10-day limit", async ({ page }, testInfo) => {
   await free.last().click();
 
   await expect(page.getByText("Maksymalnie 10 dni")).toBeVisible();
-  await expect(page.getByRole("group", { name: "Dni" }).locator('button[aria-pressed="true"]')).toHaveCount(10);
+  const selected = page.getByRole("group", { name: "Dni" }).locator('button[aria-pressed="true"]');
+  await expect(selected).toHaveCount(10);
+  await expect(selected.first()).toHaveCSS("color", "rgb(30, 27, 24)");
   await saveScreenshot(page, testInfo, "create-limit");
 });
 

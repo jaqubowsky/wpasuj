@@ -72,7 +72,7 @@
 
 .date[aria-pressed="true"] {
   background: var(--accent);
-  color: #fff;
+  color: var(--ink);
   font-weight: 600;
   box-shadow: none;
 }
