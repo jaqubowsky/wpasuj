@@ -3,7 +3,7 @@ import { Cell } from "@/shared/ui/cell/cell";
 import { Text } from "@/shared/ui/text/text";
 import type { Run } from "../domain/best-time";
 import { heatCellOf } from "../domain/heat";
-import styles from "./heatmap.module.css";
+import "./heatmap.css";
 import type { FinalTime, Results } from "../server/results-schema";
 import { useBumpOnRise } from "./use-bump-on-rise";
 import { useFillIn } from "./use-fill-in";
@@ -47,12 +47,12 @@ function fillOrderOf(final: FinalTime | null, { date, hour }: GridCell) {
 
 export function Heatmap({ results, best, isSelected, onCellTap }: HeatmapProps) {
   return (
-    <section className={styles.heatmap}>
-      <div className={styles.legend}>
+    <section className="lg:rounded-card lg:bg-surface lg:pt-5 lg:pr-6 lg:pb-6 lg:pl-3" data-heatmap>
+      <div className="mb-[10px] flex items-center justify-between gap-3">
         <Text variant="meta">Kliknij godzinę, żeby zobaczyć, kto może</Text>
-        <span className={styles.ramp} aria-hidden>
+        <span className="flex flex-none gap-[3px]" aria-hidden>
           {ramp.map((heat) => (
-            <span key={heat} data-heat={heat} />
+            <span key={heat} className="h-[10px] w-[18px] rounded-[3px] data-[heat=1]:bg-heat-1 data-[heat=2]:bg-heat-2 data-[heat=3]:bg-heat-3 data-[heat=4]:bg-heat-4 data-[heat=5]:bg-heat-5" data-heat={heat} />
           ))}
         </span>
       </div>

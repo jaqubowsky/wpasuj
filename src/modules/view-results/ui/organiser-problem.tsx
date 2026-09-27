@@ -1,4 +1,3 @@
-import styles from "./results.module.css";
 import type { OrganiserProblem as Problem } from "./use-is-organiser";
 
 const problems: Record<Problem, string> = {
@@ -9,7 +8,7 @@ const problems: Record<Problem, string> = {
 
 export function OrganiserProblem({ problem }: { problem: Problem }) {
   return (
-    <p className={styles.problem} role="alert">
+    <p className="m-[0] text-footer text-accent-ink" role="alert">
       {problems[problem]}
     </p>
   );
