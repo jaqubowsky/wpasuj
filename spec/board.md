@@ -2,7 +2,7 @@
 
 The host keeps this file current and a fresh host session resumes from it. One line per ticket: its file in `spec/tickets/` and, while it runs, its container. What each seat may do lives in the repository's profile, never here.
 
-Every ticket whose blockers have landed runs at once, one container each, up to 4 containers (32 GB host, 6 GB per container). MVP: 13 alone; then 26 (Tailwind base) alone; then 27 to 30 (Tailwind per module) in parallel; then 25; then 12; then 08; then 24. Landing, beside it: 15, 21 and 22 after 30 (21 also after 27); scenes 16 to 20 after 15, each in its own file under `story/scenes/`; 23 last. A merge is blocked only by a proven broken acceptance criterion of the ticket; notes go to 12 (MVP) or to `host-acceptance/notes-landing.md` (landing). One fix round and one recheck per ticket, then merge or a host decision. Each landing ticket is accepted by its screenshots beside the canvas renders in `~/.sandboxes/wpasuj/host-acceptance/landing-canvas/`.
+Every ticket whose blockers have landed runs at once, one container each, up to 4 containers (32 GB host, 6 GB per container). MVP: 13 alone; then 26 (Tailwind base) alone; then 33 (architecture gates) alone; then 27 to 30 (Tailwind per module) in parallel; then 25; then 12; then 08; then 24. Landing, beside it: 15, 21 and 22 after 30 (21 also after 27); scenes 16 to 20 after 15, each in its own file under `story/scenes/`; 23 last. A merge is blocked only by a proven broken acceptance criterion of the ticket; notes go to 12 (MVP) or to `host-acceptance/notes-landing.md` (landing). One fix round and one recheck per ticket, then merge or a host decision. Each landing ticket is accepted by its screenshots beside the canvas renders in `~/.sandboxes/wpasuj/host-acceptance/landing-canvas/`.
 
 ## Now
 
@@ -11,7 +11,8 @@ Every ticket whose blockers have landed runs at once, one container each, up to 
 ## Next
 
 - `tickets/26-tailwind-base.md` (after 13; alone)
-- `tickets/27-tailwind-shared.md`, `28-tailwind-create-answer.md`, `29-tailwind-view-results.md`, `30-tailwind-landing.md` (after 26; in parallel)
+- `tickets/33-architecture-gates.md` (after 26; alone)
+- `tickets/27-tailwind-shared.md`, `28-tailwind-create-answer.md`, `29-tailwind-view-results.md`, `30-tailwind-landing.md` (after 26, 33; in parallel)
 - `tickets/25-create-and-cant-feedback.md` (after 27, 28, 29)
 - `tickets/15-story-frame.md` (after 30)
 - `tickets/21-landing-demo.md` (after 27, 30)
