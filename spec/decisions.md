@@ -24,3 +24,9 @@ Points `spec/brief.md` leaves open, taken by the host. A container that meets an
 20. Segment tabs are 44px tall, the brief's minimum target, where the design system draws 40px
 21. Selected dates carry their text in `ink` on `accent` (5.3:1), not white (3.3:1), because the brief requires WCAG AA for every text pair; the mockup's white loses
 22. Button has no link form; the gone page's "Zrób nową ankietę" link keeps its own styles in `not-found.module.css`
+23. "Wszyscy" with no respondents shows only "Nikt jeszcze nie odpowiedział. Wyślij link na grupę."; the heatmap and "Kto odpowiedział" appear with the first answer, because an empty heatmap says nothing
+24. With respondents but nobody free in any hour, the best-time card says "Na razie nikt nie może w żadnym terminie."
+25. A tapped result cell opens a bottom sheet below 1280px and a side panel fixed at the right from 1280px, because the poll page is 600px wide and the panel fits beside it only from there
+26. Runs are maximal, so two runs never overlap and "Też dobre" is the next two runs in rank
+27. `DayHourGrid` without `onStroke`, `onDateTap` and `onHourTap` is view-only: no painting, dates and hours are labels, arrows stay on the cells, cells let the page scroll. The heat Cell is a button (a tap shows who can); heat 0 is a free tile with no count, as the mockup draws it
+28. "Kto odpowiedział" times are relative to the server's read time sent with the results, so the server render and the client agree; refresh on return uses TanStack Query's `visibilitychange`

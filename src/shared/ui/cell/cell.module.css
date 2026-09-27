@@ -79,3 +79,13 @@ button.cell:active {
   outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
+
+.cell[data-bump] {
+  animation: bump var(--duration-bump) var(--ease-out);
+}
+
+@keyframes bump {
+  50% {
+    transform: scale(1.08);
+  }
+}

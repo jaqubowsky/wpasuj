@@ -37,12 +37,26 @@ describe("Cell", () => {
     expect(screen.getByRole("button", { name: "usuwam" })).toHaveAttribute("data-state", "removing");
   });
 
-  it("shows the count of a heat cell with its level", () => {
-    render(<Cell heat={3}>3</Cell>);
+  it("shows the count of a heat cell with its level and asks who can on a tap", async () => {
+    const onClick = vi.fn();
+    render(
+      <Cell heat={3} aria-label="sb 19:00" onClick={onClick}>
+        3
+      </Cell>,
+    );
 
-    const cell = screen.getByText("3");
+    const cell = screen.getByRole("button", { name: "sb 19:00" });
+    expect(cell).toHaveTextContent("3");
     expect(cell).toHaveAttribute("data-heat", "3");
-    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    expect(cell).not.toHaveAttribute("aria-pressed");
+    await userEvent.click(cell);
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+
+  it("is a free tile with no heat where nobody can", () => {
+    render(<Cell heat={0} aria-label="sb 19:00" />);
+
+    expect(screen.getByRole("button", { name: "sb 19:00" })).not.toHaveAttribute("data-heat");
   });
 
   it("marks a heat cell where everyone is free and the best time", () => {
@@ -60,5 +74,21 @@ describe("Cell", () => {
     expect(screen.getByText("6")).toHaveAttribute("data-everyone");
     expect(screen.getByText("6")).not.toHaveAttribute("data-best");
     expect(screen.getByText("5")).toHaveAttribute("data-best");
+  });
+
+  it("bumps a heat cell whose count rose", () => {
+    render(
+      <>
+        <Cell heat={2} bump aria-label="rośnie">
+          2
+        </Cell>
+        <Cell heat={2} aria-label="stoi">
+          2
+        </Cell>
+      </>,
+    );
+
+    expect(screen.getByRole("button", { name: "rośnie" })).toHaveAttribute("data-bump");
+    expect(screen.getByRole("button", { name: "stoi" })).not.toHaveAttribute("data-bump");
   });
 });

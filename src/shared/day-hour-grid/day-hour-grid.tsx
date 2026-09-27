@@ -17,9 +17,9 @@ type DayHourGridProps = {
   isSelected: (cell: GridCell) => boolean;
   renderCell: (cell: RenderedCell) => ReactNode;
   onCellTap: (cell: GridCell) => void;
-  onDateTap: (date: string) => void;
-  onHourTap: (hour: number) => void;
-  onStroke: (rectangle: PaintedRectangle) => void;
+  onDateTap?: (date: string) => void;
+  onHourTap?: (hour: number) => void;
+  onStroke?: (rectangle: PaintedRectangle) => void;
 };
 
 const weekdays = ["nd", "pn", "wt", "śr", "cz", "pt", "sb"];
@@ -38,7 +38,7 @@ function cellUnder(event: PointerEvent): GridCell | undefined {
 export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCellTap, onDateTap, onHourTap, onStroke }: DayHourGridProps) {
   const gridRef = useRef<HTMLDivElement>(null);
   const stroke = usePaintStroke({ dates, hours, onStroke, onTap: onCellTap });
-  const keyboard = useGridKeyboard({ gridRef, dates, hours, onStroke });
+  const keyboard = useGridKeyboard({ gridRef, dates, hours, onStroke, firstRow: onDateTap ? 0 : 1, firstColumn: onHourTap ? 0 : 1 });
 
   return (
     <div className={styles.frame}>
@@ -46,15 +46,19 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
         ref={gridRef}
         role="grid"
         aria-label={label}
-        aria-multiselectable
+        aria-multiselectable={onStroke && true}
         className={styles.grid}
         style={{ "--date-count": dates.length } as CSSProperties}
         data-scrolls={dates.length > 4 || undefined}
+        data-paints={onStroke && true}
         onKeyDown={keyboard.onKeyDown}
-        onPointerMove={(event) => {
-          const cell = cellUnder(event);
-          if (cell) stroke.move(cell);
-        }}
+        onPointerMove={
+          onStroke &&
+          ((event) => {
+            const cell = cellUnder(event);
+            if (cell) stroke.move(cell);
+          })
+        }
         onPointerUp={stroke.end}
       >
         <div role="row" className={styles.row}>
@@ -62,18 +66,27 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
           {dates.map((date, index) => {
             const day = dayOf(date);
             const position = { row: 0, column: index + 1 };
+            const label = (
+              <>
+                <Text variant="meta">{day.weekday}</Text>
+                <Text variant="day-number">{day.number}</Text>
+              </>
+            );
             return (
               <div key={date} role="columnheader" className={styles.date} data-row={position.row} data-column={position.column}>
-                <button
-                  type="button"
-                  aria-label={`${day.weekday} ${day.number}`}
-                  tabIndex={keyboard.tabIndexOf(position)}
-                  onFocus={() => keyboard.onFocus(position)}
-                  onClick={() => onDateTap(date)}
-                >
-                  <Text variant="meta">{day.weekday}</Text>
-                  <Text variant="day-number">{day.number}</Text>
-                </button>
+                {onDateTap ? (
+                  <button
+                    type="button"
+                    aria-label={`${day.weekday} ${day.number}`}
+                    tabIndex={keyboard.tabIndexOf(position)}
+                    onFocus={() => keyboard.onFocus(position)}
+                    onClick={() => onDateTap(date)}
+                  >
+                    {label}
+                  </button>
+                ) : (
+                  <span>{label}</span>
+                )}
               </div>
             );
           })}
@@ -83,9 +96,15 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
           return (
             <div key={hour} role="row" className={styles.row}>
               <div role="rowheader" className={styles.hour} data-row={header.row} data-column={header.column}>
-                <button type="button" tabIndex={keyboard.tabIndexOf(header)} onFocus={() => keyboard.onFocus(header)} onClick={() => onHourTap(hour)}>
-                  <Text variant="meta">{hour}:00</Text>
-                </button>
+                {onHourTap ? (
+                  <button type="button" tabIndex={keyboard.tabIndexOf(header)} onFocus={() => keyboard.onFocus(header)} onClick={() => onHourTap(hour)}>
+                    <Text variant="meta">{hour}:00</Text>
+                  </button>
+                ) : (
+                  <span>
+                    <Text variant="meta">{hour}:00</Text>
+                  </span>
+                )}
               </div>
               {dates.map((date, columnIndex) => {
                 const cell = { date, hour };
@@ -103,7 +122,7 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
                     data-hour={hour}
                     onFocus={() => keyboard.onFocus(position)}
                     onPointerDown={(event) => {
-                      if (event.button !== 0) return;
+                      if (!onStroke || event.button !== 0) return;
                       event.currentTarget.setPointerCapture(event.pointerId);
                       stroke.start(cell, isSelected(cell));
                     }}

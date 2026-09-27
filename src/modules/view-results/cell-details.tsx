@@ -1,0 +1,50 @@
+import { Avatar } from "@/shared/ui/avatar/avatar";
+import { Button } from "@/shared/ui/button/button";
+import { Text } from "@/shared/ui/text/text";
+import styles from "./cell-details.module.css";
+import { hourLabel } from "./time-label";
+
+type CellDetailsProps = {
+  cell: { date: string; hour: number };
+  free: string[];
+  respondents: string[];
+  onClose: () => void;
+};
+
+function People({ label, names }: { label: string; names: string[] }) {
+  if (names.length === 0) return null;
+  return (
+    <div>
+      <Text as="h3" variant="meta">
+        {label}
+      </Text>
+      <ul className={styles.people} aria-label={label}>
+        {names.map((name) => (
+          <li key={name}>
+            <Avatar name={name} />
+            {name}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export function CellDetails({ cell, free, respondents, onClose }: CellDetailsProps) {
+  const label = hourLabel(cell);
+
+  return (
+    <section className={styles.details} aria-label={label}>
+      <div className={styles.top}>
+        <Text as="h2" variant="heading">
+          {label}
+        </Text>
+        <Button variant="text" onClick={onClose}>
+          Zamknij
+        </Button>
+      </div>
+      <People label="Mogą" names={free} />
+      <People label="Nie mogą" names={respondents.filter((name) => !free.includes(name))} />
+    </section>
+  );
+}

@@ -74,14 +74,25 @@
   outline-offset: -2px;
 }
 
-.date button {
+.date button,
+.date > span {
   display: grid;
   justify-items: center;
   padding: var(--space-1) 0 var(--space-2);
 }
 
+.hour > span {
+  display: grid;
+  height: 100%;
+  place-items: start end;
+  padding-right: var(--space-2);
+}
+
 .cell {
   display: grid;
+}
+
+.grid[data-paints] .cell {
   touch-action: none;
 }
 

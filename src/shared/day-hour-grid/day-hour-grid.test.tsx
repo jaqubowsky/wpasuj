@@ -98,4 +98,41 @@ describe("DayHourGrid", () => {
 
     expect(onStroke).toHaveBeenLastCalledWith({ dates: ["2026-10-16", "2026-10-17"], hours: [19], mode: "add" });
   });
+
+  describe("to look at, without painting", () => {
+    function renderViewOnlyGrid() {
+      const onCellTap = vi.fn();
+      render(
+        <DayHourGrid
+          label="Ile osób może"
+          dates={dates}
+          hours={hours}
+          isSelected={({ date, hour }) => date === "2026-10-17" && hour === 18}
+          renderCell={({ label, tabIndex }) => <Cell heat={1} aria-label={label} tabIndex={tabIndex}>1</Cell>}
+          onCellTap={onCellTap}
+        />,
+      );
+      return { onCellTap };
+    }
+
+    it("is a single-select grid whose dates and hours are labels, not buttons", () => {
+      renderViewOnlyGrid();
+
+      expect(screen.getByRole("grid", { name: "Ile osób może" })).not.toHaveAttribute("aria-multiselectable");
+      expect(screen.getAllByRole("columnheader").map((header) => header.textContent)).toEqual(["pt16", "sb17", "nd18"]);
+      expect(screen.queryByRole("button", { name: "nd 18" })).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "18:00" })).not.toBeInTheDocument();
+    });
+
+    it("keeps the arrows on the cells and reports Space as a tap", async () => {
+      const { onCellTap } = renderViewOnlyGrid();
+      await userEvent.tab();
+
+      await userEvent.keyboard("{ArrowUp}{ArrowLeft}{Shift>}{ArrowRight}{/Shift} ");
+
+      expect(screen.getByRole("button", { name: "sb 17, 17:00" })).toHaveFocus();
+      expect(onCellTap).toHaveBeenCalledExactlyOnceWith({ date: "2026-10-17", hour: 17 });
+    });
+
+  });
 });

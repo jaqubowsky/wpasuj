@@ -1,0 +1,11 @@
+.results {
+  display: grid;
+  gap: var(--space-6);
+  padding-top: var(--space-5);
+}
+
+.empty {
+  padding: var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}

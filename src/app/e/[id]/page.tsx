@@ -1,4 +1,5 @@
 import { findPoll } from "@/modules/create-poll";
+import { ResultsPanel } from "@/modules/view-results";
 import { Avatar } from "@/shared/ui/avatar/avatar";
 import { Text } from "@/shared/ui/text/text";
 import { notFound } from "next/navigation";
@@ -25,7 +26,7 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
           {poll.title}
         </Text>
         <div className={styles.tabs}>
-          <PollTabs />
+          <PollTabs everyone={<ResultsPanel pollId={id} findPoll={(pollId) => findPoll(pollId, new Date())} />} />
         </div>
       </main>
     </div>
