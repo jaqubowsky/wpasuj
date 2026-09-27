@@ -57,7 +57,7 @@ export function AnswerBody() {
       {answer.justSaidCant && (
         <div className="mt-2 flex flex-col items-center text-center" data-answer-declined>
           <p className="m-[0] text-caption font-medium">Nie możesz w żadnym terminie.</p>
-          <p className="m-[0] mt-1 text-label text-muted">Organizator zobaczy Twoją odpowiedź.</p>
+          {answer.saveState === "saved" && <p className="m-[0] mt-1 text-label text-muted">Organizator zobaczy Twoją odpowiedź.</p>}
           <Button variant="text" onClick={answer.undoCant}>
             Cofnij
           </Button>

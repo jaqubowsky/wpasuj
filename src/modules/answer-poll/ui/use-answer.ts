@@ -44,6 +44,7 @@ export function useAnswer({ pollId, dates, hours, mine }: AnswerOptions) {
   const slotsRef = useRef(mySlots);
   const [holdsRow, setHoldsRow] = useState(mine !== undefined);
   const [beforeCant, setBeforeCant] = useState<Set<string>>();
+  const [cantTurnedOff, setCantTurnedOff] = useState(false);
   const clearing = useRef<ReturnType<typeof setTimeout>[]>([]);
   const [problem, setProblem] = useState<Problem>();
   const nameRef = useRef<HTMLInputElement>(null);
@@ -112,6 +113,7 @@ export function useAnswer({ pollId, dates, hours, mine }: AnswerOptions) {
     const before = slotsRef.current;
     replaceSlots(new Set());
     setBeforeCant(before);
+    setCantTurnedOff(false);
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const order = [...before].sort(inReadingOrder);
     const showFrom = (index: number) => setMySlots(new Set(order.slice(index)));
@@ -135,7 +137,7 @@ export function useAnswer({ pollId, dates, hours, mine }: AnswerOptions) {
     problem,
     holdsRow,
     canMakeIt: mySlots.size > 0,
-    saidCant: beforeCant !== undefined || (holdsRow && mySlots.size === 0),
+    saidCant: beforeCant !== undefined || (holdsRow && mySlots.size === 0 && !cantTurnedOff),
     justSaidCant: beforeCant !== undefined,
     isMine: (cell: GridCell) => mySlots.has(keyOf(cell)),
     rename(next: string) {
@@ -151,7 +153,7 @@ export function useAnswer({ pollId, dates, hours, mine }: AnswerOptions) {
         mode === "add",
       ),
     cantMakeAny,
-    undoCant: () => beforeCant && replaceSlots(beforeCant),
+    undoCant: () => (beforeCant ? replaceSlots(beforeCant) : setCantTurnedOff(true)),
     retry: autosave.retry,
     async claim(heldName: string) {
       const result = await claimName(pollId, heldName);

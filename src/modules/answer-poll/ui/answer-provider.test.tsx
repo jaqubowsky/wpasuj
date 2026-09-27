@@ -133,6 +133,7 @@ describe("the Moje lead and body", () => {
     expect(screen.getAllByRole("gridcell", { selected: true })).toHaveLength(1);
     await act(async () => vi.advanceTimersByTime(120));
     expect(screen.queryAllByRole("gridcell", { selected: true })).toHaveLength(0);
+    expect(screen.queryByText("Organizator zobaczy Twoją odpowiedź.")).not.toBeInTheDocument();
     await afterQuiet();
     expect(saveAnswer).toHaveBeenCalledExactlyOnceWith(pollId, { name: "Ola", slots: [] });
     expect(await screen.findByRole("status")).toHaveTextContent("Zapisane");
@@ -179,6 +180,19 @@ describe("the Moje lead and body", () => {
     expect(cantButton()).toHaveAttribute("aria-pressed", "false");
     expect(screen.queryByRole("button", { name: "Cofnij" })).not.toBeInTheDocument();
     expect(screen.queryByText("Organizator zobaczy Twoją odpowiedź.")).not.toBeInTheDocument();
+  });
+
+  it("a tap turns off the toggle of an answer saved with no hours, and the next saves no hours again", async () => {
+    const { user } = renderPanel({ name: "Ola", slots: [] });
+
+    await user.click(cantButton());
+
+    expect(cantButton()).toHaveAttribute("aria-pressed", "false");
+    expect(saveAnswer).not.toHaveBeenCalled();
+    await user.click(cantButton());
+    await afterQuiet();
+    expect(cantButton()).toHaveAttribute("aria-pressed", "true");
+    expect(saveAnswer).toHaveBeenCalledExactlyOnceWith(pollId, { name: "Ola", slots: [] });
   });
 
   it("opens with the toggle selected for an answer saved with no hours", () => {

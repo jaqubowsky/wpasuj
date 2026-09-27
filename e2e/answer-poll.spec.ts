@@ -194,6 +194,12 @@ test("save states: Zapisuję, Nie zapisano with Spróbuj ponownie, and nie może
 
   await cantButton(page).click();
   await expect(selected(page)).toHaveCount(0);
+  await expect(status(page)).toHaveText("Zapisane");
+  await page.reload();
+  await page.getByRole("tab", { name: "Moje" }).click();
+  await expect(page.getByRole("button", { name: "Nie mogę w żadnym terminie", pressed: true })).toBeVisible();
+  await cantButton(page).click();
+  await expect(page.getByRole("button", { name: "Nie mogę w żadnym terminie", pressed: false })).toBeVisible();
   await cellAt(page, 2, 0).click();
   await expect(page.getByRole("button", { name: "Nie mogę w żadnym terminie", pressed: false })).toBeVisible();
   await expect(page.getByRole("button", { name: "Cofnij" })).toHaveCount(0);
