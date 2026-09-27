@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { Button } from "@/shared/ui/button/button";
 
 function goToForm(formId: string) {
@@ -8,10 +9,10 @@ function goToForm(formId: string) {
   form.querySelector("input")!.focus({ preventScroll: true });
 }
 
-export function GoToFormButton({ formId }: { formId: string }) {
+export function GoToFormButton({ formId, children }: { formId: string; children: ReactNode }) {
   return (
     <Button variant="primary" onClick={() => goToForm(formId)}>
-      Utwórz ankietę
+      {children}
     </Button>
   );
 }
