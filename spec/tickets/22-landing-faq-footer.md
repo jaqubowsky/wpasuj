@@ -1,7 +1,7 @@
 # 22: FAQ and footer
 
 Status: ready-for-agent
-Blocked by: 30-tailwind-landing.md
+Blocked by: 26-tailwind-base.md (written in Tailwind from the start, per the `AGENTS.md` Styling pattern)
 
 ## Parent
 
