@@ -62,6 +62,11 @@ export function AnswerLead() {
           </div>
         </div>
       )}
+      {problem?.kind === "organiser-name" && (
+        <p className="mt-2 mb-0 text-base" role="alert">
+          Tak ma na imię organizator. Wpisz swoje.
+        </p>
+      )}
       {(problem?.kind === "closed" || problem?.kind === "full" || problem?.kind === "gone") && (
         <p className="mt-4 mb-0 text-sm font-medium text-accent-ink" role="alert">
           {notices[problem.kind]}

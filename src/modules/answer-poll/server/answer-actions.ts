@@ -7,14 +7,14 @@ import { and, count, eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { fitsPoll, refusalOf } from "../domain/answer-rules";
 import { answerSchema, nameSchema, type AnswerInput, type Slot } from "./answer-schema";
-import { findLivePoll, participantByToken, slotsOf } from "./answer-queries";
+import { findLivePoll, isOrganiserDevice, participantByToken, slotsOf } from "./answer-queries";
 import { nameKey } from "../domain/name-rules";
 
 type SaveResult =
   | { ok: true }
   | { ok: false; reason: "name-taken"; name: string }
-  | { ok: false; reason: "invalid" | "not-yours" | "closed" | "full" | "gone" };
-type ClaimResult = { ok: true; name: string; slots: Slot[] } | { ok: false; reason: "invalid" | "closed" | "gone" };
+  | { ok: false; reason: "invalid" | "organiser-name" | "not-yours" | "closed" | "full" | "gone" };
+type ClaimResult = { ok: true; name: string; slots: Slot[] } | { ok: false; reason: "invalid" | "organiser-name" | "closed" | "gone" };
 
 export type ClaimRefusal = Extract<ClaimResult, { ok: false }>["reason"];
 
@@ -46,8 +46,10 @@ export async function saveAnswer(pollId: string, answer: AnswerInput): Promise<S
   const normalisedName = nameKey(name);
   const holder = participantNamed(pollId, normalisedName);
   const [{ participantCount }] = db.select({ participantCount: count() }).from(participants).where(eq(participants.pollId, pollId)).all();
-  const nameHeldByOther = holder && holder.id !== participant?.id ? holder.name : undefined;
-  const refusal = refusalOf({ nameHeldByOther, newcomer: !participant, participantCount });
+  const ownsName = holder !== undefined && holder.id === participant?.id;
+  const nameHeldByOther = holder && !ownsName ? holder.name : undefined;
+  const takesOrganiserName = normalisedName === nameKey(poll.organiserName) && !ownsName && !(await isOrganiserDevice(poll));
+  const refusal = refusalOf({ takesOrganiserName, nameHeldByOther, newcomer: !participant, participantCount });
   if (refusal) return { ok: false, ...refusal };
 
   const now = new Date();
@@ -73,6 +75,7 @@ export async function claimName(pollId: string, name: string): Promise<ClaimResu
   const parsed = nameSchema.safeParse(name);
   if (!parsed.success) return { ok: false, reason: "invalid" };
   if (poll.finalDate !== null) return { ok: false, reason: "closed" };
+  if (nameKey(parsed.data) === nameKey(poll.organiserName) && !(await isOrganiserDevice(poll))) return { ok: false, reason: "organiser-name" };
 
   const cookieStore = await cookies();
   const heldToken = cookieStore.get(pollId)?.value;

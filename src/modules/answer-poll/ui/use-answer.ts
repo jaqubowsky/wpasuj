@@ -8,7 +8,7 @@ import { normaliseName } from "../domain/name-rules";
 import { useAutosave } from "./use-autosave";
 
 export type Answer = { name: string; slots: Slot[] };
-export type Problem = { kind: "name-taken"; heldName: string } | { kind: "invalid" | "closed" | "full" | "gone" };
+export type Problem = { kind: "name-taken"; heldName: string } | { kind: "invalid" | "organiser-name" | "closed" | "full" | "gone" };
 
 type AnswerOptions = { pollId: string; dates: string[]; hours: number[]; mine?: Answer };
 
@@ -31,6 +31,7 @@ function afterRefusedClaim(reason: ClaimRefusal): "save-as-newcomer" | Problem {
   switch (reason) {
     case "invalid":
       return "save-as-newcomer";
+    case "organiser-name":
     case "closed":
     case "gone":
       return { kind: reason };
@@ -75,6 +76,7 @@ export function useAnswer({ pollId, dates, hours, mine }: AnswerOptions) {
         setProblem({ kind: "name-taken", heldName: normaliseName(answer.name) });
         return false;
       case "invalid":
+      case "organiser-name":
       case "closed":
       case "full":
       case "gone":
