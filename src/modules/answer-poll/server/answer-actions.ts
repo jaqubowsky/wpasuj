@@ -12,7 +12,7 @@ import { nameKey } from "../domain/name-rules";
 
 type SaveResult =
   | { ok: true }
-  | { ok: false; reason: "name-taken"; name: string }
+  | { ok: false; reason: "name-taken"; name: string; hours: number }
   | { ok: false; reason: "invalid" | "organiser-name" | "not-yours" | "closed" | "full" | "gone" };
 type ClaimResult = { ok: true; name: string; slots: Slot[] } | { ok: false; reason: "invalid" | "organiser-name" | "closed" | "gone" };
 
@@ -47,7 +47,7 @@ export async function saveAnswer(pollId: string, answer: AnswerInput): Promise<S
   const holder = participantNamed(pollId, normalisedName);
   const [{ participantCount }] = db.select({ participantCount: count() }).from(participants).where(eq(participants.pollId, pollId)).all();
   const ownsName = holder !== undefined && holder.id === participant?.id;
-  const nameHeldByOther = holder && !ownsName ? holder.name : undefined;
+  const nameHeldByOther = holder && !ownsName ? { name: holder.name, hours: slotsOf(holder.id).length } : undefined;
   const takesOrganiserName = normalisedName === nameKey(poll.organiserName) && !ownsName && !(await isOrganiserDevice(poll));
   const refusal = refusalOf({ takesOrganiserName, nameHeldByOther, newcomer: !participant, participantCount });
   if (refusal) return { ok: false, ...refusal };

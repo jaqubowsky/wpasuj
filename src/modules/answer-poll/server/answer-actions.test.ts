@@ -125,7 +125,7 @@ describe("saveAnswer", () => {
 
     const result = await saveAnswer(pollId, { name: "ŁUCJA", slots: [saturday17] });
 
-    expect(result).toEqual({ ok: false, reason: "name-taken", name: "Łucja" });
+    expect(result).toEqual({ ok: false, reason: "name-taken", name: "Łucja", hours: 1 });
     expect(await myAnswer()).toBeUndefined();
   });
 
@@ -137,7 +137,7 @@ describe("saveAnswer", () => {
 
     const result = await saveAnswer(pollId, { name: "ola", slots: [friday19] });
 
-    expect(result).toEqual({ ok: false, reason: "name-taken", name: "Ola" });
+    expect(result).toEqual({ ok: false, reason: "name-taken", name: "Ola", hours: 0 });
     expect(await myAnswer()).toEqual({ name: "Bartek", slots: [friday19] });
   });
 

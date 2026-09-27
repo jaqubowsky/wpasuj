@@ -231,7 +231,7 @@ describe("the Moje lead and body", () => {
   });
 
   it("asks To ty, Ola? with the stored name and takes the row over on Tak, to ja", async () => {
-    vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola" });
+    vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola", hours: 1 });
     vi.mocked(claimName).mockResolvedValue({ ok: true, name: "Ola", slots: [{ date: "2026-10-17", hour: 21 }] });
     const { user } = renderPanel();
     await user.type(nameField(), "ola ");
@@ -256,7 +256,7 @@ describe("the Moje lead and body", () => {
   });
 
   it("keeps hours painted while Tak, to ja is on its way", async () => {
-    vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola" });
+    vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola", hours: 1 });
     let finishClaim: (result: Awaited<ReturnType<typeof claimName>>) => void = () => {};
     vi.mocked(claimName).mockReturnValue(new Promise((resolve) => (finishClaim = resolve)));
     const { user } = renderPanel();
@@ -293,7 +293,7 @@ describe("the Moje lead and body", () => {
   });
 
   it("lets the participant pick another name on Nie, zmienię imię", async () => {
-    vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola" });
+    vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola", hours: 1 });
     const { user } = renderPanel();
     await user.type(nameField(), "Ola");
     fireEvent.click(cell("pt 16, 19:00"));
@@ -308,7 +308,7 @@ describe("the Moje lead and body", () => {
   it("asks again as a newcomer after another device took this row over", async () => {
     vi.mocked(saveAnswer)
       .mockResolvedValueOnce({ ok: false, reason: "not-yours" })
-      .mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola" });
+      .mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola", hours: 1 });
     renderPanel({ name: "Ola", slots: [] });
 
     fireEvent.click(cell("pt 16, 19:00"));
