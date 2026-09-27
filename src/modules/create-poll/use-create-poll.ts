@@ -5,7 +5,7 @@ import { useState } from "react";
 import { createPoll } from "./create-poll-action";
 import { createPollSchema, type CreatePollInput } from "./poll-schema";
 
-const linkNoticeMs = 1500;
+const linkNoticeMs = { copied: 1500, "not-copied": 4000 };
 
 type Field = "title" | "dates" | "organiserName";
 type Status = "idle" | "creating" | "copied" | "not-copied" | "leaving" | "refused" | "failed";
@@ -43,7 +43,7 @@ export function useCreatePoll(input: Omit<CreatePollInput, "timeZone">) {
     const outcome = await shareOrCopy({ text: `Kiedy możecie? ${parsed.data.title} ${link}`, link });
     if (outcome === "copied" || outcome === "not-copied") {
       setStatus(outcome);
-      await new Promise((resolve) => setTimeout(resolve, linkNoticeMs));
+      await new Promise((resolve) => setTimeout(resolve, linkNoticeMs[outcome]));
     } else {
       setStatus("leaving");
     }

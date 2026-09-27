@@ -25,5 +25,5 @@ Points `spec/brief.md` leaves open, taken by the host. A container that meets an
 21. Selected dates carry their text in `ink` on `accent` (5.3:1), not white (3.3:1), because the brief requires WCAG AA for every text pair; the mockup's white loses
 22. Button has no link form; the gone page's "Zrób nową ankietę" link keeps its own styles in `not-found.module.css`
 23. The date strip on create sits on a `surface` card (20px radius, 12px padding) that reaches 12px into the page gutter, because seven 44px tiles with 6px gaps (344px) do not fit a padded card inside the 350px column at 390; the tiles keep the brief's target and gap
-24. When the link can be neither shared nor copied, the create page shows "Nie udało się skopiować linku. Skopiuj go z paska adresu." for the same 1.5 s as "Link skopiowany" (decision 16), then moves to the poll, whose address bar holds the link
+24. When the link can be neither shared nor copied, the create page shows "Nie udało się skopiować linku. Skopiuj go z paska adresu." for 4 s, longer than the 1.5 s of "Link skopiowany" (decision 16) because the line asks for an action, then moves to the poll, whose address bar holds the link
 25. The poll page's zone line compares IANA zone names, so a viewer in `Europe/Berlin` on a `Europe/Warsaw` poll reads it too; the brief says "when a viewer's zone differs"

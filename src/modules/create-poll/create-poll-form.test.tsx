@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CreatePollForm } from "./create-poll-form";
@@ -16,6 +16,18 @@ function stubSharing(share?: (data: ShareData) => Promise<void>) {
   Object.defineProperty(navigator, "share", { value: share, configurable: true });
   Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
   return writeText;
+}
+
+function refuseClipboard() {
+  Object.defineProperty(navigator, "clipboard", {
+    value: { writeText: async () => Promise.reject(new DOMException("denied", "NotAllowedError")) },
+    configurable: true,
+  });
+}
+
+async function createWithFakeTimeouts() {
+  vi.useFakeTimers({ toFake: ["Date", "setTimeout"], now: thursdayMorning });
+  await act(async () => fireEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" })));
 }
 
 async function fillIn(day: string) {
@@ -205,20 +217,20 @@ describe("Utwórz i wyślij na grupę", () => {
     expect(push).toHaveBeenCalledWith("/e/abcdefghij");
   });
 
-  it("says the link was not copied and still lands on the poll", async () => {
+  it("says the link was not copied for 4 s, then lands on the poll", async () => {
     Object.defineProperty(navigator, "share", { value: undefined, configurable: true });
-    Object.defineProperty(navigator, "clipboard", {
-      value: { writeText: async () => Promise.reject(new DOMException("denied", "NotAllowedError")) },
-      configurable: true,
-    });
+    refuseClipboard();
     createPoll.mockResolvedValue({ ok: true, id: "abcdefghij" });
     render(<CreatePollForm />);
     await fillIn("Dziś");
 
-    await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
+    await createWithFakeTimeouts();
+    await act(() => vi.advanceTimersByTimeAsync(3999));
 
     expect(screen.getByText("Nie udało się skopiować linku. Skopiuj go z paska adresu.")).toBeInTheDocument();
-    await waitFor(() => expect(push).toHaveBeenCalledWith("/e/abcdefghij"), { timeout: 2000 });
+    expect(push).not.toHaveBeenCalled();
+    await act(() => vi.advanceTimersByTimeAsync(1));
+    expect(push).toHaveBeenCalledWith("/e/abcdefghij");
   });
 
   it("says to copy the link from the address bar when sharing and copying both fail", async () => {
@@ -226,18 +238,15 @@ describe("Utwórz i wyślij na grupę", () => {
       value: async () => Promise.reject(new DOMException("denied", "NotAllowedError")),
       configurable: true,
     });
-    Object.defineProperty(navigator, "clipboard", {
-      value: { writeText: async () => Promise.reject(new DOMException("denied", "NotAllowedError")) },
-      configurable: true,
-    });
+    refuseClipboard();
     createPoll.mockResolvedValue({ ok: true, id: "abcdefghij" });
     render(<CreatePollForm />);
     await fillIn("Dziś");
 
-    await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
+    await createWithFakeTimeouts();
 
     expect(screen.getByText("Nie udało się skopiować linku. Skopiuj go z paska adresu.")).toBeInTheDocument();
-    expect(push).not.toHaveBeenCalled();
-    await waitFor(() => expect(push).toHaveBeenCalledWith("/e/abcdefghij"), { timeout: 2000 });
+    await act(() => vi.advanceTimersByTimeAsync(4000));
+    expect(push).toHaveBeenCalledWith("/e/abcdefghij");
   });
 });
