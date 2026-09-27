@@ -3,7 +3,7 @@ import { participants, slots } from "@/shared/db/schema";
 import { asc, eq } from "drizzle-orm";
 import type { Results } from "./results-schema";
 
-type PollGrid = { dates: string[]; firstHour: number; lastHour: number };
+type PollGrid = Pick<Results, "dates" | "final"> & { firstHour: number; lastHour: number };
 
 export function readResults(id: string, poll: PollGrid, now: Date): Results {
   const db = getDb();
@@ -30,5 +30,6 @@ export function readResults(id: string, poll: PollGrid, now: Date): Results {
       savedAt: respondent.savedAt.getTime(),
       slots: freeSlots.filter((slot) => slot.participantId === respondent.id).map(({ date, hour }) => ({ date, hour })),
     })),
+    final: poll.final,
   };
 }

@@ -3,6 +3,13 @@
   gap: var(--space-2);
 }
 
+.problem {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--accent-ink);
+}
+
 .empty {
   padding: var(--space-5);
   border-radius: var(--radius-card);

@@ -1,3 +1,4 @@
+import { Button } from "@/shared/ui/button/button";
 import { Card } from "@/shared/ui/card/card";
 import { Text } from "@/shared/ui/text/text";
 import type { Run } from "./best-time";
@@ -10,9 +11,10 @@ type BestTimeCardProps = {
   others: Run[];
   respondentCount: number;
   cannot: string[];
+  onSet?: (run: Run) => void;
 };
 
-export function BestTimeCard({ best, previousBest, others, respondentCount, cannot }: BestTimeCardProps) {
+export function BestTimeCard({ best, previousBest, others, respondentCount, cannot, onSet }: BestTimeCardProps) {
   const share = (run: Run) => `${run.free.length} z ${respondentCount}`;
 
   if (!best) {
@@ -40,6 +42,13 @@ export function BestTimeCard({ best, previousBest, others, respondentCount, cann
               {cannot.length > 0 && <span>Nie może: {cannot.join(", ")}</span>}
             </p>
           </div>
+          {onSet && (
+            <div className={styles.set}>
+              <Button variant="on-dark" block onClick={() => onSet(best)}>
+                Ustal ten termin
+              </Button>
+            </div>
+          )}
         </Card>
       </section>
       {others.length > 0 && (
@@ -53,6 +62,11 @@ export function BestTimeCard({ best, previousBest, others, respondentCount, cann
                 <Card size="compact">
                   <span className={styles.otherTime}>{shortRunLabel(run)}</span>
                   <span className={styles.otherShare}>{share(run)}</span>
+                  {onSet && (
+                    <Button variant="text" aria-label={`Ustal ten termin: ${shortRunLabel(run)}`} onClick={() => onSet(run)}>
+                      Ustal ten termin
+                    </Button>
+                  )}
                 </Card>
               </li>
             ))}

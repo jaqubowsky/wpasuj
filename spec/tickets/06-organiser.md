@@ -1,6 +1,6 @@
 # 06: Organiser's extras and the final time
 
-Status: ready-for-agent
+Status: done
 Blocked by: 04-answer-poll.md, 05-view-results.md
 
 ## Parent
@@ -24,7 +24,7 @@ The organiser, on "Wszyscy", has "Przypomnij" and "Więcej" in one row under the
 
 ## Acceptance criteria
 
-- [ ] Unit tests: reminder text for 0, 1, 2 and 3+ names; `.ics` with DTSTART and DTEND in UTC for a poll zone of `Europe/Warsaw` across a DST change
-- [ ] Action tests: set, clear and delete succeed for the organiser and return `not-organiser` and `gone`
-- [ ] Playwright: remind copies text naming who answered; set the time, a participant context sees "Ustalone" and downloads the `.ics` with the right UTC times; answering is closed; the organiser link restores organiser controls in a fresh context
-- [ ] Screenshots at 390 and 1440: organiser row, menu open, delete confirm, Ustalone; PR body names the parts compared
+- [x] Unit tests: reminder text for 0, 1, 2 and 3+ names; `.ics` with DTSTART and DTEND in UTC for a poll zone of `Europe/Warsaw` across a DST change — `src/modules/view-results/reminder-text.test.ts`; `src/modules/view-results/calendar-file.test.ts` ("keeps the wall-clock hours across the night the clocks go back")
+- [x] Action tests: set, clear and delete succeed for the organiser and return `not-organiser` and `gone` — `src/modules/create-poll/organiser-actions.test.ts`
+- [x] Playwright: remind copies text naming who answered; set the time, a participant context sees "Ustalone" and downloads the `.ics` with the right UTC times; answering is closed; the organiser link restores organiser controls in a fresh context — `e2e/organiser.spec.ts` (phone-chromium and desktop-chromium here, phone-webkit in CI)
+- [x] Screenshots at 390 and 1440: organiser row, menu open, delete confirm, Ustalone; PR body names the parts compared — `organiser-row`, `organiser-menu`, `organiser-delete-confirm`, `final-time` from `e2e/organiser.spec.ts`; the PR body's table

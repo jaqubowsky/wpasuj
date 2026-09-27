@@ -75,7 +75,18 @@ it("answers with the poll's grid and every respondent's free hours", async () =>
       },
       { name: "Bartek", savedAt: Date.parse("2030-10-15T09:40:00Z"), slots: [] },
     ],
+    final: null,
   });
+});
+
+it("carries the time the organiser set", async () => {
+  await seedPoll(["2030-10-19", "2030-10-20"]);
+  await db.update(polls).set({ finalDate: "2030-10-20", finalFirstHour: 18, finalLastHour: 20 });
+
+  const response = await get(pollId);
+
+  const { resultsSchema } = await import("@/modules/view-results/results-schema");
+  expect(resultsSchema.parse(await response.json()).final).toEqual({ date: "2030-10-20", firstHour: 18, lastHour: 20 });
 });
 
 it("answers 404 for a poll that does not exist", async () => {

@@ -40,5 +40,5 @@ export function useResults(pollId: string, initial: Results) {
   });
 
   const gone = query.error instanceof PollGone;
-  return { results: query.data, gone, refreshFailed: query.isRefetchError && !gone };
+  return { results: query.data, gone, refreshFailed: query.isRefetchError && !gone, refresh: query.refetch };
 }
