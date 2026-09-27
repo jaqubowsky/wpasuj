@@ -1,6 +1,6 @@
 # 18: Story scene "Każdy klika godziny"
 
-Status: ready-for-agent
+Status: done
 Blocked by: 15-story-frame.md
 
 ## Parent
@@ -22,6 +22,6 @@ At step 4 the phone turns into the poll on "Moje": a finger paints seven cells a
 
 ## Acceptance criteria
 
-- [ ] Unit test of the scene's pure state at in-step time 0, 0.5 and 1
-- [ ] e2e: at its step the scene is visible and the others are not
-- [ ] Screenshots at 1440 beside `story-4.png` and at 390 in the sequence; differences listed in the PR body
+- [x] Unit test of the scene's pure state at in-step time 0, 0.5 and 1: `src/modules/landing/domain/paint-poll.test.ts`
+- [x] e2e: at its step the scene is visible and the others are not: `e2e/story.spec.ts` "the fourth scene paints hours on the poll and shows only at its step"
+- [x] Screenshots at 1440 beside `story-4.png` and at 390 in the sequence; differences listed in the PR body: `landing-story-4-desktop-chromium.png`, `landing-story-4-phone-chromium.png`
