@@ -13,6 +13,7 @@ const steps = [
 
 const story = (page: Page) => page.getByRole("region", { name: "Jak to działa" });
 const caption = (page: Page, heading: string) => story(page).getByRole("heading", { name: heading });
+const shown = (page: Page, text: string) => story(page).getByText(text, { exact: true }).filter({ visible: true });
 
 async function scrollThroughStory(page: Page, share: number) {
   await story(page).evaluate((section, share) => {
@@ -98,8 +99,8 @@ test("the fourth scene paints hours on the poll and shows only at its step", asy
 
   await scrollThroughStory(page, 3.6 / steps.length);
 
-  await expect(story(page).getByText("Kuba pyta", { exact: true })).toBeVisible();
-  await expect(story(page).getByText("Moje", { exact: true })).toBeVisible();
+  await expect(story(page).getByText("Kuba pyta", { exact: true }).filter({ visible: true })).toHaveCount(1);
+  await expect(story(page).getByText("Moje", { exact: true }).filter({ visible: true })).toHaveCount(1);
   await expect(story(page).getByText("Utwórz i wyślij na grupę")).toBeHidden();
   await expect(story(page).getByText("Ej, planszówki w weekend? Kiedy możecie?").filter({ visible: true })).toHaveCount(0);
   await expect(caption(page, steps[3].heading)).toBeVisible();
@@ -108,7 +109,51 @@ test("the fourth scene paints hours on the poll and shows only at its step", asy
 
   await scrollThroughStory(page, 4.5 / steps.length);
 
-  await expect(story(page).getByText("Kuba pyta", { exact: true })).toBeHidden();
+  await expect(story(page).locator("[data-painted]").filter({ visible: true })).toHaveCount(0);
+});
+
+test("at step 6 the best-time card rises over the heat, alone in the phone", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "the story pins from 1280px");
+  await page.goto("/");
+  await story(page).scrollIntoViewIfNeeded();
+
+  await scrollThroughStory(page, 5.6 / steps.length);
+
+  for (const text of ["Najlepiej", "Sobota 18.10, 19–22", "5 z 6 może", "Nie może: Ola", "Ustal ten termin"]) {
+    await expect(shown(page, text)).toHaveCount(1);
+  }
+  await expect(story(page).locator("[data-chosen]").filter({ visible: true })).toHaveCount(0);
+  await expect(story(page).getByText("Kuba pyta", { exact: true }).filter({ visible: true })).toHaveCount(1);
+  await expect(caption(page, steps[5].heading)).toBeVisible();
+  await settleAnimations(page);
+  await page.screenshot({ path: `e2e/screenshots/landing-story-6-${testInfo.project.name}.png` });
+
+  await scrollThroughStory(page, 4.5 / steps.length);
+
+  await expect(shown(page, "Ustal ten termin")).toHaveCount(0);
+});
+
+test("at step 7 the time is settled, off to the calendar, alone in the phone", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "the story pins from 1280px");
+  await page.goto("/");
+  await story(page).scrollIntoViewIfNeeded();
+
+  await scrollThroughStory(page, 6.6 / steps.length);
+
+  for (const text of ["Sobota 18.10, 19–22", "Dodaj do kalendarza"]) {
+    await expect(shown(page, text)).toHaveCount(1);
+  }
+  await expect(shown(page, "Ustalone")).toHaveCount(2);
+  await expect(shown(page, "Najlepiej")).toHaveCount(0);
+  await expect(shown(page, "Ustal ten termin")).toHaveCount(0);
+  await expect(story(page).locator("[data-chosen]").filter({ visible: true })).toHaveCount(3);
+  await expect(caption(page, steps[6].heading)).toBeVisible();
+  await settleAnimations(page);
+  await page.screenshot({ path: `e2e/screenshots/landing-story-7-${testInfo.project.name}.png` });
+
+  await scrollThroughStory(page, 5.6 / steps.length);
+
+  await expect(shown(page, "Dodaj do kalendarza")).toHaveCount(0);
 });
 
 test("below 1280px the story is a still sequence, since the caption column is too narrow to pin", async ({ page }, testInfo) => {
@@ -175,4 +220,20 @@ test("on the phone the poll shows its seven painted hours", async ({ page }, tes
   await expect(stepFour.getByText("Kuba pyta", { exact: true })).toBeVisible();
   await expect(stepFour.locator("[data-painted]")).toHaveCount(7);
   await stepFour.screenshot({ path: `e2e/screenshots/landing-story-4-${testInfo.project.name}.png`, style: "header { visibility: hidden; }" });
+});
+
+test("on the phone the best time shows risen, then settled", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("phone"), "the sequence is the phone layout");
+  await page.goto("/#jak-to-dziala");
+  const stepSix = story(page).locator(":scope > div").nth(5);
+  const stepSeven = story(page).locator(":scope > div").nth(6);
+
+  await stepSix.scrollIntoViewIfNeeded();
+  await expect(stepSix.getByText("Ustal ten termin")).toBeVisible();
+  await stepSix.screenshot({ path: `e2e/screenshots/landing-story-6-${testInfo.project.name}.png`, style: "header { visibility: hidden; }" });
+
+  await stepSeven.scrollIntoViewIfNeeded();
+  await expect(stepSeven.getByText("Dodaj do kalendarza")).toBeVisible();
+  await expect(stepSeven.locator("[data-chosen]")).toHaveCount(3);
+  await stepSeven.screenshot({ path: `e2e/screenshots/landing-story-7-${testInfo.project.name}.png`, style: "header { visibility: hidden; }" });
 });
