@@ -6,6 +6,7 @@ import { FinalTime, InviteCard, ResultsBody, ResultsLead, ResultsProvider } from
 import { Avatar } from "@/shared/ui/avatar/avatar";
 import { Text } from "@/shared/ui/text/text";
 import { Morph, pollTitleMorph } from "@/shared/morph";
+import { siteUrl } from "@/shared/site-url";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -22,7 +23,7 @@ export async function generateMetadata({ params }: PageProps<"/e/[id]">): Promis
   if (!poll) return {};
   const question = `Kiedy możesz? ${poll.title}`;
   return {
-    metadataBase: new URL(process.env.SITE_URL!),
+    metadataBase: await siteUrl(),
     title: question,
     description: question,
     openGraph: { title: question, description: question },

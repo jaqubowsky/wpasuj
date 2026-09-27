@@ -1,10 +1,12 @@
 import { productName } from "@/shared/brand";
 import { Text } from "@/shared/ui/text/text";
 import type { ReactNode } from "react";
+import { headline, pitch } from "../domain/pitch";
 import { Faq } from "./faq/faq";
 import { Footer } from "./footer/footer";
 import { GoToFormButton } from "./go-to-form-button";
 import { LazyDemo, LazyStory } from "./lazy-sections";
+import { WebApplicationJsonLd } from "./web-application-json-ld";
 
 const formId = "utworz";
 
@@ -26,9 +28,10 @@ const reasons = [
   },
 ];
 
-export function Landing({ hero }: { hero: ReactNode }) {
+export function Landing({ hero, home }: { hero: ReactNode; home: URL }) {
   return (
     <>
+      <WebApplicationJsonLd home={home} />
       <header className="sticky top-[0] z-1 box-border flex h-[72px] items-center justify-between bg-paper px-5 lg:px-[48px]">
         <div className="flex items-center gap-[10px]">
           <span aria-hidden className="grid grid-cols-[repeat(2,var(--spacing-2))] gap-[2px]">
@@ -49,10 +52,10 @@ export function Landing({ hero }: { hero: ReactNode }) {
           <div className="flex flex-col gap-3">
             <span className="text-bubble font-semibold text-accent-ink">{productName}</span>
             <h1 id="hero-heading" className="m-[0] font-display font-extrabold tracking-[-0.03em] text-balance text-title-desktop/[42px] lg:[font-size:84px] lg:leading-[84px]">
-              Kiedy się widzimy? Ustalcie to w minutę.
+              {headline}
             </h1>
             <p className="m-[0] max-w-[30em] text-section/[28px] text-muted lg:text-story-lead">
-              Wrzucasz jeden link na grupę, każdy klika godziny, kiedy może. Najlepszy termin wyskakuje sam.
+              {pitch}
             </p>
           </div>
           <div id={formId} className="scroll-mt-[72px]">
