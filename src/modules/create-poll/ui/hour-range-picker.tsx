@@ -1,6 +1,5 @@
 import { Chip } from "@/shared/ui/chip/chip";
 import { Stepper } from "@/shared/ui/stepper/stepper";
-import styles from "./create-poll-form.module.css";
 import type { HourRangeState, RangeChoice } from "./use-hour-range";
 
 const choices: { choice: RangeChoice; label: string }[] = [
@@ -12,7 +11,7 @@ const choices: { choice: RangeChoice; label: string }[] = [
 export function HourRangePicker({ hours }: { hours: HourRangeState }) {
   return (
     <>
-      <div className={styles.chips}>
+      <div className="flex flex-wrap gap-2">
         {choices.map(({ choice, label }) => (
           <Chip key={choice} pressed={hours.choice === choice} onClick={() => hours.choose(choice)}>
             {label}
@@ -20,7 +19,7 @@ export function HourRangePicker({ hours }: { hours: HourRangeState }) {
         ))}
       </div>
       {hours.choice === "custom" && (
-        <div className={styles.steppers}>
+        <div className="mt-4 flex flex-wrap gap-3">
           <Stepper label="od" value={hours.custom.firstHour} {...hours.startBounds} onChange={hours.setStart} />
           <Stepper label="do" value={hours.custom.lastHour} {...hours.endBounds} onChange={hours.setEnd} />
         </div>

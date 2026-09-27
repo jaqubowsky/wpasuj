@@ -1,6 +1,7 @@
 import type { ComponentType } from "react";
 import { CreateForm } from "./scenes/create-form";
 import { HeatGrid } from "./scenes/heat-grid";
+import { PaintPoll } from "./scenes/paint-poll";
 import { SharedLink } from "./scenes/shared-link";
 import { SilentGroup } from "./scenes/silent-group";
 
@@ -41,6 +42,7 @@ export const storySteps: StoryStep[] = [
     kicker: "Krok 3",
     heading: "Każdy klika swoje godziny.",
     body: "Imię i kilka kafelków. Można przeciągnąć palcem po kilku naraz. Zapisuje się samo.",
+    Scene: PaintPoll,
   },
   {
     label: "Godziny się nagrzewają",
