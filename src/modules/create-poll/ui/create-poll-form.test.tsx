@@ -89,17 +89,74 @@ describe("Kiedy?", () => {
 });
 
 describe("O której?", () => {
-  it("keeps Wieczór 17–23 by default and Własne reveals od and do", async () => {
+  it("shows Od and Do of the evening, with no presets", () => {
     render(<CreatePollForm />);
-    expect(screen.getByRole("button", { name: "Wieczór 17–23", pressed: true })).toBeInTheDocument();
-    expect(screen.queryByRole("group", { name: "od" })).not.toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole("button", { name: "Własne" }));
+    expect(screen.getByRole("button", { name: "Od 17:00" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Do 23:00" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Wieczór 17–23" })).not.toBeInTheDocument();
+    expect(screen.getAllByText("17:00 → 23:00 · 6 godzin")).not.toHaveLength(0);
+  });
 
-    const from = screen.getByRole("group", { name: "od" });
-    const to = screen.getByRole("group", { name: "do" });
-    expect(within(from).getByRole("status")).toHaveTextContent("17");
-    expect(within(to).getByRole("status")).toHaveTextContent("23");
+  it("picks 22:00 to 4:00 in the sheet's two hour columns", async () => {
+    render(<CreatePollForm />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Od 17:00" }));
+    const sheet = screen.getByRole("dialog", { name: "O której?" });
+    await userEvent.click(within(within(sheet).getByRole("group", { name: "Od" })).getByRole("button", { name: "22:00" }));
+    await userEvent.click(within(within(sheet).getByRole("group", { name: "Do" })).getByRole("button", { name: "4:00" }));
+
+    expect(within(sheet).getByText("22:00 → 4:00 · 6 godzin")).toBeInTheDocument();
+    await userEvent.click(within(sheet).getByRole("button", { name: "Gotowe" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Do 4:00" })).toBeInTheDocument();
+  });
+
+  it("opens the sheet on the hour of the field that was tapped", async () => {
+    render(<CreatePollForm />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Do 23:00" }));
+
+    expect(within(screen.getByRole("group", { name: "Do" })).getByRole("button", { name: "23:00" })).toHaveFocus();
+  });
+
+  it("closes the sheet on Escape and on the scrim, back on the field that opened it", async () => {
+    render(<CreatePollForm />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Do 23:00" }));
+    await userEvent.keyboard("{Escape}");
+
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Do 23:00" })).toHaveFocus();
+    await userEvent.click(screen.getByRole("button", { name: "Od 17:00" }));
+    await userEvent.click(screen.getByTestId("hour-sheet-scrim"));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "Od 17:00" }));
+    await userEvent.keyboard("{Escape}");
+    expect(screen.getByRole("button", { name: "Od 17:00" })).toHaveFocus();
+  });
+
+  it("picks 22:00 to 4:00 on the hour tiles, start then end", async () => {
+    render(<CreatePollForm />);
+    const tiles = screen.getByRole("group", { name: "Godziny" });
+
+    await userEvent.click(within(tiles).getByRole("button", { name: "22:00" }));
+    expect(screen.getByText("Od 22:00, teraz kliknij koniec")).toBeInTheDocument();
+    expect(within(tiles).queryAllByRole("button", { pressed: true })).toEqual([]);
+    await userEvent.click(within(tiles).getByRole("button", { name: "3:00" }));
+
+    expect(within(tiles).getAllByRole("button", { pressed: true }).map((tile) => tile.textContent)).toEqual(["22", "23", "0", "1", "2", "3"]);
+    expect(screen.getAllByText("22:00 → 4:00 · 6 godzin")).not.toHaveLength(0);
+  });
+
+  it("starts again from a tile before the start", async () => {
+    render(<CreatePollForm />);
+    const tiles = screen.getByRole("group", { name: "Godziny" });
+
+    await userEvent.click(within(tiles).getByRole("button", { name: "20:00" }));
+    await userEvent.click(within(tiles).getByRole("button", { name: "18:00" }));
+
+    expect(screen.getByText("Od 18:00, teraz kliknij koniec")).toBeInTheDocument();
   });
 });
 
@@ -123,16 +180,16 @@ describe("Utwórz i wyślij na grupę", () => {
 
     await userEvent.type(screen.getByRole("textbox", { name: "Co robimy?" }), "Kino");
     await userEvent.click(screen.getByRole("button", { name: "Ten weekend" }));
-    await userEvent.click(screen.getByRole("button", { name: "Własne" }));
-    await userEvent.click(within(screen.getByRole("group", { name: "od" })).getByRole("button", { name: "Później" }));
+    await userEvent.click(within(screen.getByRole("group", { name: "Godziny" })).getByRole("button", { name: "22:00" }));
+    await userEvent.click(within(screen.getByRole("group", { name: "Godziny" })).getByRole("button", { name: "3:00" }));
     await userEvent.type(screen.getByRole("textbox", { name: "Twoje imię" }), "Kuba");
     await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
 
     expect(createPoll).toHaveBeenCalledWith({
       title: "Kino",
       dates: ["2026-10-16", "2026-10-17", "2026-10-18"],
-      firstHour: 18,
-      lastHour: 23,
+      firstHour: 22,
+      hourCount: 6,
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       organiserName: "Kuba",
     });

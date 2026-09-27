@@ -1,19 +1,19 @@
-import { summaryOfDates } from "@/shared/dates/format";
+import { clockEndHour, summaryOfDates } from "@/shared/dates/format";
 
-type PreviewedPoll = { organiserName: string; title: string; dates: string[]; firstHour: number; lastHour: number };
+type PreviewedPoll = { organiserName: string; title: string; dates: string[]; firstHour: number; hourCount: number };
 type Box = { width: number; height: number };
 
-function partOfDay(firstHour: number, lastHour: number) {
-  if (firstHour === 17 && lastHour === 23) return "wieczorem";
-  if (firstHour === 10 && lastHour === 23) return "cały dzień";
-  return `${firstHour}–${lastHour}`;
+function partOfDay(firstHour: number, hourCount: number) {
+  if (firstHour === 17 && hourCount === 6) return "wieczorem";
+  if (firstHour === 10 && hourCount === 13) return "cały dzień";
+  return `${firstHour}–${clockEndHour(firstHour + hourCount)}`;
 }
 
-export function linkPreview({ organiserName, title, dates, firstHour, lastHour }: PreviewedPoll) {
+export function linkPreview({ organiserName, title, dates, firstHour, hourCount }: PreviewedPoll) {
   return {
     asker: `${organiserName} pyta, kiedy możesz`,
     title,
-    when: `${summaryOfDates(dates)}, ${partOfDay(firstHour, lastHour)}`,
+    when: `${summaryOfDates(dates)}, ${partOfDay(firstHour, hourCount)}`,
   };
 }
 

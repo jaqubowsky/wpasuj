@@ -22,13 +22,12 @@ export const createPollSchema = z
       .refine((dates) => new Set(dates).size === dates.length)
       .transform((dates) => dates.toSorted()),
     firstHour: z.int().min(0).max(23),
-    lastHour: z.int().min(1).max(24),
+    hourCount: z.int().min(1).max(24),
     timeZone: z.string().refine(isTimeZone),
     organiserName: z
       .string()
       .transform((name) => name.normalize("NFC").trim().replace(/\s+/g, " "))
       .pipe(z.string().min(1).max(30)),
-  })
-  .refine((poll) => poll.lastHour > poll.firstHour, { path: ["lastHour"] });
+  });
 
 export type CreatePollInput = z.input<typeof createPollSchema>;

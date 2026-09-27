@@ -14,7 +14,7 @@ test("the poll page asks the question and points og:image at its card on SITE_UR
   const pollId = seedPoll({
     dates: ["2030-10-18", "2030-10-19", "2030-10-20"],
     firstHour: 17,
-    lastHour: 23,
+    hourCount: 6,
     title: "Wędrówka: żubry i łąka",
   });
 
@@ -30,7 +30,7 @@ test("the card is a 1200×630 PNG under 1 MB", async ({ page, request }) => {
   const pollId = seedPoll({
     dates: ["2030-10-18", "2030-10-19", "2030-10-20"],
     firstHour: 17,
-    lastHour: 23,
+    hourCount: 6,
     title: "Wędrówka: żubry i łąka",
   });
   await page.goto(`/e/${pollId}`);

@@ -13,7 +13,7 @@ const input = {
   title: "  Planszówki u Michała ",
   dates: ["2026-10-17", "2026-10-16", "2026-10-18"],
   firstHour: 17,
-  lastHour: 23,
+  hourCount: 6,
   timeZone: "Europe/Warsaw",
   organiserName: "  Kuba   Nowak ",
 };
@@ -53,11 +53,20 @@ describe("createPoll", () => {
       organiserName: "Kuba Nowak",
       dates: ["2026-10-16", "2026-10-17", "2026-10-18"],
       firstHour: 17,
-      lastHour: 23,
+      hourCount: 6,
       timeZone: "Europe/Warsaw",
       respondentCount: 0,
       final: null,
     });
+  });
+
+  it("creates an evening that runs past midnight", async () => {
+    const { createPoll } = await actions();
+
+    const result = await createPoll({ ...input, firstHour: 22, hourCount: 6 });
+
+    const { findPoll } = await queries();
+    expect(findPoll(result.ok ? result.id : "", new Date())).toMatchObject({ firstHour: 22, hourCount: 6 });
   });
 
   it("gives the organiser a one-year httpOnly cookie named after the poll", async () => {
@@ -139,8 +148,9 @@ describe("createPoll", () => {
     ["the same date twice", { dates: ["2026-10-16", "2026-10-16"] }],
     ["a date that is not a date", { dates: ["2026-02-30"] }],
     ["a date in the past of the poll's zone", { dates: ["2026-10-14", "2026-10-16"] }],
-    ["an end before the start", { firstHour: 20, lastHour: 20 }],
-    ["an hour outside 0 to 24", { firstHour: 17, lastHour: 25 }],
+    ["no hours", { hourCount: 0 }],
+    ["more than a day of hours", { hourCount: 25 }],
+    ["a start outside 0 to 23", { firstHour: 24 }],
     ["an unknown time zone", { timeZone: "Mars/Olympus" }],
     ["an empty name", { organiserName: "  " }],
     ["a name over 30 characters", { organiserName: "x".repeat(31) }],

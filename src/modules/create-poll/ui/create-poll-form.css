@@ -18,3 +18,13 @@
     transform: rotate(360deg);
   }
 }
+
+[data-create-hour-sheet] {
+  animation: create-hour-sheet-in var(--duration-sheet) var(--ease-out);
+}
+
+@keyframes create-hour-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}

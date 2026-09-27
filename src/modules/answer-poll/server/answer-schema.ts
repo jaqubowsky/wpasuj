@@ -5,7 +5,7 @@ export const pollIdSchema = z.string().regex(/^[A-Za-z0-9_-]{10}$/);
 
 export const nameSchema = z.string().transform(normaliseName).pipe(z.string().min(1).max(maxNameLength));
 
-const slotSchema = z.object({ date: z.iso.date(), hour: z.int().min(0).max(23) });
+const slotSchema = z.object({ date: z.iso.date(), hour: z.int().min(0).max(46) });
 
 export const answerSchema = z.object({
   name: nameSchema,

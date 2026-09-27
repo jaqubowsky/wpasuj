@@ -10,8 +10,8 @@ export function isExpired(dates: string[], today: string) {
   return dates.every((date) => date < cutoff);
 }
 
-export function fitsPoll(poll: { dates: string[]; firstHour: number; lastHour: number }, slots: Slot[]) {
-  return slots.every((slot) => poll.dates.includes(slot.date) && slot.hour >= poll.firstHour && slot.hour < poll.lastHour);
+export function fitsPoll(poll: { dates: string[]; firstHour: number; hourCount: number }, slots: Slot[]) {
+  return slots.every((slot) => poll.dates.includes(slot.date) && slot.hour >= poll.firstHour && slot.hour < poll.firstHour + poll.hourCount);
 }
 
 type Standing = { nameHeldByOther?: string; newcomer: boolean; participantCount: number };

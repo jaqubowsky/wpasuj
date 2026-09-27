@@ -19,6 +19,12 @@ describe("runsOf", () => {
     expect(runs).toEqual([{ date: saturday, firstHour: 18, lastHour: 21, free: ["Ola", "Bartek"] }]);
   });
 
+  it("keeps 23:00 to 1:00 one run across midnight", () => {
+    const runs = runsOf([saturday], [22, 23, 24, 25], [answer("Ola", [[saturday, 23], [saturday, 24]])]);
+
+    expect(runs).toEqual([{ date: saturday, firstHour: 23, lastHour: 25, free: ["Ola"] }]);
+  });
+
   it("splits a run where the free set changes while the count stays the same", () => {
     const runs = runsOf([saturday], hours, [
       answer("Ola", [[saturday, 18], [saturday, 19]]),
