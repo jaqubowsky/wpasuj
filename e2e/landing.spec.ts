@@ -83,6 +83,20 @@ test("the demo loads only once the reader nears it", async ({ page }, testInfo) 
   await expect(demo).toBeAttached();
 });
 
+test("on the phone the create bar stays whole as it leaves with the form", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("phone"), "the bar sticks only on the phone");
+  const createButton = page.getByRole("button", { name: "Utwórz i wyślij na grupę" });
+  await page.goto("/");
+
+  await page.locator("form").evaluate((form) => window.scrollBy(0, form.getBoundingClientRect().bottom - (window.innerHeight - 30)));
+
+  await expect(createButton).toBeInViewport({ ratio: 1 });
+  await page.goto("/#jak-to-dziala");
+  const story = (await page.getByRole("region", { name: "Jak to działa" }).boundingBox())!;
+  const button = (await createButton.boundingBox())!;
+  expect(button.y + button.height).toBeLessThanOrEqual(story.y);
+});
+
 test.describe("with reduced motion", () => {
   test.use({ reducedMotion: "reduce" });
 
