@@ -1,6 +1,6 @@
 # 35: Poll page in the approved look
 
-Status: claimed
+Status: done
 Blocked by: 34-design-token-scale.md, 30-tailwind-landing.md
 
 ## Parent
@@ -32,9 +32,14 @@ The poll page looks and behaves as the approved boards Answer, NameClash, Organi
 
 ## Acceptance criteria
 
-- [ ] Screenshots at 390 and 1440 of every board listed in Outcome beside its `.dc.html`, differences listed in the pull request body
-- [ ] e2e: switching "Moje" and "Wszyscy" on desktop moves no element of the header, title, tab switch or side panel (bounding boxes equal before and after)
-- [ ] e2e: "⋯" opens the sheet on phone and the menu on desktop, Escape and the scrim close it, focus returns to "⋯"; reduced motion has no animation
-- [ ] Action test: `claimName` with the organiser's normalised name returns a refusal and changes no row
-- [ ] e2e: "Nie mogę" pressed and "Cofnij" shift no element above the grid
-- [ ] `lint`, `typecheck`, `test`, `knip`, `build`, `e2e` green
+- [x] Screenshots at 390 and 1440 of every board listed in Outcome beside its `.dc.html`, differences listed in the pull request body: `e2e/poll-page.spec.ts` saves `v3-*` (Invite: `invite-card` from `create-poll.spec.ts`); side by side in the task directory `browser/v3-compare/`
+- [x] e2e: switching "Moje" and "Wszyscy" on desktop moves no element of the header, title, tab switch or side panel (bounding boxes equal before and after): `e2e/poll-page.spec.ts` "DesktopMoje: on a desktop, switching tabs moves no part…"
+- [x] e2e: "⋯" opens the sheet on phone and the menu on desktop, Escape and the scrim close it, focus returns to "⋯"; reduced motion has no animation: `e2e/poll-page.spec.ts` "⋯ opens a sheet on a phone and a menu on a desktop…" and "with reduced motion › the ⋯ sheet opens with no animation"
+- [x] Action test: `claimName` with the organiser's normalised name returns a refusal and changes no row: `answer-actions.test.ts` "refuses the organiser's name and changes no row"
+- [x] e2e: "Nie mogę" pressed and "Cofnij" shift no element above the grid: `e2e/poll-page.spec.ts` "CantMake: Nie mogę and Cofnij move nothing above the grid"
+- [x] `lint`, `typecheck`, `test`, `knip`, `build`, `e2e` green: task directory `logs/gate-20260927T234853/` (e2e phone-chromium and desktop-chromium here; phone-webkit in CI)
+
+## Comments
+
+- "Też dobre" is gone with the boards, so "Ustal termin" sets only the best run; the brief still describes "Też dobre" and asks for a host call (task `status.md`)
+- A tapped hour stays in the desktop side panel after switching to "Moje" (review P2, left for the host)
