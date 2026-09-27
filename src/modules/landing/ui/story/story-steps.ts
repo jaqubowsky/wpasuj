@@ -1,5 +1,6 @@
 import type { ComponentType } from "react";
 import { CreateForm } from "./scenes/create-form";
+import { PaintPoll } from "./scenes/paint-poll";
 import { SilentGroup } from "./scenes/silent-group";
 
 export type SceneProps = { time: number };
@@ -38,6 +39,7 @@ export const storySteps: StoryStep[] = [
     kicker: "Krok 3",
     heading: "Każdy klika swoje godziny.",
     body: "Imię i kilka kafelków. Można przeciągnąć palcem po kilku naraz. Zapisuje się samo.",
+    Scene: PaintPoll,
   },
   {
     label: "Godziny się nagrzewają",

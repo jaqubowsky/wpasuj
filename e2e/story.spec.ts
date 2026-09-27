@@ -59,7 +59,7 @@ test("the second scene fills in the create form and shows only at its step", asy
 
   await scrollThroughStory(page, 1.65 / steps.length);
 
-  await expect(story(page).getByText("Planszówki u Michała")).toBeVisible();
+  await expect(story(page).getByText("Planszówki u Michała").first()).toBeVisible();
   await expect(story(page).getByText("Utwórz i wyślij na grupę")).toBeVisible();
   await expect(story(page).getByText("Ej, planszówki w weekend? Kiedy możecie?")).toBeHidden();
   await expect(caption(page, steps[1].heading)).toBeVisible();
@@ -69,6 +69,26 @@ test("the second scene fills in the create form and shows only at its step", asy
   await scrollThroughStory(page, 2.5 / steps.length);
 
   await expect(story(page).getByText("Utwórz i wyślij na grupę")).toBeHidden();
+});
+
+test("the fourth scene paints hours on the poll and shows only at its step", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "the story pins from 1280px");
+  await page.goto("/");
+  await story(page).scrollIntoViewIfNeeded();
+
+  await scrollThroughStory(page, 3.6 / steps.length);
+
+  await expect(story(page).getByText("Kuba pyta", { exact: true })).toBeVisible();
+  await expect(story(page).getByText("Moje", { exact: true })).toBeVisible();
+  await expect(story(page).getByText("Utwórz i wyślij na grupę")).toBeHidden();
+  await expect(story(page).getByText("Ej, planszówki w weekend? Kiedy możecie?")).toBeHidden();
+  await expect(caption(page, steps[3].heading)).toBeVisible();
+  await settleAnimations(page);
+  await page.screenshot({ path: `e2e/screenshots/landing-story-4-${testInfo.project.name}.png` });
+
+  await scrollThroughStory(page, 4.5 / steps.length);
+
+  await expect(story(page).getByText("Kuba pyta", { exact: true })).toBeHidden();
 });
 
 test("below 1280px the story is a still sequence, since the caption column is too narrow to pin", async ({ page }, testInfo) => {
@@ -122,4 +142,16 @@ test("on the phone the create form shows filled in", async ({ page }, testInfo) 
   await expect(stepTwo.getByText("Planszówki u Michała")).toBeVisible();
   await expect(stepTwo.getByText("Utwórz i wyślij na grupę")).toBeVisible();
   await stepTwo.screenshot({ path: `e2e/screenshots/landing-story-2-${testInfo.project.name}.png`, style: "header { visibility: hidden; }" });
+});
+
+test("on the phone the poll shows its seven painted hours", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("phone"), "the sequence is the phone layout");
+  await page.goto("/#jak-to-dziala");
+  const stepFour = story(page).locator(":scope > div").nth(3);
+
+  await stepFour.scrollIntoViewIfNeeded();
+
+  await expect(stepFour.getByText("Kuba pyta", { exact: true })).toBeVisible();
+  await expect(stepFour.locator("[data-painted]")).toHaveCount(7);
+  await stepFour.screenshot({ path: `e2e/screenshots/landing-story-4-${testInfo.project.name}.png`, style: "header { visibility: hidden; }" });
 });
