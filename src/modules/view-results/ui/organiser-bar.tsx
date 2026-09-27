@@ -4,7 +4,6 @@ import { Button } from "@/shared/ui/button/button";
 import { Card } from "@/shared/ui/card/card";
 import { Text } from "@/shared/ui/text/text";
 import { useId } from "react";
-import styles from "./organiser-bar.module.css";
 import { useOrganiserBar, type BarNotice } from "./use-organiser-bar";
 
 const notices: Record<BarNotice, string> = {
@@ -21,8 +20,8 @@ export function OrganiserBar({ onDelete, ...input }: OrganiserBarProps) {
   const menuId = useId();
 
   return (
-    <div className={styles.bar} data-organiser-bar>
-      <div className={styles.row}>
+    <div className="mb-4 grid gap-3" data-organiser-bar>
+      <div className="flex flex-wrap gap-2">
         <Button onClick={bar.remind}>Przypomnij</Button>
         <Button aria-expanded={bar.menuOpen} aria-controls={menuId} onClick={bar.toggleMenu}>
           Więcej
@@ -31,7 +30,7 @@ export function OrganiserBar({ onDelete, ...input }: OrganiserBarProps) {
       {bar.menuOpen && (
         <div id={menuId}>
           <Card>
-            <div className={styles.menu}>
+            <div className="grid gap-3">
               <Button block onClick={bar.copyLink}>
                 Kopiuj link
               </Button>
@@ -39,16 +38,16 @@ export function OrganiserBar({ onDelete, ...input }: OrganiserBarProps) {
                 <Button block onClick={bar.copyOrganiserLink}>
                   Link organizatora
                 </Button>
-                <p className={styles.note}>
+                <p className="m-[0] mt-2 text-label text-muted">
                   Otwórz go na swoim drugim urządzeniu. Nie wysyłaj go na grupę: kto go ma, może ustalić termin i usunąć ankietę.
                 </p>
               </div>
               {bar.confirmingDelete ? (
-                <div className={styles.confirm}>
+                <div className="grid gap-3">
                   <Text as="p" variant="body">
                     Usunąć ankietę razem z odpowiedziami? Tego nie da się cofnąć.
                   </Text>
-                  <div className={styles.row}>
+                  <div className="flex flex-wrap gap-2">
                     <Button variant="primary" onClick={onDelete}>
                       Tak, usuń
                     </Button>
@@ -66,7 +65,7 @@ export function OrganiserBar({ onDelete, ...input }: OrganiserBarProps) {
           </Card>
         </div>
       )}
-      <p className={styles.notice} role="status">
+      <p className="m-[0] text-label text-muted empty:hidden" role="status">
         {bar.notice && notices[bar.notice]}
       </p>
     </div>
