@@ -37,7 +37,7 @@ export function SharedLink({ time }: SceneProps) {
             ))}
           </div>
         </div>
-        <p className="m-[0] bg-surface px-3 py-2 text-mini text-muted">wpasuj.app · pt 17 – nd 19 października</p>
+        <p className="m-[0] bg-surface px-3 py-2 text-mini text-muted">wpasuj.pl · pt 17 – nd 19 października</p>
       </div>
       <p
         data-in={reply || undefined}

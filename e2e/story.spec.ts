@@ -61,7 +61,7 @@ test("at its step the link scene drops the preview and the reply into the chat, 
   await scrollThroughStory(page, 2.5 / steps.length);
 
   await expect(story(page).getByText("Kuba pyta, kiedy możesz")).toBeVisible();
-  await expect(story(page).getByText("wpasuj.app · pt 17 – nd 19 października")).toBeVisible();
+  await expect(story(page).getByText("wpasuj.pl · pt 17 – nd 19 października")).toBeVisible();
   await expect(story(page).getByText("Zaznaczcie tu, zajmie wam to 20 sekund")).toBeVisible();
   await expect(story(page).getByText("Ej, planszówki w weekend? Kiedy możecie?").filter({ visible: true })).toHaveCount(1);
   await expect(caption(page, steps[2].heading)).toBeVisible();
