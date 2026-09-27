@@ -1,5 +1,8 @@
+import { findMyAnswer } from "@/modules/answer-poll";
+import { AnswerBody, AnswerLead, AnswerProvider } from "@/modules/answer-poll/client";
 import { findPoll } from "@/modules/create-poll";
-import { ResultsPanel } from "@/modules/view-results";
+import { readResults } from "@/modules/view-results";
+import { ResultsBody, ResultsLead, ResultsProvider } from "@/modules/view-results/client";
 import { Avatar } from "@/shared/ui/avatar/avatar";
 import { Text } from "@/shared/ui/text/text";
 import { notFound } from "next/navigation";
@@ -11,8 +14,11 @@ import { PollTabs } from "./poll-tabs";
 
 export default async function PollPage({ params }: PageProps<"/e/[id]">) {
   const { id } = await params;
-  const poll = findPoll(id, new Date());
+  const now = new Date();
+  const poll = findPoll(id, now);
   if (!poll) notFound();
+  const mine = await findMyAnswer(id);
+  const hours = Array.from({ length: poll.lastHour - poll.firstHour }, (_, index) => poll.firstHour + index);
 
   return (
     <div className={`${frame.frame} ${styles.page}`}>
@@ -28,7 +34,15 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
           </Text>
         </div>
         <div className={styles.tabs}>
-          <PollTabs everyone={<ResultsPanel pollId={id} findPoll={(pollId) => findPoll(pollId, new Date())} />} />
+          <AnswerProvider pollId={id} dates={poll.dates} hours={hours} mine={mine}>
+            <ResultsProvider pollId={id} initial={readResults(id, poll, now)}>
+              <PollTabs
+                opening={mine ? "Wszyscy" : "Moje"}
+                leads={{ Moje: <AnswerLead />, Wszyscy: <ResultsLead /> }}
+                bodies={{ Moje: <AnswerBody />, Wszyscy: <ResultsBody /> }}
+              />
+            </ResultsProvider>
+          </AnswerProvider>
         </div>
       </main>
     </div>

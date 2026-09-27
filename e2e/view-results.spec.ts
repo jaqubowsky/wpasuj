@@ -140,10 +140,12 @@ test("the best time leads the page on a phone and sits beside the heatmap on a d
   }
   expect(best.x).toBeGreaterThanOrEqual(grid.x + grid.width);
   expect(best.y).toBeLessThan(tabs.y);
+  expect(grid.y - (tabs.y + tabs.height)).toBeLessThan(80);
   await page.getByRole("button", { name: "nd 20, 18:00, 2 z 3 może" }).click();
   const details = (await page.getByRole("region", { name: "Niedziela 20.10, 18:00" }).boundingBox())!;
   expect(details.x).toBe(best.x);
   expect(details.width).toBe(best.width);
+  expect(details.y).toBeGreaterThan(best.y + best.height);
   const weekday = page.getByRole("columnheader").first().locator("[data-long]");
   expect(await weekday.evaluate((element) => getComputedStyle(element, "::after").content)).toBe('"sobota"');
 });

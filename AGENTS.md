@@ -37,3 +37,4 @@ A ticket is a file in `spec/tickets/`, in the shape of `spec/ticket.md`. It is c
 - Work comes from `spec/board.md`; the host plans in `spec/` and decides what the brief leaves open, listed in `spec/decisions.md`
 - One ticket per container, one pull request per ticket against `main`
 - Done means a pull request with CI green for the host to merge; containers never merge
+- The host merges only after its acceptance finds no open point: each ticked criterion checked against one piece of evidence, the changed files against Scope, the brief sections named in Parent, the last commit's screenshots against `spec/design/v2`, and an independent review of the diff against the brief. It writes the result to `acceptance.md` in the task directory; a pull request sent back closes every open point listed there

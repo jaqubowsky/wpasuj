@@ -1,7 +1,7 @@
 # 08: End-to-end acceptance
 
 Status: ready-for-agent
-Blocked by: 06-organiser.md, 07-link-preview.md
+Blocked by: 06-organiser.md, 07-link-preview.md, 09-design-system-fixes.md, 10-grid-robustness.md, 11-create-fixes.md
 
 ## Parent
 

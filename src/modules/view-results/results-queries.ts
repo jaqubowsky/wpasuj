@@ -3,11 +3,9 @@ import { participants, slots } from "@/shared/db/schema";
 import { asc, eq } from "drizzle-orm";
 import type { Results } from "./results-schema";
 
-export type FindPollGrid = (id: string) => { dates: string[]; firstHour: number; lastHour: number } | undefined;
+type PollGrid = { dates: string[]; firstHour: number; lastHour: number };
 
-export function readResults(id: string, findPoll: FindPollGrid, now: Date): Results | undefined {
-  const poll = findPoll(id);
-  if (!poll) return undefined;
+export function readResults(id: string, poll: PollGrid, now: Date): Results {
   const db = getDb();
   const respondents = db
     .select({ id: participants.id, name: participants.name, savedAt: participants.updatedAt })

@@ -1,15 +1,6 @@
-.side {
-  display: contents;
-}
-
 .lead {
-  order: -1;
   display: grid;
   gap: var(--space-2);
-}
-
-.people {
-  order: 1;
 }
 
 .empty {
@@ -18,12 +9,15 @@
   background: var(--surface);
 }
 
+.body,
+.side {
+  display: grid;
+  gap: var(--space-5);
+}
+
 @media (min-width: 1024px) {
   .side {
-    display: grid;
     align-content: start;
     gap: var(--space-6);
-    grid-column: 2;
-    grid-row: 1 / span 4;
   }
 }

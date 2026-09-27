@@ -19,7 +19,13 @@ describe("Segment", () => {
     render(<Segment label="Widok" options={views} selected="Wszyscy" onSelect={() => {}} panels={panels} />);
 
     expect(screen.getByRole("tabpanel", { name: "Wszyscy" })).toHaveTextContent("wyniki");
-    expect(screen.queryByText("moja siatka")).not.toBeInTheDocument();
+    expect(screen.queryByRole("tabpanel", { name: "Moje" })).not.toBeInTheDocument();
+  });
+
+  it("keeps the other views mounted and hidden, so switching back loses nothing", () => {
+    render(<Segment label="Widok" options={views} selected="Wszyscy" onSelect={() => {}} panels={panels} />);
+
+    expect(screen.getByText("moja siatka")).not.toBeVisible();
   });
 
   it("switches to the tapped view", async () => {

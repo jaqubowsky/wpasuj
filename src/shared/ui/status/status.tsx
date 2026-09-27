@@ -29,16 +29,20 @@ const glyphs = {
 };
 
 type StatusProps = {
-  state: keyof typeof words;
+  state?: keyof typeof words;
 };
 
 export function Status({ state }: StatusProps) {
   return (
     <span className={styles.status} role="status" data-state={state}>
-      <svg viewBox="0 0 16 16" aria-hidden="true">
-        {glyphs[state]}
-      </svg>
-      {words[state]}
+      {state && (
+        <>
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            {glyphs[state]}
+          </svg>
+          {words[state]}
+        </>
+      )}
     </span>
   );
 }

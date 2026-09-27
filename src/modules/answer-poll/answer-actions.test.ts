@@ -1,0 +1,216 @@
+import { participants, polls } from "@/shared/db/schema";
+import { fakeCookies } from "@/shared/testing/fake-cookies";
+import { openTestDatabase } from "@/shared/testing/test-database";
+import { eq } from "drizzle-orm";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+let cookieJar = fakeCookies();
+vi.mock("next/headers", () => ({ cookies: async () => cookieJar }));
+
+const thursdayNoonInWarsaw = new Date("2026-10-15T10:00:00Z");
+const pollId = "Planszowki";
+
+let db: Awaited<ReturnType<typeof openTestDatabase>>;
+
+async function actions() {
+  return import("./answer-actions");
+}
+
+async function myAnswer() {
+  const { findMyAnswer } = await import("./answer-queries");
+  return findMyAnswer(pollId);
+}
+
+function onAnotherDevice() {
+  cookieJar = fakeCookies();
+}
+
+beforeEach(async () => {
+  cookieJar = fakeCookies();
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(thursdayNoonInWarsaw);
+  db = await openTestDatabase();
+  db.insert(polls)
+    .values({
+      id: pollId,
+      title: "Planszówki u Michała",
+      organiserName: "Kuba",
+      dates: ["2026-10-16", "2026-10-17"],
+      firstHour: 17,
+      lastHour: 23,
+      timeZone: "Europe/Warsaw",
+      organiserTokenHash: "organiser",
+      createdByParticipant: false,
+      createdAt: thursdayNoonInWarsaw,
+    })
+    .run();
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+  vi.unstubAllEnvs();
+});
+
+const friday19 = { date: "2026-10-16", hour: 19 };
+const friday20 = { date: "2026-10-16", hour: 20 };
+const saturday17 = { date: "2026-10-17", hour: 17 };
+
+describe("saveAnswer", () => {
+  it("creates the participant on the first save and resumes it from the cookie", async () => {
+    const { saveAnswer } = await actions();
+
+    const result = await saveAnswer(pollId, { name: "  Ola  ", slots: [friday19, friday20] });
+
+    expect(result).toEqual({ ok: true });
+    expect(await myAnswer()).toEqual({ name: "Ola", slots: [friday19, friday20] });
+  });
+
+  it("gives the participant a one-year httpOnly cookie named after the poll", async () => {
+    const { saveAnswer } = await actions();
+
+    await saveAnswer(pollId, { name: "Ola", slots: [] });
+
+    expect(cookieJar.get(pollId)).toEqual({
+      name: pollId,
+      value: expect.stringMatching(/^[A-Za-z0-9_-]{43}$/),
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 31_536_000,
+    });
+  });
+
+  it("saves an empty set for someone who can't make any time", async () => {
+    const { saveAnswer } = await actions();
+    await saveAnswer(pollId, { name: "Ola", slots: [friday19] });
+
+    const result = await saveAnswer(pollId, { name: "Ola", slots: [] });
+
+    expect(result).toEqual({ ok: true });
+    expect(await myAnswer()).toEqual({ name: "Ola", slots: [] });
+  });
+
+  it("replaces the slots and renames the row on later saves", async () => {
+    const { saveAnswer } = await actions();
+    await saveAnswer(pollId, { name: "Ola", slots: [friday19, friday20] });
+
+    await saveAnswer(pollId, { name: "Ola Nowak", slots: [saturday17] });
+
+    expect(await myAnswer()).toEqual({ name: "Ola Nowak", slots: [saturday17] });
+  });
+
+  it("refuses an empty name, a name over 30 characters and a slot outside the poll", async () => {
+    const { saveAnswer } = await actions();
+
+    expect(await saveAnswer(pollId, { name: "   ", slots: [] })).toEqual({ ok: false, reason: "invalid" });
+    expect(await saveAnswer(pollId, { name: "a".repeat(31), slots: [] })).toEqual({ ok: false, reason: "invalid" });
+    expect(await saveAnswer(pollId, { name: "Ola", slots: [{ date: "2026-10-16", hour: 23 }] })).toEqual({ ok: false, reason: "invalid" });
+    expect(await saveAnswer(pollId, { name: "Ola", slots: [{ date: "2026-10-18", hour: 19 }] })).toEqual({ ok: false, reason: "invalid" });
+    expect(await saveAnswer(pollId, { name: "Ola", slots: [friday19, friday19] })).toEqual({ ok: false, reason: "invalid" });
+    expect(await myAnswer()).toBeUndefined();
+  });
+
+  it("tells a newcomer that a name already in the poll is taken, ignoring case", async () => {
+    const { saveAnswer } = await actions();
+    await saveAnswer(pollId, { name: "Łucja", slots: [friday19] });
+    onAnotherDevice();
+
+    const result = await saveAnswer(pollId, { name: "ŁUCJA", slots: [saturday17] });
+
+    expect(result).toEqual({ ok: false, reason: "name-taken", name: "Łucja" });
+    expect(await myAnswer()).toBeUndefined();
+  });
+
+  it("refuses a rename onto someone else's name", async () => {
+    const { saveAnswer } = await actions();
+    await saveAnswer(pollId, { name: "Ola", slots: [] });
+    onAnotherDevice();
+    await saveAnswer(pollId, { name: "Bartek", slots: [friday19] });
+
+    const result = await saveAnswer(pollId, { name: "ola", slots: [friday19] });
+
+    expect(result).toEqual({ ok: false, reason: "name-taken", name: "Ola" });
+    expect(await myAnswer()).toEqual({ name: "Bartek", slots: [friday19] });
+  });
+
+  it("says not-yours and forgets the device once another device took its row over", async () => {
+    const { saveAnswer, claimName } = await actions();
+    await saveAnswer(pollId, { name: "Ola", slots: [friday19] });
+    const firstDevice = cookieJar;
+    onAnotherDevice();
+    await claimName(pollId, "Ola");
+    cookieJar = firstDevice;
+
+    const result = await saveAnswer(pollId, { name: "Ola", slots: [saturday17] });
+
+    expect(result).toEqual({ ok: false, reason: "not-yours" });
+    expect(cookieJar.get(pollId)).toBeUndefined();
+  });
+
+  it("refuses answers once the final time is set", async () => {
+    const { saveAnswer } = await actions();
+    db.update(polls).set({ finalDate: "2026-10-16", finalFirstHour: 19, finalLastHour: 22 }).where(eq(polls.id, pollId)).run();
+
+    expect(await saveAnswer(pollId, { name: "Ola", slots: [friday19] })).toEqual({ ok: false, reason: "closed" });
+  });
+
+  it("refuses a 31st participant", async () => {
+    const { saveAnswer } = await actions();
+    for (let friend = 1; friend <= 30; friend++) {
+      onAnotherDevice();
+      await saveAnswer(pollId, { name: `Osoba ${friend}`, slots: [] });
+    }
+    onAnotherDevice();
+
+    expect(await saveAnswer(pollId, { name: "Ola", slots: [friday19] })).toEqual({ ok: false, reason: "full" });
+  });
+
+  it("says gone for a deleted, expired or malformed poll", async () => {
+    const { saveAnswer } = await actions();
+
+    expect(await saveAnswer("abcdefghij", { name: "Ola", slots: [] })).toEqual({ ok: false, reason: "gone" });
+    expect(await saveAnswer("../etc", { name: "Ola", slots: [] })).toEqual({ ok: false, reason: "gone" });
+    vi.setSystemTime(new Date("2026-12-17T10:00:00Z"));
+    expect(await saveAnswer(pollId, { name: "Ola", slots: [] })).toEqual({ ok: false, reason: "gone" });
+  });
+});
+
+describe("claimName", () => {
+  it("moves the row to this device and hands back its slots", async () => {
+    const { saveAnswer, claimName } = await actions();
+    await saveAnswer(pollId, { name: "Ola", slots: [friday19] });
+    onAnotherDevice();
+
+    const result = await claimName(pollId, " ola ");
+
+    expect(result).toEqual({ ok: true, name: "Ola", slots: [friday19] });
+    expect(await myAnswer()).toEqual({ name: "Ola", slots: [friday19] });
+  });
+
+  it("retires the row this device held, so one person never counts twice", async () => {
+    const { saveAnswer, claimName } = await actions();
+    await saveAnswer(pollId, { name: "Ola", slots: [friday19] });
+    onAnotherDevice();
+    await saveAnswer(pollId, { name: "O", slots: [saturday17] });
+
+    await claimName(pollId, "Ola");
+
+    expect(db.select({ name: participants.name }).from(participants).all()).toEqual([{ name: "Ola" }]);
+  });
+
+  it("refuses a name nobody in the poll has", async () => {
+    const { claimName } = await actions();
+
+    expect(await claimName(pollId, "Ola")).toEqual({ ok: false, reason: "invalid" });
+  });
+
+  it("refuses once the final time is set, and for a gone poll", async () => {
+    const { saveAnswer, claimName } = await actions();
+    await saveAnswer(pollId, { name: "Ola", slots: [] });
+    onAnotherDevice();
+    db.update(polls).set({ finalDate: "2026-10-16", finalFirstHour: 19, finalLastHour: 22 }).where(eq(polls.id, pollId)).run();
+
+    expect(await claimName(pollId, "Ola")).toEqual({ ok: false, reason: "closed" });
+    expect(await claimName("abcdefghij", "Ola")).toEqual({ ok: false, reason: "gone" });
+  });
+});

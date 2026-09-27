@@ -1,7 +1,9 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { LiveResults } from "./live-results";
+import { ResultsBody } from "./results-body";
+import { ResultsLead } from "./results-lead";
+import { ResultsProvider } from "./results-provider";
 import type { Results } from "./results-schema";
 
 const saturday = "2030-10-19";
@@ -24,11 +26,31 @@ const threeAnswers: Results = {
   ],
 };
 
-function renderResults(results: Results) {
-  render(<LiveResults pollId="Pl4nszowki" initial={results} />);
+function Tabs({ results, lead = true }: { results: Results; lead?: boolean }) {
+  return (
+    <ResultsProvider pollId="Pl4nszowki" initial={results}>
+      <div data-testid="lead">{lead && <ResultsLead />}</div>
+      <div data-testid="body">
+        <ResultsBody />
+      </div>
+    </ResultsProvider>
+  );
 }
 
-describe("LiveResults", () => {
+function renderResults(results: Results) {
+  return render(<Tabs results={results} />);
+}
+
+describe("Results", () => {
+  it("puts the best time in the lead and the heatmap with who answered in the body", () => {
+    renderResults(threeAnswers);
+
+    expect(within(screen.getByTestId("lead")).getByRole("region", { name: "Najlepiej" })).toBeVisible();
+    expect(within(screen.getByTestId("lead")).getByRole("list", { name: "Też dobre" })).toBeVisible();
+    expect(within(screen.getByTestId("body")).getByRole("grid")).toBeVisible();
+    expect(within(screen.getByTestId("body")).getByRole("list", { name: "Kto odpowiedział" })).toBeVisible();
+  });
+
   it("leads with the best time and offers two other good ones", () => {
     renderResults(threeAnswers);
 
@@ -96,7 +118,7 @@ describe("LiveResults", () => {
   });
 });
 
-describe("LiveResults refreshing", () => {
+describe("Results refreshing", () => {
   const withZosia = { ...threeAnswers, respondents: [...threeAnswers.respondents, answer("Zosia", minutesBefore(0), [])] };
 
   function answerWith(...responses: Response[]) {
@@ -122,6 +144,19 @@ describe("LiveResults refreshing", () => {
     await wait(9_000);
 
     expect(screen.getByRole("region", { name: "Najlepiej" })).toHaveTextContent("3 z 4 może");
+  });
+
+  it("keeps refreshed answers when the lead mounts again", async () => {
+    vi.useFakeTimers();
+    const fetch = answerWith(Response.json(withZosia));
+    const { rerender } = renderResults(threeAnswers);
+    await wait(9_000);
+
+    rerender(<Tabs results={threeAnswers} lead={false} />);
+    rerender(<Tabs results={threeAnswers} />);
+
+    expect(screen.getByRole("region", { name: "Najlepiej" })).toHaveTextContent("3 z 4 może");
+    expect(fetch).toHaveBeenCalledOnce();
   });
 
   it("asks at once when the window regains focus", async () => {
