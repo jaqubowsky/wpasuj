@@ -27,3 +27,7 @@ A first-time participant opens the link on a phone, types a name, taps or drags 
 - [x] Playwright on phone-chromium and phone-webkit at 390: a fresh participant answers with a name and one drag and sees "Zapisane"; the same with taps only; a second context typing the same name gets "To ty, Ola?" and takes the row over: `e2e/answer-poll.spec.ts` (touch drag and `tap()` on phone-chromium, mouse drag and `tap()` on phone-webkit per decision 14; phone-webkit runs in CI only)
 - [x] Polling never overwrites local "Moje" state (test with a concurrent save from another context): `e2e/answer-poll.spec.ts` "server data never overwrites my Moje grid while another device saves" and `answer-panel.test.tsx` "resumes the saved answer and keeps it when newer server data arrives"; rerun once ticket 05 adds polling
 - [x] Screenshots at 390 and 1440: empty, painting, Zapisuję, Zapisane, Nie zapisano, "To ty?", "nie może"; PR body names the mockup and parts compared: `e2e/screenshots/answer-*` via `e2e/answer-poll.spec.ts`, table in pull request #5
+
+## Comments
+
+- Host acceptance of the first head closed 13 points: tab lead above the Segment and body below (decision 23), "Kiedy możesz?" heading, pending answer sent on hide, leave and unmount, focus rules in `use-answer`, claim reads its row inside the write, stored name on "To ty?" and after "Tak", strokes kept while "Tak" is on its way, sticky "Nie zapisano", "Gotowe" only while this device holds a row, mounted Status region, exhaustive claim switch, View Transition on the tab switch, one-shade paint preview
