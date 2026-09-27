@@ -1,6 +1,7 @@
 import type { ComponentType } from "react";
 import { BestTime } from "./scenes/best-time";
 import { CreateForm } from "./scenes/create-form";
+import { HeatGrid } from "./scenes/heat-grid";
 import { PaintPoll } from "./scenes/paint-poll";
 import { Settled } from "./scenes/settled";
 import { SharedLink } from "./scenes/shared-link";
@@ -50,6 +51,7 @@ export const storySteps: StoryStep[] = [
     kicker: "Krok 4",
     heading: "Wspólne godziny robią się coraz cieplejsze.",
     body: "Im więcej osób może, tym mocniejszy kolor i większa liczba w kafelku.",
+    Scene: HeatGrid,
   },
   {
     label: "Najlepszy termin",
