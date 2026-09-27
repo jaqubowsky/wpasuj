@@ -1,4 +1,4 @@
-import { act, render, screen, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { CreatePollForm } from "./create-poll-form";
@@ -151,6 +151,21 @@ describe("Utwórz i wyślij na grupę", () => {
 
     expect(writeText).toHaveBeenCalledWith(`${location.origin}/e/abcdefghij`);
     expect(screen.getByText("Link skopiowany")).toBeInTheDocument();
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/e/abcdefghij"), { timeout: 2000 });
+  });
+
+  it("a second tap while Link skopiowany shows creates nothing", async () => {
+    stubSharing();
+    createPoll.mockResolvedValue({ ok: true, id: "abcdefghij" });
+    render(<CreatePollForm />);
+    await fillIn("Jutro");
+    await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
+    expect(screen.getByText("Link skopiowany")).toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
+
+    await waitFor(() => expect(push).toHaveBeenCalledTimes(1), { timeout: 2000 });
+    expect(createPoll).toHaveBeenCalledTimes(1);
   });
 
   it("prefills the name used last on this device", async () => {
@@ -177,20 +192,20 @@ describe("Utwórz i wyślij na grupę", () => {
     expect(push).not.toHaveBeenCalled();
   });
 
-  it("says the connection failed and lets the organiser try again", async () => {
+  it("says something went wrong when creating throws and lets the organiser try again", async () => {
     stubSharing(async () => {});
-    createPoll.mockRejectedValueOnce(new TypeError("Failed to fetch")).mockResolvedValueOnce({ ok: true, id: "abcdefghij" });
+    createPoll.mockRejectedValueOnce(new Error("database is locked")).mockResolvedValueOnce({ ok: true, id: "abcdefghij" });
     render(<CreatePollForm />);
     await fillIn("Dziś");
 
     await act(() => userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" })));
-    expect(screen.getByText("Nie udało się połączyć. Sprawdź internet i spróbuj jeszcze raz.")).toBeInTheDocument();
+    expect(screen.getByText("Coś poszło nie tak. Spróbuj jeszcze raz.")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
 
     expect(push).toHaveBeenCalledWith("/e/abcdefghij");
   });
 
-  it("still lands on the poll when the link could not be copied", async () => {
+  it("says the link was not copied and still lands on the poll", async () => {
     Object.defineProperty(navigator, "share", { value: undefined, configurable: true });
     Object.defineProperty(navigator, "clipboard", {
       value: { writeText: async () => Promise.reject(new DOMException("denied", "NotAllowedError")) },
@@ -202,6 +217,27 @@ describe("Utwórz i wyślij na grupę", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
 
-    expect(push).toHaveBeenCalledWith("/e/abcdefghij");
+    expect(screen.getByText("Nie udało się skopiować linku. Skopiuj go z paska adresu.")).toBeInTheDocument();
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/e/abcdefghij"), { timeout: 2000 });
+  });
+
+  it("says to copy the link from the address bar when sharing and copying both fail", async () => {
+    Object.defineProperty(navigator, "share", {
+      value: async () => Promise.reject(new DOMException("denied", "NotAllowedError")),
+      configurable: true,
+    });
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText: async () => Promise.reject(new DOMException("denied", "NotAllowedError")) },
+      configurable: true,
+    });
+    createPoll.mockResolvedValue({ ok: true, id: "abcdefghij" });
+    render(<CreatePollForm />);
+    await fillIn("Dziś");
+
+    await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
+
+    expect(screen.getByText("Nie udało się skopiować linku. Skopiuj go z paska adresu.")).toBeInTheDocument();
+    expect(push).not.toHaveBeenCalled();
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/e/abcdefghij"), { timeout: 2000 });
   });
 });

@@ -1,14 +1,24 @@
-import { addDays } from "@/shared/dates/iso-date";
+import { addDays, todayIn } from "@/shared/dates/iso-date";
 import type { HourRange } from "./hour-range";
 
-export const daysKeptAfterLastDate = 60;
+const daysKeptAfterLastDate = 60;
 
-export function hasPastDate(dates: string[], today: string) {
-  return dates.some((date) => date < today);
+const lastZoneToReachToday = "Etc/GMT+12";
+
+export function isPastDate(date: string, today: string) {
+  return date < today;
 }
 
-export function expiryCutoff(today: string) {
+export function hasPastDate(dates: string[], today: string) {
+  return dates.some((date) => isPastDate(date, today));
+}
+
+function expiryCutoff(today: string) {
   return addDays(today, -daysKeptAfterLastDate);
+}
+
+export function cleanupCutoff(now: Date) {
+  return expiryCutoff(todayIn(lastZoneToReachToday, now));
 }
 
 export function isExpired(dates: string[], today: string) {

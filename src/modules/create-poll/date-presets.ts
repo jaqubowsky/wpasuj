@@ -4,7 +4,7 @@ export const maxDates = 10;
 
 export type Preset = "today" | "tomorrow" | "weekend" | "next-week";
 
-type Selection = { dates: string[]; limitReached?: true };
+export type Selection = { dates: string[]; limitReached?: true };
 
 function daysSinceMonday(date: string) {
   return (new Date(date).getUTCDay() + 6) % 7;

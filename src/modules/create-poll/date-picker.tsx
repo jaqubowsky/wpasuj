@@ -41,7 +41,7 @@ export function DatePicker({ dates, picker }: DatePickerProps) {
             aria-label={fullDate(date)}
             aria-pressed={dates.includes(date)}
             data-today={date === picker.today || undefined}
-            disabled={date < picker.today}
+            disabled={picker.isPast(date)}
             onClick={() => picker.tapDate(date)}
           >
             {dayNumber(date)}

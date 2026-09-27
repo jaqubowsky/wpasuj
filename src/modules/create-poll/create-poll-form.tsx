@@ -60,9 +60,14 @@ export function CreatePollForm() {
             Nie udało się utworzyć ankiety. Sprawdź daty i spróbuj jeszcze raz.
           </p>
         )}
-        {status === "offline" && (
+        {status === "failed" && (
           <p className={styles.notice} role="alert">
-            Nie udało się połączyć. Sprawdź internet i spróbuj jeszcze raz.
+            Coś poszło nie tak. Spróbuj jeszcze raz.
+          </p>
+        )}
+        {status === "not-copied" && (
+          <p className={styles.notice} role="alert">
+            Nie udało się skopiować linku. Skopiuj go z paska adresu.
           </p>
         )}
         {status === "copied" && (
