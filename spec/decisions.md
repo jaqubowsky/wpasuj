@@ -24,3 +24,10 @@ Points `spec/brief.md` leaves open, taken by the host. A container that meets an
 20. Segment tabs are 44px tall, the brief's minimum target, where the design system draws 40px
 21. Selected dates carry their text in `ink` on `accent` (5.3:1), not white (3.3:1), because the brief requires WCAG AA for every text pair; the mockup's white loses
 22. Button has no link form; the gone page's "Zrób nową ankietę" link keeps its own styles in `not-found.module.css`
+23. The name field and its save Status sit at the top of the "Moje" panel, not above the Segment as the mockup and `patterns.md` place them, because only answering needs them and ticket 05 composes the rest of the poll page in parallel
+24. Segment keeps every panel mounted and hides the unselected ones, so switching to "Wszyscy" and back never reseeds "Moje" from the server
+25. `not-yours` means this device's cookie names a row another device took over with "Tak, to ja"; the save action clears that cookie, and the client sends once more as a newcomer, which reaches "To ty, {imię}?"
+26. After "Tak, to ja" the grid holds the row's saved slots plus the ones painted on this device, and that union is saved
+27. The Status reads "Zapisuję" from the stroke on, through the 500 ms quiet time, so "Zapisane" never stands beside a change that has not been sent
+28. "Tak, to ja" on a device that already holds another row of the same poll deletes that row, so one person is one respondent; its slots are already in the grid that decision 26 saves
+29. Copy the brief leaves open: a zero-slot answer reads "Nie możesz w żadnym terminie. Zmieniasz zdanie? Po prostu kliknij."; a missing name "Wpisz swoje imię, żeby zapisać"; `closed` "Termin jest już ustalony, odpowiedzi są zamknięte. Zobacz go w zakładce Wszyscy."; `full` "W tej ankiecie jest już 30 osób, więcej się nie zmieści. Napisz na grupie, kiedy możesz."; `gone` "Tej ankiety już nie ma." with the "Zrób nową ankietę" link of decision 18
