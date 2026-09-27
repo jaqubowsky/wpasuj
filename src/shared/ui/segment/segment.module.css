@@ -1,28 +1,28 @@
 .segment {
   display: flex;
-  padding: var(--space-1);
+  padding: var(--spacing-1);
   border-radius: 12px;
-  background: var(--track);
+  background: var(--color-track);
 }
 
 .segment button {
   flex: 1;
-  height: var(--size-target);
+  height: var(--spacing-target);
   border: 0;
   border-radius: 9px;
   background: none;
   font: 600 16px/1 var(--font-sans);
-  color: var(--muted);
+  color: var(--color-muted);
   cursor: pointer;
 }
 
 .segment button[aria-selected="true"] {
-  background: var(--surface);
-  color: var(--ink);
+  background: var(--color-surface);
+  color: var(--color-ink);
   box-shadow: var(--shadow-lift);
 }
 
 .segment button:focus-visible {
-  outline: 2px solid var(--ink);
+  outline: 2px solid var(--color-ink);
   outline-offset: 1px;
 }

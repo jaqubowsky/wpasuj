@@ -32,6 +32,21 @@ Declared in `package.json` by ticket 01; a change passes all of them:
 
 Each module in `src/modules/` has `domain/` (pure functions and tests, no imports from React, `server/` or `ui/`), `server/` (schemas, queries, actions, the only I/O) and `ui/` (components, hooks), with `index.ts` (server) and `client.ts` (client) as the only public entries. ESLint `no-restricted-imports` enforces the direction. Rule source: `spec/brief.md`, "Code rules".
 
+## Styling
+
+Tailwind v4 utilities written inline in `className`; `src/app/` is the reference (`app-header.tsx`, `page-frame.tsx`, `e/[id]/not-found.tsx`).
+
+- `src/app/tokens.css` is the `@theme static` with the default theme reset: the only colours, spacing, type sizes, radii, shadows, fonts, weights, breakpoint (`lg:` = 1024px) and easings that exist. `better-tailwindcss/no-unknown-classes` fails `npm run lint` on anything else (`p-7`, `bg-red-500`, `md:`). It reads `className` and `cn`/`clsx` calls, and Tailwind generates classes only from `src/**/*.tsx` (`@source` in `globals.css`), so class strings stay in `className` in `.tsx` files
+- Type is `text-<role>` from the brief's type table, which sets size and line height: `text-title` (`lg:text-title-desktop`), `text-best-time` (`lg:text-best-time-desktop`), `text-day`, `text-section`, `text-body`, `text-button`, `text-label`; weight and tracking stay separate utilities (`font-semibold`). Lint rejects `text-[16px]`; a size outside the table needs a new `--text-*` token, which is a host decision
+- Colours come only from tokens: lint rejects a colour in brackets (`bg-[#f00]`, `text-[rgb(…)]`, `bg-[red]`)
+- A length the theme has no token for (`56px`, `340px`, `720px`) is an arbitrary value copied from the CSS it replaces: `h-[56px]`, `max-w-[720px]`. Where a token exists, the token is used
+- Durations have no Tailwind namespace: `duration-(--duration-fill)`. A press scale is `motion-safe:active:scale-97`, and lint rejects a `scale-` class without `motion-safe:`: `scale-*` sets the `scale` property, which the reduced-motion rule in `globals.css` (`transform: none`) does not reach
+- No preflight is loaded, so browser defaults (heading margins, `box-sizing: content-box`) hold as they did under CSS Modules; add `m-0` or `box-border` where the box would change, and drop a declaration the element already inherits (`font-family` from `body`)
+- Utilities are unlayered, so while CSS Modules remain they win or lose by specificity, as the old CSS did
+- A look reused across product screens is a component (`PageFrame`), never an exported class string; the `dev/` demo pages keep their own copy
+- CSS that `className` cannot carry (rules on DOM another module renders, `:has()` layouts, `@keyframes` the ticket keeps out of the theme) goes in a plain `<name>.css` beside its component, selected by `data-*` attributes, tokens through `var(--color-…)`/`var(--spacing-…)`: `e/[id]/poll-page.css`. Plain CSS is global, so every attribute and keyframe name there carries the owner's prefix (`data-poll-*`); a state on the component's own DOM is a `data-[…]:` utility instead
+- Token names inside `var()`: `--color-<name>`, `--spacing-<n>` (also `--spacing-target`, `--spacing-cell`, `--spacing-button`), `--text-<role>` with `--text-<role>--line-height`, `--radius-*`, `--shadow-*`, `--ease-*`, `--duration-*`, `--font-sans`, `--font-display`
+
 ## Tickets
 
 A ticket is a file in `spec/tickets/`, in the shape of `spec/ticket.md`. It is claimed by setting `Status: claimed` before any work, and closed once its work is committed: every acceptance criterion ticked beside its evidence, `Status: done`.
