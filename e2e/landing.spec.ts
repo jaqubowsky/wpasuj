@@ -69,6 +69,51 @@ test("the story and the demo load after the form is interactive", async ({ page,
   expect(lateChunks.length).toBeGreaterThan(0);
 });
 
+const questions = [
+  "Czy znajomi muszą coś instalować albo zakładać konto?",
+  "A jak ktoś otworzy link na innym telefonie?",
+  "Ile to kosztuje?",
+  "Co się dzieje z danymi?",
+];
+const faq = (page: Page) => page.getByRole("region", { name: "Pytania" });
+const answerOf = (page: Page, question: string) => faq(page).locator("details", { hasText: question }).locator("p");
+
+test.describe("on a touch screen", () => {
+  test.use({ hasTouch: true });
+
+  test("each question opens with a tap", async ({ page }) => {
+    await page.goto("/");
+    await faq(page).scrollIntoViewIfNeeded();
+    await expect(page.getByRole("region", { name: "Jak to działa" })).toBeAttached();
+    await expect(page.getByRole("region", { name: "Wypróbuj na żywo" })).toBeAttached();
+
+    for (const question of questions) {
+      await expect(answerOf(page, question)).toBeHidden();
+      await faq(page).getByText(question, { exact: true }).tap();
+      await expect(answerOf(page, question)).toBeVisible();
+    }
+  });
+});
+
+test("each question opens with the keyboard", async ({ page }) => {
+  await page.goto("/");
+  await faq(page).getByText(questions[0], { exact: true }).focus();
+
+  for (const question of questions) {
+    await expect(answerOf(page, question)).toBeHidden();
+    await page.keyboard.press("Enter");
+    await expect(answerOf(page, question)).toBeVisible();
+    await page.keyboard.press("Tab");
+  }
+});
+
+test("the footer names the product and links nowhere", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.getByRole("contentinfo")).toHaveText("Wpasuj, darmowe ankiety terminów dla znajomych");
+  await expect(page.getByRole("contentinfo").getByRole("link")).toHaveCount(0);
+});
+
 test.describe("with reduced motion", () => {
   test.use({ reducedMotion: "reduce" });
 
@@ -90,6 +135,8 @@ test.describe("with reduced motion", () => {
       ["hero", page.getByRole("region", { name: "Kiedy się widzimy? Ustalcie to w minutę." })],
       ["reasons", page.getByRole("region", { name: "Zrobione pod paczkę znajomych, nie pod firmę." })],
       ["final-call", finalCall(page)],
+      ["faq", faq(page)],
+      ["footer", page.getByRole("contentinfo")],
     ] as const) {
       await section.screenshot({ path: `e2e/screenshots/landing-${name}-${testInfo.project.name}.png` });
     }
