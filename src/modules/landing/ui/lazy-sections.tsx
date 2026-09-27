@@ -8,7 +8,7 @@ const storyScreens = 8;
 const demoScreens = 1;
 
 function Placeholder({ screens }: { screens: number }) {
-  return Array.from({ length: screens }, (_, screen) => <div key={screen} className="min-h-dvh" />);
+  return Array.from({ length: screens }, (_, screen) => <div key={screen} data-lazy-placeholder className="min-h-dvh" />);
 }
 
 const Story = dynamic(() => import("./story/story").then((module) => module.Story), {
