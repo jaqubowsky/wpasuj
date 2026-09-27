@@ -62,6 +62,9 @@ test("the header button scrolls to the form and focuses its first field", async 
   await expect(titleField(page)).toBeInViewport();
 });
 
+const storyChunkMarker = "Pytanie do wszystkich to pytanie do nikogo.";
+const demoChunkMarker = "data-demo-panel";
+
 test("the story and the demo load after the form is interactive", async ({ page, request }) => {
   const html = await (await request.get("/")).text();
   const initialChunks = new Set([...html.matchAll(/\/_next\/static\/chunks\/[^"'\s]+\.js/g)].map((match) => match[0]));
@@ -87,7 +90,14 @@ test("the story and the demo load after the form is interactive", async ({ page,
   await finalCall(page).scrollIntoViewIfNeeded();
 
   await expect(page.getByRole("region", { name: "Wypróbuj na żywo" })).toBeAttached();
-  expect(lateChunks.length).toBeGreaterThan(0);
+  const chunksHolding = async (chunks: Iterable<string>, marker: string) => {
+    const bodies = await Promise.all([...chunks].map(async (chunk) => [chunk, await (await request.get(chunk)).text()] as const));
+    return bodies.filter(([, body]) => body.includes(marker)).map(([chunk]) => chunk);
+  };
+  for (const marker of [storyChunkMarker, demoChunkMarker]) {
+    expect(await chunksHolding(initialChunks, marker)).toEqual([]);
+    expect(await chunksHolding(lateChunks, marker)).toHaveLength(1);
+  }
 });
 
 test("the demo loads only once the reader nears it", async ({ page }, testInfo) => {
