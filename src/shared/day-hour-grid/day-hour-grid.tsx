@@ -23,10 +23,11 @@ type DayHourGridProps = {
 };
 
 const weekdays = ["nd", "pn", "wt", "śr", "cz", "pt", "sb"];
+const longWeekdays = ["niedziela", "poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota"];
 
 function dayOf(date: string) {
   const day = new Date(`${date}T00:00:00Z`);
-  return { weekday: weekdays[day.getUTCDay()], number: day.getUTCDate() };
+  return { weekday: weekdays[day.getUTCDay()], longWeekday: longWeekdays[day.getUTCDay()], number: day.getUTCDate() };
 }
 
 function cellUnder(event: PointerEvent): GridCell | undefined {
@@ -68,7 +69,9 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
             const position = { row: 0, column: index + 1 };
             const label = (
               <>
-                <Text variant="meta">{day.weekday}</Text>
+                <Text variant="meta">
+                  <span data-long={day.longWeekday}>{day.weekday}</span>
+                </Text>
                 <Text variant="day-number">{day.number}</Text>
               </>
             );

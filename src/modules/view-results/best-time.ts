@@ -1,11 +1,17 @@
-type Slot = { date: string; hour: number };
-type Answer = { name: string; slots: Slot[] };
+import type { Results } from "./results-schema";
+
+type Answer = Pick<Results["respondents"][number], "name" | "slots">;
+type Slot = Answer["slots"][number];
 export type Run = { date: string; firstHour: number; lastHour: number; free: string[] };
 
 const shownTimes = 3;
 
 export function freeAt(answers: Answer[], { date, hour }: Slot) {
   return answers.filter((answer) => answer.slots.some((slot) => slot.date === date && slot.hour === hour)).map((answer) => answer.name);
+}
+
+export function cannotMake(answers: Answer[], free: string[]) {
+  return answers.map((answer) => answer.name).filter((name) => !free.includes(name));
 }
 
 export function runsOf(dates: string[], hours: number[], answers: Answer[]): Run[] {

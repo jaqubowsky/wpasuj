@@ -1,6 +1,6 @@
-import { render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { LiveResults } from "./live-results";
 import type { Results } from "./results-schema";
 
@@ -93,5 +93,74 @@ describe("LiveResults", () => {
 
     expect(screen.getByText("Nikt jeszcze nie odpowiedział. Wyślij link na grupę.")).toBeVisible();
     expect(screen.queryByRole("grid")).not.toBeInTheDocument();
+  });
+});
+
+describe("LiveResults refreshing", () => {
+  const withZosia = { ...threeAnswers, respondents: [...threeAnswers.respondents, answer("Zosia", minutesBefore(0), [])] };
+
+  function answerWith(...responses: Response[]) {
+    const fetch = vi.fn(async () => responses.shift() ?? Response.json(withZosia));
+    vi.stubGlobal("fetch", fetch);
+    return fetch;
+  }
+
+  async function wait(ms: number) {
+    await act(() => vi.advanceTimersByTimeAsync(ms));
+  }
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+
+  it("shows another answer within 10 seconds, the request included", async () => {
+    vi.useFakeTimers();
+    answerWith(Response.json(withZosia));
+    renderResults(threeAnswers);
+
+    await wait(9_000);
+
+    expect(screen.getByRole("region", { name: "Najlepiej" })).toHaveTextContent("3 z 4 może");
+  });
+
+  it("asks at once when the window regains focus", async () => {
+    vi.useFakeTimers();
+    const fetch = answerWith(Response.json(withZosia));
+    renderResults(threeAnswers);
+
+    fireEvent.focus(window);
+    await wait(0);
+
+    expect(fetch).toHaveBeenCalledOnce();
+    expect(screen.getByRole("region", { name: "Najlepiej" })).toHaveTextContent("3 z 4 może");
+  });
+
+  it("says the poll is gone once the read answers 404, and stops asking", async () => {
+    vi.useFakeTimers();
+    const fetch = answerWith(Response.json({ reason: "gone" }, { status: 404 }));
+    renderResults(threeAnswers);
+
+    await wait(60_000);
+
+    expect(screen.getByRole("heading", { name: "Tej ankiety już nie ma" })).toBeVisible();
+    expect(screen.getByRole("link", { name: "Zrób nową ankietę" })).toHaveAttribute("href", "/");
+    expect(fetch).toHaveBeenCalledOnce();
+  });
+
+  it("says a refresh failed until the next one succeeds", async () => {
+    vi.useFakeTimers();
+    answerWith(new Response(null, { status: 500 }), Response.json(withZosia));
+    renderResults(threeAnswers);
+
+    await wait(9_000);
+
+    expect(screen.getByText("Nie udało się odświeżyć. Spróbujemy za chwilę.")).toBeVisible();
+    expect(screen.getByRole("region", { name: "Najlepiej" })).toHaveTextContent("3 z 3 może");
+
+    await wait(9_000);
+
+    expect(screen.queryByText("Nie udało się odświeżyć. Spróbujemy za chwilę.")).not.toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Najlepiej" })).toHaveTextContent("3 z 4 może");
   });
 });

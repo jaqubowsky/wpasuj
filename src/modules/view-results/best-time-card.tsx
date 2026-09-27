@@ -8,14 +8,13 @@ type BestTimeCardProps = {
   best?: Run;
   previousBest?: Run;
   others: Run[];
-  respondents: string[];
+  respondentCount: number;
+  cannot: string[];
 };
 
-function share(run: Run, respondents: string[]) {
-  return `${run.free.length} z ${respondents.length}`;
-}
+export function BestTimeCard({ best, previousBest, others, respondentCount, cannot }: BestTimeCardProps) {
+  const share = (run: Run) => `${run.free.length} z ${respondentCount}`;
 
-export function BestTimeCard({ best, previousBest, others, respondents }: BestTimeCardProps) {
   if (!best) {
     return (
       <section aria-label="Najlepiej">
@@ -27,7 +26,6 @@ export function BestTimeCard({ best, previousBest, others, respondents }: BestTi
   }
 
   const label = longRunLabel(best);
-  const cannot = respondents.filter((name) => !best.free.includes(name));
 
   return (
     <div className={styles.times}>
@@ -38,7 +36,7 @@ export function BestTimeCard({ best, previousBest, others, respondents }: BestTi
               {label}
             </Text>
             <p className={styles.who}>
-              <span className={styles.can}>{share(best, respondents)} może</span>
+              <span className={styles.can}>{share(best)} może</span>
               {cannot.length > 0 && <span>Nie może: {cannot.join(", ")}</span>}
             </p>
           </div>
@@ -54,7 +52,7 @@ export function BestTimeCard({ best, previousBest, others, respondents }: BestTi
               <li key={shortRunLabel(run)}>
                 <Card size="compact">
                   <span className={styles.otherTime}>{shortRunLabel(run)}</span>
-                  <span className={styles.otherShare}>{share(run, respondents)}</span>
+                  <span className={styles.otherShare}>{share(run)}</span>
                 </Card>
               </li>
             ))}

@@ -99,3 +99,14 @@
 .cell > :first-child {
   width: 100%;
 }
+
+@container (min-width: 600px) {
+  .date [data-long] {
+    font-size: 0;
+  }
+
+  .date [data-long]::after {
+    content: attr(data-long);
+    font-size: 13px;
+  }
+}

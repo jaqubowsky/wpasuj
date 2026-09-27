@@ -7,7 +7,7 @@ import { hourLabel } from "./time-label";
 type CellDetailsProps = {
   cell: { date: string; hour: number };
   free: string[];
-  respondents: string[];
+  cannot: string[];
   onClose: () => void;
 };
 
@@ -30,7 +30,7 @@ function People({ label, names }: { label: string; names: string[] }) {
   );
 }
 
-export function CellDetails({ cell, free, respondents, onClose }: CellDetailsProps) {
+export function CellDetails({ cell, free, cannot, onClose }: CellDetailsProps) {
   const label = hourLabel(cell);
 
   return (
@@ -44,7 +44,7 @@ export function CellDetails({ cell, free, respondents, onClose }: CellDetailsPro
         </Button>
       </div>
       <People label="Mogą" names={free} />
-      <People label="Nie mogą" names={respondents.filter((name) => !free.includes(name))} />
+      <People label="Nie mogą" names={cannot} />
     </section>
   );
 }

@@ -44,15 +44,13 @@
   min-height: var(--size-target);
 }
 
-@media (min-width: 1280px) {
+@media (min-width: 1024px) {
   .details {
-    top: var(--space-8);
-    right: var(--space-10);
-    bottom: auto;
-    left: auto;
-    width: 300px;
-    max-height: calc(100dvh - 2 * var(--space-8));
+    position: static;
+    max-width: none;
+    max-height: none;
     margin: 0;
+    padding-bottom: var(--space-5);
     border-radius: var(--radius-card);
     box-shadow: none;
     animation: none;

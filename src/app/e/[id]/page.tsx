@@ -15,16 +15,18 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
   if (!poll) notFound();
 
   return (
-    <div className={frame.frame}>
+    <div className={`${frame.frame} ${styles.page}`}>
       <AppHeader aside={<Text variant="meta">{answeredCount(poll.respondentCount)}</Text>} />
       <main className={styles.main}>
-        <div className={styles.asker}>
-          <Avatar name={poll.organiserName} />
-          <Text variant="meta">{poll.organiserName} pyta</Text>
+        <div className={styles.head}>
+          <div className={styles.asker}>
+            <Avatar name={poll.organiserName} />
+            <Text variant="meta">{poll.organiserName} pyta</Text>
+          </div>
+          <Text as="h1" variant="title">
+            {poll.title}
+          </Text>
         </div>
-        <Text as="h1" variant="title">
-          {poll.title}
-        </Text>
         <div className={styles.tabs}>
           <PollTabs everyone={<ResultsPanel pollId={id} findPoll={(pollId) => findPoll(pollId, new Date())} />} />
         </div>

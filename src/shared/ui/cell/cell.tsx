@@ -12,12 +12,11 @@ type HeatCellProps = CellButtonProps & {
   heat: 0 | 1 | 2 | 3 | 4 | 5;
   everyone?: boolean;
   best?: boolean;
-  bump?: boolean;
 };
 
 export function Cell(props: AnswerCellProps | HeatCellProps) {
   if ("heat" in props) {
-    const { heat, everyone, best, bump, ...buttonProps } = props;
+    const { heat, everyone, best, ...buttonProps } = props;
     return (
       <button
         type="button"
@@ -25,7 +24,6 @@ export function Cell(props: AnswerCellProps | HeatCellProps) {
         data-heat={heat || undefined}
         data-everyone={everyone || undefined}
         data-best={best || undefined}
-        data-bump={bump || undefined}
         {...buttonProps}
       />
     );

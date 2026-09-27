@@ -9,7 +9,7 @@ import { useResults } from "./use-results";
 type LiveResultsProps = { pollId: string; initial: Results };
 
 function FreshResults({ pollId, initial }: LiveResultsProps) {
-  return <ResultsView results={useResults(pollId, initial)} />;
+  return <ResultsView {...useResults(pollId, initial)} />;
 }
 
 export function LiveResults(props: LiveResultsProps) {

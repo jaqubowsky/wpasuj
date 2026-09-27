@@ -76,19 +76,4 @@ describe("Cell", () => {
     expect(screen.getByText("5")).toHaveAttribute("data-best");
   });
 
-  it("bumps a heat cell whose count rose", () => {
-    render(
-      <>
-        <Cell heat={2} bump aria-label="rośnie">
-          2
-        </Cell>
-        <Cell heat={2} aria-label="stoi">
-          2
-        </Cell>
-      </>,
-    );
-
-    expect(screen.getByRole("button", { name: "rośnie" })).toHaveAttribute("data-bump");
-    expect(screen.getByRole("button", { name: "stoi" })).not.toHaveAttribute("data-bump");
-  });
 });

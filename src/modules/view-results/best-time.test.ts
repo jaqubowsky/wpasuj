@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { bestTimes, runsOf } from "./best-time";
+import { bestTimes, cannotMake, runsOf } from "./best-time";
 
 const saturday = "2030-10-19";
 const sunday = "2030-10-20";
@@ -78,5 +78,14 @@ describe("bestTimes", () => {
   it("has no best time while nobody can make any hour", () => {
     expect(bestTimes([saturday], hours, [answer("Ola", [])])).toEqual([]);
     expect(bestTimes([saturday], hours, [])).toEqual([]);
+  });
+});
+
+describe("cannotMake", () => {
+  it("names every respondent outside the free set, in answer order", () => {
+    const respondents = [answer("Ola", []), answer("Bartek", []), answer("Kasia", []), answer("Zosia", [])];
+
+    expect(cannotMake(respondents, ["Kasia", "Ola"])).toEqual(["Bartek", "Zosia"]);
+    expect(cannotMake(respondents, ["Ola", "Bartek", "Kasia", "Zosia"])).toEqual([]);
   });
 });
