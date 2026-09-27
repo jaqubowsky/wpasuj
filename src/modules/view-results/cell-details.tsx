@@ -2,26 +2,29 @@ import { Avatar } from "@/shared/ui/avatar/avatar";
 import { Button } from "@/shared/ui/button/button";
 import { Text } from "@/shared/ui/text/text";
 import styles from "./cell-details.module.css";
+import type { Results } from "./results-schema";
 import { hourLabel } from "./time-label";
+
+type Person = Pick<Results["respondents"][number], "name" | "normalisedName">;
 
 type CellDetailsProps = {
   cell: { date: string; hour: number };
-  free: string[];
-  cannot: string[];
+  free: Person[];
+  cannot: Person[];
   onClose: () => void;
 };
 
-function People({ label, names }: { label: string; names: string[] }) {
-  if (names.length === 0) return null;
+function People({ label, people }: { label: string; people: Person[] }) {
+  if (people.length === 0) return null;
   return (
     <div>
       <Text as="h3" variant="meta">
         {label}
       </Text>
       <ul className={styles.people} aria-label={label}>
-        {names.map((name) => (
-          <li key={name}>
-            <Avatar name={name} />
+        {people.map(({ name, normalisedName }) => (
+          <li key={normalisedName}>
+            <Avatar name={name} tintKey={normalisedName} />
             {name}
           </li>
         ))}
@@ -43,8 +46,8 @@ export function CellDetails({ cell, free, cannot, onClose }: CellDetailsProps) {
           Zamknij
         </Button>
       </div>
-      <People label="Mogą" names={free} />
-      <People label="Nie mogą" names={cannot} />
+      <People label="Mogą" people={free} />
+      <People label="Nie mogą" people={cannot} />
     </section>
   );
 }

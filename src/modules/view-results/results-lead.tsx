@@ -28,7 +28,7 @@ function ResultsHeadline() {
       previousBest={previousBest}
       others={others}
       respondentCount={respondents.length}
-      cannot={best ? cannotMake(respondents, best.free) : []}
+      cannot={best ? cannotMake(respondents, best.free).map((respondent) => respondent.name) : []}
     />
   );
 }

@@ -5,7 +5,7 @@
 }
 
 .field > span:first-child {
-  font: 600 15px/20px var(--font-sans);
+  font: 500 13px/18px var(--font-sans);
 }
 
 .stepper {
@@ -43,4 +43,5 @@
   min-width: 64px;
   text-align: center;
   font: 700 22px/26px var(--font-display);
+  letter-spacing: -0.02em;
 }

@@ -12,7 +12,7 @@ const readAt = Date.parse("2030-10-15T18:00:00Z");
 const minutesBefore = (minutes: number) => readAt - minutes * 60_000;
 
 function answer(name: string, savedAt: number, cells: [string, number][]) {
-  return { name, savedAt, slots: cells.map(([date, hour]) => ({ date, hour })) };
+  return { name, normalisedName: name.toLocaleLowerCase("pl"), savedAt, slots: cells.map(([date, hour]) => ({ date, hour })) };
 }
 
 const threeAnswers: Results = {
@@ -108,6 +108,20 @@ describe("Results", () => {
       "BBartek20 min temu",
       "OOla2 godz. temu",
     ]);
+  });
+
+  it("keeps a respondent's tint through a case-only rename", async () => {
+    const tintsOf = async (name: string) => {
+      const { unmount } = renderResults({ ...threeAnswers, respondents: [{ ...threeAnswers.respondents[0], name }] });
+      const listed = within(screen.getByRole("list", { name: "Kto odpowiedział" })).getByRole("img", { name });
+      await userEvent.click(screen.getByRole("button", { name: "sb 19, 17:00, 1 z 1 może" }));
+      const free = within(screen.getByRole("list", { name: "Mogą" })).getByRole("img", { name });
+      const tints = [listed.dataset.tint, free.dataset.tint];
+      unmount();
+      return tints;
+    };
+
+    expect(await tintsOf("ola")).toEqual(await tintsOf("Ola"));
   });
 
   it("asks to send the link while nobody answered", () => {

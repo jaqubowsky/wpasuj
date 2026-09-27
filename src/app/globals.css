@@ -17,4 +17,8 @@ body {
     transition: none !important;
     animation: none !important;
   }
+
+  :is(button, a):active {
+    transform: none !important;
+  }
 }
