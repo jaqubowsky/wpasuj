@@ -10,6 +10,39 @@ declare global {
 
 const slow4g = { offline: false, latency: 562.5, downloadThroughput: (1474.56 * 1024) / 8, uploadThroughput: (675 * 1024) / 8 };
 
+function benchmarkIndex() {
+  function withGarbage() {
+    const start = Date.now();
+    let iterations = 0;
+    while (Date.now() - start < 500) {
+      let text = "";
+      for (let j = 0; j < 10000; j++) text += "a";
+      if (text.length === 1) throw new Error("keeps the loop from being optimised away");
+      iterations++;
+    }
+    return Math.round(iterations / 10 / ((Date.now() - start) / 1000));
+  }
+  function withoutGarbage() {
+    const first: number[] = [];
+    const second: number[] = [];
+    for (let i = 0; i < 100000; i++) first[i] = second[i] = i;
+    const start = Date.now();
+    let iterations = 0;
+    while (iterations % 10 !== 0 || Date.now() - start < 500) {
+      const [source, target] = iterations % 2 === 0 ? [first, second] : [second, first];
+      for (let j = 0; j < source.length; j++) target[j] = source[j];
+      iterations++;
+    }
+    return Math.round(iterations / 10 / ((Date.now() - start) / 1000));
+  }
+  return (withGarbage() + withoutGarbage()) / 2;
+}
+
+function midTierMobileSlowdown(index: number) {
+  if (index >= 1500) return 4;
+  return index >= 1000 ? 2 : 1;
+}
+
 function cumulativeLayoutShift(shifts: Shift[]) {
   let worst = 0;
   let session: Shift[] = [];
@@ -24,10 +57,12 @@ function cumulativeLayoutShift(shifts: Shift[]) {
 }
 
 test("the landing holds LCP, TBT and CLS on a throttled phone, story included", async ({ page }) => {
+  const index = await page.evaluate(benchmarkIndex);
+  const slowdown = midTierMobileSlowdown(index);
   const cdp = await page.context().newCDPSession(page);
   await cdp.send("Network.enable");
   await cdp.send("Network.emulateNetworkConditions", slow4g);
-  await cdp.send("Emulation.setCPUThrottlingRate", { rate: 4 });
+  await cdp.send("Emulation.setCPUThrottlingRate", { rate: slowdown });
   await page.addInitScript(() => {
     window.landingPerf = { longTasks: [], shifts: [] };
     const describe = (element: Element | null) => (element ? `${element.tagName.toLowerCase()}${element.id ? `#${element.id}` : ""}` : "none");
@@ -61,7 +96,7 @@ test("the landing holds LCP, TBT and CLS on a throttled phone, story included", 
     .filter((task) => task.startTime >= firstContentfulPaint)
     .reduce((sum, task) => sum + Math.max(0, task.duration - 50), 0);
   const cls = cumulativeLayoutShift(shifts);
-  console.log(`LCP ${Math.round(lcp.startTime)} ms on ${lcp.element}, TBT ${Math.round(tbt)} ms, CLS ${cls.toFixed(3)} with the story scrolled through`);
+  console.log(`LCP ${Math.round(lcp.startTime)} ms on ${lcp.element}, TBT ${Math.round(tbt)} ms, CLS ${cls.toFixed(3)} with the story scrolled through (benchmark index ${Math.round(index)}, CPU ${slowdown}x)`);
   expect.soft(lcp.startTime).toBeLessThanOrEqual(2500);
   expect.soft(tbt).toBeLessThanOrEqual(200);
   expect.soft(cls).toBeLessThanOrEqual(0.1);
