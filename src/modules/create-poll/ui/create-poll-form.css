@@ -1,0 +1,20 @@
+[data-create-pending] {
+  animation: create-pending-in var(--duration-sheet) var(--ease-out);
+}
+
+[data-create-spinner] {
+  animation: create-spin 700ms linear infinite;
+}
+
+@keyframes create-pending-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes create-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

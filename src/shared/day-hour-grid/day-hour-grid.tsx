@@ -2,6 +2,7 @@
 
 import { useRef, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { Text } from "@/shared/ui/text/text";
+import { dateMorph, Morph } from "@/shared/morph";
 import { useGridKeyboard } from "./use-grid-keyboard";
 import { usePaintStroke, type GridCell, type PaintedRectangle } from "./use-paint-stroke";
 
@@ -19,6 +20,7 @@ type DayHourGridProps = {
   onDateTap?: (date: string) => void;
   onHourTap?: (hour: number) => void;
   onStroke?: (rectangle: PaintedRectangle) => void;
+  morphDates?: boolean;
 };
 
 const weekdays = ["nd", "pn", "wt", "śr", "cz", "pt", "sb"];
@@ -35,7 +37,7 @@ function cellUnder(event: PointerEvent): GridCell | undefined {
   return { date: slot.dataset.date, hour: Number(slot.dataset.hour) };
 }
 
-export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCellTap, onDateTap, onHourTap, onStroke }: DayHourGridProps) {
+export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCellTap, onDateTap, onHourTap, onStroke, morphDates }: DayHourGridProps) {
   const gridRef = useRef<HTMLDivElement>(null);
   const stroke = usePaintStroke({ dates, hours, onStroke, onTap: onCellTap });
   const keyboard = useGridKeyboard({ gridRef, dates, hours, onStroke, firstRow: onDateTap ? 0 : 1, firstColumn: onHourTap ? 0 : 1 });
@@ -79,20 +81,22 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
                 data-row={position.row}
                 data-column={position.column}
               >
-                {onDateTap ? (
-                  <button
-                    type="button"
-                    className="box-border min-h-target w-full cursor-pointer rounded-cell border-0 bg-track font-sans text-ink tabular-nums transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink motion-safe:active:scale-96 grid h-full justify-items-center px-[0] pt-1 pb-2"
-                    aria-label={`${day.weekday} ${day.number}`}
-                    tabIndex={keyboard.tabIndexOf(position)}
-                    onFocus={() => keyboard.onFocus(position)}
-                    onClick={() => onDateTap(date)}
-                  >
-                    {label}
-                  </button>
-                ) : (
-                  <span className="grid justify-items-center pt-1 pb-2">{label}</span>
-                )}
+                <Morph name={morphDates ? dateMorph(date) : undefined}>
+                  {onDateTap ? (
+                    <button
+                      type="button"
+                      className="box-border min-h-target w-full cursor-pointer rounded-cell border-0 bg-track font-sans text-ink tabular-nums transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink motion-safe:active:scale-96 grid h-full justify-items-center px-[0] pt-1 pb-2"
+                      aria-label={`${day.weekday} ${day.number}`}
+                      tabIndex={keyboard.tabIndexOf(position)}
+                      onFocus={() => keyboard.onFocus(position)}
+                      onClick={() => onDateTap(date)}
+                    >
+                      {label}
+                    </button>
+                  ) : (
+                    <span className="grid justify-items-center pt-1 pb-2">{label}</span>
+                  )}
+                </Morph>
               </div>
             );
           })}

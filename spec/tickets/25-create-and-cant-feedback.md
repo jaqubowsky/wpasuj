@@ -1,6 +1,6 @@
 # 25: Feedback on creating a poll and on "Nie mogę w żadnym terminie"
 
-Status: ready-for-agent
+Status: done
 Blocked by: 27-tailwind-shared.md, 28-tailwind-create-answer.md, 29-tailwind-view-results.md
 
 ## Parent
@@ -26,9 +26,9 @@ Blocked by: 27-tailwind-shared.md, 28-tailwind-create-answer.md, 29-tailwind-vie
 
 ## Acceptance criteria
 
-- [ ] e2e on phone-chromium, phone-webkit, desktop: with a slowed create action the button shows the pending state before it returns; the organiser lands on the card with the link preview; a second visit shows no card
-- [ ] e2e: "Wyślij na grupę" calls `navigator.share` from its own tap with the invite text (stubbed), and folds the card after success; "Kopiuj link" copies and shows "Skopiowano"
-- [ ] Unit or e2e: the create flow calls no `navigator.share` after the awaited action
-- [ ] e2e: "Nie mogę…" selects the toggle, clears the grid, shows "Zapisane" and "Cofnij"; "Cofnij" restores and saves the previous hours; painting an hour leaves the state
-- [ ] e2e with reduced motion: both flows work with no transition or animation
-- [ ] Screenshots at 390 and 1440: pending button, the card, the folded line, "Nie mogę" state; the PR body names the design-system parts compared
+- [x] e2e on phone-chromium, phone-webkit, desktop: with a slowed create action the button shows the pending state before it returns; the organiser lands on the card with the link preview; a second visit shows no card (`e2e/create-poll.spec.ts` "lands on the invite card"; phone-webkit runs in CI only)
+- [x] e2e: "Wyślij na grupę" calls `navigator.share` from its own tap with the invite text (stubbed), and folds the card after success; "Kopiuj link" copies and shows "Skopiowano" (the stub records `navigator.userActivation.isActive`; "Kopiuj link copies the link")
+- [x] Unit or e2e: the create flow calls no `navigator.share` after the awaited action (`create-poll-form.test.tsx` and the e2e's `window.shared` undefined on landing)
+- [x] e2e: "Nie mogę…" selects the toggle, clears the grid, shows "Zapisane" and "Cofnij"; "Cofnij" restores and saves the previous hours; painting an hour leaves the state (`e2e/answer-poll.spec.ts` "save states", reloads prove the saves)
+- [x] e2e with reduced motion: both flows work with no transition or animation (`e2e/create-poll.spec.ts` "with reduced motion": no animationstart, transitionrun or startViewTransition)
+- [x] Screenshots at 390 and 1440: pending button, the card, the folded line, "Nie mogę" state; the PR body names the design-system parts compared (`create-pending`, `invite-card`, `invite-copied`, `invite-sent`, `answer-nie-moze`)

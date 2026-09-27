@@ -7,7 +7,7 @@ export async function settleAnimations(page: Page) {
     Promise.all(
       document
         .getAnimations()
-        .filter((animation) => animation.timeline === document.timeline)
+        .filter((animation) => animation.timeline === document.timeline && animation.effect?.getTiming().iterations !== Infinity)
         .map((animation) => animation.finished),
     ),
   );

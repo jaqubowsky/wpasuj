@@ -4,7 +4,7 @@ import { saveScreenshot } from "./screenshot";
 
 declare global {
   interface Window {
-    shared?: ShareData;
+    shared?: { data: ShareData; fromTap: boolean }[];
   }
 }
 
@@ -13,11 +13,39 @@ async function stubShareSheet(page: Page) {
     Object.defineProperty(navigator, "share", {
       configurable: true,
       value: async (data: ShareData) => {
-        window.shared = data;
+        window.shared = [...(window.shared ?? []), { data, fromTap: navigator.userActivation.isActive }];
       },
     });
   });
 }
+
+async function holdCreateAction(page: Page) {
+  let release = () => {};
+  let onHeld = () => {};
+  const held = new Promise<void>((resolve) => (onHeld = resolve));
+  await page.route("/", async (route) => {
+    if (route.request().method() !== "POST") return route.continue();
+    onHeld();
+    await new Promise<void>((resolve) => (release = resolve));
+    await route.continue();
+  });
+  return { held, release: () => release() };
+}
+
+async function countViewTransitions(page: Page) {
+  await page.addInitScript(() => {
+    const started: string[] = [];
+    Object.defineProperty(window, "viewTransitions", { value: started });
+    const start = document.startViewTransition?.bind(document);
+    if (start) document.startViewTransition = (update) => (started.push(location.pathname), start(update));
+  });
+  return () => page.evaluate(() => (window as unknown as { viewTransitions: string[] }).viewTransitions.length);
+}
+
+const namedForTransition = (page: Page) =>
+  page.evaluate(() => [...document.querySelectorAll("*")].map((element) => getComputedStyle(element).viewTransitionName).filter((name) => name !== "none" && name !== "root"));
+
+const inviteCard = (page: Page) => page.getByRole("region", { name: "Ankieta gotowa. Wyślij ją na grupę." });
 
 const createButton = (page: Page) => page.getByRole("button", { name: "Utwórz i wyślij na grupę" });
 async function createPoll(page: Page, { title, day, name }: { title: string; day: string; name: string }) {
@@ -29,7 +57,7 @@ async function createPoll(page: Page, { title, day, name }: { title: string; day
 
 const days = (page: Page) => page.getByRole("group", { name: "Dni" }).getByRole("button");
 
-test("the organiser creates a weekend evening poll, shares it and lands on it", async ({ page }, testInfo) => {
+test("the organiser creates a weekend evening poll, lands on the invite card and sends it", async ({ page }, testInfo) => {
   await stubShareSheet(page);
   await page.goto("/");
   await expect(days(page).first()).toBeVisible();
@@ -41,31 +69,95 @@ test("the organiser creates a weekend evening poll, shares it and lands on it", 
   await expect(page.getByRole("button", { name: "Wieczór 17–23", pressed: true })).toBeVisible();
   await page.getByRole("textbox", { name: "Twoje imię" }).fill("Kuba");
   await saveScreenshot(page, testInfo, "create-filled");
+  const action = await holdCreateAction(page);
   await createButton(page).click();
+
+  await action.held;
+  await expect(page.getByRole("button", { name: "Tworzę ankietę…" })).toBeVisible();
+  await expect(page).toHaveURL("/");
+  await saveScreenshot(page, testInfo, "create-pending");
+  action.release();
 
   await expect(page).toHaveURL(/\/e\/[A-Za-z0-9_-]{10}$/);
   expect(Date.now() - started).toBeLessThan(30_000);
-  expect(await page.evaluate(() => window.shared)).toEqual({ text: `Kiedy możecie? Planszówki u Michała ${page.url()}` });
-  await expect(page.getByText("Kuba pyta")).toBeVisible();
+  expect(await page.evaluate(() => window.shared)).toBeUndefined();
   await expect(page.getByRole("heading", { level: 1, name: "Planszówki u Michała" })).toBeVisible();
+  const preview = inviteCard(page).getByRole("figure", { name: "Podgląd linku w czacie" });
+  await expect(preview).toContainText("Kuba pyta, kiedy możesz");
+  await expect(preview).toContainText("Planszówki u Michała");
+  await expect(preview).toContainText("wieczorem");
+  await saveScreenshot(page, testInfo, "invite-card");
+
+  await inviteCard(page).getByRole("button", { name: "Wyślij na grupę" }).click();
+
+  await expect(page.getByText("Wysłane. Odpowiedzi pojawią się tutaj.")).toBeVisible();
+  expect(await page.evaluate(() => window.shared)).toEqual([{ data: { text: `Kiedy możecie? Planszówki u Michała ${page.url()}` }, fromTap: true }]);
+  await expect(inviteCard(page)).toHaveCount(0);
+  await saveScreenshot(page, testInfo, "invite-sent");
+
+  await page.reload();
+  await expect(page.getByText("Kuba pyta")).toBeVisible();
   await expect(page.getByText("Bądź pierwszy")).toBeVisible();
   await expect(page.getByRole("tab", { name: "Moje", selected: true })).toBeVisible();
   await expect(page.getByRole("tabpanel", { name: "Moje" })).toBeAttached();
+  await expect(inviteCard(page)).toHaveCount(0);
+  await expect(page.getByText("Wysłane. Odpowiedzi pojawią się tutaj.")).toHaveCount(0);
   await saveScreenshot(page, testInfo, "poll-shell");
 
   await page.getByRole("tab", { name: "Wszyscy" }).click();
   await expect(page.getByRole("tabpanel", { name: "Wszyscy" })).toBeAttached();
 });
 
-test("without a share sheet the link is copied and the organiser still lands on the poll", async ({ page }) => {
+test("on a slow network the spinner keeps moving and the form morphs only once the poll has arrived", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name.includes("webkit"), "the view transition count is read in Chromium");
+  await stubShareSheet(page);
+  const viewTransitions = await countViewTransitions(page);
+  let release = () => {};
+  let onHeld = () => {};
+  const held = new Promise<void>((resolve) => (onHeld = resolve));
+  let holding = true;
+  await page.route(/\/e\/[A-Za-z0-9_-]{10}(\?.*)?$/, async (route) => {
+    if (!holding) return route.continue();
+    holding = false;
+    onHeld();
+    await new Promise<void>((resolve) => (release = resolve));
+    await route.continue();
+  });
+  await page.goto("/");
+
+  await createPoll(page, { title: "Kino", day: "Jutro", name: "Ola" });
+  await held;
+
+  const spinner = page.getByRole("button", { name: "Tworzę ankietę…" }).locator("[data-create-spinner]");
+  const turned = () => spinner.evaluate((element) => element.getAnimations()[0].currentTime);
+  const before = await turned();
+  await expect.poll(turned).not.toBe(before);
+  expect(await viewTransitions()).toBe(0);
+  release();
+
+  await expect(page).toHaveURL(/\/e\/[A-Za-z0-9_-]{10}$/);
+  await expect(inviteCard(page)).toBeVisible();
+  expect(await viewTransitions()).toBe(1);
+  await expect.poll(() => namedForTransition(page)).toEqual([]);
+  await page.getByRole("tab", { name: "Wszyscy" }).click();
+  await expect(page.getByRole("tab", { name: "Wszyscy", selected: true })).toBeVisible();
+  expect(await namedForTransition(page)).toEqual([]);
+});
+
+test("Kopiuj link copies the link, says Skopiowano and keeps the card", async ({ page }, testInfo) => {
   await stubClipboardWithoutShareSheet(page);
   await page.goto("/");
 
   await createPoll(page, { title: "Kino", day: "Jutro", name: "Ola" });
-
-  await expect(page.getByText("Link skopiowany")).toBeVisible();
   await expect(page).toHaveURL(/\/e\/[A-Za-z0-9_-]{10}$/);
+  await inviteCard(page).getByRole("button", { name: "Kopiuj link" }).click();
+
+  await expect(inviteCard(page).getByRole("button", { name: "Skopiowano" })).toBeVisible();
   expect(await page.evaluate(() => window.copied)).toBe(page.url());
+  await saveScreenshot(page, testInfo, "invite-copied");
+  await expect(inviteCard(page).getByRole("button", { name: "Kopiuj link" })).toBeVisible();
+  await inviteCard(page).getByRole("button", { name: "Gotowe" }).click();
+  await expect(inviteCard(page)).toHaveCount(0);
 });
 
 test("the name used last on this device is prefilled", async ({ page }) => {
@@ -148,7 +240,7 @@ test.describe("a viewer in London on a Warsaw poll", () => {
     await organiser.goto("/");
     await createPoll(organiser, { title: "Kino", day: "Jutro", name: "Ola" });
     await expect(organiser).toHaveURL(/\/e\/[A-Za-z0-9_-]{10}$/);
-    await expect(organiser.getByText("Ola pyta")).toBeVisible();
+    await expect(organiser.getByText("Ola pyta", { exact: true })).toBeVisible();
 
     await page.goto(organiser.url());
 
@@ -169,4 +261,37 @@ test("a poll that does not exist says it is gone and links to a new one", async 
   await page.getByRole("link", { name: "Zrób nową ankietę" }).click();
 
   await expect(page.getByRole("textbox", { name: "Co robimy?" })).toBeVisible();
+});
+
+test.describe("with reduced motion", () => {
+  test.use({ reducedMotion: "reduce" });
+
+  test("creating, sending and Nie mogę work with no transition or animation", async ({ page }) => {
+    await stubShareSheet(page);
+    await page.addInitScript(() => {
+      const moved: string[] = [];
+      Object.defineProperty(window, "moved", { value: moved });
+      for (const event of ["animationstart", "transitionrun"]) document.addEventListener(event, () => moved.push(event), true);
+    });
+    const moved = () => page.evaluate(() => (window as unknown as { moved: string[] }).moved);
+    await page.goto("/");
+
+    await createPoll(page, { title: "Kino", day: "Jutro", name: "Ola" });
+    await expect(page).toHaveURL(/\/e\/[A-Za-z0-9_-]{10}$/);
+    await inviteCard(page).getByRole("button", { name: "Wyślij na grupę" }).click();
+    await expect(page.getByText("Wysłane. Odpowiedzi pojawią się tutaj.")).toBeVisible();
+
+    const grid = page.getByRole("grid", { name: "Kiedy możesz?" });
+    const cell = (hourIndex: number) => grid.getByRole("row").nth(hourIndex + 1).getByRole("button").nth(1);
+    await cell(0).click();
+    await cell(1).click();
+    await expect(page.getByRole("status").filter({ hasText: "Zapisane" })).toBeVisible();
+    await page.getByRole("button", { name: "Nie mogę w żadnym terminie" }).click();
+    await expect(grid.getByRole("gridcell", { selected: true })).toHaveCount(0);
+    await page.getByRole("button", { name: "Cofnij" }).click();
+    await expect(grid.getByRole("gridcell", { selected: true })).toHaveCount(2);
+
+    expect(await moved()).toEqual([]);
+    expect(await page.evaluate(() => document.getAnimations().length)).toBe(0);
+  });
 });

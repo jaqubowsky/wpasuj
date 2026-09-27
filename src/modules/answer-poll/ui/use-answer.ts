@@ -3,6 +3,7 @@ import { readLastName, rememberName, useLastName } from "@/shared/last-name";
 import { useEffect, useRef, useState } from "react";
 import { claimName, saveAnswer, type ClaimRefusal } from "../server/answer-actions";
 import type { Slot } from "../server/answer-schema";
+import { clearingStepMs } from "../domain/clearing";
 import { normaliseName } from "../domain/name-rules";
 import { useAutosave } from "./use-autosave";
 
@@ -12,6 +13,10 @@ export type Problem = { kind: "name-taken"; heldName: string } | { kind: "invali
 type AnswerOptions = { pollId: string; dates: string[]; hours: number[]; mine?: Answer };
 
 const keyOf = ({ date, hour }: GridCell) => `${date} ${hour}`;
+
+const hourOf = (key: string) => Number(key.split(" ")[1]);
+
+const inReadingOrder = (a: string, b: string) => hourOf(a) - hourOf(b) || a.localeCompare(b);
 
 function slotsOf(keys: Set<string>): Slot[] {
   return [...keys]
@@ -38,6 +43,9 @@ export function useAnswer({ pollId, dates, hours, mine }: AnswerOptions) {
   const [mySlots, setMySlots] = useState(() => new Set(mine?.slots.map(keyOf)));
   const slotsRef = useRef(mySlots);
   const [holdsRow, setHoldsRow] = useState(mine !== undefined);
+  const [beforeCant, setBeforeCant] = useState<Set<string>>();
+  const [cantTurnedOff, setCantTurnedOff] = useState(false);
+  const clearing = useRef<ReturnType<typeof setTimeout>[]>([]);
   const [problem, setProblem] = useState<Problem>();
   const nameRef = useRef<HTMLInputElement>(null);
   const name = typedName ?? lastName;
@@ -77,7 +85,16 @@ export function useAnswer({ pollId, dates, hours, mine }: AnswerOptions) {
 
   const autosave = useAutosave(send, mine ? "saved" : undefined);
 
+  function stopClearing() {
+    clearing.current.forEach(clearTimeout);
+    clearing.current = [];
+  }
+
+  useEffect(() => stopClearing, []);
+
   function replaceSlots(next: Set<string>, answerName = name) {
+    stopClearing();
+    setBeforeCant(undefined);
     slotsRef.current = next;
     setMySlots(next);
     autosave.schedule({ name: answerName, slots: slotsOf(next) });
@@ -90,6 +107,19 @@ export function useAnswer({ pollId, dates, hours, mine }: AnswerOptions) {
       else next.delete(keyOf(cell));
     }
     replaceSlots(next);
+  }
+
+  function cantMakeAny() {
+    const before = slotsRef.current;
+    replaceSlots(new Set());
+    setBeforeCant(before);
+    setCantTurnedOff(false);
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const order = [...before].sort(inReadingOrder);
+    const showFrom = (index: number) => setMySlots(new Set(order.slice(index)));
+    const step = clearingStepMs(order.length);
+    showFrom(1);
+    clearing.current = order.slice(1).map((_, index) => setTimeout(() => showFrom(index + 2), (index + 1) * step));
   }
 
   function toggleAll(cells: GridCell[]) {
@@ -107,6 +137,8 @@ export function useAnswer({ pollId, dates, hours, mine }: AnswerOptions) {
     problem,
     holdsRow,
     canMakeIt: mySlots.size > 0,
+    saidCant: beforeCant !== undefined || (holdsRow && mySlots.size === 0 && !cantTurnedOff),
+    justSaidCant: beforeCant !== undefined,
     isMine: (cell: GridCell) => mySlots.has(keyOf(cell)),
     rename(next: string) {
       setTypedName(next);
@@ -120,7 +152,8 @@ export function useAnswer({ pollId, dates, hours, mine }: AnswerOptions) {
         strokeDates.flatMap((date) => strokeHours.map((hour) => ({ date, hour }))),
         mode === "add",
       ),
-    cantMakeAny: () => replaceSlots(new Set()),
+    cantMakeAny,
+    undoCant: () => (beforeCant ? replaceSlots(beforeCant) : setCantTurnedOff(true)),
     retry: autosave.retry,
     async claim(heldName: string) {
       const result = await claimName(pollId, heldName);

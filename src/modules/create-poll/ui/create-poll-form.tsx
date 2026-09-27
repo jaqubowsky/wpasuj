@@ -2,7 +2,9 @@
 
 import { Button } from "@/shared/ui/button/button";
 import { Input } from "@/shared/ui/input/input";
+import { pollTitleMorph } from "@/shared/morph";
 import { useState } from "react";
+import "./create-poll-form.css";
 import { DatePicker, PendingDatePicker } from "./date-picker";
 import { HourRangePicker } from "./hour-range-picker";
 import { useCreatePoll } from "./use-create-poll";
@@ -31,6 +33,7 @@ export function CreatePollForm() {
         variant="title"
         placeholder="Piwo, planszówki, kino…"
         maxLength={60}
+        morph={pollTitleMorph}
         value={title}
         onChange={(event) => setTitle(event.target.value)}
         error={isInvalid("title") ? "Wpisz, co robicie" : undefined}
@@ -64,18 +67,15 @@ export function CreatePollForm() {
             Coś poszło nie tak. Spróbuj jeszcze raz.
           </p>
         )}
-        {status === "not-copied" && (
-          <p className="m-[0] text-label font-medium text-accent-ink" role="alert">
-            Nie udało się skopiować linku. Skopiuj go z paska adresu.
-          </p>
-        )}
-        {status === "copied" && (
-          <p className="m-[0] text-center font-semibold" role="status">
-            Link skopiowany
-          </p>
-        )}
         <Button type="submit" variant="primary" block aria-busy={status === "creating"}>
-          Utwórz i wyślij na grupę
+          {status === "creating" ? (
+            <span className="inline-flex items-center gap-2" data-create-pending>
+              <span className="box-border size-4 rounded-pill border-2 border-solid border-surface/35 border-t-surface" aria-hidden="true" data-create-spinner />
+              Tworzę ankietę…
+            </span>
+          ) : (
+            "Utwórz i wyślij na grupę"
+          )}
         </Button>
       </div>
     </form>
