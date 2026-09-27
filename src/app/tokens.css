@@ -65,6 +65,12 @@
   --text-button--line-height: 20px;
   --text-label: 13px;
   --text-label--line-height: 18px;
+  --text-faq-heading: 44px;
+  --text-faq-heading--line-height: 48px;
+  --text-question: 20px;
+  --text-question--line-height: 24px;
+  --text-footer: 14px;
+  --text-footer--line-height: 20px;
 
   --font-weight-regular: 400;
   --font-weight-medium: 500;
