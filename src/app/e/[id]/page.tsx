@@ -1,6 +1,8 @@
 import { findMyAnswer } from "@/modules/answer-poll";
 import { AnswerBody, AnswerLead, AnswerProvider } from "@/modules/answer-poll/client";
 import { findPoll } from "@/modules/create-poll";
+import { readResults } from "@/modules/view-results";
+import { ResultsBody, ResultsLead, ResultsProvider } from "@/modules/view-results/client";
 import { Avatar } from "@/shared/ui/avatar/avatar";
 import { Text } from "@/shared/ui/text/text";
 import { notFound } from "next/navigation";
@@ -13,30 +15,35 @@ import { ZoneNote } from "./zone-note";
 
 export default async function PollPage({ params }: PageProps<"/e/[id]">) {
   const { id } = await params;
-  const poll = findPoll(id, new Date());
+  const now = new Date();
+  const poll = findPoll(id, now);
   if (!poll) notFound();
   const mine = await findMyAnswer(id);
   const hours = Array.from({ length: poll.lastHour - poll.firstHour }, (_, index) => poll.firstHour + index);
 
   return (
-    <div className={frame.frame}>
+    <div className={`${frame.frame} ${styles.page}`}>
       <AppHeader aside={<Text variant="meta">{answeredCount(poll.respondentCount)}</Text>} />
       <main className={styles.main}>
-        <div className={styles.asker}>
-          <Avatar name={poll.organiserName} />
-          <Text variant="meta">{poll.organiserName} pyta</Text>
+        <div className={styles.head}>
+          <div className={styles.asker}>
+            <Avatar name={poll.organiserName} />
+            <Text variant="meta">{poll.organiserName} pyta</Text>
+          </div>
+          <Text as="h1" variant="title">
+            {poll.title}
+          </Text>
+          <ZoneNote pollZone={poll.timeZone} />
         </div>
-        <Text as="h1" variant="title">
-          {poll.title}
-        </Text>
-        <ZoneNote pollZone={poll.timeZone} />
         <div className={styles.tabs}>
           <AnswerProvider pollId={id} dates={poll.dates} hours={hours} mine={mine}>
-            <PollTabs
-              opening={mine ? "Wszyscy" : "Moje"}
-              leads={{ Moje: <AnswerLead />, Wszyscy: null }}
-              bodies={{ Moje: <AnswerBody />, Wszyscy: null }}
-            />
+            <ResultsProvider pollId={id} initial={readResults(id, poll, now)}>
+              <PollTabs
+                opening={mine ? "Wszyscy" : "Moje"}
+                leads={{ Moje: <AnswerLead />, Wszyscy: <ResultsLead /> }}
+                bodies={{ Moje: <AnswerBody />, Wszyscy: <ResultsBody /> }}
+              />
+            </ResultsProvider>
           </AnswerProvider>
         </div>
       </main>

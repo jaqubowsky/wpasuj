@@ -7,7 +7,9 @@ type GridKeyboardOptions = {
   gridRef: RefObject<HTMLElement | null>;
   dates: string[];
   hours: number[];
-  onStroke: (rectangle: PaintedRectangle) => void;
+  onStroke?: (rectangle: PaintedRectangle) => void;
+  firstRow: 0 | 1;
+  firstColumn: 0 | 1;
 };
 
 const steps: Record<string, GridPosition> = {
@@ -29,7 +31,7 @@ function span(from: number, to: number) {
   return [Math.min(from, to), Math.max(from, to) + 1];
 }
 
-export function useGridKeyboard({ gridRef, dates, hours, onStroke }: GridKeyboardOptions) {
+export function useGridKeyboard({ gridRef, dates, hours, onStroke, firstRow, firstColumn }: GridKeyboardOptions) {
   const [active, setActive] = useState<GridPosition>({ row: 1, column: 1 });
   const extensionRef = useRef<{ anchor: GridPosition; reached: GridPosition } | null>(null);
 
@@ -48,7 +50,7 @@ export function useGridKeyboard({ gridRef, dates, hours, onStroke }: GridKeyboar
       event.preventDefault();
 
       const next = { row: active.row + step.row, column: active.column + step.column };
-      const inside = next.row >= 0 && next.row <= hours.length && next.column >= 0 && next.column <= dates.length;
+      const inside = next.row >= firstRow && next.row <= hours.length && next.column >= firstColumn && next.column <= dates.length;
       if (!inside || (next.row === 0 && next.column === 0)) return;
 
       if (!event.shiftKey) {
@@ -62,7 +64,7 @@ export function useGridKeyboard({ gridRef, dates, hours, onStroke }: GridKeyboar
       const anchor = extension && isSamePosition(extension.reached, active) ? extension.anchor : active;
       extensionRef.current = { anchor, reached: next };
       focus(next);
-      onStroke({
+      onStroke?.({
         dates: dates.slice(...span(anchor.column - 1, next.column - 1)),
         hours: hours.slice(...span(anchor.row - 1, next.row - 1)),
         mode: "add",

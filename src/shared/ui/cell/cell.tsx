@@ -1,25 +1,31 @@
-import type { ComponentProps, ReactNode } from "react";
+import type { ComponentProps } from "react";
 import styles from "./cell.module.css";
 
-type AnswerCellProps = Omit<ComponentProps<"button">, "type" | "aria-pressed" | "children" | "className"> & {
+type CellButtonProps = Omit<ComponentProps<"button">, "type" | "aria-pressed" | "className">;
+
+type AnswerCellProps = Omit<CellButtonProps, "children"> & {
   pressed: boolean;
   state?: "mine" | "adding" | "removing";
 };
 
-type HeatCellProps = {
-  heat: 1 | 2 | 3 | 4 | 5;
+type HeatCellProps = CellButtonProps & {
+  heat: 0 | 1 | 2 | 3 | 4 | 5;
   everyone?: boolean;
   best?: boolean;
-  children: ReactNode;
 };
 
 export function Cell(props: AnswerCellProps | HeatCellProps) {
   if ("heat" in props) {
-    const { heat, everyone, best, children } = props;
+    const { heat, everyone, best, ...buttonProps } = props;
     return (
-      <span className={styles.cell} data-heat={heat} data-everyone={everyone || undefined} data-best={best || undefined}>
-        {children}
-      </span>
+      <button
+        type="button"
+        className={styles.cell}
+        data-heat={heat || undefined}
+        data-everyone={everyone || undefined}
+        data-best={best || undefined}
+        {...buttonProps}
+      />
     );
   }
 

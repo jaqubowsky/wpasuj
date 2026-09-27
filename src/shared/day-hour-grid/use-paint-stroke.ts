@@ -8,7 +8,7 @@ type Stroke = { anchor: GridCell; current: GridCell; mode: PaintedRectangle["mod
 type PaintStrokeOptions = {
   dates: string[];
   hours: number[];
-  onStroke: (rectangle: PaintedRectangle) => void;
+  onStroke?: (rectangle: PaintedRectangle) => void;
   onTap: (cell: GridCell) => void;
 };
 
@@ -49,7 +49,7 @@ export function usePaintStroke({ dates, hours, onStroke, onTap }: PaintStrokeOpt
       const current = strokeRef.current;
       update(null);
       paintedRef.current = Boolean(current?.spread);
-      if (current?.spread) onStroke(rectangleOf(current));
+      if (current?.spread) onStroke?.(rectangleOf(current));
     },
     tap(cell: GridCell, source: "pointer" | "keyboard") {
       if (source === "pointer" && paintedRef.current) return;

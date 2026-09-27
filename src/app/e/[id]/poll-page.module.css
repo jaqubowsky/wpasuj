@@ -16,3 +16,43 @@
 .lead {
   margin-bottom: var(--space-4);
 }
+
+@media (min-width: 1024px) {
+  .page:has([role="tabpanel"]:not([hidden]) [data-results-side]) {
+    max-width: 1120px;
+    padding: var(--space-8) var(--space-10) 0;
+  }
+
+  .main:has([role="tabpanel"]:not([hidden]) [data-results-side]) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    grid-template-rows: auto auto auto 1fr;
+    align-items: start;
+    gap: var(--space-5) var(--space-10);
+  }
+
+  .main:has([role="tabpanel"]:not([hidden]) [data-results-side]) :is(.tabs, [role="tabpanel"]:not([hidden]), [data-results-body]) {
+    display: contents;
+  }
+
+  .main:has([role="tabpanel"]:not([hidden]) [data-results-side]) .head {
+    grid-area: 1 / 1;
+  }
+
+  .main:has([role="tabpanel"]:not([hidden]) [data-results-side]) [role="tablist"] {
+    grid-area: 2 / 1;
+  }
+
+  .main:has([role="tabpanel"]:not([hidden]) [data-results-side]) .lead {
+    grid-area: 1 / 2 / span 3;
+    margin: 0;
+  }
+
+  .main:has([role="tabpanel"]:not([hidden]) [data-results-side]) [data-results-body] > section {
+    grid-area: 3 / 1 / span 2;
+  }
+
+  .main:has([role="tabpanel"]:not([hidden]) [data-results-side]) [data-results-side] {
+    grid-area: 4 / 2;
+  }
+}

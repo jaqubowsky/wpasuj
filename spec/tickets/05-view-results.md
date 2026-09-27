@@ -1,6 +1,6 @@
 # 05: Results on "Wszyscy"
 
-Status: ready-for-agent
+Status: done
 Blocked by: 02-day-hour-grid.md, 03-create-poll.md
 
 ## Parent
@@ -23,7 +23,7 @@ Anyone on "Wszyscy" sees the best time as the headline ("Najlepiej: sobota 18.10
 
 ## Acceptance criteria
 
-- [ ] Unit tests for runs, best time, "Też dobre", buckets, including a case where the free set changes while the count stays the same (the run splits)
-- [ ] Read endpoint test: shape validated, gone poll answered with 404
-- [ ] Playwright: with seeded answers from three people the headline, "Też dobre", cell counts, per-cell names and "Kto odpowiedział" agree with a hand count; a change from another context shows within 10 s
-- [ ] Screenshots at 390 and 1440: empty, three answers, sheet open, side panel open; PR body names the mockups and parts compared
+- [x] Unit tests for runs, best time, "Też dobre", buckets, including a case where the free set changes while the count stays the same (the run splits): `src/modules/view-results/best-time.test.ts`, `heat.test.ts`
+- [x] Read endpoint test: shape validated, gone poll answered with 404: `src/app/api/polls/[id]/route.test.ts`
+- [x] Playwright: with seeded answers from three people the headline, "Też dobre", cell counts, per-cell names and "Kto odpowiedział" agree with a hand count; a change from another context shows within 10 s: `e2e/view-results.spec.ts`
+- [x] Screenshots at 390 and 1440: empty, three answers, sheet open, side panel open; PR body names the mockups and parts compared: `results-*` in the CI `screenshots` artifact
