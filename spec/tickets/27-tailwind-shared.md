@@ -1,6 +1,6 @@
 # 27: Tailwind in shared
 
-Status: ready-for-agent
+Status: claimed
 Blocked by: 26-tailwind-base.md, 33-architecture-gates.md
 
 ## Parent
