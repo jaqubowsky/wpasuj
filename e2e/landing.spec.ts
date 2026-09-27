@@ -5,7 +5,7 @@ import { saveScreenshot } from "./screenshot";
 const titleField = (page: Page) => page.getByRole("textbox", { name: "Co robimy?" });
 const finalCall = (page: Page) => page.getByRole("region", { name: "To kiedy się widzicie?" });
 const demo = (page: Page) => page.getByRole("region", { name: "Wypróbuj na żywo" });
-const demoCell = (page: Page, name: string) => demo(page).getByRole("button", { name, exact: true });
+const demoCell = (page: Page, name: string) => demo(page).getByRole("button", { name: new RegExp(`^${name}, \\d z 5 może$`) });
 
 test("the create form is in the first viewport and creates a poll", async ({ page }) => {
   await page.addInitScript(() => {

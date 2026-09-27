@@ -51,7 +51,7 @@ export function Demo({ formId }: { formId: string }) {
               const { count, heat, everyone, best } = poll.cellAt({ date, hour });
               const marked = preview ? preview === "adding" : selected;
               return (
-                <Cell heat={heat} everyone={everyone} best={best} aria-label={label} tabIndex={tabIndex}>
+                <Cell heat={heat} everyone={everyone} best={best} aria-label={`${label}, ${count} z ${poll.respondentCount} może`} tabIndex={tabIndex}>
                   <span className="col-start-1 row-start-1">{count || ""}</span>
                   {marked && <span aria-hidden className="col-start-1 row-start-1 mb-1 size-[6px] self-end rounded-pill bg-current" />}
                 </Cell>

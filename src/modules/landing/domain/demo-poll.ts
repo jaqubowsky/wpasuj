@@ -32,6 +32,7 @@ export function demoPoll(mine: Slot[]) {
       share: share(best),
       cannot: cannotMake(respondents, best.free).map((answer) => answer.name),
     },
+    respondentCount: respondents.length,
     others: others.map((run) => ({ label: shortRunLabel(run), share: share(run) })),
     cellAt: (cell: Slot) => heatCellOf(respondents, cell, best),
   };

@@ -12,8 +12,9 @@ it("recomputes the best time when the visitor taps an hour and resets it", async
   expect(bestTime().getByText("Sobota 18.10, 19–21")).toBeInTheDocument();
   expect(bestTime().getByText("Nie może: Ty")).toBeInTheDocument();
 
-  fireEvent.click(screen.getByRole("button", { name: "sb 18, 19:00" }));
+  fireEvent.click(screen.getByRole("button", { name: "sb 18, 19:00, 4 z 5 może" }));
 
+  expect(screen.getByRole("button", { name: "sb 18, 19:00, 5 z 5 może" })).toBeInTheDocument();
   expect(bestTime().getByText("Sobota 18.10, 19–20")).toBeInTheDocument();
   expect(bestTime().getByText("5 z 5 może")).toBeInTheDocument();
   expect(bestTime().getByText("Wszyscy mogą")).toBeInTheDocument();
