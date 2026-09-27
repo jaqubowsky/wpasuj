@@ -1,6 +1,6 @@
 # 21: Live demo grid
 
-Status: ready-for-agent
+Status: done
 Blocked by: 26-tailwind-base.md (written in Tailwind from the start, per the `AGENTS.md` Styling pattern)
 
 ## Parent
@@ -22,6 +22,6 @@ As ticket 14. Reference render: `section-demo.png`.
 
 ## Acceptance criteria
 
-- [ ] Unit tests of the copied rule on the demo data, before and after the visitor adds hours
-- [ ] e2e on phone-chromium, phone-webkit and desktop: a tap and a drag change the best time as a hand count says
-- [ ] Screenshots at 1440 beside `section-demo.png` and at 390; differences listed in the PR body
+- [x] Unit tests of the copied rule on the demo data, before and after the visitor adds hours (`src/modules/landing/domain/demo-poll.test.ts`)
+- [x] e2e on phone-chromium, phone-webkit and desktop: a tap and a drag change the best time as a hand count says (`e2e/landing.spec.ts`, "the demo's best time follows a tap and a drag"; phone-webkit runs in CI)
+- [x] Screenshots at 1440 beside `section-demo.png` and at 390; differences listed in the PR body (`e2e/screenshots/landing-demo-*.png`, `landing-demo-painted-*.png`)

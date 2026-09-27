@@ -1,8 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
+import { centreOf, mouseDrag, touchDrag } from "./pointer";
 import { saveScreenshot } from "./screenshot";
 
 const titleField = (page: Page) => page.getByRole("textbox", { name: "Co robimy?" });
 const finalCall = (page: Page) => page.getByRole("region", { name: "To kiedy się widzicie?" });
+const demo = (page: Page) => page.getByRole("region", { name: "Wypróbuj na żywo" });
+const demoCell = (page: Page, name: string) => demo(page).getByRole("button", { name: new RegExp(`^${name}, \\d z 5 może$`) });
 
 test("the create form is in the first viewport and creates a poll", async ({ page }) => {
   await page.addInitScript(() => {
@@ -69,6 +72,45 @@ test("the story and the demo load after the form is interactive", async ({ page,
   expect(lateChunks.length).toBeGreaterThan(0);
 });
 
+test("the demo's best time follows a tap and a drag", async ({ page, browserName, isMobile }, testInfo) => {
+  await page.goto("/");
+  await demo(page).scrollIntoViewIfNeeded();
+  const bestTime = demo(page).getByRole("status", { name: "Najlepiej" });
+  await expect(bestTime).toContainText("Sobota 18.10, 19–21");
+  await expect(bestTime).toContainText("4 z 5 może");
+  await expect(bestTime).toContainText("Nie może: Ty");
+
+  const saturday19 = demoCell(page, "sb 18, 19:00");
+  if (isMobile) await saturday19.tap();
+  else await saturday19.click();
+
+  await expect(bestTime).toContainText("Sobota 18.10, 19–20");
+  await expect(bestTime).toContainText("5 z 5 może");
+  await expect(bestTime).toContainText("Wszyscy mogą");
+
+  await demo(page).getByRole("button", { name: "Wyczyść moje godziny" }).click();
+  await expect(bestTime).toContainText("Nie może: Ty");
+  const drag = browserName === "chromium" && isMobile ? touchDrag : mouseDrag;
+  await demoCell(page, "pt 17, 19:00").scrollIntoViewIfNeeded();
+  await drag(page, await centreOf(demoCell(page, "pt 17, 19:00")), await centreOf(demoCell(page, "pt 17, 20:00")));
+
+  await expect(demo(page).getByRole("gridcell", { selected: true })).toHaveCount(2);
+  await expect(bestTime).toContainText("Piątek 17.10, 20–21");
+  await expect(bestTime).toContainText("5 z 5 może");
+  await expect(demo(page).getByRole("list", { name: "Też dobre" })).toContainText("sb 18.10, 19–214 z 5");
+  await demo(page).screenshot({ path: `e2e/screenshots/landing-demo-painted-${testInfo.project.name}.png` });
+});
+
+test("the demo's call scrolls to the form and focuses its first field", async ({ page }) => {
+  await page.goto("/");
+  await demo(page).scrollIntoViewIfNeeded();
+
+  await demo(page).getByRole("button", { name: "Zrób taką ankietę dla swojej paczki" }).click();
+
+  await expect(titleField(page)).toBeFocused();
+  await expect(titleField(page)).toBeInViewport();
+});
+
 const questions = [
   "Czy znajomi muszą coś instalować albo zakładać konto?",
   "A jak ktoś otworzy link na innym telefonie?",
@@ -133,6 +175,7 @@ test.describe("with reduced motion", () => {
     await saveScreenshot(page, testInfo, "landing");
     for (const [name, section] of [
       ["hero", page.getByRole("region", { name: "Kiedy się widzimy? Ustalcie to w minutę." })],
+      ["demo", demo(page)],
       ["reasons", page.getByRole("region", { name: "Zrobione pod paczkę znajomych, nie pod firmę." })],
       ["final-call", finalCall(page)],
       ["faq", faq(page)],
