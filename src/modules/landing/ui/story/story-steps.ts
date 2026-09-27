@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import { CreateForm } from "./scenes/create-form";
 import { SilentGroup } from "./scenes/silent-group";
 
 export type SceneProps = { time: number };
@@ -24,6 +25,7 @@ export const storySteps: StoryStep[] = [
     kicker: "Krok 1",
     heading: "Ankieta w trzy tapnięcia.",
     body: "Co robicie, który weekend, jaka pora. Bez konta i bez maila.",
+    Scene: CreateForm,
   },
   {
     label: "Wrzucasz link",
