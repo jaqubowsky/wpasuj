@@ -1,24 +1,23 @@
 import { Text } from "@/shared/ui/text/text";
 import Link from "next/link";
 import { AppHeader } from "../../app-header";
-import frame from "../../page-frame.module.css";
-import styles from "./not-found.module.css";
+import { PageFrame } from "../../page-frame";
 
 export default function PollGone() {
   return (
-    <div className={frame.frame}>
+    <PageFrame>
       <AppHeader />
-      <main className={styles.main}>
+      <main className="flex flex-col items-start gap-3 pt-6">
         <Text as="h1" variant="title">
           Tej ankiety już nie ma
         </Text>
         <Text as="p" variant="body">
           Organizator mógł ją usunąć albo jej terminy minęły dawno temu.
         </Text>
-        <Link href="/" className={styles.create}>
+        <Link href="/" className="mt-3 inline-flex h-button items-center rounded-control bg-ink px-6 text-[16px]/[20px] font-semibold text-surface no-underline transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink motion-safe:active:scale-97">
           Zrób nową ankietę
         </Link>
       </main>
-    </div>
+    </PageFrame>
   );
 }

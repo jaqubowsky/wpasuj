@@ -9,9 +9,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AppHeader } from "../../app-header";
-import frame from "../../page-frame.module.css";
+import { PageFrame } from "../../page-frame";
 import { answeredCount } from "./answered-count";
-import styles from "./poll-page.module.css";
+import "./poll-page.css";
 import { PollTabs } from "./poll-tabs";
 import { ZoneNote } from "./zone-note";
 
@@ -47,13 +47,13 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
   const hours = Array.from({ length: poll.lastHour - poll.firstHour }, (_, index) => poll.firstHour + index);
 
   return (
-    <div className={`${frame.frame} ${styles.page}`}>
+    <PageFrame>
       <AppHeader aside={<Text variant="meta">{answeredCount(poll.respondentCount)}</Text>} />
-      <main className={styles.main}>
+      <main data-poll-main className="pt-1 pb-8">
         <AnswerProvider pollId={id} dates={poll.dates} hours={hours} mine={mine}>
           <ResultsProvider pollId={id} initial={readResults(id, poll, now)} organiser={organiser}>
-            <div className={styles.head}>
-              <div className={styles.asker}>
+            <div data-poll-head>
+              <div className="mb-2 flex items-center gap-2">
                 <Avatar name={poll.organiserName} tintKey={nameKey(poll.organiserName)} />
                 <Text variant="meta">{poll.organiserName} pyta</Text>
               </div>
@@ -63,7 +63,7 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
               <ZoneNote pollZone={poll.timeZone} />
               <FinalTime />
             </div>
-            <div className={styles.tabs}>
+            <div data-poll-tabs className="mt-5">
               <PollTabs
                 opening={mine ? "Wszyscy" : "Moje"}
                 leads={{ Moje: <AnswerLead />, Wszyscy: <ResultsLead /> }}
@@ -73,11 +73,11 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
           </ResultsProvider>
         </AnswerProvider>
       </main>
-      <footer className={styles.footer}>
-        <Link href="/" className={styles.create}>
+      <footer className="flex justify-center pb-8">
+        <Link href="/" className="inline-flex min-h-target items-center text-[16px]/[20px] font-medium text-muted underline underline-offset-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink">
           Zrób własną ankietę
         </Link>
       </footer>
-    </div>
+    </PageFrame>
   );
 }

@@ -12,7 +12,6 @@ import { Status } from "@/shared/ui/status/status";
 import { Stepper } from "@/shared/ui/stepper/stepper";
 import { Text } from "@/shared/ui/text/text";
 import { useState, type ReactNode } from "react";
-import styles from "./page.module.css";
 
 const views = ["Moje", "Wszyscy"] as const;
 
@@ -26,11 +25,11 @@ const people = [
 
 function Section({ name, children }: { name: string; children: ReactNode }) {
   return (
-    <section className={styles.section} aria-label={name}>
+    <section className="grid gap-3" aria-label={name}>
       <Text as="h2" variant="heading">
         {name}
       </Text>
-      <div className={styles.row}>{children}</div>
+      <div className="flex flex-wrap items-center gap-3">{children}</div>
     </section>
   );
 }
@@ -40,9 +39,9 @@ export function ComponentsDemo() {
   const [hour, setHour] = useState(19);
 
   return (
-    <main className={styles.page}>
+    <main className="mx-auto box-border grid max-w-[720px] gap-8 px-5 pt-6 pb-10">
       <Section name="Text">
-        <div className={styles.stack}>
+        <div className="grid w-full gap-3">
           <Text variant="wordmark">{productName}</Text>
           <Text variant="title">Planszówki u Michała</Text>
           <Text variant="best-time">Sobota 18.10, 19–22</Text>
@@ -75,7 +74,7 @@ export function ComponentsDemo() {
         <Chip pressed>Ten weekend</Chip>
       </Section>
       <Section name="Segment">
-        <div className={styles.stack}>
+        <div className="grid w-full gap-3">
           <Segment
             label="Widok"
             options={views}
@@ -86,7 +85,7 @@ export function ComponentsDemo() {
         </div>
       </Section>
       <Section name="Input">
-        <div className={styles.stack}>
+        <div className="grid w-full gap-3">
           <Input label="Co robimy?" variant="title" placeholder="Piwo, planszówki, kino…" />
           <Input label="Tytuł z błędem" variant="title" defaultValue="" error="Wpisz, co robicie" />
           <Input label="Jak masz na imię?" placeholder="Twoje imię" />

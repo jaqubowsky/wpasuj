@@ -1,34 +1,40 @@
-:root {
-  --paper: #fbf7f1;
-  --surface: #ffffff;
-  --track: #f2ece3;
-  --ink: #1e1b18;
-  --muted: #72695f;
-  --line: #ede6dc;
-  --edge: #958a7e;
-  --accent: #f0603f;
-  --accent-ink: #b8401f;
-  --on-dark-muted: #cfc7bc;
-  --heat-1: #fdede6;
-  --heat-2: #fad3c3;
-  --heat-3: #f6ae93;
-  --heat-4: #f18463;
-  --heat-5: #cc4420;
-  --tint-coral: #fad3c3;
-  --tint-lilac: #e6e1f8;
-  --tint-mint: #ddefe3;
-  --tint-butter: #fbebc4;
-  --tint-sky: #dcebf7;
+@theme static {
+  --*: initial;
 
-  --space-1: 4px;
-  --space-cell-gap: 6px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
-  --space-10: 40px;
+  --color-paper: #fbf7f1;
+  --color-surface: #ffffff;
+  --color-track: #f2ece3;
+  --color-ink: #1e1b18;
+  --color-muted: #72695f;
+  --color-line: #ede6dc;
+  --color-edge: #958a7e;
+  --color-accent: #f0603f;
+  --color-accent-ink: #b8401f;
+  --color-on-dark-muted: #cfc7bc;
+  --color-heat-1: #fdede6;
+  --color-heat-2: #fad3c3;
+  --color-heat-3: #f6ae93;
+  --color-heat-4: #f18463;
+  --color-heat-5: #cc4420;
+  --color-tint-coral: #fad3c3;
+  --color-tint-lilac: #e6e1f8;
+  --color-tint-mint: #ddefe3;
+  --color-tint-butter: #fbebc4;
+  --color-tint-sky: #dcebf7;
+
+  --spacing-1: 4px;
+  --spacing-cell-gap: 6px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-10: 40px;
+
+  --spacing-target: 44px;
+  --spacing-cell: 48px;
+  --spacing-button: 52px;
 
   --radius-cell: 10px;
   --radius-control: 14px;
@@ -38,9 +44,16 @@
   --shadow-lift: 0 1px 2px rgba(30, 27, 24, 0.08);
   --shadow-sheet: 0 -8px 32px rgba(30, 27, 24, 0.12);
 
-  --size-target: 44px;
-  --size-cell: 48px;
-  --size-button: 52px;
+  --font-sans: var(--font-onest);
+  --font-display: var(--font-bricolage);
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  --breakpoint-lg: 1024px;
 
   --duration-fill: 120ms;
   --duration-bump: 180ms;

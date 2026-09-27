@@ -1,0 +1,67 @@
+@media (min-width: 1024px) {
+  [data-page-frame]:has([role="tabpanel"]:not([hidden]) [data-results-side]) {
+    max-width: 1120px;
+    padding: var(--spacing-8) var(--spacing-10) 0;
+  }
+
+  [data-poll-main]:has([role="tabpanel"]:not([hidden]) [data-results-side]) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    grid-template-rows: auto auto auto 1fr;
+    align-items: start;
+    gap: var(--spacing-5) var(--spacing-10);
+  }
+
+  [data-poll-main]:has([role="tabpanel"]:not([hidden]) [data-results-side]) :is([data-poll-tabs], [role="tabpanel"]:not([hidden]), [data-results-body]) {
+    display: contents;
+  }
+
+  [data-poll-main]:has([role="tabpanel"]:not([hidden]) [data-results-side]) [data-poll-head] {
+    grid-area: 1 / 1;
+  }
+
+  [data-poll-main]:has([role="tabpanel"]:not([hidden]) [data-results-side]) [role="tablist"] {
+    grid-area: 2 / 1;
+  }
+
+  [data-poll-main]:has([role="tabpanel"]:not([hidden]) [data-results-side]) [data-poll-lead] {
+    display: contents;
+  }
+
+  [data-poll-main]:has([role="tabpanel"]:not([hidden]) [data-results-side]) [data-results-lead] {
+    grid-area: 1 / 2 / span 3;
+  }
+
+  [data-poll-main]:has([role="tabpanel"]:not([hidden]) [data-results-side]) [data-results-body] > section {
+    grid-area: 3 / 1 / span 2;
+  }
+
+  [data-poll-main]:has([role="tabpanel"]:not([hidden]) [data-results-side]) [data-results-side] {
+    grid-area: 4 / 2;
+  }
+
+  [data-poll-main]:has([role="tabpanel"]:not([hidden]) [data-results-side]):has([data-organiser-bar]) {
+    grid-template-rows: auto auto auto auto 1fr;
+  }
+
+  [data-poll-main]:has([role="tabpanel"]:not([hidden]) [data-results-side]) [data-organiser-bar] {
+    grid-area: 2 / 1;
+    margin: 0;
+  }
+
+  [data-poll-main]:has([role="tabpanel"]:not([hidden]) [data-results-side]):has([data-organiser-bar]) [role="tablist"] {
+    grid-area: 3 / 1;
+  }
+
+  [data-poll-main]:has([role="tabpanel"]:not([hidden]) [data-results-side]):has([data-organiser-bar]) [data-results-lead] {
+    grid-area: 1 / 2 / span 4;
+  }
+
+  [data-poll-main]:has([role="tabpanel"]:not([hidden]) [data-results-side]):has([data-organiser-bar]) [data-results-body] > section {
+    grid-area: 4 / 1 / span 2;
+  }
+
+  [data-poll-main]:has([role="tabpanel"]:not([hidden]) [data-results-side]):has([data-organiser-bar]) [data-results-side] {
+    grid-area: 5 / 2;
+  }
+}

@@ -6,27 +6,27 @@
   display: inline-grid;
   place-items: center;
   font: 600 13px/1 var(--font-sans);
-  color: var(--ink);
+  color: var(--color-ink);
 }
 
 .avatar[data-tint="coral"] {
-  background: var(--tint-coral);
+  background: var(--color-tint-coral);
 }
 
 .avatar[data-tint="lilac"] {
-  background: var(--tint-lilac);
+  background: var(--color-tint-lilac);
 }
 
 .avatar[data-tint="mint"] {
-  background: var(--tint-mint);
+  background: var(--color-tint-mint);
 }
 
 .avatar[data-tint="butter"] {
-  background: var(--tint-butter);
+  background: var(--color-tint-butter);
 }
 
 .avatar[data-tint="sky"] {
-  background: var(--tint-sky);
+  background: var(--color-tint-sky);
 }
 
 .avatar[data-pop] {

@@ -10,10 +10,10 @@
   margin: 0 auto;
   overflow-y: auto;
   display: grid;
-  gap: var(--space-3);
-  padding: var(--space-4) var(--space-5) calc(var(--space-5) + env(safe-area-inset-bottom));
+  gap: var(--spacing-3);
+  padding: var(--spacing-4) var(--spacing-5) calc(var(--spacing-5) + env(safe-area-inset-bottom));
   border-radius: var(--radius-card) var(--radius-card) 0 0;
-  background: var(--surface);
+  background: var(--color-surface);
   box-shadow: var(--shadow-sheet);
   animation: slide-up var(--duration-sheet) ease-out;
 }
@@ -28,7 +28,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-3);
+  gap: var(--spacing-3);
 }
 
 .people {
@@ -40,8 +40,8 @@
 .people > li {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  min-height: var(--size-target);
+  gap: var(--spacing-3);
+  min-height: var(--spacing-target);
 }
 
 @media (min-width: 1024px) {
@@ -50,7 +50,7 @@
     max-width: none;
     max-height: none;
     margin: 0;
-    padding-bottom: var(--space-5);
+    padding-bottom: var(--spacing-5);
     border-radius: var(--radius-card);
     box-shadow: none;
     animation: none;

@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-3);
+  gap: var(--spacing-3);
   margin-bottom: 10px;
 }
 
@@ -19,35 +19,35 @@
 }
 
 .ramp > [data-heat="1"] {
-  background: var(--heat-1);
+  background: var(--color-heat-1);
 }
 
 .ramp > [data-heat="2"] {
-  background: var(--heat-2);
+  background: var(--color-heat-2);
 }
 
 .ramp > [data-heat="3"] {
-  background: var(--heat-3);
+  background: var(--color-heat-3);
 }
 
 .ramp > [data-heat="4"] {
-  background: var(--heat-4);
+  background: var(--color-heat-4);
 }
 
 .ramp > [data-heat="5"] {
-  background: var(--heat-5);
+  background: var(--color-heat-5);
 }
 
 @media (min-width: 1024px) {
   .heatmap {
-    padding: var(--space-5) var(--space-6) var(--space-6) var(--space-3);
+    padding: var(--spacing-5) var(--spacing-6) var(--spacing-6) var(--spacing-3);
     border-radius: var(--radius-card);
-    background: var(--surface);
+    background: var(--color-surface);
   }
 
   .heatmap [role="rowheader"],
   .heatmap [role="row"] > [aria-hidden] {
-    background: var(--surface);
-    box-shadow: var(--space-cell-gap) 0 0 var(--surface);
+    background: var(--color-surface);
+    box-shadow: var(--spacing-cell-gap) 0 0 var(--color-surface);
   }
 }
