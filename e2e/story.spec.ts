@@ -98,8 +98,8 @@ test("the fourth scene paints hours on the poll and shows only at its step", asy
 
   await scrollThroughStory(page, 3.6 / steps.length);
 
-  await expect(story(page).getByText("Kuba pyta", { exact: true })).toBeVisible();
-  await expect(story(page).getByText("Moje", { exact: true })).toBeVisible();
+  await expect(story(page).getByText("Kuba pyta", { exact: true }).filter({ visible: true })).toHaveCount(1);
+  await expect(story(page).getByText("Moje", { exact: true }).filter({ visible: true })).toHaveCount(1);
   await expect(story(page).getByText("Utwórz i wyślij na grupę")).toBeHidden();
   await expect(story(page).getByText("Ej, planszówki w weekend? Kiedy możecie?").filter({ visible: true })).toHaveCount(0);
   await expect(caption(page, steps[3].heading)).toBeVisible();
@@ -108,7 +108,28 @@ test("the fourth scene paints hours on the poll and shows only at its step", asy
 
   await scrollThroughStory(page, 4.5 / steps.length);
 
-  await expect(story(page).getByText("Kuba pyta", { exact: true })).toBeHidden();
+  await expect(story(page).locator("[data-painted]").filter({ visible: true })).toHaveCount(0);
+});
+
+test("at its step the heat scene switches to everyone and warms the grid as friends join, alone in the phone", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "the story pins from 1280px");
+  await page.goto("/");
+  await story(page).scrollIntoViewIfNeeded();
+  const avatar = (name: string) => story(page).getByRole("img", { name }).filter({ visible: true });
+
+  await scrollThroughStory(page, 4.62 / steps.length);
+
+  await expect(caption(page, steps[4].heading)).toBeVisible();
+  await expect(story(page).getByText("Wszyscy", { exact: true }).filter({ visible: true })).toHaveCount(1);
+  await expect(avatar("Bartek")).toBeVisible();
+  await expect(avatar("Kasia")).toHaveCount(0);
+  await settleAnimations(page);
+  await page.screenshot({ path: `e2e/screenshots/landing-story-5-${testInfo.project.name}.png` });
+
+  for (const other of [3.5, 5.5]) {
+    await scrollThroughStory(page, other / steps.length);
+    await expect(avatar("Bartek")).toHaveCount(0);
+  }
 });
 
 test("below 1280px the story is a still sequence, since the caption column is too narrow to pin", async ({ page }, testInfo) => {
@@ -175,4 +196,19 @@ test("on the phone the poll shows its seven painted hours", async ({ page }, tes
   await expect(stepFour.getByText("Kuba pyta", { exact: true })).toBeVisible();
   await expect(stepFour.locator("[data-painted]")).toHaveCount(7);
   await stepFour.screenshot({ path: `e2e/screenshots/landing-story-4-${testInfo.project.name}.png`, style: "header { visibility: hidden; }" });
+});
+
+test("on the phone the heat scene shows everyone in and the grid at its warmest", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("phone"), "the sequence is the phone layout");
+  await page.goto("/#jak-to-dziala");
+  const stepFive = story(page).locator(":scope > div").nth(4);
+
+  await stepFive.scrollIntoViewIfNeeded();
+
+  for (const name of ["Kuba", "Ola", "Michał", "Zuza", "Bartek", "Kasia"]) {
+    await expect(stepFive.getByRole("img", { name })).toBeVisible();
+  }
+  await expect(stepFive.getByText("Wszyscy", { exact: true })).toBeVisible();
+  await settleAnimations(page);
+  await stepFive.screenshot({ path: `e2e/screenshots/landing-story-5-${testInfo.project.name}.png`, style: "header { visibility: hidden; }" });
 });
