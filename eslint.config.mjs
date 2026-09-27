@@ -2,6 +2,30 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 import betterTailwindcss from "eslint-plugin-better-tailwindcss";
+import { readdirSync } from "node:fs";
+
+const modules = readdirSync("src/modules", { withFileTypes: true })
+  .filter((entry) => entry.isDirectory())
+  .map((entry) => entry.name);
+
+const moduleBlocks = (name) => {
+  const otherModules = {
+    group: modules.filter((other) => other !== name).flatMap((other) => [`**/${other}`, `**/${other}/**`]),
+    message: "A module never imports another module",
+  };
+  const restrict = (options) => ({ "@typescript-eslint/no-restricted-imports": ["error", options] });
+  return [
+    { files: [`src/modules/${name}/**`], rules: restrict({ patterns: [otherModules] }) },
+    {
+      files: [`src/modules/${name}/domain/**`],
+      rules: restrict({
+        paths: ["react", "react-dom"],
+        patterns: [otherModules, { group: ["next/*"] }, { group: ["../server/**"], allowTypeImports: true }, { group: ["../ui/**"] }],
+      }),
+    },
+    { files: [`src/modules/${name}/server/**`], rules: restrict({ patterns: [otherModules, { group: ["../ui/**"] }] }) },
+  ];
+};
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -32,27 +56,24 @@ const eslintConfig = defineConfig([
     },
   },
   {
-    files: ["src/modules/*/domain/**"],
+    files: ["src/app/**"],
     rules: {
       "@typescript-eslint/no-restricted-imports": [
         "error",
-        {
-          paths: ["react", "react-dom"],
-          patterns: [
-            { group: ["next/*"] },
-            { group: ["../server/**"], allowTypeImports: true },
-            { group: ["../ui/**"] },
-          ],
-        },
+        { patterns: [{ group: ["**/modules/*/**", "!**/modules/*/index", "!**/modules/*/client"], message: "Import a module through its index.ts or client.ts" }] },
       ],
     },
   },
   {
-    files: ["src/modules/*/server/**"],
+    files: ["src/shared/**"],
     rules: {
-      "@typescript-eslint/no-restricted-imports": ["error", { patterns: [{ group: ["../ui/**"] }] }],
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        { patterns: [{ group: ["@/modules", "@/modules/**", "@/app/**", "../**/modules/**", "../**/app/**"], message: "shared sits below modules and app" }] },
+      ],
     },
   },
+  ...modules.flatMap(moduleBlocks),
   globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", ".claude/**", "spec/**", "test-results/**", "playwright-report/**"]),
 ]);
 
