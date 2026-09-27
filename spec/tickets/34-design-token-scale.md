@@ -1,7 +1,7 @@
 # 34: Design token scale for type and spacing
 
 Status: ready-for-agent
-Blocked by: 12-cleanup.md, 23-landing-seo-perf.md, 25-create-and-cant-feedback.md, every ticket 14 to 30
+Blocked by: 25-create-and-cant-feedback.md, 30-tailwind-landing.md, every ticket 14 to 29
 
 ## Parent
 

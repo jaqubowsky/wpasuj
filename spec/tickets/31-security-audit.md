@@ -1,7 +1,7 @@
 # 31: Security audit
 
 Status: ready-for-agent
-Blocked by: 12-cleanup.md, 23-landing-seo-perf.md, every ticket 14 to 30, 34-design-token-scale.md
+Blocked by: 12-cleanup.md, 23-landing-seo-perf.md, 34-design-token-scale.md, 35-poll-page-v3.md, 36-finalised-poll.md, 37-overnight-hours.md
 
 ## Parent
 
