@@ -67,6 +67,14 @@
   --text-button--line-height: 20px;
   --text-label: 13px;
   --text-label--line-height: 18px;
+  --text-story: 60px;
+  --text-story--line-height: 62px;
+  --text-story-lead: 20px;
+  --text-story-lead--line-height: 30px;
+  --text-bubble: 15px;
+  --text-bubble--line-height: 21px;
+  --text-mini: 12px;
+  --text-mini--line-height: 16px;
   --text-display: 32px;
   --text-display--line-height: 36px;
   --text-display-desktop: 52px;
