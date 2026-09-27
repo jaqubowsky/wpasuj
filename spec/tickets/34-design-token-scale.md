@@ -17,7 +17,7 @@ The theme is a small scale, not one token per place of use: the whole app and la
 - Spacing: one `--spacing: 4px`; remove `--spacing-1` … `--spacing-10`, `--spacing-cell-gap`, `--spacing-target`, `--spacing-cell`, `--spacing-button` (44, 48, 52 are `11`, `12`, `13`; 6 is `1.5`); `--container-*` tokens for the page widths now bracketed (720, 1280)
 - `--tracking-*` for the display tracking now bracketed (−0.01 to −0.035em), `--leading-*` only if a size needs another line height
 - Every caller rounded onto the scale; the mapping table (old value → new step) in the pull request body, including the brief's type table rewritten as scale steps in `spec/brief.md` "Type"
-- Lint: `no-restricted-classes` refuses bracketed font sizes, spacing, sizes and tracking; allowed brackets stay only for selectors (`data-[…]`, `has-[…]`) and shadows built from tokens
+- Lint through `@shadcn/lint` (0.2.0, ESLint plugin, Tailwind v4, no shadcn components needed; owner request): `no-arbitrary-values`, `no-raw-colors`, `no-inline-styles` (the Open Graph image is exempt: Satori takes only inline styles), `no-restyle` with `settings.shadcn.componentImports` pointing at `@/shared/ui/*` so callers do not restyle shared components through `className`, `require-static-classes`. One tool per rule: where it overlaps `eslint-plugin-better-tailwindcss` (`no-unknown-classes`, the bracket rules), keep the one that reads the theme correctly, proven by a probe, and remove the other. Allowed brackets stay only for selectors (`data-[…]`, `has-[…]`)
 - `AGENTS.md` Styling rewritten around the scale
 
 ## Out of scope
@@ -30,6 +30,7 @@ The theme is a small scale, not one token per place of use: the whole app and la
 - [ ] `tokens.css` holds only the scale above plus colours, radii, shadows, motion; grep finds no role-named `--text-*` and no `--spacing-<name>`
 - [ ] `grep -rE "(text|p|m|gap|h|w|size|tracking|leading)[a-z]*-\[[0-9.-]+(px|em|rem)\]" src` finds nothing; a probe with `mt-[6px]` and `text-[15px]` fails lint (output in the pull request body)
 - [ ] Every screen at 390 and 1440 beside its base screenshot, each difference over 0.5% listed with the rounding that caused it; the owner signs off the table
+- [ ] Probes fail lint, output in the pull request body: `mt-[6px]`, `text-[15px]`, `bg-[#f00]`, `style={{ color: "red" }}` outside the Open Graph image, `className="p-8"` on a shared `Button`, a class built by string concatenation
 - [ ] `lint`, `typecheck`, `test`, `knip`, `build` and `e2e` green with the same counts as the base
 
 ## Notes
