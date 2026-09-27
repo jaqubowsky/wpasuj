@@ -1,7 +1,7 @@
 # 23: Landing SEO and performance gate
 
 Status: ready-for-agent
-Blocked by: 22-landing-faq-footer.md
+Blocked by: 15-story-frame.md, 16-story-create.md, 17-story-link.md, 18-story-paint.md, 19-story-heat.md, 20-story-best.md, 21-landing-demo.md, 22-landing-faq-footer.md
 
 ## Parent
 

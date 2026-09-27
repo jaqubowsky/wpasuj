@@ -1,7 +1,7 @@
 # 19: Story scene "Godziny się nagrzewają"
 
 Status: ready-for-agent
-Blocked by: 18-story-paint.md
+Blocked by: 15-story-frame.md
 
 ## Parent
 

@@ -1,7 +1,7 @@
 # 21: Live demo grid
 
 Status: ready-for-agent
-Blocked by: 20-story-best.md
+Blocked by: 27-tailwind-shared.md, 30-tailwind-landing.md
 
 ## Parent
 

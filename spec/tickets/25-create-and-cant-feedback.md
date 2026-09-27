@@ -1,7 +1,7 @@
 # 25: Feedback on creating a poll and on "Nie mogę w żadnym terminie"
 
 Status: ready-for-agent
-Blocked by: 13-module-layers.md
+Blocked by: 27-tailwind-shared.md, 28-tailwind-create-answer.md, 29-tailwind-view-results.md
 
 ## Parent
 
