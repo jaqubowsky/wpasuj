@@ -1,7 +1,7 @@
 # 29: Tailwind in view-results
 
 Status: ready-for-agent
-Blocked by: 26-tailwind-base.md
+Blocked by: 26-tailwind-base.md, 33-architecture-gates.md
 
 ## Parent
 
