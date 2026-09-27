@@ -47,7 +47,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - run: docker build -t wpasuj .
-      - run: docker run -d --name wpasuj -p 3000:3000 wpasuj
+      - run: docker run -d -e SITE_URL=http://localhost:3000 --name wpasuj -p 3000:3000 wpasuj
       - run: curl --retry 20 --retry-delay 1 --retry-all-errors --fail --silent --output /dev/null http://localhost:3000
       - if: ${{ failure() }}
         run: docker logs wpasuj
