@@ -10,6 +10,11 @@ type InviteCardProps = { pollId: string; poll: Parameters<typeof linkPreview>[0]
 
 const miniRows = 4;
 
+const notCopied = {
+  send: "Nie udało się wysłać. Skopiuj link przyciskiem „Kopiuj link”.",
+  link: "Nie udało się skopiować. Skopiuj link z paska adresu.",
+};
+
 function Check() {
   return (
     <span className="grid size-5 flex-none place-items-center rounded-pill bg-accent text-ink" aria-hidden="true">
@@ -81,9 +86,9 @@ export function InviteCard({ pollId, poll }: InviteCardProps) {
           <Copied when={card.copiedBy("link")}>Kopiuj link</Copied>
         </Button>
       </div>
-      {card.notCopied && (
+      {card.notCopiedBy && (
         <p className="m-[0] text-label font-medium text-accent-ink" role="alert">
-          Nie udało się skopiować. Skopiuj link z paska adresu.
+          {notCopied[card.notCopiedBy]}
         </p>
       )}
     </section>

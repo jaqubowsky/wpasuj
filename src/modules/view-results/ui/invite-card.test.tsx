@@ -86,6 +86,35 @@ it("copies the link, says Skopiowano for a moment and keeps the card", async () 
   expect(screen.getByRole("button", { name: "Kopiuj link" })).toBeInTheDocument();
 });
 
+it("keeps Skopiowano for the full moment after a second copy", async () => {
+  stubSharing();
+  renderFreshCard();
+  vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+  const copyButton = () => screen.getByRole("button", { name: /Kopiuj link|Skopiowano/ });
+
+  await act(async () => copyButton().click());
+  await act(() => vi.advanceTimersByTimeAsync(1000));
+  await act(async () => copyButton().click());
+  await act(() => vi.advanceTimersByTimeAsync(1000));
+
+  expect(screen.getByRole("button", { name: "Skopiowano" })).toBeInTheDocument();
+  await act(() => vi.advanceTimersByTimeAsync(600));
+  expect(screen.getByRole("button", { name: "Kopiuj link" })).toBeInTheDocument();
+});
+
+it("points at Kopiuj link when sharing fails and the clipboard refuses", async () => {
+  Object.defineProperty(navigator, "share", { value: async () => Promise.reject(new DOMException("denied", "NotAllowedError")), configurable: true });
+  Object.defineProperty(navigator, "clipboard", {
+    value: { writeText: async () => Promise.reject(new DOMException("denied", "NotAllowedError")) },
+    configurable: true,
+  });
+  renderFreshCard();
+
+  await userEvent.click(sendButton());
+
+  expect(await screen.findByRole("alert")).toHaveTextContent("Nie udało się wysłać. Skopiuj link przyciskiem „Kopiuj link”.");
+});
+
 it("says to copy from the address bar when the clipboard refuses", async () => {
   stubSharing();
   Object.defineProperty(navigator, "clipboard", {
