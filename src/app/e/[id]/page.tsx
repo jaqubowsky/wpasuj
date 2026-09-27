@@ -5,7 +5,7 @@ import { readResults } from "@/modules/view-results";
 import { FinalTime, InviteCard, ResultsBody, ResultsLead, ResultsProvider } from "@/modules/view-results/client";
 import { Avatar } from "@/shared/ui/avatar/avatar";
 import { Text } from "@/shared/ui/text/text";
-import { pollTitleMorph } from "@/shared/morph";
+import { Morph, pollTitleMorph } from "@/shared/morph";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -58,11 +58,11 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
                 <Avatar name={poll.organiserName} tintKey={nameKey(poll.organiserName)} />
                 <Text variant="meta">{poll.organiserName} pyta</Text>
               </div>
-              <div style={pollTitleMorph}>
+              <Morph name={pollTitleMorph}>
                 <Text as="h1" variant="title">
                   {poll.title}
                 </Text>
-              </div>
+              </Morph>
               <ZoneNote pollZone={poll.timeZone} />
               <FinalTime />
               <InviteCard pollId={id} poll={poll} />

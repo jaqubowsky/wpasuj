@@ -32,6 +32,19 @@ async function holdCreateAction(page: Page) {
   return { held, release: () => release() };
 }
 
+async function countViewTransitions(page: Page) {
+  await page.addInitScript(() => {
+    const started: string[] = [];
+    Object.defineProperty(window, "viewTransitions", { value: started });
+    const start = document.startViewTransition?.bind(document);
+    if (start) document.startViewTransition = (update) => (started.push(location.pathname), start(update));
+  });
+  return () => page.evaluate(() => (window as unknown as { viewTransitions: string[] }).viewTransitions.length);
+}
+
+const namedForTransition = (page: Page) =>
+  page.evaluate(() => [...document.querySelectorAll("*")].map((element) => getComputedStyle(element).viewTransitionName).filter((name) => name !== "none" && name !== "root"));
+
 const inviteCard = (page: Page) => page.getByRole("region", { name: "Ankieta gotowa. Wyślij ją na grupę." });
 
 const createButton = (page: Page) => page.getByRole("button", { name: "Utwórz i wyślij na grupę" });
@@ -93,6 +106,42 @@ test("the organiser creates a weekend evening poll, lands on the invite card and
 
   await page.getByRole("tab", { name: "Wszyscy" }).click();
   await expect(page.getByRole("tabpanel", { name: "Wszyscy" })).toBeAttached();
+});
+
+test("on a slow network the spinner keeps moving and the form morphs only once the poll has arrived", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name.includes("webkit"), "the view transition count is read in Chromium");
+  await stubShareSheet(page);
+  const viewTransitions = await countViewTransitions(page);
+  let release = () => {};
+  let onHeld = () => {};
+  const held = new Promise<void>((resolve) => (onHeld = resolve));
+  let holding = true;
+  await page.route(/\/e\/[A-Za-z0-9_-]{10}(\?.*)?$/, async (route) => {
+    if (!holding) return route.continue();
+    holding = false;
+    onHeld();
+    await new Promise<void>((resolve) => (release = resolve));
+    await route.continue();
+  });
+  await page.goto("/");
+
+  await createPoll(page, { title: "Kino", day: "Jutro", name: "Ola" });
+  await held;
+
+  const spinner = page.getByRole("button", { name: "Tworzę ankietę…" }).locator("[data-create-spinner]");
+  const turned = () => spinner.evaluate((element) => element.getAnimations()[0].currentTime);
+  const before = await turned();
+  await expect.poll(turned).not.toBe(before);
+  expect(await viewTransitions()).toBe(0);
+  release();
+
+  await expect(page).toHaveURL(/\/e\/[A-Za-z0-9_-]{10}$/);
+  await expect(inviteCard(page)).toBeVisible();
+  expect(await viewTransitions()).toBe(1);
+  expect(await namedForTransition(page)).toEqual([]);
+  await page.getByRole("tab", { name: "Wszyscy" }).click();
+  await expect(page.getByRole("tab", { name: "Wszyscy", selected: true })).toBeVisible();
+  expect(await namedForTransition(page)).toEqual([]);
 });
 
 test("Kopiuj link copies the link, says Skopiowano and keeps the card", async ({ page }, testInfo) => {
@@ -223,8 +272,6 @@ test.describe("with reduced motion", () => {
       const moved: string[] = [];
       Object.defineProperty(window, "moved", { value: moved });
       for (const event of ["animationstart", "transitionrun"]) document.addEventListener(event, () => moved.push(event), true);
-      const start = document.startViewTransition?.bind(document);
-      if (start) document.startViewTransition = (update) => (moved.push("view-transition"), start(update));
     });
     const moved = () => page.evaluate(() => (window as unknown as { moved: string[] }).moved);
     await page.goto("/");

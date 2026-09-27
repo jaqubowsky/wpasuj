@@ -33,7 +33,7 @@ export function CreatePollForm() {
         variant="title"
         placeholder="Piwo, planszówki, kino…"
         maxLength={60}
-        style={pollTitleMorph}
+        morph={pollTitleMorph}
         value={title}
         onChange={(event) => setTitle(event.target.value)}
         error={isInvalid("title") ? "Wpisz, co robicie" : undefined}
