@@ -146,15 +146,19 @@ Where a mockup and this document differ, this document wins; screens without a m
 
 **Type**: Bricolage Grotesque for display (titles, the best time, day numbers, the wordmark), weights 700 and 800, tight tracking (−0.02 to −0.035em); Onest for everything else, weights 400, 500 and 600, tabular figures wherever a number can change.
 
-| Role | Font | Size / line height | Weight |
+Sizes come from one scale in `tokens.css`, Tailwind's names with a paired line height: `xs` 12/16, `sm` 14/20, `base` 16/24, `lg` 18/28, `xl` 20/28, `2xl` 24/32, `3xl` 30/36, `4xl` 40/44, `5xl` 48/52, `6xl` 60/62. A role picks a step, and a desktop size is a responsive variant (`text-3xl lg:text-4xl`), never its own token.
+
+| Role | Font | Step | Weight |
 |---|---|---|---|
-| Title | Bricolage | 30 / 34 phone, 40 / 44 desktop | 700 |
-| Best time | Bricolage | 30 / 34 phone, 32 / 36 desktop | 700 |
-| Day number | Bricolage | 22 / 26 | 700 |
-| Section heading | Bricolage | 18 / 24 | 700 |
-| Body, chips | Onest | 16 / 24 | 400, chips 500 |
-| Buttons | Onest | 16 / 20 | 600 |
-| Label, meta, hour labels | Onest | 13 / 18 | 500 |
+| Title | Bricolage | `3xl` phone, `4xl` desktop | 700 |
+| Best time | Bricolage | `3xl` | 700 |
+| Day number | Bricolage | `xl` | 700 |
+| Section heading | Bricolage | `lg` | 700 |
+| Body, chips | Onest | `base` | 400, chips 500 |
+| Buttons | Onest | `base` | 600 |
+| Label, meta, hour labels | Onest | `sm` | 500 |
+
+Display tracking is `tracking-tight` (−0.01em), `tracking-tighter` (−0.02em) or `tracking-tightest` (−0.03em).
 
 Sentence case everywhere; no all-caps labels, no letter-spaced eyebrows.
 
@@ -181,7 +185,7 @@ Counts on heat cells are `ink`, white only on `heat-5`. Avatars take their tint 
 
 **Grid**: separate rounded tiles (10px radius) with a 6px gap, at least 48px tall and 56px wide on the phone. Free is `surface` with an `edge` border; mine is `accent`; add preview is `accent` at 35%; remove preview is `line`; heat 1 to 5 carry the count; every respondent free adds a 2px inset `ink` border; the best and the chosen time get a 2px `ink` outline with a 2px offset; focus is a 2px `ink` ring. The date header is the weekday small and muted over the day number large ("pt" over "17").
 
-**Shape and space**: 4px base, scale 4, 8, 12, 16, 20, 24, 32, 40. Radius 10 on cells, 14 on buttons and inputs, 20 on cards, full pill on chips. No borders on cards and no shadows, except the selected segment's 1px lift and the bottom sheet's one soft shadow. Buttons 52px tall on the phone, the main action full width; the primary is `ink` with white text. The best time sits in an `ink` card with the count in `heat-3`.
+**Shape and space**: one 4px grid (`--spacing: 4px`), so `p-7` is 28px and 44, 48 and 52 are `11`, `12` and `13`. Radius 10 on cells, 14 on buttons and inputs, 20 on cards, full pill on chips. No borders on cards and no shadows, except the selected segment's 1px lift and the bottom sheet's one soft shadow. Buttons 52px tall on the phone, the main action full width; the primary is `ink` with white text. The best time sits in an `ink` card with the count in `heat-3`.
 
 **Motion**: the app has some play in it, used where it carries meaning and never on load:
 - A tapped cell fills in 120 ms with a 0.96 press scale.

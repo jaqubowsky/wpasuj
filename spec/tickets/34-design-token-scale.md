@@ -1,6 +1,6 @@
 # 34: Design token scale for type and spacing
 
-Status: ready-for-agent
+Status: claimed
 Blocked by: 12-cleanup.md, 23-landing-seo-perf.md, 25-create-and-cant-feedback.md, every ticket 14 to 30
 
 ## Parent
