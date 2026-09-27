@@ -1,6 +1,6 @@
 # 13: Module layers refactor, no behaviour change
 
-Status: ready-for-agent
+Status: done
 Blocked by: 06-organiser.md, 07-link-preview.md, 09-design-system-fixes.md, 10-grid-robustness.md
 
 ## Parent
@@ -24,7 +24,11 @@ Blocked by: 06-organiser.md, 07-link-preview.md, 09-design-system-fixes.md, 10-g
 
 ## Acceptance criteria
 
-- [ ] `npm run lint`, `typecheck`, `test`, `build`, `e2e` green; CI green
-- [ ] `git diff --stat -M` on the pull request shows only renames and import-line edits (`git diff -M --word-diff` has no change outside `import` lines, `eslint.config.mjs` and this ticket)
-- [ ] A deliberate `import { useState } from "react"` in a `domain/` file fails lint (shown in the PR body, not committed)
-- [ ] Same test count before and after
+- [x] `npm run lint`, `typecheck`, `test`, `build`, `e2e` green; CI green — all five exit 0 here (e2e: phone-chromium and desktop-chromium, 86 passed, 8 skipped); CI on the pull request
+- [x] `git diff --stat -M` on the pull request shows only renames and import-line edits (`git diff -M --word-diff` has no change outside `import` lines, `eslint.config.mjs` and this ticket) — the only word changes outside static `import`/`export` lines are module paths in `import()` and `vi.mock()`
+- [x] A deliberate `import { useState } from "react"` in a `domain/` file fails lint (shown in the PR body, not committed) — `@typescript-eslint/no-restricted-imports` reports it; the PR body
+- [x] Same test count before and after — Vitest 45 files, 312 tests on `dd5eae1` and after; e2e 86 passed, 8 skipped both
+
+## Notes
+
+Zod schemas sit in `server/` as Scope says, and three domain files take a type from them (`Results`, `Slot`, `createPollSchema`), so the `../server/**` pattern sets `allowTypeImports`: a runtime import from `server/` still fails lint. That option exists only on `@typescript-eslint/no-restricted-imports`, the rule used here.
