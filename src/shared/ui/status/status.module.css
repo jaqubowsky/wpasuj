@@ -1,0 +1,19 @@
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.status svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+}
+
+.status[data-state="failed"] {
+  color: var(--accent-ink);
+}

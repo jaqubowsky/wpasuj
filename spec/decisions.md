@@ -9,3 +9,8 @@ Points `spec/brief.md` leaves open, taken by the host. A container that meets an
 5. Cookies: participant cookie named by the poll id (`<id>`), organiser cookie `<id>-org`, both httpOnly, SameSite=Lax, path `/`, one year
 6. The server checks "none in the past" against the date today in the poll's time zone, the same date the organiser's device shows
 7. `created_by_participant` is true when the create request carries any cookie that is a valid participant token of another poll
+8. `participants.id` is an autoincrement integer; `slots.participant_id` references it
+9. `npm run start` runs `.next/standalone/server.js`; `npm run build` copies `.next/static` and `drizzle/` into the standalone folder, so the Dockerfile copies one directory
+10. Cell is one component: a toggle button (`pressed`, `state`) on the answer grid, or a heat cell (`heat`, `everyone`, `best`) on results
+11. Avatar picks its tint from the name as given; callers pass the name they show
+12. The `text` Button has no edge ring, as its README describes; the preview's ring comes only from the `.wp-button` cascade

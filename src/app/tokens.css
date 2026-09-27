@@ -1,0 +1,52 @@
+:root {
+  --paper: #fbf7f1;
+  --surface: #ffffff;
+  --track: #f2ece3;
+  --ink: #1e1b18;
+  --muted: #72695f;
+  --line: #ede6dc;
+  --edge: #958a7e;
+  --accent: #f0603f;
+  --accent-ink: #b8401f;
+  --on-dark-muted: #cfc7bc;
+  --heat-1: #fdede6;
+  --heat-2: #fad3c3;
+  --heat-3: #f6ae93;
+  --heat-4: #f18463;
+  --heat-5: #cc4420;
+  --tint-coral: #fad3c3;
+  --tint-lilac: #e6e1f8;
+  --tint-mint: #ddefe3;
+  --tint-butter: #fbebc4;
+  --tint-sky: #dcebf7;
+
+  --space-1: 4px;
+  --space-cell-gap: 6px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+
+  --radius-cell: 10px;
+  --radius-control: 14px;
+  --radius-card: 20px;
+  --radius-pill: 999px;
+
+  --shadow-lift: 0 1px 2px rgba(30, 27, 24, 0.08);
+  --shadow-sheet: 0 -8px 32px rgba(30, 27, 24, 0.12);
+
+  --size-target: 44px;
+  --size-cell: 48px;
+  --size-button: 52px;
+
+  --duration-fill: 120ms;
+  --duration-bump: 180ms;
+  --duration-sheet: 200ms;
+  --duration-pop: 320ms;
+
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-pop: cubic-bezier(0.3, 1.5, 0.5, 1);
+}

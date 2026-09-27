@@ -1,0 +1,28 @@
+.card {
+  padding: var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.card[data-tone="ink"] {
+  background: var(--ink);
+  color: #fff;
+}
+
+.card[data-size="compact"] {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-control);
+}
+
+.label {
+  display: block;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.card[data-tone="ink"] .label {
+  color: var(--on-dark-muted);
+}
