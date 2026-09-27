@@ -1,5 +1,5 @@
 .body {
-  padding-top: var(--space-5);
+  padding-top: var(--spacing-5);
 }
 
 .body > h2 {
@@ -22,56 +22,56 @@
 }
 
 .claim {
-  margin-top: var(--space-4);
-  padding: var(--space-5);
+  margin-top: var(--spacing-4);
+  padding: var(--spacing-5);
   border-radius: var(--radius-card);
-  background: var(--surface);
+  background: var(--color-surface);
 }
 
 .claim > p {
-  margin: 0 0 var(--space-4);
+  margin: 0 0 var(--spacing-4);
 }
 
 .claimActions {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--spacing-4);
 }
 
 .notice {
-  margin: var(--space-4) 0 0;
+  margin: var(--spacing-4) 0 0;
   font-size: 15px;
   line-height: 20px;
   font-weight: 500;
-  color: var(--accent-ink);
+  color: var(--color-accent-ink);
 }
 
 .hint {
-  margin: var(--space-2) 0 var(--space-3);
+  margin: var(--spacing-2) 0 var(--spacing-3);
   font-size: 15px;
   line-height: 20px;
-  color: var(--muted);
+  color: var(--color-muted);
 }
 
 .done {
-  margin: var(--space-4) 0 0;
+  margin: var(--spacing-4) 0 0;
   font-size: 15px;
   line-height: 20px;
-  color: var(--muted);
+  color: var(--color-muted);
 }
 
 .cant {
   display: block;
-  min-height: var(--size-target);
-  margin: var(--space-3) auto 0;
-  padding: 0 var(--space-4);
+  min-height: var(--spacing-target);
+  margin: var(--spacing-3) auto 0;
+  padding: 0 var(--spacing-4);
   border: 0;
   background: none;
   font: 500 15px/20px var(--font-sans);
-  color: var(--muted);
+  color: var(--color-muted);
   text-decoration: underline;
   text-underline-offset: 3px;
-  text-decoration-color: var(--edge);
+  text-decoration-color: var(--color-edge);
   cursor: pointer;
 }
 

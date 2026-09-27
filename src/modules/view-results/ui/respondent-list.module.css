@@ -1,5 +1,5 @@
 .list {
-  margin: var(--space-2) 0 0;
+  margin: var(--spacing-2) 0 0;
   padding: 0;
   list-style: none;
 }
@@ -7,9 +7,9 @@
 .list > li {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--spacing-3);
   height: 48px;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--color-line);
 }
 
 .list > li:first-child {
@@ -20,5 +20,5 @@
   margin-left: auto;
   font-size: 13px;
   line-height: 18px;
-  color: var(--muted);
+  color: var(--color-muted);
 }

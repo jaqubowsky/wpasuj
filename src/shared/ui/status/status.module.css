@@ -5,7 +5,7 @@
   font-size: 13px;
   line-height: 18px;
   font-weight: 500;
-  color: var(--muted);
+  color: var(--color-muted);
 }
 
 .status svg {
@@ -15,5 +15,5 @@
 }
 
 .status[data-state="failed"] {
-  color: var(--accent-ink);
+  color: var(--color-accent-ink);
 }

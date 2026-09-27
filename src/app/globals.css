@@ -1,8 +1,12 @@
+@import "./tokens.css";
+@import "tailwindcss/utilities.css" source(none);
+@source "../**/*.tsx";
+
 body {
   margin: 0;
   min-height: 100dvh;
-  background: var(--paper);
-  color: var(--ink);
+  background: var(--color-paper);
+  color: var(--color-ink);
   font-family: var(--font-sans);
   font-size: 16px;
   line-height: 24px;

@@ -1,17 +1,17 @@
 .card {
-  padding: var(--space-5);
+  padding: var(--spacing-5);
   border-radius: var(--radius-card);
-  background: var(--surface);
-  color: var(--ink);
+  background: var(--color-surface);
+  color: var(--color-ink);
 }
 
 .card[data-tone="ink"] {
-  background: var(--ink);
+  background: var(--color-ink);
   color: #fff;
 }
 
 .card[data-size="compact"] {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--spacing-3) var(--spacing-4);
   border-radius: var(--radius-control);
 }
 
@@ -20,9 +20,9 @@
   font-size: 13px;
   line-height: 18px;
   font-weight: 500;
-  color: var(--muted);
+  color: var(--color-muted);
 }
 
 .card[data-tone="ink"] .label {
-  color: var(--on-dark-muted);
+  color: var(--color-on-dark-muted);
 }

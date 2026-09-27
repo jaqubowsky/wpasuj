@@ -8,12 +8,12 @@
   display: grid;
   grid-template-columns: var(--hour-column) repeat(var(--date-count), minmax(56px, 1fr));
   grid-template-rows: auto;
-  grid-auto-rows: var(--size-cell);
-  gap: var(--space-cell-gap);
+  grid-auto-rows: var(--spacing-cell);
+  gap: var(--spacing-cell-gap);
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
-  scroll-padding-left: calc(var(--hour-column) + var(--space-cell-gap));
+  scroll-padding-left: calc(var(--hour-column) + var(--spacing-cell-gap));
   scrollbar-width: none;
 }
 
@@ -23,7 +23,7 @@
 
 @container (max-width: 599px) {
   .grid[data-scrolls] {
-    grid-template-columns: var(--hour-column) repeat(var(--date-count), max(56px, calc((100cqi - var(--hour-column) - 5 * var(--space-cell-gap)) / 4.4)));
+    grid-template-columns: var(--hour-column) repeat(var(--date-count), max(56px, calc((100cqi - var(--hour-column) - 5 * var(--spacing-cell-gap)) / 4.4)));
   }
 }
 
@@ -36,8 +36,8 @@
   position: sticky;
   left: 0;
   z-index: 1;
-  background: var(--paper);
-  box-shadow: var(--space-cell-gap) 0 0 var(--paper);
+  background: var(--color-paper);
+  box-shadow: var(--spacing-cell-gap) 0 0 var(--color-paper);
   touch-action: pan-y;
 }
 
@@ -51,12 +51,12 @@
   box-sizing: border-box;
   width: 100%;
   height: 100%;
-  min-height: var(--size-target);
+  min-height: var(--spacing-target);
   padding: 0;
   border: 0;
   border-radius: var(--radius-cell);
-  background: var(--track);
-  color: var(--ink);
+  background: var(--color-track);
+  color: var(--color-ink);
   font-family: var(--font-sans);
   font-variant-numeric: tabular-nums;
   cursor: pointer;
@@ -70,7 +70,7 @@
 
 .date button:focus-visible,
 .hour button:focus-visible {
-  outline: 2px solid var(--ink);
+  outline: 2px solid var(--color-ink);
   outline-offset: -2px;
 }
 
@@ -78,14 +78,14 @@
 .date > span {
   display: grid;
   justify-items: center;
-  padding: var(--space-1) 0 var(--space-2);
+  padding: var(--spacing-1) 0 var(--spacing-2);
 }
 
 .hour > span {
   display: grid;
   height: 100%;
   place-items: start end;
-  padding-right: var(--space-2);
+  padding-right: var(--spacing-2);
 }
 
 .cell {
