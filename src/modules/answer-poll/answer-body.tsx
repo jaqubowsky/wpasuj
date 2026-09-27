@@ -20,10 +20,9 @@ export function AnswerBody() {
         dates={answer.dates}
         hours={answer.hours}
         isSelected={answer.isMine}
-        renderCell={({ label, tabIndex, preview, ...cell }) => {
-          const mine = answer.isMine(cell);
-          return <Cell pressed={mine} state={preview ?? (mine ? "mine" : undefined)} aria-label={label} tabIndex={tabIndex} />;
-        }}
+        renderCell={({ selected, label, tabIndex, preview }) => (
+          <Cell state={preview ?? (selected ? "mine" : undefined)} aria-label={label} tabIndex={tabIndex} />
+        )}
         onCellTap={answer.tapCell}
         onDateTap={answer.tapDate}
         onHourTap={answer.tapHour}

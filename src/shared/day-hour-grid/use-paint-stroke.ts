@@ -3,7 +3,9 @@ import { useRef, useState } from "react";
 export type GridCell = { date: string; hour: number };
 export type PaintedRectangle = { dates: string[]; hours: number[]; mode: "add" | "remove" };
 
-type Stroke = { anchor: GridCell; current: GridCell; mode: PaintedRectangle["mode"]; spread: boolean };
+type Pointer = { pointerId: number; buttons: number };
+
+type Stroke = { pointerId: number; anchor: GridCell; current: GridCell; mode: PaintedRectangle["mode"]; spread: boolean };
 
 type PaintStrokeOptions = {
   dates: string[];
@@ -31,25 +33,37 @@ export function usePaintStroke({ dates, hours, onStroke, onTap }: PaintStrokeOpt
     setStroke(next);
   }
 
+  function strokeOf({ pointerId }: Pick<Pointer, "pointerId">) {
+    const current = strokeRef.current;
+    return current?.pointerId === pointerId ? current : null;
+  }
+
   function rectangleOf({ anchor, current, mode }: Stroke): PaintedRectangle {
     return { dates: between(dates, anchor.date, current.date), hours: between(hours, anchor.hour, current.hour), mode };
   }
 
   return {
-    start(cell: GridCell, filled: boolean) {
+    start(cell: GridCell, filled: boolean, { pointerId }: Pointer) {
+      if (strokeRef.current) return;
       paintedRef.current = false;
-      update({ anchor: cell, current: cell, mode: filled ? "remove" : "add", spread: false });
+      update({ pointerId, anchor: cell, current: cell, mode: filled ? "remove" : "add", spread: false });
     },
-    move(cell: GridCell) {
-      const current = strokeRef.current;
-      if (!current || isSameCell(current.current, cell)) return;
+    move(cell: GridCell | undefined, pointer: Pointer) {
+      const current = strokeOf(pointer);
+      if (!current) return;
+      if (pointer.buttons === 0) return update(null);
+      if (!cell || isSameCell(current.current, cell)) return;
       update({ ...current, current: cell, spread: current.spread || !isSameCell(current.anchor, cell) });
     },
-    end() {
-      const current = strokeRef.current;
+    end(pointer: Pick<Pointer, "pointerId">) {
+      const current = strokeOf(pointer);
+      if (!current) return;
       update(null);
-      paintedRef.current = Boolean(current?.spread);
-      if (current?.spread) onStroke?.(rectangleOf(current));
+      paintedRef.current = current.spread;
+      if (current.spread) onStroke?.(rectangleOf(current));
+    },
+    cancel(pointer: Pick<Pointer, "pointerId">) {
+      if (strokeOf(pointer)) update(null);
     },
     tap(cell: GridCell, source: "pointer" | "keyboard") {
       if (source === "pointer" && paintedRef.current) return;

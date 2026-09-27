@@ -1,6 +1,6 @@
 # 10: Grid robustness from the acceptance of ticket 02
 
-Status: ready-for-agent
+Status: claimed
 Blocked by: 04-answer-poll.md, 05-view-results.md
 
 ## Parent
@@ -27,9 +27,14 @@ Painting stays exactly the rectangle the first finger draws, whatever else touch
 
 ## Acceptance criteria
 
-- [ ] Unit test: a second pointer down during a stroke changes neither its anchor nor its rectangle
-- [ ] Unit test: `pointercancel` and a buttonless move report no stroke
-- [ ] Component test: column header n is the header of data column n
-- [ ] e2e on all three projects: mouse drag paints the rectangle
-- [ ] e2e: at 320 columns are ≥56px; with 7 dates at 390 part of the fifth column is visible
-- [ ] Screenshots at 390 and 1440 with 7 dates in the CI artifact
+- [x] Unit test: a second pointer down during a stroke changes neither its anchor nor its rectangle: `use-paint-stroke.test.ts` "keeps the rectangle of the first finger when a second one touches the grid"
+- [x] Unit test: `pointercancel` and a buttonless move report no stroke: `use-paint-stroke.test.ts` "drops a stroke the browser cancels", "drops a stroke once the pointer moves with no button pressed"
+- [x] Component test: column header n is the header of data column n: `day-hour-grid.test.tsx` "puts each date header over its own column of cells"
+- [ ] e2e on all three projects: mouse drag paints the rectangle: `e2e/day-hour-grid.spec.ts` "a mouse drag across cells paints the rectangle…", green on phone-chromium and desktop-chromium locally; phone-webkit only in CI
+- [x] e2e: at 320 columns are ≥56px; with 7 dates at 390 part of the fifth column is visible: `e2e/day-hour-grid.spec.ts` "keeps 7 dates at least 56px wide", "shows part of the fifth of 7 dates at the edge of a phone"
+- [ ] Screenshots at 390 and 1440 with 7 dates in the CI artifact: `day-hour-grid-7-dates-*` from "shows 7 dates as 48px tiles with a 6px gap"; waits for the CI run
+
+## Comments
+
+- "Announced once" needed `src/shared/ui/cell`, outside the grid: on the user's word Cell dropped `pressed`/`aria-pressed` and the grid's `aria-selected` is the one announcement (decision 10). `spec/design/system/components/Cell/README.md` and `preview.html` still show `aria-pressed`; left to the host
+- At 320 the 56px floor wins over the peek: the fourth column is the one cut and the fifth is off screen. The peek of 0.4 holds from a container of 324.4px (390 phones and up)

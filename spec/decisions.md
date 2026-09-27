@@ -11,7 +11,7 @@ Points `spec/brief.md` leaves open, taken by the host. A container that meets an
 7. `created_by_participant` is true when the create request carries any cookie that is a valid participant token of another poll
 8. `participants.id` is an autoincrement integer; `slots.participant_id` references it
 9. `npm run start` runs `.next/standalone/server.js`; `npm run build` copies `.next/static` and `drizzle/` into the standalone folder, so the Dockerfile copies one directory
-10. Cell is one component: a toggle button (`pressed`, `state`) on the answer grid, or a heat cell (`heat`, `everyone`, `best`) on results
+10. Cell is one component: a button (`state`) on the answer grid, or a heat cell (`heat`, `everyone`, `best`) on results. The grid passes each cell `selected` and announces it once, as `aria-selected` on the gridcell, so Cell carries no `aria-pressed` (corrected by ticket 10)
 11. Avatar picks its tint from a key the caller passes, the participant's normalised name, as the brief says (corrected by the host at the acceptance of ticket 01; ticket 09)
 12. The `text` Button has no edge ring, as its README describes; the preview's ring comes only from the `.wp-button` cascade
 13. Demo routes under `src/app/dev/` answer 404 unless `DEMO_ROUTES=1`, which `.env.development` and the Playwright web server set, because e2e runs the production build

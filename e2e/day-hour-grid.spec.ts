@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { centreOf, touchDrag } from "./pointer";
+import { centreOf, mouseDrag, touchDrag } from "./pointer";
 import { saveScreenshot } from "./screenshot";
 
 function cell(page: Page, name: string) {
@@ -44,6 +44,40 @@ test.describe("day-hour grid", () => {
     await grid.evaluate((element) => element.scrollBy({ left: 60, behavior: "instant" }));
 
     await expect.poll(() => grid.evaluate((element, snap) => Math.abs(element.scrollLeft - snap), pitch)).toBeLessThanOrEqual(1);
+  });
+
+  test("a mouse drag across cells paints the rectangle between the first and the last cell", async ({ page }) => {
+    await page.goto("/dev/day-hour-grid?dates=7");
+
+    await mouseDrag(page, await centreOf(cell(page, "pt 16, 13:00")), await centreOf(cell(page, "nd 18, 15:00")));
+
+    for (const name of ["pt 16, 13:00", "sb 17, 14:00", "nd 18, 15:00"]) {
+      await expect(page.getByRole("gridcell", { selected: true }).filter({ has: cell(page, name) })).toHaveCount(1);
+    }
+    await expect(page.getByRole("gridcell", { selected: true })).toHaveCount(9);
+  });
+
+  test.describe("on a 320px phone", () => {
+    test.use({ viewport: { width: 320, height: 640 } });
+
+    test("keeps 7 dates at least 56px wide", async ({ page }) => {
+      await page.goto("/dev/day-hour-grid?dates=7");
+
+      const width = await cell(page, "pt 16, 19:00").evaluate((element) => element.getBoundingClientRect().width);
+      expect(width).toBeGreaterThanOrEqual(56);
+    });
+  });
+
+  test("shows part of the fifth of 7 dates at the edge of a phone", async ({ page, isMobile }) => {
+    test.skip(!isMobile, "all 7 dates fit at 1440");
+    await page.goto("/dev/day-hour-grid?dates=7");
+
+    const gridRight = await page.getByRole("grid", { name: "Kiedy możesz?" }).evaluate((element) => element.getBoundingClientRect().right);
+    const fifth = await page.getByRole("columnheader").nth(4).evaluate((element) => element.getBoundingClientRect().toJSON() as DOMRect);
+    const shown = (gridRight - fifth.left) / fifth.width;
+
+    expect(shown).toBeGreaterThan(0.3);
+    expect(shown).toBeLessThan(0.5);
   });
 
   test.describe("on a touch screen", () => {

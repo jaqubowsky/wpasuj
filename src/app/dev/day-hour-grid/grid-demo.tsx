@@ -32,10 +32,9 @@ export function GridDemo({ dates, hours }: GridDemoProps) {
       dates={dates}
       hours={hours}
       isSelected={(cell) => mine.has(keyOf(cell))}
-      renderCell={({ label, tabIndex, preview, ...cell }) => {
-        const selected = mine.has(keyOf(cell));
-        return <Cell pressed={selected} state={preview ?? (selected ? "mine" : undefined)} aria-label={label} tabIndex={tabIndex} />;
-      }}
+      renderCell={({ selected, label, tabIndex, preview }) => (
+        <Cell state={preview ?? (selected ? "mine" : undefined)} aria-label={label} tabIndex={tabIndex} />
+      )}
       onCellTap={(cell) => toggleAll([cell])}
       onDateTap={(date) => toggleAll(hours.map((hour) => ({ date, hour })))}
       onHourTap={(hour) => toggleAll(dates.map((date) => ({ date, hour })))}
