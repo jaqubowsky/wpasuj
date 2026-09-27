@@ -1,0 +1,37 @@
+# 34: Design token scale for type and spacing
+
+Status: ready-for-agent
+Blocked by: 12-cleanup.md, 23-landing-seo-perf.md, 25-create-and-cant-feedback.md, every ticket 14 to 30
+
+## Parent
+
+`spec/brief.md` ("Type", "Stack (decided)" Styling), `AGENTS.md` ("Styling"), host decision 53. Research: `~/.sandboxes/wpasuj/host-acceptance/research-34.md`.
+
+## Outcome
+
+The theme is a small scale, not one token per place of use: the whole app and landing use `text-xs` … `text-6xl`, spacing on one 4px grid (`p-7` is 28px, `m-0` works), a handful of tracking and leading steps, and lint refuses any bracketed size, spacing or tracking. A designer reading `tokens.css` sees the system in one screen.
+
+## Scope
+
+- Type scale in `tokens.css`, each with its paired line height, Tailwind's names: `xs` 12/16, `sm` 14/20, `base` 16/24, `lg` 18/28, `xl` 20/28, `2xl` 24/32, `3xl` 30/36, `4xl` 40/44, `5xl` 48/52, `6xl` 60/62. Phone and desktop sizes through responsive variants (`text-3xl lg:text-4xl`), no `-desktop` tokens. Remove every role-named `--text-*` token (decisions 50 superseded)
+- Spacing: one `--spacing: 4px`; remove `--spacing-1` … `--spacing-10`, `--spacing-cell-gap`, `--spacing-target`, `--spacing-cell`, `--spacing-button` (44, 48, 52 are `11`, `12`, `13`; 6 is `1.5`); `--container-*` tokens for the page widths now bracketed (720, 1280)
+- `--tracking-*` for the display tracking now bracketed (−0.01 to −0.035em), `--leading-*` only if a size needs another line height
+- Every caller rounded onto the scale; the mapping table (old value → new step) in the pull request body, including the brief's type table rewritten as scale steps in `spec/brief.md` "Type"
+- Lint: `no-restricted-classes` refuses bracketed font sizes, spacing, sizes and tracking; allowed brackets stay only for selectors (`data-[…]`, `has-[…]`) and shadows built from tokens
+- `AGENTS.md` Styling rewritten around the scale
+
+## Out of scope
+
+- Colours, radii, shadows, motion: already a small named set
+- Layout or copy changes beyond the rounding
+
+## Acceptance criteria
+
+- [ ] `tokens.css` holds only the scale above plus colours, radii, shadows, motion; grep finds no role-named `--text-*` and no `--spacing-<name>`
+- [ ] `grep -rE "(text|p|m|gap|h|w|size|tracking|leading)[a-z]*-\[[0-9.-]+(px|em|rem)\]" src` finds nothing; a probe with `mt-[6px]` and `text-[15px]` fails lint (output in the pull request body)
+- [ ] Every screen at 390 and 1440 beside its base screenshot, each difference over 0.5% listed with the rounding that caused it; the owner signs off the table
+- [ ] `lint`, `typecheck`, `test`, `knip`, `build` and `e2e` green with the same counts as the base
+
+## Notes
+
+The rounding moves some text by 1–2px (13 → 12 or 14, 15 → 14 or 16, 19 → 18 or 20, 22 → 20 or 24) and 3px gaps to 4px; that visible drift is the point of the ticket, which is why the owner signs off the table rather than the 0.5% rule.

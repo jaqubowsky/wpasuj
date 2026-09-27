@@ -1,7 +1,7 @@
 # 32: Architecture audit
 
 Status: ready-for-agent
-Blocked by: 12-cleanup.md, 23-landing-seo-perf.md, every ticket 14 to 30
+Blocked by: 12-cleanup.md, 23-landing-seo-perf.md, every ticket 14 to 30, 34-design-token-scale.md
 
 ## Parent
 
