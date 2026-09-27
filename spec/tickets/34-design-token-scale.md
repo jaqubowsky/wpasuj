@@ -1,6 +1,6 @@
 # 34: Design token scale for type and spacing
 
-Status: claimed
+Status: done
 Blocked by: 25-create-and-cant-feedback.md, 30-tailwind-landing.md, every ticket 14 to 29
 
 ## Parent
@@ -28,11 +28,11 @@ The theme is a small scale, not one token per place of use: the whole app and la
 
 ## Acceptance criteria
 
-- [ ] `tokens.css` holds only the scale above plus colours, radii, shadows, motion; grep finds no role-named `--text-*` and no `--spacing-<name>`
-- [ ] `grep -rE "(text|p|m|gap|h|w|size|tracking|leading)[a-z]*-\[[0-9.-]+(px|em|rem)\]" src` finds nothing; a probe with `mt-[6px]` and `text-[15px]` fails lint (output in the pull request body)
-- [ ] Every screen at 390 and 1440 beside its base screenshot, each difference over 0.5% listed with the rounding that caused it; the owner signs off the table
-- [ ] Probes fail lint, output in the pull request body: `mt-[6px]`, `text-[15px]`, `bg-[#f00]`, `style={{ color: "red" }}` outside the Open Graph image, `className="p-8"` on a shared `Button`, a class built by string concatenation, a template-string `className`
-- [ ] `lint`, `typecheck`, `test`, `knip`, `build` and `e2e` green with the same counts as the base
+- [x] `tokens.css` holds only the scale above plus colours, radii, shadows, motion; grep finds no role-named `--text-*` and no `--spacing-<name>` Evidence: `src/app/tokens.css` has colours, `--spacing`, `--container-*`, radii, shadows, fonts, `--text-xs` … `--text-6xl`, `--tracking-*`, `--leading-none`, weights, breakpoint, motion; no `--text-<role>` or `--spacing-<name>`.
+- [x] `grep -rE "(text|p|m|gap|h|w|size|tracking|leading)[a-z]*-\[[0-9.-]+(px|em|rem)\]" src` finds nothing; a probe with `mt-[6px]` and `text-[15px]` fails lint (output in the pull request body) Evidence: the grep prints nothing; the probe output is in the pull request body.
+- [x] Every screen at 390 and 1440 beside its base screenshot, each difference over 0.5% listed with the rounding that caused it; the owner signs off the table Evidence: the per-screen table and rounding table in the pull request body, side-by-side images in the task's `browser/t34-rounding/`. The owner's sign-off is given on the pull request.
+- [x] Probes fail lint, output in the pull request body: `mt-[6px]`, `text-[15px]`, `bg-[#f00]`, `style={{ color: "red" }}` outside the Open Graph image, `className="p-8"` on a shared `Button`, a class built by string concatenation, a template-string `className` Evidence: probe output in the pull request body, all seven fail.
+- [x] `lint`, `typecheck`, `test`, `knip`, `build` and `e2e` green with the same counts as the base Evidence: all green; test 59 files/374 (base 58/371 plus `cn.test.ts`), e2e 137 passed/25 skipped as on base `3c0a096`; WebKit runs in CI.
 
 ## Notes
 
