@@ -5,6 +5,7 @@ import { saveScreenshot } from "./screenshot";
 const titleField = (page: Page) => page.getByRole("textbox", { name: "Co robimy?" });
 const finalCall = (page: Page) => page.getByRole("region", { name: "To kiedy się widzicie?" });
 const demo = (page: Page) => page.getByRole("region", { name: "Wypróbuj na żywo" });
+const demoSlot = (page: Page) => page.locator("#jak-to-dziala + div");
 const demoCell = (page: Page, name: string) => demo(page).getByRole("button", { name: new RegExp(`^${name}, \\d z 5 może$`) });
 
 test("the create form is in the first viewport and creates a poll", async ({ page }) => {
@@ -82,7 +83,7 @@ test("the demo loads only once the reader nears it", async ({ page }, testInfo) 
 
   await expect(demo).not.toBeAttached();
 
-  await page.getByRole("heading", { name: "Zrobione pod paczkę znajomych, nie pod firmę." }).scrollIntoViewIfNeeded();
+  await demoSlot(page).scrollIntoViewIfNeeded();
   await expect(demo).toBeAttached();
 });
 
@@ -102,7 +103,7 @@ test("on the phone the create bar stays whole as it leaves with the form", async
 
 test("the demo's best time follows a tap and a drag", async ({ page, browserName, isMobile }, testInfo) => {
   await page.goto("/");
-  await page.getByRole("heading", { name: "Zrobione pod paczkę znajomych, nie pod firmę." }).scrollIntoViewIfNeeded();
+  await demoSlot(page).scrollIntoViewIfNeeded();
   await demo(page).scrollIntoViewIfNeeded();
   const bestTime = demo(page).getByRole("status", { name: "Najlepiej" });
   await expect(bestTime).toContainText("Sobota 18.10, 19–21");
@@ -132,7 +133,7 @@ test("the demo's best time follows a tap and a drag", async ({ page, browserName
 
 test("the demo's call scrolls to the form and focuses its first field", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("heading", { name: "Zrobione pod paczkę znajomych, nie pod firmę." }).scrollIntoViewIfNeeded();
+  await demoSlot(page).scrollIntoViewIfNeeded();
   await demo(page).scrollIntoViewIfNeeded();
 
   await demo(page).getByRole("button", { name: "Zrób taką ankietę dla swojej paczki" }).click();
@@ -156,7 +157,7 @@ test.describe("on a touch screen", () => {
   test("each question opens with a tap", async ({ page }) => {
     await page.goto("/#jak-to-dziala");
     await expect(page.getByRole("region", { name: "Jak to działa" })).toBeAttached();
-    await page.getByRole("heading", { name: "Zrobione pod paczkę znajomych, nie pod firmę." }).scrollIntoViewIfNeeded();
+    await demoSlot(page).scrollIntoViewIfNeeded();
     await expect(page.getByRole("region", { name: "Wypróbuj na żywo" })).toBeAttached();
     await faq(page).scrollIntoViewIfNeeded();
 
