@@ -15,6 +15,7 @@ export const resultsSchema = z.object({
     }),
   ),
   final: finalTimeSchema.nullable(),
+  you: z.string().optional(),
 });
 
 export type FinalTime = z.infer<typeof finalTimeSchema>;

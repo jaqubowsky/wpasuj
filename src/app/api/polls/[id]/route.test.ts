@@ -1,8 +1,13 @@
 import { participants, polls, slots } from "@/shared/db/schema";
+import { fakeCookies } from "@/shared/testing/fake-cookies";
 import { openTestDatabase } from "@/shared/testing/test-database";
+import { hashToken } from "@/shared/token-cookie";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 vi.mock("server-only", () => ({}));
+
+let cookieJar = fakeCookies();
+vi.mock("next/headers", () => ({ cookies: async () => cookieJar }));
 
 const now = new Date("2030-10-15T10:00:00Z");
 const pollId = "Pl4nszowki";
@@ -32,12 +37,13 @@ async function seedPoll(dates: string[]) {
 async function seedAnswer(name: string, savedAt: Date, cells: [string, number][]) {
   const [{ id }] = await db
     .insert(participants)
-    .values({ pollId, name, normalisedName: name.toLowerCase(), tokenHash: name, createdAt: savedAt, updatedAt: savedAt })
+    .values({ pollId, name, normalisedName: name.toLowerCase(), tokenHash: hashToken(`${name}-token`), createdAt: savedAt, updatedAt: savedAt })
     .returning({ id: participants.id });
   if (cells.length > 0) await db.insert(slots).values(cells.map(([date, hour]) => ({ participantId: id, date, hour })));
 }
 
 beforeEach(async () => {
+  cookieJar = fakeCookies();
   vi.useFakeTimers({ toFake: ["Date"] });
   vi.setSystemTime(now);
   db = await openTestDatabase();
@@ -78,6 +84,18 @@ it("answers with the poll's grid and every respondent's free hours", async () =>
     ],
     final: null,
   });
+});
+
+it("names the viewer's own row from the participant cookie", async () => {
+  await seedPoll(["2030-10-19"]);
+  await seedAnswer("Ola", now, []);
+  await seedAnswer("Bartek", now, []);
+  cookieJar.set(pollId, "Bartek-token");
+
+  const response = await get(pollId);
+
+  const { resultsSchema } = await import("@/modules/view-results/server/results-schema");
+  expect(resultsSchema.parse(await response.json()).you).toBe("bartek");
 });
 
 it("carries the time the organiser set", async () => {

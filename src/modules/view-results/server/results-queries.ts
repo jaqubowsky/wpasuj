@@ -1,14 +1,15 @@
 import { getDb } from "@/shared/db/client";
 import { participants, slots } from "@/shared/db/schema";
+import { hashToken } from "@/shared/token-cookie";
 import { asc, eq } from "drizzle-orm";
 import type { Results } from "./results-schema";
 
 type PollGrid = Pick<Results, "dates" | "final"> & { firstHour: number; lastHour: number };
 
-export function readResults(id: string, poll: PollGrid, now: Date): Results {
+export function readResults(id: string, poll: PollGrid, now: Date, participantToken?: string): Results {
   const db = getDb();
   const respondents = db
-    .select({ id: participants.id, name: participants.name, normalisedName: participants.normalisedName, savedAt: participants.updatedAt })
+    .select({ id: participants.id, name: participants.name, normalisedName: participants.normalisedName, savedAt: participants.updatedAt, tokenHash: participants.tokenHash })
     .from(participants)
     .where(eq(participants.pollId, id))
     .orderBy(asc(participants.id))
@@ -32,5 +33,6 @@ export function readResults(id: string, poll: PollGrid, now: Date): Results {
       slots: freeSlots.filter((slot) => slot.participantId === respondent.id).map(({ date, hour }) => ({ date, hour })),
     })),
     final: poll.final,
+    you: participantToken === undefined ? undefined : respondents.find((respondent) => respondent.tokenHash === hashToken(participantToken))?.normalisedName,
   };
 }

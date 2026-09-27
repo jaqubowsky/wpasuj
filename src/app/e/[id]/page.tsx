@@ -8,6 +8,7 @@ import { Text } from "@/shared/ui/text/text";
 import { Morph, pollTitleMorph } from "@/shared/morph";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { AppHeader } from "../../app-header";
 import { PageFrame } from "../../page-frame";
@@ -52,7 +53,7 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
       <AppHeader aside={<Text variant="meta">{answeredCount(poll.respondentCount)}</Text>} />
       <main data-poll-main className="pt-1 pb-8">
         <AnswerProvider pollId={id} dates={poll.dates} hours={hours} mine={mine}>
-          <ResultsProvider pollId={id} initial={readResults(id, poll, now)} organiser={organiser}>
+          <ResultsProvider pollId={id} initial={readResults(id, poll, now, (await cookies()).get(id)?.value)} organiser={organiser}>
             <div data-poll-head>
               <div className="mb-2 flex items-center gap-2">
                 <Avatar name={poll.organiserName} tintKey={nameKey(poll.organiserName)} />
