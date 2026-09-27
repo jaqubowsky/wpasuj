@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wpasuj: Wyniki</title><link rel="stylesheet" href="kiedy.css">
+<style>
+  body { width: 390px; min-height: 844px; }
+  header { height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+  main { padding: 4px 20px 32px; }
+  .best { margin: 16px 0; padding: 20px; background: var(--ink); color: #fff; border-radius: 20px; }
+  .best .k { font-size: 13px; font-weight: 500; color: #CFC7BC; }
+  .best .t { font: 700 30px/34px var(--display); letter-spacing: -0.025em; margin: 6px 0 12px; }
+  .best .who { display: flex; align-items: center; justify-content: space-between; font-size: 14px; }
+  .best .n { font-weight: 600; color: var(--heat-3); }
+  .alt { display: flex; gap: 8px; margin: -4px 0 20px; }
+  .alt div { flex: 1; background: var(--surface); border-radius: 14px; padding: 12px 14px; }
+  .alt .t { font-weight: 600; font-size: 14px; }
+  .alt .n { font-size: 13px; color: var(--muted); }
+  .people { margin-top: 24px; }
+  .people h2 { margin-bottom: 8px; }
+  .row { display: flex; align-items: center; gap: 12px; height: 48px; border-top: 1px solid var(--line); }
+  .row:first-of-type { border-top: 0; }
+  .row .s { margin-left: auto; font-size: 13px; color: var(--muted); }
+  .legend { display: flex; align-items: center; justify-content: space-between; margin: 16px 0 10px; font-size: 13px; color: var(--muted); }
+  .ramp { display: flex; gap: 3px; } .ramp b { width: 18px; height: 10px; border-radius: 3px; }
+</style></head>
+<body>
+<header><span class="logo">Wpasuj</span><span class="meta">6 osób</span></header>
+<main>
+  <div class="asker meta">Kuba pyta</div>
+  <h1>Planszówki u Michała</h1>
+  <div class="best">
+    <div class="k">Najlepiej</div>
+    <div class="t">Sobota 18.10, 19–22</div>
+    <div class="who"><span class="n">5 z 6 może</span><span>Nie może: Ola</span></div>
+  </div>
+  <div class="meta" style="margin:-4px 0 8px">Też dobre</div><div class="alt"><div><div class="t">pt 17.10, 18–20</div><div class="n">4 z 6</div></div><div><div class="t">nd 19.10, 17–19</div><div class="n">4 z 6</div></div></div>
+  <div class="seg"><span>Moje</span><span class="on">Wszyscy</span></div>
+  <div class="legend"><span>Ile osób może</span><span class="ramp"><b style="background:var(--heat-1)"></b><b style="background:var(--heat-2)"></b><b style="background:var(--heat-3)"></b><b style="background:var(--heat-4)"></b><b style="background:var(--heat-5)"></b></span></div>
+  <div class="grid" id="g"></div>
+  <section class="people">
+    <h2>Kto odpowiedział</h2>
+    <div class="row"><span class="avatar b">B</span>Bartek<span class="s">przed chwilą</span></div>
+    <div class="row"><span class="avatar c">M</span>Michał<span class="s">20 min temu</span></div>
+    <div class="row"><span class="avatar d">O</span>Ola<span class="s">1 godz. temu</span></div>
+    <div class="row"><span class="avatar e">K</span>Kasia<span class="s">2 godz. temu</span></div>
+  </section>
+</main>
+<script src="grid.js"></script>
+<script>
+  renderGrid(document.getElementById("g"), {
+    days: [{ wd: "pt", dn: "17" }, { wd: "sb", dn: "18" }, { wd: "nd", dn: "19" }],
+    cell: 48, timeCol: 48, mode: "heat", counts: true,
+  });
+</script>
+</body></html>

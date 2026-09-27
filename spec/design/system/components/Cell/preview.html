@@ -1,0 +1,26 @@
+<!-- @dsCard group="Grid" height=200 subtitle="Free, mine, adding, removing, heat 1–5, everyone, best, focus" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Cell</title></head>
+<body>
+<div class="wp-stack">
+  <div class="wp-row">
+    <div class="wp-stack" style="gap:4px;align-items:center"><button class="wp-cell" aria-pressed="false" aria-label="Wolne"></button><span class="wp-label">wolne</span></div>
+    <div class="wp-stack" style="gap:4px;align-items:center"><button class="wp-cell" data-state="mine" aria-pressed="true" aria-label="Moje"></button><span class="wp-label">moje</span></div>
+    <div class="wp-stack" style="gap:4px;align-items:center"><span class="wp-cell" data-state="adding"></span><span class="wp-label">dodaję</span></div>
+    <div class="wp-stack" style="gap:4px;align-items:center"><span class="wp-cell" data-state="removing"></span><span class="wp-label">usuwam</span></div>
+    <div class="wp-stack" style="gap:4px;align-items:center"><button class="wp-cell" id="focusme" aria-label="Fokus"></button><span class="wp-label">fokus</span></div>
+  </div>
+  <div class="wp-row">
+    <div class="wp-stack" style="gap:4px;align-items:center"><span class="wp-cell" data-heat="1">1</span><span class="wp-label">≤20%</span></div>
+    <div class="wp-stack" style="gap:4px;align-items:center"><span class="wp-cell" data-heat="2">2</span><span class="wp-label">≤40%</span></div>
+    <div class="wp-stack" style="gap:4px;align-items:center"><span class="wp-cell" data-heat="3">3</span><span class="wp-label">≤60%</span></div>
+    <div class="wp-stack" style="gap:4px;align-items:center"><span class="wp-cell" data-heat="4">4</span><span class="wp-label">≤80%</span></div>
+    <div class="wp-stack" style="gap:4px;align-items:center"><span class="wp-cell" data-heat="5">5</span><span class="wp-label">&gt;80%</span></div>
+    <div class="wp-stack" style="gap:4px;align-items:center"><span class="wp-cell" data-heat="5" data-everyone>6</span><span class="wp-label">wszyscy</span></div>
+    <div class="wp-stack" style="gap:4px;align-items:center"><span class="wp-cell" data-heat="5" data-best>5</span><span class="wp-label">najlepszy</span></div>
+  </div>
+</div>
+<script>document.getElementById("focusme").style.boxShadow = "inset 0 0 0 2px var(--ink)";</script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wpasuj: Odpowiedź</title><link rel="stylesheet" href="kiedy.css">
+<style>
+  body { width: 390px; min-height: 844px; }
+  header { height: 56px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+  main { padding: 4px 20px 32px; }
+  .asker { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .name { margin: 20px 0 16px; display: flex; align-items: center; justify-content: space-between; background: var(--surface); border-radius: 14px; padding: 0 8px 0 16px; height: 56px; }
+  .name .v { font-weight: 600; font-size: 16px; }
+  .status { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; padding-right: 8px; }
+  .status svg { width: 16px; height: 16px; }
+  .hint { font-size: 14px; color: var(--muted); margin: 16px 0 12px; }
+  .cant { display: block; text-align: center; margin-top: 20px; font-size: 15px; font-weight: 500; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line); }
+</style></head>
+<body>
+<header><span class="logo">Wpasuj</span><span class="meta">4 osoby odpowiedziały</span></header>
+<main>
+  <div class="asker"><span class="avatar">K</span><span class="meta">Kuba pyta</span></div>
+  <h1>Planszówki u Michała</h1>
+  <div class="name"><span class="v">Zuza</span><span class="status"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Zapisane</span></div>
+  <div class="seg"><span class="on">Moje</span><span>Wszyscy</span></div>
+  <p class="hint">Kliknij godziny, kiedy możesz. Możesz też przeciągnąć.</p>
+  <div class="grid" id="g"></div>
+  <a class="cant">Nie mogę w żadnym terminie</a>
+</main>
+<script src="grid.js"></script>
+<script>
+  renderGrid(document.getElementById("g"), {
+    days: [{ wd: "pt", dn: "17" }, { wd: "sb", dn: "18" }, { wd: "nd", dn: "19" }],
+    cell: 52, timeCol: 48, mode: "mine",
+    mine: (d, s) => (d === 0 && s >= 1 && s <= 3) || (d === 1 && s >= 2 && s <= 4),
+    add: (d, s) => d === 2 && s <= 1,
+  });
+</script>
+</body></html>

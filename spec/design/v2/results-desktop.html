@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wpasuj: Wyniki, desktop</title><link rel="stylesheet" href="kiedy.css">
+<style>
+  header { height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; }
+  main { max-width: 1040px; margin: 0 auto; padding: 24px 40px 64px; display: grid; grid-template-columns: 1fr 340px; gap: 40px; }
+  h1 { font-size: 40px; line-height: 44px; margin: 6px 0 24px; }
+  .org { display: flex; gap: 8px; margin-bottom: 24px; }
+  .best { padding: 24px; background: var(--ink); color: #fff; border-radius: 20px; }
+  .best .k { font-size: 13px; font-weight: 500; color: #CFC7BC; }
+  .best .t { font: 700 32px/36px var(--display); letter-spacing: -0.025em; margin: 6px 0 14px; }
+  .best .n { font-weight: 600; color: var(--heat-3); }
+  .best .who { font-size: 14px; margin-top: 4px; color: #CFC7BC; }
+  .best .btn { margin-top: 18px; height: 44px; background: #fff; color: var(--ink); width: 100%; }
+  .alt { background: var(--surface); border-radius: 14px; padding: 14px 16px; margin-top: 10px; display: flex; justify-content: space-between; }
+  .alt .t { font-weight: 600; } .alt .n { color: var(--muted); font-size: 14px; }
+  aside h2 { margin: 28px 0 8px; }
+  .row { display: flex; align-items: center; gap: 12px; height: 48px; border-top: 1px solid var(--line); }
+  .row .s { margin-left: auto; font-size: 13px; color: var(--muted); }
+  .gridcard { background: var(--surface); border-radius: 20px; padding: 20px 24px 24px 12px; }
+  .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+</style></head>
+<body>
+<header><span class="logo">Wpasuj</span><span class="meta">Twoja ankieta</span></header>
+<main>
+  <section>
+    <div class="meta">Kuba pyta · pt 17 – nd 19 października</div>
+    <h1>Planszówki u Michała</h1>
+    <div class="org"><button class="btn small">Przypomnij</button><button class="btn small">Więcej</button></div>
+    <div class="top"><div class="seg" style="width:240px"><span>Moje</span><span class="on">Wszyscy</span></div><span class="meta">Kliknij godzinę, żeby zobaczyć kto może</span></div>
+    <div class="gridcard"><div class="grid" id="g"></div></div>
+  </section>
+  <aside>
+    <div class="best">
+      <div class="k">Najlepiej</div>
+      <div class="t">Sobota 18.10, 19–22</div>
+      <div><span class="n">5 z 6 może</span></div>
+      <div class="who">Nie może: Ola</div>
+      <button class="btn">Ustal ten termin</button>
+    </div>
+    <div class="alt"><span class="t">pt 17.10, 18–20</span><span class="n">4 z 6</span></div>
+    <div class="alt"><span class="t">nd 19.10, 17–19</span><span class="n">4 z 6</span></div>
+    <h2>Kto odpowiedział</h2>
+    <div class="row"><span class="avatar b">B</span>Bartek<span class="s">przed chwilą</span></div>
+    <div class="row"><span class="avatar c">M</span>Michał<span class="s">20 min temu</span></div>
+    <div class="row"><span class="avatar d">O</span>Ola<span class="s">1 godz. temu</span></div>
+    <div class="row"><span class="avatar e">K</span>Kasia<span class="s">2 godz. temu</span></div>
+  </aside>
+</main>
+<script src="grid.js"></script>
+<script>
+  renderGrid(document.getElementById("g"), {
+    days: [{ wd: "piątek", dn: "17" }, { wd: "sobota", dn: "18" }, { wd: "niedziela", dn: "19" }],
+    cell: 56, timeCol: 56, mode: "heat", counts: true,
+    best: (d, s) => d === 1 && s >= 2 && s <= 4,
+  });
+</script>
+</body></html>
