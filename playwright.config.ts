@@ -21,7 +21,7 @@ export default defineConfig({
   webServer: {
     command: `rm -f ${databasePath} && npm run start`,
     url: "http://localhost:3000",
-    env: { DATABASE_PATH: databasePath },
+    env: { DATABASE_PATH: databasePath, DEMO_ROUTES: "1" },
     reuseExistingServer: false,
   },
 });

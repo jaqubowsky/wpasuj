@@ -14,3 +14,5 @@ Points `spec/brief.md` leaves open, taken by the host. A container that meets an
 10. Cell is one component: a toggle button (`pressed`, `state`) on the answer grid, or a heat cell (`heat`, `everyone`, `best`) on results
 11. Avatar picks its tint from the name as given; callers pass the name they show
 12. The `text` Button has no edge ring, as its README describes; the preview's ring comes only from the `.wp-button` cascade
+13. Demo routes under `src/app/dev/` answer 404 unless `DEMO_ROUTES=1`, which `.env.development` and the Playwright web server set, because e2e runs the production build
+14. On phone-webkit the grid's touch zones are proven by computed `touch-action` and snap; the real touch drag and swipes run on phone-chromium through CDP, because Playwright cannot move a touch in WebKit

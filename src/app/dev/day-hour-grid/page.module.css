@@ -1,0 +1,12 @@
+.page {
+  box-sizing: border-box;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5) var(--space-10);
+}
+
+.intro {
+  display: grid;
+  gap: var(--space-1);
+  margin-bottom: var(--space-3);
+}
