@@ -118,11 +118,8 @@ test("server data never overwrites my Moje grid while another device saves", asy
   await nameField(other).fill("Ola");
   await cellAt(other, 2, 1).click();
   await expect(status(other)).toHaveText("Zapisane");
-  await mine.evaluate(() => {
-    window.dispatchEvent(new Event("focus"));
-    document.dispatchEvent(new Event("visibilitychange"));
-  });
   await mine.getByRole("tab", { name: "Wszyscy" }).click();
+  await expect(mine.getByRole("list", { name: "Kto odpowiedział" })).toContainText("Ola", { timeout: 10_000 });
   await mine.getByRole("tab", { name: "Moje" }).click();
 
   await expect(status(mine)).toHaveText("Zapisane");
