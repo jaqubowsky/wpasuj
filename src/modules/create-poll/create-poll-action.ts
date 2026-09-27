@@ -7,6 +7,7 @@ import { hashToken, newToken, tokenCookieOptions } from "@/shared/token-cookie";
 import { inArray, lt, sql } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { randomBytes } from "node:crypto";
+import { organiserCookie } from "./organiser-access";
 import { createPollSchema, type CreatePollInput } from "./poll-schema";
 import { cleanupCutoff, hasPastDate } from "./poll-rules";
 
@@ -44,6 +45,6 @@ export async function createPoll(input: CreatePollInput): Promise<CreatePollResu
       .run();
   });
 
-  cookieStore.set(`${id}-org`, organiserToken, tokenCookieOptions);
+  cookieStore.set(organiserCookie(id), organiserToken, tokenCookieOptions);
   return { ok: true, id };
 }

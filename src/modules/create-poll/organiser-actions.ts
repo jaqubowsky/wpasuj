@@ -3,10 +3,9 @@
 import { todayIn } from "@/shared/dates/iso-date";
 import { getDb } from "@/shared/db/client";
 import { polls } from "@/shared/db/schema";
-import { hashToken } from "@/shared/token-cookie";
 import { eq } from "drizzle-orm";
-import { cookies } from "next/headers";
 import { z } from "zod";
+import { organiserToken } from "./organiser-access";
 import { fitsPoll, isExpired } from "./poll-rules";
 import { pollIdSchema } from "./poll-schema";
 
@@ -22,8 +21,7 @@ async function organisersPoll(id: string) {
   if (!pollIdSchema.safeParse(id).success) return "gone";
   const poll = getDb().select().from(polls).where(eq(polls.id, id)).get();
   if (!poll || isExpired(poll.dates, todayIn(poll.timeZone, new Date()))) return "gone";
-  const token = (await cookies()).get(`${id}-org`)?.value;
-  if (token === undefined || hashToken(token) !== poll.organiserTokenHash) return "not-organiser";
+  if ((await organiserToken(id)) === undefined) return "not-organiser";
   return poll;
 }
 
@@ -40,6 +38,14 @@ export async function setFinal(id: string, final: FinalTime): Promise<OrganiserR
     .set({ finalDate: date, finalFirstHour: firstHour, finalLastHour: lastHour })
     .where(eq(polls.id, id))
     .run();
+  return { ok: true };
+}
+
+export async function clearFinal(id: string): Promise<OrganiserResult> {
+  const poll = await organisersPoll(id);
+  if (typeof poll === "string") return { ok: false, reason: poll };
+
+  getDb().update(polls).set({ finalDate: null, finalFirstHour: null, finalLastHour: null }).where(eq(polls.id, id)).run();
   return { ok: true };
 }
 
