@@ -33,11 +33,13 @@ button.cell:active {
 .cell[data-state="adding"] {
   background: color-mix(in srgb, var(--accent) 35%, transparent);
   box-shadow: none;
+  transition: transform var(--duration-fill) var(--ease-out);
 }
 
 .cell[data-state="removing"] {
   background: var(--line);
   box-shadow: none;
+  transition: transform var(--duration-fill) var(--ease-out);
 }
 
 .cell[data-heat="1"] {

@@ -12,3 +12,7 @@
 .tabs {
   margin-top: var(--space-5);
 }
+
+.lead {
+  margin-bottom: var(--space-4);
+}
