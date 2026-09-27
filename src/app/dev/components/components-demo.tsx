@@ -100,10 +100,10 @@ export function ComponentsDemo() {
         <Stepper label="do" value={24} min={18} max={24} onChange={() => {}} />
       </Section>
       <Section name="Cell">
-        <Cell pressed={false} aria-label="wolne" />
-        <Cell pressed state="mine" aria-label="moje" />
-        <Cell pressed={false} state="adding" aria-label="dodaję" />
-        <Cell pressed state="removing" aria-label="usuwam" />
+        <Cell aria-label="wolne" />
+        <Cell state="mine" aria-label="moje" />
+        <Cell state="adding" aria-label="dodaję" />
+        <Cell state="removing" aria-label="usuwam" />
         <Cell heat={0} aria-label="nikt" />
         {([1, 2, 3, 4, 5] as const).map((heat) => (
           <Cell key={heat} heat={heat} aria-label={`ciepło ${heat}`}>

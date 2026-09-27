@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 export const databasePath = join(tmpdir(), "wpasuj-e2e.db");
+export const siteUrl = "https://wpasuj.example";
 
 export default defineConfig({
   testDir: "./e2e",
@@ -22,7 +23,7 @@ export default defineConfig({
   webServer: {
     command: `rm -f ${databasePath} && npm run start`,
     url: "http://localhost:3000",
-    env: { DATABASE_PATH: databasePath, DEMO_ROUTES: "1" },
+    env: { DATABASE_PATH: databasePath, DEMO_ROUTES: "1", SITE_URL: siteUrl },
     reuseExistingServer: false,
   },
 });

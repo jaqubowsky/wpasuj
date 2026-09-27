@@ -124,7 +124,7 @@ test("server data never overwrites my Moje grid while another device saves", asy
 
   await expect(status(mine)).toHaveText("Zapisane");
   await expect(selected(mine)).toHaveCount(2);
-  await expect(cellAt(mine, 2, 1)).toHaveAttribute("aria-pressed", "false");
+  await expect(cellAt(mine, 2, 1).locator("..")).toHaveAttribute("aria-selected", "false");
 });
 
 test("the organiser answers on Moje with the name from create prefilled", async ({ browser }) => {
