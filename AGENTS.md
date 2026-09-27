@@ -6,7 +6,7 @@ A no-account availability poll for a group of friends: one link in the group cha
 
 - Next.js (current stable, App Router), TypeScript strict, server actions for mutations
 - SQLite through Drizzle ORM and `better-sqlite3`, file at `DATABASE_PATH`, migrations in `drizzle/` applied on start
-- TanStack Query for polling server state; CSS Modules on `src/app/tokens.css`; fonts through `next/font` (`latin-ext`)
+- TanStack Query for polling server state; Tailwind v4 utilities on the `@theme` in `src/app/tokens.css` (default theme reset); fonts through `next/font` (`latin-ext`)
 - `output: 'standalone'`, a `Dockerfile`; production is one Railway service with a volume at `/data` (not deployed in this phase)
 
 ## Scripts
@@ -30,7 +30,7 @@ Declared in `package.json` by ticket 01; a change passes all of them:
 
 ## Module layout
 
-Each module in `src/modules/` has `domain/` (pure functions and tests, no imports from React, `server/` or `ui/`), `server/` (schemas, queries, actions, the only I/O) and `ui/` (components, CSS Modules, hooks), with `index.ts` (server) and `client.ts` (client) as the only public entries. ESLint `no-restricted-imports` enforces the direction. Rule source: `spec/brief.md`, "Code rules".
+Each module in `src/modules/` has `domain/` (pure functions and tests, no imports from React, `server/` or `ui/`), `server/` (schemas, queries, actions, the only I/O) and `ui/` (components, hooks), with `index.ts` (server) and `client.ts` (client) as the only public entries. ESLint `no-restricted-imports` enforces the direction. Rule source: `spec/brief.md`, "Code rules".
 
 ## Tickets
 

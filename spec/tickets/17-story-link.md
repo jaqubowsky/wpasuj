@@ -1,7 +1,7 @@
 # 17: Story scene "Wrzucasz link"
 
 Status: ready-for-agent
-Blocked by: 16-story-create.md
+Blocked by: 15-story-frame.md
 
 ## Parent
 

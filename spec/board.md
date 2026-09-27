@@ -2,24 +2,25 @@
 
 The host keeps this file current and a fresh host session resumes from it. One line per ticket: its file in `spec/tickets/` and, while it runs, its container. What each seat may do lives in the repository's profile, never here.
 
-Two tracks. MVP: 06, 07, 09 and 10 in parallel; then 13 alone; then 25; then 12; then 08. Landing: 14 to 23 in order, one container at a time, beside the MVP track; paused while 13 runs. A merge is blocked only by a proven broken acceptance criterion of the ticket; notes go to 12. One fix round and one recheck per ticket, then merge or a host decision. Each landing ticket is accepted by its screenshots beside the canvas renders in `~/.sandboxes/wpasuj/host-acceptance/landing-canvas/`.
+Every ticket whose blockers have landed runs at once, one container each, up to 4 containers (32 GB host, 6 GB per container). MVP: 13 alone; then 26 (Tailwind base) alone; then 27 to 30 (Tailwind per module) in parallel; then 25; then 12; then 08; then 24. Landing, beside it: 15, 21 and 22 after 30 (21 also after 27); scenes 16 to 20 after 15, each in its own file under `story/scenes/`; 23 last. A merge is blocked only by a proven broken acceptance criterion of the ticket; notes go to 12 (MVP) or to `host-acceptance/notes-landing.md` (landing). One fix round and one recheck per ticket, then merge or a host decision. Each landing ticket is accepted by its screenshots beside the canvas renders in `~/.sandboxes/wpasuj/host-acceptance/landing-canvas/`.
 
 ## Now
 
-- `tickets/06-organiser.md`: claude-wpasuj-t06-organiser
-- `tickets/07-link-preview.md`: claude-wpasuj-t07-link-preview
-- `tickets/09-design-system-fixes.md`: claude-wpasuj-t09-design-fixes
-- `tickets/10-grid-robustness.md`: claude-wpasuj-t10-grid
-- `tickets/14-landing-skeleton.md`
+- `tickets/13-module-layers.md`: claude-wpasuj-t13-module-layers, PR #15
 
 ## Next
 
-- `tickets/13-module-layers.md` (after 06, 07, 09, 10; alone)
-- `tickets/25-create-and-cant-feedback.md` (after 13)
+- `tickets/26-tailwind-base.md` (after 13; alone)
+- `tickets/27-tailwind-shared.md`, `28-tailwind-create-answer.md`, `29-tailwind-view-results.md`, `30-tailwind-landing.md` (after 26; in parallel)
+- `tickets/25-create-and-cant-feedback.md` (after 27, 28, 29)
+- `tickets/15-story-frame.md` (after 30)
+- `tickets/21-landing-demo.md` (after 27, 30)
+- `tickets/22-landing-faq-footer.md` (after 30)
+- `tickets/16-story-create.md` … `tickets/20-story-best.md` (after 15)
 - `tickets/12-cleanup.md` (after 25)
 - `tickets/08-acceptance.md` (after 12, 13)
+- `tickets/23-landing-seo-perf.md` (after 15-22)
 - `tickets/24-readme.md` (after 08)
-- `tickets/15-story-frame.md` … `tickets/23-landing-seo-perf.md` (in order, after 14)
 
 ## Landed
 
@@ -28,4 +29,9 @@ Two tracks. MVP: 06, 07, 09 and 10 in parallel; then 13 alone; then 25; then 12;
 - `tickets/03-create-poll.md`: PR #2; gaps in ticket 11
 - `tickets/04-answer-poll.md`: PR #5
 - `tickets/05-view-results.md`: PR #4
+- `tickets/06-organiser.md`: PR #12
+- `tickets/07-link-preview.md`: PR #9
+- `tickets/09-design-system-fixes.md`: PR #11
+- `tickets/10-grid-robustness.md`: PR #10
 - `tickets/11-create-fixes.md`: PR #7
+- `tickets/14-landing-skeleton.md`: PR #13

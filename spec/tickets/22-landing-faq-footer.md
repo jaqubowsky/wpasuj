@@ -1,7 +1,7 @@
 # 22: FAQ and footer
 
 Status: ready-for-agent
-Blocked by: 21-landing-demo.md
+Blocked by: 30-tailwind-landing.md
 
 ## Parent
 

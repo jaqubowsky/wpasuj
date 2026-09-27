@@ -1,7 +1,7 @@
 # 20: Story scene "Najlepszy termin i Ustalone"
 
 Status: ready-for-agent
-Blocked by: 19-story-heat.md
+Blocked by: 15-story-frame.md
 
 ## Parent
 

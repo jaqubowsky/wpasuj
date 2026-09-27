@@ -1,7 +1,7 @@
 # 15: Scroll story frame and scene "Na grupie cisza"
 
 Status: ready-for-agent
-Blocked by: 14-landing-skeleton.md
+Blocked by: 30-tailwind-landing.md
 
 ## Parent
 

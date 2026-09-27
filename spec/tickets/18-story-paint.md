@@ -1,7 +1,7 @@
 # 18: Story scene "Każdy klika godziny"
 
 Status: ready-for-agent
-Blocked by: 17-story-link.md
+Blocked by: 15-story-frame.md
 
 ## Parent
 
