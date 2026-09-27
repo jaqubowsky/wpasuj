@@ -1,6 +1,6 @@
 # 33: Architecture gates in lint, hooks and CI
 
-Status: ready-for-agent
+Status: done
 Blocked by: 26-tailwind-base.md
 
 ## Parent
@@ -27,7 +27,7 @@ A change that breaks the module layout or leaves dead code fails before it reach
 
 ## Acceptance criteria
 
-- [ ] Four deliberate violations (module importing another module, `app` deep-importing a module's `ui/`, `shared` importing a module, `domain` importing React) each fail `npm run lint`; the output is in the pull request body, the probes not committed
-- [ ] An unused export added on purpose fails `npm run knip`; output in the pull request body
-- [ ] A commit with a lint error is refused by the pre-commit hook; a push with a failing unit test is refused by the pre-push hook; both outputs in the pull request body
-- [ ] CI runs `knip` and is green; `lint`, `typecheck`, `test`, `build` and `e2e` green with the same counts as the base
+- [x] Four deliberate violations (module importing another module, `app` deep-importing a module's `ui/`, `shared` importing a module, `domain` importing React) each fail `npm run lint`; the output is in the pull request body, the probes not committed: pull request #20 body, "Four violations, `npm run lint`"
+- [x] An unused export added on purpose fails `npm run knip`; output in the pull request body: pull request #20 body, "Unused export added on purpose"
+- [x] A commit with a lint error is refused by the pre-commit hook; a push with a failing unit test is refused by the pre-push hook; both outputs in the pull request body: pull request #20 body, "Pre-commit refusing" and "Pre-push refusing"
+- [x] CI runs `knip` and is green; `lint`, `typecheck`, `test`, `build` and `e2e` green with the same counts as the base: `knip` step in `.github/workflows/ci.yml`, CI green on pull request #20; counts table in its body (46 files, 313 tests; e2e 98 passed, 8 skipped on both)
