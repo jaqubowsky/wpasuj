@@ -1,7 +1,7 @@
 # 08: End-to-end acceptance
 
 Status: ready-for-agent
-Blocked by: 12-cleanup.md, 13-module-layers.md
+Blocked by: 31-security-audit.md, 32-architecture-audit.md
 
 ## Parent
 
