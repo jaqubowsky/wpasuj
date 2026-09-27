@@ -1,6 +1,6 @@
 # 22: FAQ and footer
 
-Status: ready-for-agent
+Status: done
 Blocked by: 26-tailwind-base.md (written in Tailwind from the start, per the `AGENTS.md` Styling pattern)
 
 ## Parent
@@ -21,5 +21,5 @@ As ticket 14. Reference renders: `section-reasons-faq.png`, `section-end.png`.
 
 ## Acceptance criteria
 
-- [ ] e2e: each question opens with a tap and with the keyboard
-- [ ] Screenshots at 390 and 1440 beside the references; differences listed in the PR body
+- [x] e2e: each question opens with a tap and with the keyboard (`e2e/landing.spec.ts`, "each question opens with a tap", "each question opens with the keyboard"; the footer's line and its lack of links in "the footer names the product and links nowhere")
+- [x] Screenshots at 390 and 1440 beside the references; differences listed in the PR body (`e2e/screenshots/landing-faq-*.png`, `landing-footer-*.png`)

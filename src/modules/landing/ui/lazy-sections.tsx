@@ -28,10 +28,10 @@ export function LazyStory() {
   );
 }
 
-export function LazyDemo() {
+export function LazyDemo({ formId }: { formId: string }) {
   return (
     <NearViewport>
-      <Demo />
+      <Demo formId={formId} />
     </NearViewport>
   );
 }

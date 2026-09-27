@@ -12,7 +12,7 @@ it("brings the form into view and puts the cursor in its first field", async () 
         <input aria-label="Co robimy?" />
         <input aria-label="Twoje imię" />
       </div>
-      <GoToFormButton formId="utworz" />
+      <GoToFormButton formId="utworz">Utwórz ankietę</GoToFormButton>
     </>,
   );
 

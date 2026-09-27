@@ -1,6 +1,8 @@
 import { productName } from "@/shared/brand";
 import { Text } from "@/shared/ui/text/text";
 import type { ReactNode } from "react";
+import { Faq } from "./faq/faq";
+import { Footer } from "./footer/footer";
 import { GoToFormButton } from "./go-to-form-button";
 import styles from "./landing.module.css";
 import { LazyDemo, LazyStory } from "./lazy-sections";
@@ -30,7 +32,7 @@ export function Landing({ hero }: { hero: ReactNode }) {
     <>
       <header className={styles.header}>
         <Text variant="wordmark">{productName}</Text>
-        <GoToFormButton formId={formId} />
+        <GoToFormButton formId={formId}>Utwórz ankietę</GoToFormButton>
       </header>
       <main>
         <section className={styles.hero} aria-labelledby="hero-heading">
@@ -47,7 +49,7 @@ export function Landing({ hero }: { hero: ReactNode }) {
           </div>
         </section>
         <LazyStory />
-        <LazyDemo />
+        <LazyDemo formId={formId} />
         <section className={styles.reasons} aria-labelledby="reasons-heading">
           <h2 id="reasons-heading" className={`${styles.heading} ${styles.rise}`}>
             Zrobione pod paczkę znajomych, nie pod firmę.
@@ -67,11 +69,13 @@ export function Landing({ hero }: { hero: ReactNode }) {
             To kiedy się widzicie?
           </h2>
           <div className={`${styles.start} ${styles.rise}`}>
-            <GoToFormButton formId={formId} />
+            <GoToFormButton formId={formId}>Utwórz ankietę</GoToFormButton>
             <Text variant="meta">Za darmo. Znajomi nie zakładają kont.</Text>
           </div>
         </section>
+        <Faq />
       </main>
+      <Footer />
     </>
   );
 }
