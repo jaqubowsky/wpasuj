@@ -48,7 +48,12 @@ function PinnedStory() {
   return (
     <section ref={ref} aria-label="Jak to działa" className="relative h-[800dvh]">
       <div className="sticky top-[0] h-dvh overflow-hidden">
-        <div className="mx-auto box-border grid h-full max-w-[1280px] grid-cols-[200px_minmax(0,1fr)_380px] items-center gap-[56px] px-[48px] pt-[72px]">
+        <div
+          aria-hidden
+          data-warm={storySteps[moment.step].warm}
+          className="absolute inset-[0] bg-warm opacity-0 transition-opacity duration-[600ms] ease-[ease] data-warm:opacity-100"
+        />
+        <div className="relative mx-auto box-border grid h-full max-w-[1280px] grid-cols-[200px_minmax(0,1fr)_380px] items-center gap-[56px] px-[48px] pt-[72px]">
           <div className="relative pl-5">
             <span className="absolute top-[6px] bottom-[6px] left-[3px] w-[2px] rounded-[1px] bg-line" />
             <span

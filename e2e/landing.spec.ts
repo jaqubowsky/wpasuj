@@ -26,6 +26,22 @@ test("the create form is in the first viewport and creates a poll", async ({ pag
   await expect(page.getByRole("heading", { name: "Kino w piątek" })).toBeVisible();
 });
 
+test("the hero opens with the product name above the headline", async ({ page }) => {
+  await page.goto("/");
+
+  const hero = page.getByRole("region", { name: "Kiedy się widzimy? Ustalcie to w minutę." });
+  const kicker = await hero.getByText("Wpasuj", { exact: true }).boundingBox();
+  const headline = await hero.getByRole("heading", { level: 1 }).boundingBox();
+  expect(kicker!.y + kicker!.height).toBeLessThanOrEqual(headline!.y);
+});
+
+test("the questions sit between the reasons and the final call", async ({ page }) => {
+  await page.goto("/");
+
+  const order = await page.locator("main > section").evaluateAll((sections) => sections.map((section) => section.getAttribute("aria-labelledby")));
+  expect(order).toEqual(["hero-heading", "reasons-heading", "faq-heading", "end-heading"]);
+});
+
 test("the final call scrolls to the form and focuses its first field", async ({ page }) => {
   await page.goto("/");
   await finalCall(page).scrollIntoViewIfNeeded();
@@ -226,4 +242,13 @@ test("reveals follow the scroll where motion is allowed", async ({ page }) => {
   await page.getByRole("heading", { name: "Zrobione pod paczkę znajomych, nie pod firmę." }).scrollIntoViewIfNeeded();
 
   expect(await page.evaluate(() => document.getAnimations().length)).toBeGreaterThan(0);
+});
+
+test("the questions reveal with the scroll where motion is allowed", async ({ page }) => {
+  await page.goto("/");
+  test.skip(!(await page.evaluate(() => CSS.supports("animation-timeline: view()"))), "no scroll-driven animations");
+
+  await faq(page).scrollIntoViewIfNeeded();
+
+  expect(await faq(page).getByRole("heading", { name: "Pytania" }).evaluate((heading) => heading.getAnimations().length)).toBeGreaterThan(0);
 });

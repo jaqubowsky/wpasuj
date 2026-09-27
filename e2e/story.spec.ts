@@ -175,6 +175,35 @@ test("at step 7 the time is settled, off to the calendar, alone in the phone", a
   await expect(shown(page, "Dodaj do kalendarza")).toHaveCount(0);
 });
 
+async function backdropOf(page: Page) {
+  const shot = await page.screenshot({ clip: { x: 8, y: 450, width: 1, height: 1 } });
+  return page.evaluate(async (data) => {
+    const image = new Image();
+    image.src = `data:image/png;base64,${data}`;
+    await image.decode();
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 1;
+    const context = canvas.getContext("2d")!;
+    context.drawImage(image, 0, 0);
+    const [red, green, blue] = context.getImageData(0, 0, 1, 1).data;
+    return `rgb(${red}, ${green}, ${blue})`;
+  }, shot.toString("base64"));
+}
+
+test("the page warms while the hours heat up and the best time shows", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "the story pins from 1280px");
+  await page.goto("/");
+  await story(page).scrollIntoViewIfNeeded();
+
+  for (const [index, step] of steps.entries()) {
+    await scrollThroughStory(page, (index + 0.5) / steps.length);
+    await expect(caption(page, step.heading)).toBeVisible();
+
+    const warm = step.label === "Godziny się nagrzewają" || step.label === "Najlepszy termin";
+    await expect.poll(() => backdropOf(page)).toBe(warm ? "rgb(253, 241, 234)" : "rgb(251, 247, 241)");
+  }
+});
+
 test("below 1280px the story is a still sequence, since the caption column is too narrow to pin", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("desktop"), "a laptop width");
   await page.setViewportSize({ width: 1100, height: 768 });
