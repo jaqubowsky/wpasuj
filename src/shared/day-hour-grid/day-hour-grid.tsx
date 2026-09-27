@@ -49,7 +49,7 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
         role="grid"
         aria-label={label}
         aria-multiselectable={onStroke && true}
-        className="grid [scrollbar-width:none] grid-cols-[var(--hour-column)_repeat(var(--date-count),minmax(56px,1fr))] grid-rows-[auto] auto-rows-12 gap-1.5 overflow-x-auto overscroll-x-contain scroll-pl-[calc(var(--hour-column)+--spacing(1.5))] [--hour-column:--spacing(12)] snap-x snap-mandatory @max-grid:data-scrolls:grid-cols-[var(--hour-column)_repeat(var(--date-count),max(56px,calc((100cqi_-_var(--hour-column)_-_5_*_--spacing(1.5))_/_4.4)))] [&::-webkit-scrollbar]:hidden"
+        className="grid [scrollbar-width:none] grid-cols-[var(--hour-column)_repeat(var(--date-count),minmax(56px,1fr))] grid-rows-[auto] auto-rows-12 gap-1.5 overflow-x-auto overscroll-x-contain scroll-pl-[calc(var(--hour-column)+--spacing(1.5))] [--hour-column:--spacing(12)] snap-x snap-mandatory @max-grid-fit:data-scrolls:grid-cols-[var(--hour-column)_repeat(var(--date-count),max(56px,calc((100cqi_-_var(--hour-column)_-_5_*_--spacing(1.5))_/_4.4)))] [&::-webkit-scrollbar]:hidden"
         style={{ "--date-count": dates.length } as CSSProperties}
         data-scrolls={dates.length > 4 || undefined}
         data-paints={onStroke && true}
@@ -67,7 +67,7 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
             const label = (
               <>
                 <Text variant="meta">
-                  <span className="@grid:[font-size:0] @grid:after:text-sm @grid:after:content-[attr(data-long)]" data-long={day.longWeekday}>{day.weekday}</span>
+                  <span className="@grid-fit:[font-size:0] @grid-fit:after:text-sm @grid-fit:after:content-[attr(data-long)]" data-long={day.longWeekday}>{day.weekday}</span>
                 </Text>
                 <Text variant="day-number">{day.number}</Text>
               </>

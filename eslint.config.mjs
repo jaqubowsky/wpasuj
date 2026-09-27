@@ -68,7 +68,7 @@ const eslintConfig = defineConfig([
             "[contain-intrinsic-size:auto_640px]",
             "[scrollbar-width:none]",
             "content",
-            "@grid:[font-size:0]",
+            "@grid-fit:[font-size:0]",
             "[--hour-column:--spacing(12)]",
             "scroll-pl-[calc(var(--hour-column)+--spacing(1.5))]",
             "shadow-[--spacing(1.5)_0_0_var(--color-paper)]",

@@ -27,7 +27,7 @@
 
   --container-narrow: 720px;
   --container-wide: 1280px;
-  --container-grid: 600px;
+  --container-grid-fit: 600px;
 
   --radius-cell: 10px;
   --radius-control: 14px;
