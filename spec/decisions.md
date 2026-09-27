@@ -14,3 +14,9 @@ Points `spec/brief.md` leaves open, taken by the host. A container that meets an
 10. Cell is one component: a toggle button (`pressed`, `state`) on the answer grid, or a heat cell (`heat`, `everyone`, `best`) on results
 11. Avatar picks its tint from the name as given; callers pass the name they show
 12. The `text` Button has no edge ring, as its README describes; the preview's ring comes only from the `.wp-button` cascade
+13. "Pokaż cały miesiąc" opens six weeks from this week's Monday, with no month paging; the first day of each month carries the month's short name
+14. Where the link is copied instead of shared, the create page shows "Link skopiowany" for 1.5 s before it moves to the poll; a clipboard the browser refuses still moves to the poll
+15. A poll is gone once all its dates are more than 60 days before today in its zone; the create action's cleanup takes today in `Etc/GMT+12`, where the date changes last, so it never deletes a poll its own zone still shows
+16. The gone page says "Tej ankiety już nie ma", one line on why (deleted, or its dates long past) and links to `/` with "Zrób nową ankietę"
+17. The last name used on a device lives in `localStorage` under `last-name` (`src/shared/last-name.ts`), read by create and answer alike
+18. Segment tabs are 44px tall, the brief's minimum target, where the design system draws 40px
