@@ -7,7 +7,6 @@ import { OrganiserBar } from "./organiser-bar";
 import { OrganiserProblem } from "./organiser-problem";
 import { PollGone } from "./poll-gone";
 import { useResultsContext } from "./results-provider";
-import styles from "./results.module.css";
 
 function ResultsHeadline() {
   const { results, previous, organiser } = useResultsContext();
@@ -15,7 +14,7 @@ function ResultsHeadline() {
 
   if (respondents.length === 0) {
     return (
-      <div className={styles.empty}>
+      <div className="rounded-card bg-surface p-5">
         <Text variant="body">Nikt jeszcze nie odpowiedział. Wyślij link na grupę.</Text>
       </div>
     );
@@ -52,7 +51,7 @@ export function ResultsLead() {
           onDelete={organiser.deletePoll}
         />
       )}
-      <div className={styles.lead} data-results-lead>
+      <div className="grid gap-2" data-results-lead>
         {organiserProblem && !results.final && <OrganiserProblem problem={organiserProblem} />}
         <ResultsHeadline />
         {refreshFailed && (

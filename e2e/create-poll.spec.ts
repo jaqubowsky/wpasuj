@@ -131,7 +131,7 @@ test("the create button sits above the safe area", async ({ page }, testInfo) =>
   await page.goto("/");
 
   const bar = createButton(page).locator("..");
-  await expect(bar).toHaveCSS("position", "fixed");
+  await expect(bar).toHaveCSS("position", "sticky");
   await expect(bar).toHaveCSS("bottom", "0px");
   const viewport = page.viewportSize()!;
   const button = (await createButton(page).boundingBox())!;

@@ -11,7 +11,7 @@ export function useNearViewport() {
         setNear(true);
         observer.disconnect();
       },
-      { rootMargin: "100% 0px" },
+      { rootMargin: "50% 0px" },
     );
     observer.observe(ref.current!);
     return () => observer.disconnect();

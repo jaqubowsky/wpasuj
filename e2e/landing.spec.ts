@@ -5,6 +5,7 @@ import { saveScreenshot } from "./screenshot";
 const titleField = (page: Page) => page.getByRole("textbox", { name: "Co robimy?" });
 const finalCall = (page: Page) => page.getByRole("region", { name: "To kiedy się widzicie?" });
 const demo = (page: Page) => page.getByRole("region", { name: "Wypróbuj na żywo" });
+const demoSlot = (page: Page) => page.locator("#jak-to-dziala + div");
 const demoCell = (page: Page, name: string) => demo(page).getByRole("button", { name: new RegExp(`^${name}, \\d z 5 może$`) });
 
 test("the create form is in the first viewport and creates a poll", async ({ page }) => {
@@ -65,15 +66,44 @@ test("the story and the demo load after the form is interactive", async ({ page,
   await page.getByRole("button", { name: "Dziś", exact: true }).click();
   await expect(page.getByRole("button", { name: "Dziś", pressed: true })).toBeVisible();
   releaseLateChunks();
+  await page.goto("/#jak-to-dziala");
+  await expect(page.getByRole("region", { name: "Jak to działa" })).toBeAttached();
   await finalCall(page).scrollIntoViewIfNeeded();
 
-  await expect(page.getByRole("region", { name: "Jak to działa" })).toBeAttached();
   await expect(page.getByRole("region", { name: "Wypróbuj na żywo" })).toBeAttached();
   expect(lateChunks.length).toBeGreaterThan(0);
 });
 
+test("the demo loads only once the reader nears it", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "on the phone the hero keeps both far below");
+  const demo = page.getByRole("region", { name: "Wypróbuj na żywo" });
+  await page.goto("/");
+  await expect(page.getByRole("region", { name: "Jak to działa" })).toBeAttached();
+  await page.waitForLoadState("networkidle");
+
+  await expect(demo).not.toBeAttached();
+
+  await demoSlot(page).scrollIntoViewIfNeeded();
+  await expect(demo).toBeAttached();
+});
+
+test("on the phone the create bar stays whole as it leaves with the form", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("phone"), "the bar sticks only on the phone");
+  const createButton = page.getByRole("button", { name: "Utwórz i wyślij na grupę" });
+  await page.goto("/");
+
+  await page.locator("form").evaluate((form) => window.scrollBy(0, form.getBoundingClientRect().bottom - (window.innerHeight - 30)));
+
+  await expect(createButton).toBeInViewport({ ratio: 1 });
+  await page.goto("/#jak-to-dziala");
+  const story = (await page.getByRole("region", { name: "Jak to działa" }).boundingBox())!;
+  const button = (await createButton.boundingBox())!;
+  expect(button.y + button.height).toBeLessThanOrEqual(story.y);
+});
+
 test("the demo's best time follows a tap and a drag", async ({ page, browserName, isMobile }, testInfo) => {
   await page.goto("/");
+  await demoSlot(page).scrollIntoViewIfNeeded();
   await demo(page).scrollIntoViewIfNeeded();
   const bestTime = demo(page).getByRole("status", { name: "Najlepiej" });
   await expect(bestTime).toContainText("Sobota 18.10, 19–21");
@@ -103,6 +133,7 @@ test("the demo's best time follows a tap and a drag", async ({ page, browserName
 
 test("the demo's call scrolls to the form and focuses its first field", async ({ page }) => {
   await page.goto("/");
+  await demoSlot(page).scrollIntoViewIfNeeded();
   await demo(page).scrollIntoViewIfNeeded();
 
   await demo(page).getByRole("button", { name: "Zrób taką ankietę dla swojej paczki" }).click();
@@ -124,10 +155,11 @@ test.describe("on a touch screen", () => {
   test.use({ hasTouch: true });
 
   test("each question opens with a tap", async ({ page }) => {
-    await page.goto("/");
-    await faq(page).scrollIntoViewIfNeeded();
+    await page.goto("/#jak-to-dziala");
     await expect(page.getByRole("region", { name: "Jak to działa" })).toBeAttached();
+    await demoSlot(page).scrollIntoViewIfNeeded();
     await expect(page.getByRole("region", { name: "Wypróbuj na żywo" })).toBeAttached();
+    await faq(page).scrollIntoViewIfNeeded();
 
     for (const question of questions) {
       await expect(answerOf(page, question)).toBeHidden();
@@ -160,7 +192,8 @@ test.describe("with reduced motion", () => {
   test.use({ reducedMotion: "reduce" });
 
   test("nothing animates and nothing is moved", async ({ page }, testInfo) => {
-    await page.goto("/");
+    await page.goto("/#jak-to-dziala");
+    await expect(page.getByRole("region", { name: "Jak to działa" })).toBeAttached();
     await expect(page.getByRole("heading", { name: "Zrobione pod paczkę znajomych, nie pod firmę." })).toBeAttached();
 
     for (const y of [0.25, 0.5, 0.75, 1]) {

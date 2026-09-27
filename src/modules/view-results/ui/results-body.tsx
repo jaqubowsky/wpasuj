@@ -5,7 +5,6 @@ import { CellDetails } from "./cell-details";
 import { Heatmap } from "./heatmap";
 import { RespondentList } from "./respondent-list";
 import { useResultsContext } from "./results-provider";
-import styles from "./results.module.css";
 import { useSelectedCell } from "./use-selected-cell";
 
 export function ResultsBody() {
@@ -19,9 +18,9 @@ export function ResultsBody() {
   const selectedFree = selection.selected && freeAt(respondents, selection.selected);
 
   return (
-    <div className={styles.body} data-results-body>
+    <div className="grid gap-5" data-results-body>
       <Heatmap results={results} best={best} isSelected={selection.isSelected} onCellTap={selection.toggle} />
-      <aside className={styles.side} data-results-side>
+      <aside className="grid gap-5 lg:content-start lg:gap-6" data-results-side>
         {selection.selected && selectedFree && (
           <CellDetails
             cell={selection.selected}

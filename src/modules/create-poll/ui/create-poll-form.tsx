@@ -19,7 +19,7 @@ export function CreatePollForm() {
 
   return (
     <form
-      className="flex flex-col gap-8 pb-[calc(var(--spacing-button)+var(--spacing-10)+env(safe-area-inset-bottom))] lg:pb-10"
+      className="flex flex-col gap-8 lg:pb-10"
       noValidate
       onSubmit={(event) => {
         event.preventDefault();
@@ -53,7 +53,7 @@ export function CreatePollForm() {
         onChange={(event) => setName(event.target.value)}
         error={isInvalid("organiserName") ? "Wpisz swoje imię" : undefined}
       />
-      <div className="fixed right-[0] bottom-[0] left-[0] flex flex-col gap-2 border-t border-line bg-paper px-5 pt-3 pb-[calc(var(--spacing-3)+env(safe-area-inset-bottom))] lg:static lg:border-0 lg:bg-transparent lg:p-[0]">
+      <div className="sticky bottom-[0] -mx-5 flex flex-col gap-2 border-t border-line bg-paper px-5 pt-3 pb-[calc(var(--spacing-3)+env(safe-area-inset-bottom))] lg:static lg:mx-[0] lg:border-0 lg:bg-transparent lg:p-[0]">
         {status === "refused" && (
           <p className="m-[0] text-label font-medium text-accent-ink" role="alert">
             Nie udało się utworzyć ankiety. Sprawdź daty i spróbuj jeszcze raz.

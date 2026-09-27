@@ -1,0 +1,5 @@
+@keyframes cell-details-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+}
