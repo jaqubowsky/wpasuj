@@ -28,6 +28,10 @@ Declared in `package.json` by ticket 01; a change passes all of them:
 - End to end in `e2e/`; run one with `npx playwright test <path>`
 - Screenshots: each pull request that adds or changes a screen or state saves it at 390 and 1440 through Playwright into `e2e/screenshots/` (not committed), uploaded by CI as the `screenshots` artifact. The pull request body lists each screen and the mockup (`spec/design/v2/`) or design-system parts (`spec/design/system/`) it was compared with
 
+## Module layout
+
+Each module in `src/modules/` has `domain/` (pure functions and tests, no imports from React, `server/` or `ui/`), `server/` (schemas, queries, actions, the only I/O) and `ui/` (components, CSS Modules, hooks), with `index.ts` (server) and `client.ts` (client) as the only public entries. ESLint `no-restricted-imports` enforces the direction. Rule source: `spec/brief.md`, "Code rules".
+
 ## Tickets
 
 A ticket is a file in `spec/tickets/`, in the shape of `spec/ticket.md`. It is claimed by setting `Status: claimed` before any work, and closed once its work is committed: every acceptance criterion ticked beside its evidence, `Status: done`.
