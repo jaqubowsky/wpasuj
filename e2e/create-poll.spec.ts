@@ -138,7 +138,7 @@ test("on a slow network the spinner keeps moving and the form morphs only once t
   await expect(page).toHaveURL(/\/e\/[A-Za-z0-9_-]{10}$/);
   await expect(inviteCard(page)).toBeVisible();
   expect(await viewTransitions()).toBe(1);
-  expect(await namedForTransition(page)).toEqual([]);
+  await expect.poll(() => namedForTransition(page)).toEqual([]);
   await page.getByRole("tab", { name: "Wszyscy" }).click();
   await expect(page.getByRole("tab", { name: "Wszyscy", selected: true })).toBeVisible();
   expect(await namedForTransition(page)).toEqual([]);
