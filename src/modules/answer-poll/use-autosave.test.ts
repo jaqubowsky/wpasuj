@@ -27,6 +27,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.restoreAllMocks();
 });
 
 describe("useAutosave", () => {
@@ -77,6 +78,18 @@ describe("useAutosave", () => {
     expect(result.current.state).toBe("saved");
   });
 
+  it("still says saving when a save lands while a newer stroke waits", async () => {
+    const sends = deferredSends();
+    const { result } = renderHook(() => useAutosave(sends.send));
+    act(() => result.current.schedule("a"));
+    await wait(500);
+    act(() => result.current.schedule("b"));
+
+    await settle(sends, 0, true);
+
+    expect(result.current.state).toBe("saving");
+  });
+
   it("stays failed until a retry succeeds", async () => {
     const sends = deferredSends();
     const { result } = renderHook(() => useAutosave(sends.send));
@@ -92,6 +105,70 @@ describe("useAutosave", () => {
     expect(sends.send).toHaveBeenLastCalledWith("a");
     await settle(sends, 1, true);
     expect(result.current.state).toBe("saved");
+  });
+
+  it("keeps saying failed through new strokes until a save succeeds", async () => {
+    const sends = deferredSends();
+    const { result } = renderHook(() => useAutosave(sends.send));
+    act(() => result.current.schedule("a"));
+    await wait(500);
+    await settle(sends, 0, false);
+
+    act(() => result.current.schedule("b"));
+    expect(result.current.state).toBe("failed");
+    await wait(500);
+    expect(sends.send).toHaveBeenLastCalledWith("b");
+    expect(result.current.state).toBe("failed");
+    await settle(sends, 1, true);
+
+    expect(result.current.state).toBe("saved");
+  });
+
+  it("sends a pending set at once when the page is hidden", async () => {
+    const sends = deferredSends();
+    const { result } = renderHook(() => useAutosave(sends.send));
+    act(() => result.current.schedule("a"));
+    vi.spyOn(document, "visibilityState", "get").mockReturnValue("hidden");
+
+    act(() => {
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+
+    expect(sends.send).toHaveBeenCalledExactlyOnceWith("a");
+  });
+
+  it("leaves a visible page's pending set to its quiet time", async () => {
+    const sends = deferredSends();
+    const { result } = renderHook(() => useAutosave(sends.send));
+    act(() => result.current.schedule("a"));
+
+    act(() => {
+      document.dispatchEvent(new Event("visibilitychange"));
+    });
+
+    expect(sends.send).not.toHaveBeenCalled();
+  });
+
+  it("sends a pending set at once when the page is left", async () => {
+    const sends = deferredSends();
+    const { result } = renderHook(() => useAutosave(sends.send));
+    act(() => result.current.schedule("a"));
+
+    act(() => {
+      window.dispatchEvent(new Event("pagehide"));
+    });
+
+    expect(sends.send).toHaveBeenCalledExactlyOnceWith("a");
+  });
+
+  it("sends a pending set at once when it unmounts", async () => {
+    const sends = deferredSends();
+    const { result, unmount } = renderHook(() => useAutosave(sends.send));
+    act(() => result.current.schedule("a"));
+
+    unmount();
+
+    expect(sends.send).toHaveBeenCalledExactlyOnceWith("a");
   });
 
   it("treats a send that throws, such as a dropped connection, as not saved", async () => {
