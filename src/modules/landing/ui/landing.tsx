@@ -48,7 +48,7 @@ export function Landing({ hero }: { hero: ReactNode }) {
         >
           <div className="flex flex-col gap-3">
             <span className="text-sm font-semibold text-accent-ink">{productName}</span>
-            <h1 id="hero-heading" className="m-0 font-display font-extrabold tracking-tightest text-balance text-4xl lg:text-6xl">
+            <h1 id="hero-heading" className="m-0 font-display font-extrabold tracking-tightest text-balance text-4xl lg:text-7xl">
               Kiedy się widzimy? Ustalcie to w minutę.
             </h1>
             <p className="m-0 max-w-150 text-lg text-muted lg:text-xl">
@@ -83,7 +83,7 @@ export function Landing({ hero }: { hero: ReactNode }) {
           className="mx-auto box-border flex max-w-wide flex-col gap-8 px-5 py-20 [contain-intrinsic-size:auto_640px] [content-visibility:auto] lg:grid lg:grid-cols-[minmax(0,1fr)_480px] lg:items-center lg:gap-16 lg:px-12 lg:py-30"
           aria-labelledby="end-heading"
         >
-          <h2 id="end-heading" className="m-0 font-display font-extrabold tracking-tightest text-balance text-4xl animate-rise [animation-range:entry_0%_cover_30%] [animation-timeline:view()] lg:text-6xl">
+          <h2 id="end-heading" className="m-0 font-display font-extrabold tracking-tightest text-balance text-4xl animate-rise [animation-range:entry_0%_cover_30%] [animation-timeline:view()] lg:text-7xl">
             To kiedy się widzicie?
           </h2>
           <div className="flex flex-col gap-3 text-center animate-rise [animation-range:entry_0%_cover_30%] [animation-timeline:view()]">
