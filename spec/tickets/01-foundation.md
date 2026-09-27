@@ -1,6 +1,6 @@
 # 01: Foundation, CI and the design system in code
 
-Status: ready-for-agent
+Status: done
 Blocked by: None, can start immediately
 
 ## Parent
@@ -29,8 +29,14 @@ Blocked by: None, can start immediately
 
 ## Acceptance criteria
 
-- [ ] `npm run lint`, `typecheck`, `test`, `build`, `e2e` all exit 0 locally
-- [ ] The pull request's CI runs all five and passes; the `screenshots` artifact holds the home page at 390 and 1440
-- [ ] A test starts the app on an empty `DATABASE_PATH` and finds the three tables
-- [ ] `docker build` succeeds and the container answers on port 3000
-- [ ] A test page or Vitest render shows every `src/shared/ui` component matching its `preview.html` states
+- [x] `npm run lint`, `typecheck`, `test`, `build`, `e2e` all exit 0 locally: lint, typecheck, test (33), build and e2e on phone-chromium and desktop-chromium exit 0 in the container; phone-webkit cannot run there (no WebKit, download blocked) and passes in CI below
+- [x] The pull request's CI runs all five and passes; the `screenshots` artifact holds the home page at 390 and 1440: PR #1, run 36311580404, job `check` success, 6 e2e passed; artifact `screenshots` holds `home-phone-chromium`, `home-phone-webkit`, `home-desktop-chromium`
+- [x] A test starts the app on an empty `DATABASE_PATH` and finds the three tables: `e2e/database.spec.ts`
+- [x] `docker build` succeeds and the container answers on port 3000: run 36311580404, job `docker` success (build, run, `curl --fail` on port 3000)
+- [x] A test page or Vitest render shows every `src/shared/ui` component matching its `preview.html` states: Vitest renders every preview state in `src/shared/ui/*/*.test.tsx`; a throwaway page compared side by side with the previews at 390 in Chromium, screenshots attached to the task, not committed
+
+## Comments
+
+- Cell has no count bump yet (1.08, `duration-bump`); the heatmap ticket (05) adds it with the rising count
+- Segment tabs have no arrow-key model yet; ticket 03 adds it with the panels
+- `next dev` run by an agent appends a Next.js block to `AGENTS.md`; it was left out of this pull request for the host to decide
