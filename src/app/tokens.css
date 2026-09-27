@@ -61,6 +61,8 @@
   --text-section--line-height: 24px;
   --text-body: 16px;
   --text-body--line-height: 24px;
+  --text-stepper: 20px;
+  --text-stepper--line-height: 1;
   --text-button: 16px;
   --text-button--line-height: 20px;
   --text-label: 13px;

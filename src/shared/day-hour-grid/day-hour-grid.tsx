@@ -2,7 +2,6 @@
 
 import { useRef, type CSSProperties, type PointerEvent, type ReactNode } from "react";
 import { Text } from "@/shared/ui/text/text";
-import styles from "./day-hour-grid.module.css";
 import { useGridKeyboard } from "./use-grid-keyboard";
 import { usePaintStroke, type GridCell, type PaintedRectangle } from "./use-paint-stroke";
 
@@ -42,13 +41,13 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
   const keyboard = useGridKeyboard({ gridRef, dates, hours, onStroke, firstRow: onDateTap ? 0 : 1, firstColumn: onHourTap ? 0 : 1 });
 
   return (
-    <div className={styles.frame}>
+    <div className="@container">
       <div
         ref={gridRef}
         role="grid"
         aria-label={label}
         aria-multiselectable={onStroke && true}
-        className={styles.grid}
+        className="grid [scrollbar-width:none] grid-cols-[var(--hour-column)_repeat(var(--date-count),minmax(56px,1fr))] grid-rows-[auto] auto-rows-(--spacing-cell) gap-cell-gap overflow-x-auto overscroll-x-contain scroll-pl-[calc(var(--hour-column)+var(--spacing-cell-gap))] [--hour-column:48px] snap-x snap-mandatory @max-[600px]:data-scrolls:grid-cols-[var(--hour-column)_repeat(var(--date-count),max(56px,calc((100cqi_-_var(--hour-column)_-_5_*_var(--spacing-cell-gap))_/_4.4)))] [&::-webkit-scrollbar]:hidden"
         style={{ "--date-count": dates.length } as CSSProperties}
         data-scrolls={dates.length > 4 || undefined}
         data-paints={onStroke && true}
@@ -58,15 +57,15 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
         onPointerCancel={stroke.cancel}
         onLostPointerCapture={stroke.cancel}
       >
-        <div role="row" className={styles.row}>
-          <div className={styles.corner} aria-hidden />
+        <div role="row" className="contents">
+          <div className="sticky left-[0] z-1 touch-pan-y bg-paper shadow-[var(--spacing-cell-gap)_0_0_var(--color-paper)]" aria-hidden />
           {dates.map((date, index) => {
             const day = dayOf(date);
             const position = { row: 0, column: index + 1 };
             const label = (
               <>
                 <Text variant="meta">
-                  <span data-long={day.longWeekday}>{day.weekday}</span>
+                  <span className="@min-[600px]:[font-size:0] @min-[600px]:after:text-label @min-[600px]:after:content-[attr(data-long)]" data-long={day.longWeekday}>{day.weekday}</span>
                 </Text>
                 <Text variant="day-number">{day.number}</Text>
               </>
@@ -76,13 +75,14 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
                 key={date}
                 role="columnheader"
                 aria-colindex={position.column + 1}
-                className={styles.date}
+                className="snap-start touch-pan-x"
                 data-row={position.row}
                 data-column={position.column}
               >
                 {onDateTap ? (
                   <button
                     type="button"
+                    className="box-border min-h-target w-full cursor-pointer rounded-cell border-0 bg-track font-sans text-ink tabular-nums transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink motion-safe:active:scale-96 grid h-full justify-items-center px-[0] pt-1 pb-2"
                     aria-label={`${day.weekday} ${day.number}`}
                     tabIndex={keyboard.tabIndexOf(position)}
                     onFocus={() => keyboard.onFocus(position)}
@@ -91,7 +91,7 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
                     {label}
                   </button>
                 ) : (
-                  <span>{label}</span>
+                  <span className="grid justify-items-center pt-1 pb-2">{label}</span>
                 )}
               </div>
             );
@@ -100,14 +100,14 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
         {hours.map((hour, rowIndex) => {
           const header = { row: rowIndex + 1, column: 0 };
           return (
-            <div key={hour} role="row" className={styles.row}>
-              <div role="rowheader" aria-colindex={header.column + 1} className={styles.hour} data-row={header.row} data-column={header.column}>
+            <div key={hour} role="row" className="contents">
+              <div role="rowheader" aria-colindex={header.column + 1} className="sticky left-[0] z-1 touch-pan-y bg-paper shadow-[var(--spacing-cell-gap)_0_0_var(--color-paper)]" data-row={header.row} data-column={header.column}>
                 {onHourTap ? (
-                  <button type="button" tabIndex={keyboard.tabIndexOf(header)} onFocus={() => keyboard.onFocus(header)} onClick={() => onHourTap(hour)}>
+                  <button type="button" className="box-border min-h-target w-full cursor-pointer rounded-cell border-0 bg-track font-sans text-ink tabular-nums transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink motion-safe:active:scale-96 h-full p-[0]" tabIndex={keyboard.tabIndexOf(header)} onFocus={() => keyboard.onFocus(header)} onClick={() => onHourTap(hour)}>
                     <Text variant="meta">{hour}:00</Text>
                   </button>
                 ) : (
-                  <span>
+                  <span className="grid h-full items-start justify-items-end pr-2">
                     <Text variant="meta">{hour}:00</Text>
                   </span>
                 )}
@@ -123,7 +123,7 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
                     role="gridcell"
                     aria-colindex={position.column + 1}
                     aria-selected={selected}
-                    className={styles.cell}
+                    className="grid in-data-paints:touch-none [&>:first-child]:w-full"
                     data-row={position.row}
                     data-column={position.column}
                     data-date={date}

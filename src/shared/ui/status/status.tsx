@@ -1,5 +1,3 @@
-import styles from "./status.module.css";
-
 const words = {
   saving: "Zapisuję",
   saved: "Zapisane",
@@ -34,10 +32,10 @@ type StatusProps = {
 
 export function Status({ state }: StatusProps) {
   return (
-    <span className={styles.status} role="status" data-state={state}>
+    <span className="inline-flex items-center gap-[6px] text-label font-medium text-muted data-[state=failed]:text-accent-ink" role="status" data-state={state}>
       {state && (
         <>
-          <svg viewBox="0 0 16 16" aria-hidden="true">
+          <svg className="size-4 flex-none" viewBox="0 0 16 16" aria-hidden="true">
             {glyphs[state]}
           </svg>
           {words[state]}

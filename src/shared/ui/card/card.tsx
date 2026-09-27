@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import styles from "./card.module.css";
 
 type CardProps = {
   tone?: "ink";
@@ -10,8 +9,12 @@ type CardProps = {
 
 export function Card({ tone, size, label, children }: CardProps) {
   return (
-    <div className={styles.card} data-tone={tone} data-size={size}>
-      {label && <span className={styles.label}>{label}</span>}
+    <div
+      className="group/card rounded-card bg-surface p-5 text-ink data-[size=compact]:rounded-control data-[size=compact]:px-4 data-[size=compact]:py-3 data-[tone=ink]:bg-ink data-[tone=ink]:text-surface"
+      data-tone={tone}
+      data-size={size}
+    >
+      {label && <span className="block text-label font-medium text-muted group-data-[tone=ink]/card:text-on-dark-muted">{label}</span>}
       {children}
     </div>
   );
