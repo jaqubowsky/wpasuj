@@ -4,7 +4,7 @@ import { Button } from "@/shared/ui/button/button";
 import { Input } from "@/shared/ui/input/input";
 import { useState } from "react";
 import styles from "./create-poll-form.module.css";
-import { DatePicker } from "./date-picker";
+import { DatePicker, PendingDatePicker } from "./date-picker";
 import { HourRangePicker } from "./hour-range-picker";
 import { useCreatePoll } from "./use-create-poll";
 import { useDateSelection } from "./use-date-selection";
@@ -38,7 +38,7 @@ export function CreatePollForm() {
       />
       <fieldset className={styles.question}>
         <legend>Kiedy?</legend>
-        {picker ? <DatePicker dates={dates} picker={picker} /> : <div className={styles.pickerSpace} />}
+        {picker ? <DatePicker dates={dates} picker={picker} /> : <PendingDatePicker />}
         {isInvalid("dates") && <p className={styles.notice}>Wybierz co najmniej jeden dzień</p>}
       </fieldset>
       <fieldset className={styles.question}>
@@ -60,9 +60,14 @@ export function CreatePollForm() {
             Nie udało się utworzyć ankiety. Sprawdź daty i spróbuj jeszcze raz.
           </p>
         )}
-        {status === "offline" && (
+        {status === "failed" && (
           <p className={styles.notice} role="alert">
-            Nie udało się połączyć. Sprawdź internet i spróbuj jeszcze raz.
+            Coś poszło nie tak. Spróbuj jeszcze raz.
+          </p>
+        )}
+        {status === "not-copied" && (
+          <p className={styles.notice} role="alert">
+            Nie udało się skopiować linku. Skopiuj go z paska adresu.
           </p>
         )}
         {status === "copied" && (

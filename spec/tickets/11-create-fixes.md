@@ -1,6 +1,6 @@
 # 11: Create fixes from the acceptance of ticket 03
 
-Status: ready-for-agent
+Status: done
 Blocked by: None, can start immediately
 
 ## Parent
@@ -26,8 +26,8 @@ The organiser always learns what happened to the link, one tap makes one poll, a
 
 ## Acceptance criteria
 
-- [ ] Hook test: share rejected and clipboard rejected shows the copy line; a thrown action shows the neutral line
-- [ ] Hook test: a second submit during "Link skopiowany" creates nothing
-- [ ] Unit tests: cutoff and past-date rule in `poll-rules.test.ts`; weekend on Friday gives Fri–Sun, on Monday gives the coming Fri–Sun
-- [ ] e2e with `timezoneId: 'Europe/London'` on a Warsaw poll shows the zone line; with the same zone it does not
-- [ ] Screenshots at 390 and 1440 of create and the poll header with the zone line
+- [x] Hook test: share rejected and clipboard rejected shows the copy line; a thrown action shows the neutral line. `create-poll-form.test.tsx`, "says to copy the link from the address bar when sharing and copying both fail", "says the link was not copied and still lands on the poll", "says something went wrong when creating throws and lets the organiser try again" (`useCreatePoll` driven through the form, where the copy renders)
+- [x] Hook test: a second submit during "Link skopiowany" creates nothing. `create-poll-form.test.tsx`, "a second tap while Link skopiowany shows creates nothing"
+- [x] Unit tests: cutoff and past-date rule in `poll-rules.test.ts`; weekend on Friday gives Fri–Sun, on Monday gives the coming Fri–Sun. `poll-rules.test.ts` "a date before today is past…", "cleanup keeps 60 days…"; `date-presets.test.ts` "Ten weekend on a Friday…", "Ten weekend on a Monday…"
+- [x] e2e with `timezoneId: 'Europe/London'` on a Warsaw poll shows the zone line; with the same zone it does not. `e2e/create-poll.spec.ts`, "a viewer in London on a Warsaw poll"
+- [x] Screenshots at 390 and 1440 of create and the poll header with the zone line. `e2e/screenshots/create-*` and `poll-zone-line-*`, CI artifact `screenshots`

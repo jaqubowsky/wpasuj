@@ -1,6 +1,7 @@
 import { useDeviceToday } from "@/shared/dates/use-device-today";
 import { useState } from "react";
-import { isLit, stripDates, toggleDate, togglePreset, type Preset } from "./date-presets";
+import { isLit, stripDates, toggleDate, togglePreset, type Preset, type Selection } from "./date-presets";
+import { isPastDate } from "./poll-rules";
 
 export function useDateSelection() {
   const today = useDeviceToday();
@@ -8,7 +9,7 @@ export function useDateSelection() {
   const [limitReached, setLimitReached] = useState(false);
   const [monthOpen, setMonthOpen] = useState(false);
 
-  function apply(selection: { dates: string[]; limitReached?: true }) {
+  function apply(selection: Selection) {
     setDates(selection.dates);
     setLimitReached(selection.limitReached ?? false);
   }
@@ -19,6 +20,7 @@ export function useDateSelection() {
     monthOpen,
     limitReached,
     toggleMonth: () => setMonthOpen((open) => !open),
+    isPast: (date: string) => isPastDate(date, today),
     isLit: (preset: Preset) => isLit(dates, preset, today),
     tapPreset: (preset: Preset) => apply(togglePreset(dates, preset, today)),
     tapDate: (date: string) => apply(toggleDate(dates, date)),

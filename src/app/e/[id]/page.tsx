@@ -9,6 +9,7 @@ import frame from "../../page-frame.module.css";
 import { answeredCount } from "./answered-count";
 import styles from "./poll-page.module.css";
 import { PollTabs } from "./poll-tabs";
+import { ZoneNote } from "./zone-note";
 
 export default async function PollPage({ params }: PageProps<"/e/[id]">) {
   const { id } = await params;
@@ -28,6 +29,7 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
         <Text as="h1" variant="title">
           {poll.title}
         </Text>
+        <ZoneNote pollZone={poll.timeZone} />
         <div className={styles.tabs}>
           <AnswerProvider pollId={id} dates={poll.dates} hours={hours} mine={mine}>
             <PollTabs
