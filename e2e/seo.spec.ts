@@ -17,9 +17,9 @@ test("the home page names itself to search engines and chat previews", async ({ 
   const url = await page.locator('meta[property="og:url"]').getAttribute("content");
   expect([new URL(canonical!).href, new URL(url!).href]).toEqual([`${siteUrl}/`, `${siteUrl}/`]);
   const image = await page.locator('meta[property="og:image"]').getAttribute("content");
-  expect(image).toMatch(new RegExp(`^${siteUrl}/opengraph-image`));
+  expect(image).toBe(`${siteUrl}/og.png`);
 
-  const card = await request.get(new URL(image!).pathname + new URL(image!).search);
+  const card = await request.get(new URL(image!).pathname);
   expect(card.headers()["content-type"]).toBe("image/png");
   const png = await card.body();
   expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([1200, 630]);

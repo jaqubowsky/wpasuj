@@ -1,18 +1,9 @@
 import { productName } from "@/shared/brand";
+import { accent, edge, ink, muted, ogCardSize, ogFont, paper, surface } from "@/shared/og-card";
 import { ImageResponse } from "next/og";
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { headline, pitch } from "../domain/pitch";
 
-export const landingCardSize = { width: 1200, height: 630 };
-
-const paper = "#FBF7F1";
-const ink = "#1E1B18";
-const muted = "#72695F";
-const accent = "#F0603F";
 const tintCoral = "#FAD3C3";
-const surface = "#FFFFFF";
-const edge = "#958A7E";
 const heat = ["#FDEDE6", "#FAD3C3", "#F6AE93", "#F18463", "#CC4420"];
 
 const heatRows = [
@@ -23,12 +14,8 @@ const heatRows = [
   [0, 3, 1, 1],
 ];
 
-function font(file: string) {
-  return readFile(join(process.cwd(), "src/shared/fonts", file));
-}
-
 export async function landingCardImage() {
-  const [display, sans500] = await Promise.all([font("bricolage-grotesque-800.ttf"), font("onest-500.ttf")]);
+  const [display, sans500] = await Promise.all([ogFont("bricolage-grotesque-800.ttf"), ogFont("onest-500.ttf")]);
 
   return new ImageResponse(
     <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", gap: 64, padding: "56px 72px", background: paper, color: ink, fontFamily: "Onest" }}>
@@ -55,7 +42,7 @@ export async function landingCardImage() {
       </div>
     </div>,
     {
-      ...landingCardSize,
+      ...ogCardSize,
       fonts: [
         { name: "Bricolage Grotesque", data: display, weight: 800 },
         { name: "Onest", data: sans500, weight: 500 },
