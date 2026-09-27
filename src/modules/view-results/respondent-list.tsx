@@ -16,7 +16,7 @@ export function RespondentList({ results, previous }: { results: Results; previo
       <ul className={styles.list} aria-label="Kto odpowiedział">
         {newestFirst.map((respondent) => (
           <li key={respondent.name}>
-            <Avatar name={respondent.name} pop={seen && !seen.has(respondent.name)} />
+            <Avatar name={respondent.name} tintKey={respondent.normalisedName} pop={seen && !seen.has(respondent.name)} />
             {respondent.name}
             <span className={styles.when}>
               {respondent.slots.length === 0 ? "nie może" : savedAgo(respondent.savedAt, results.readAt)}

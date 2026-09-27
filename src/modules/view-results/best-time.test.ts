@@ -85,7 +85,7 @@ describe("cannotMake", () => {
   it("names every respondent outside the free set, in answer order", () => {
     const respondents = [answer("Ola", []), answer("Bartek", []), answer("Kasia", []), answer("Zosia", [])];
 
-    expect(cannotMake(respondents, ["Kasia", "Ola"])).toEqual(["Bartek", "Zosia"]);
+    expect(cannotMake(respondents, ["Kasia", "Ola"]).map((respondent) => respondent.name)).toEqual(["Bartek", "Zosia"]);
     expect(cannotMake(respondents, ["Ola", "Bartek", "Kasia", "Zosia"])).toEqual([]);
   });
 });

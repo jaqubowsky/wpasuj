@@ -29,6 +29,7 @@
 .text[data-variant="day-number"] {
   font-size: 22px;
   line-height: 26px;
+  letter-spacing: -0.02em;
 }
 
 .text[data-variant="heading"] {

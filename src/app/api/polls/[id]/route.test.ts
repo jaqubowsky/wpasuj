@@ -67,13 +67,14 @@ it("answers with the poll's grid and every respondent's free hours", async () =>
     respondents: [
       {
         name: "Ola",
+        normalisedName: "ola",
         savedAt: Date.parse("2030-10-15T08:00:00Z"),
         slots: [
           { date: "2030-10-19", hour: 18 },
           { date: "2030-10-20", hour: 17 },
         ],
       },
-      { name: "Bartek", savedAt: Date.parse("2030-10-15T09:40:00Z"), slots: [] },
+      { name: "Bartek", normalisedName: "bartek", savedAt: Date.parse("2030-10-15T09:40:00Z"), slots: [] },
     ],
   });
 });

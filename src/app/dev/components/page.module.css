@@ -1,0 +1,26 @@
+.page {
+  box-sizing: border-box;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-5) var(--space-10);
+  display: grid;
+  gap: var(--space-8);
+}
+
+.section {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.stack {
+  display: grid;
+  gap: var(--space-3);
+  width: 100%;
+}

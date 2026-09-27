@@ -4,16 +4,16 @@ import { Avatar } from "./avatar";
 
 describe("Avatar", () => {
   it("shows the capital initial and names the person", () => {
-    render(<Avatar name="łucja" />);
+    render(<Avatar name="łucja" tintKey="łucja" />);
 
     expect(screen.getByRole("img", { name: "łucja" })).toHaveTextContent("Ł");
   });
 
-  it("gives a person the same tint every time", () => {
+  it("keeps a person's tint through a case-only rename", () => {
     render(
       <>
-        <Avatar name="Ola" />
-        <Avatar name="Ola" />
+        <Avatar name="Ola" tintKey="ola" />
+        <Avatar name="ola" tintKey="ola" />
       </>,
     );
 
@@ -23,14 +23,14 @@ describe("Avatar", () => {
 
   it("spreads names over all five tints", () => {
     const names = ["Kuba", "Ola", "Michał", "Zosia", "Bartek", "Ania", "Tomek", "Ewa", "Piotr", "Kasia", "Jan", "Ula"];
-    render(names.map((name) => <Avatar key={name} name={name} />));
+    render(names.map((name) => <Avatar key={name} name={name} tintKey={name.toLocaleLowerCase("pl")} />));
 
     const tints = new Set(screen.getAllByRole("img").map((avatar) => avatar.dataset.tint));
     expect(tints).toEqual(new Set(["coral", "lilac", "mint", "butter", "sky"]));
   });
 
   it("pops in when asked", () => {
-    render(<Avatar name="Bartek" pop />);
+    render(<Avatar name="Bartek" tintKey="bartek" pop />);
 
     expect(screen.getByRole("img", { name: "Bartek" })).toHaveAttribute("data-pop");
   });

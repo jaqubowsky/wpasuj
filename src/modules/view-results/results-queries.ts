@@ -8,7 +8,7 @@ type PollGrid = { dates: string[]; firstHour: number; lastHour: number };
 export function readResults(id: string, poll: PollGrid, now: Date): Results {
   const db = getDb();
   const respondents = db
-    .select({ id: participants.id, name: participants.name, savedAt: participants.updatedAt })
+    .select({ id: participants.id, name: participants.name, normalisedName: participants.normalisedName, savedAt: participants.updatedAt })
     .from(participants)
     .where(eq(participants.pollId, id))
     .orderBy(asc(participants.id))
@@ -27,6 +27,7 @@ export function readResults(id: string, poll: PollGrid, now: Date): Results {
     readAt: now.getTime(),
     respondents: respondents.map((respondent) => ({
       name: respondent.name,
+      normalisedName: respondent.normalisedName,
       savedAt: respondent.savedAt.getTime(),
       slots: freeSlots.filter((slot) => slot.participantId === respondent.id).map(({ date, hour }) => ({ date, hour })),
     })),

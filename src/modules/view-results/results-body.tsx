@@ -23,7 +23,12 @@ export function ResultsBody() {
       <Heatmap results={results} best={best} isSelected={selection.isSelected} onCellTap={selection.toggle} />
       <aside className={styles.side} data-results-side>
         {selection.selected && selectedFree && (
-          <CellDetails cell={selection.selected} free={selectedFree} cannot={cannotMake(respondents, selectedFree)} onClose={selection.close} />
+          <CellDetails
+            cell={selection.selected}
+            free={selectedFree}
+            cannot={cannotMake(respondents, selectedFree.map((respondent) => respondent.name))}
+            onClose={selection.close}
+          />
         )}
         <RespondentList results={results} previous={previous} />
       </aside>
