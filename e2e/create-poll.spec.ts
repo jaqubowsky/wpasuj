@@ -1,10 +1,10 @@
 import { expect, test, type Page } from "@playwright/test";
+import { stubClipboardWithoutShareSheet } from "./clipboard";
 import { saveScreenshot } from "./screenshot";
 
 declare global {
   interface Window {
     shared?: ShareData;
-    copied?: string;
   }
 }
 
@@ -14,20 +14,6 @@ async function stubShareSheet(page: Page) {
       configurable: true,
       value: async (data: ShareData) => {
         window.shared = data;
-      },
-    });
-  });
-}
-
-async function stubClipboardWithoutShareSheet(page: Page) {
-  await page.addInitScript(() => {
-    Object.defineProperty(navigator, "share", { configurable: true, value: undefined });
-    Object.defineProperty(navigator, "clipboard", {
-      configurable: true,
-      value: {
-        writeText: async (text: string) => {
-          window.copied = text;
-        },
       },
     });
   });

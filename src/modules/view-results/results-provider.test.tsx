@@ -24,6 +24,7 @@ const threeAnswers: Results = {
     answer("Bartek", minutesBefore(20), [[saturday, 18], [saturday, 19], [saturday, 20], [sunday, 18]]),
     answer("Kasia", minutesBefore(0), [[saturday, 18], [saturday, 19], [saturday, 20], [sunday, 17], [sunday, 18], [sunday, 19], [sunday, 20]]),
   ],
+  final: null,
 };
 
 function Tabs({ results, lead = true }: { results: Results; lead?: boolean }) {

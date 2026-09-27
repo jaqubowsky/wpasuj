@@ -56,6 +56,7 @@ describe("createPoll", () => {
       lastHour: 23,
       timeZone: "Europe/Warsaw",
       respondentCount: 0,
+      final: null,
     });
   });
 

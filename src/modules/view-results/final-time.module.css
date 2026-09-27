@@ -1,0 +1,56 @@
+.final {
+  margin-top: var(--space-4);
+}
+
+.time {
+  margin: 6px 0 var(--space-4);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.calendar {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: var(--size-button);
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--ink);
+  font: 600 16px/20px var(--font-sans);
+  text-decoration: none;
+  transition: transform var(--duration-fill) var(--ease-out);
+}
+
+.change {
+  min-height: var(--size-target);
+  padding: 0 var(--space-2);
+  border: 0;
+  background: none;
+  color: var(--on-dark-muted);
+  font: 500 16px/20px var(--font-sans);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .calendar:active {
+    transform: scale(0.97);
+  }
+}
+
+.final p[role="alert"] {
+  margin: var(--space-3) 0 0;
+  color: var(--heat-3);
+}
+
+.calendar:focus-visible,
+.change:focus-visible {
+  outline: 2px solid var(--surface);
+  outline-offset: 2px;
+}

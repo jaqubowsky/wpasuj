@@ -79,12 +79,38 @@ describe("setFinal", () => {
   });
 });
 
+describe("clearFinal", () => {
+  it("reopens the poll for the organiser", async () => {
+    const { clearFinal, setFinal } = await import("./organiser-actions");
+    await setFinal(pollId, saturdayEvening);
+
+    expect(await clearFinal(pollId)).toEqual({ ok: true });
+    expect(await finalOf(pollId)).toEqual({ date: null, firstHour: null, lastHour: null });
+  });
+
+  it("refuses someone without the organiser cookie", async () => {
+    const { clearFinal, setFinal } = await import("./organiser-actions");
+    await setFinal(pollId, saturdayEvening);
+    asStranger();
+
+    expect(await clearFinal(pollId)).toEqual({ ok: false, reason: "not-organiser" });
+    expect(await finalOf(pollId)).toEqual(saturdayEvening);
+  });
+
+  it("answers gone for a poll that does not exist", async () => {
+    const { clearFinal } = await import("./organiser-actions");
+
+    expect(await clearFinal("abcdefghij")).toEqual({ ok: false, reason: "gone" });
+  });
+});
+
 describe("a poll 60 days past its last date", () => {
   it("is gone for the organiser too", async () => {
-    const { deletePoll, setFinal } = await import("./organiser-actions");
+    const { clearFinal, deletePoll, setFinal } = await import("./organiser-actions");
     vi.setSystemTime(new Date("2026-12-17T10:00:00Z"));
 
     expect(await setFinal(pollId, saturdayEvening)).toEqual({ ok: false, reason: "gone" });
+    expect(await clearFinal(pollId)).toEqual({ ok: false, reason: "gone" });
     expect(await deletePoll(pollId)).toEqual({ ok: false, reason: "gone" });
   });
 });
