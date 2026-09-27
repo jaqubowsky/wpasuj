@@ -2,7 +2,9 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { claimName, saveAnswer } from "./answer-actions";
-import { AnswerPanel } from "./answer-panel";
+import { AnswerBody } from "./answer-body";
+import { AnswerLead } from "./answer-lead";
+import { AnswerProvider } from "./answer-provider";
 
 vi.mock("./answer-actions", () => ({ saveAnswer: vi.fn(), claimName: vi.fn() }));
 
@@ -10,9 +12,20 @@ const pollId = "Planszowki";
 const dates = ["2026-10-16", "2026-10-17"];
 const hours = [19, 20, 21];
 
-function renderPanel(mine?: { name: string; slots: { date: string; hour: number }[] }) {
+type Mine = { name: string; slots: { date: string; hour: number }[] };
+
+function panel(mine?: Mine) {
+  return (
+    <AnswerProvider pollId={pollId} dates={dates} hours={hours} mine={mine}>
+      <AnswerLead />
+      <AnswerBody />
+    </AnswerProvider>
+  );
+}
+
+function renderPanel(mine?: Mine) {
   const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-  const view = render(<AnswerPanel pollId={pollId} dates={dates} hours={hours} mine={mine} />);
+  const view = render(panel(mine));
   return { user, ...view };
 }
 
@@ -34,7 +47,7 @@ afterEach(() => {
   vi.resetAllMocks();
 });
 
-describe("AnswerPanel", () => {
+describe("the Moje lead and body", () => {
   it("saves the name and the tapped hours without a button and says so", async () => {
     const { user } = renderPanel();
     await user.type(nameField(), "Ola");
@@ -65,6 +78,12 @@ describe("AnswerPanel", () => {
     expect(await screen.findByRole("link", { name: "Zrób nową ankietę" })).toHaveAttribute("href", "/");
   });
 
+  it("heads the grid with Kiedy możesz?", () => {
+    renderPanel();
+
+    expect(screen.getByRole("heading", { level: 2, name: "Kiedy możesz?" })).toBeInTheDocument();
+  });
+
   it("prefills the name last used on this device", () => {
     localStorage.setItem("last-name", "Bartek");
 
@@ -78,7 +97,7 @@ describe("AnswerPanel", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Zapisane");
     fireEvent.click(cell("sb 17, 21:00"));
 
-    rerender(<AnswerPanel pollId={pollId} dates={dates} hours={hours} mine={{ name: "Ola", slots: [{ date: "2026-10-17", hour: 20 }] }} />);
+    rerender(panel({ name: "Ola", slots: [{ date: "2026-10-17", hour: 20 }] }));
 
     expect(nameField()).toHaveValue("Ola");
     expect(cell("pt 16, 19:00")).toHaveAttribute("aria-pressed", "true");
@@ -133,11 +152,11 @@ describe("AnswerPanel", () => {
     expect(saveAnswer).toHaveBeenLastCalledWith(pollId, { name: "Ola", slots: [{ date: "2026-10-16", hour: 19 }] });
   });
 
-  it("asks To ty, Ola? for a taken name and takes the row over on Tak, to ja", async () => {
-    vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason: "name-taken" });
-    vi.mocked(claimName).mockResolvedValue({ ok: true, slots: [{ date: "2026-10-17", hour: 21 }] });
+  it("asks To ty, Ola? with the stored name and takes the row over on Tak, to ja", async () => {
+    vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola" });
+    vi.mocked(claimName).mockResolvedValue({ ok: true, name: "Ola", slots: [{ date: "2026-10-17", hour: 21 }] });
     const { user } = renderPanel();
-    await user.type(nameField(), "Ola");
+    await user.type(nameField(), "ola ");
     fireEvent.click(cell("pt 16, 19:00"));
     await afterQuiet();
     expect(await screen.findByText("To ty, Ola?")).toBeInTheDocument();
@@ -146,6 +165,7 @@ describe("AnswerPanel", () => {
     await afterQuiet();
 
     expect(claimName).toHaveBeenCalledWith(pollId, "Ola");
+    expect(nameField()).toHaveValue("Ola");
     expect(saveAnswer).toHaveBeenLastCalledWith(pollId, {
       name: "Ola",
       slots: [
@@ -157,8 +177,45 @@ describe("AnswerPanel", () => {
     expect(screen.queryByText("To ty, Ola?")).not.toBeInTheDocument();
   });
 
+  it("keeps hours painted while Tak, to ja is on its way", async () => {
+    vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola" });
+    let finishClaim: (result: Awaited<ReturnType<typeof claimName>>) => void = () => {};
+    vi.mocked(claimName).mockReturnValue(new Promise((resolve) => (finishClaim = resolve)));
+    const { user } = renderPanel();
+    await user.type(nameField(), "Ola");
+    fireEvent.click(cell("pt 16, 19:00"));
+    await afterQuiet();
+    await user.click(await screen.findByRole("button", { name: "Tak, to ja" }));
+
+    fireEvent.click(cell("pt 16, 20:00"));
+    await act(async () => finishClaim({ ok: true, name: "Ola", slots: [] }));
+    await afterQuiet();
+
+    expect(cell("pt 16, 20:00")).toHaveAttribute("aria-pressed", "true");
+    expect(saveAnswer).toHaveBeenLastCalledWith(pollId, {
+      name: "Ola",
+      slots: [
+        { date: "2026-10-16", hour: 19 },
+        { date: "2026-10-16", hour: 20 },
+      ],
+    });
+  });
+
+  it("keeps Nie zapisano and Spróbuj ponownie through a new stroke that fails again", async () => {
+    vi.mocked(saveAnswer).mockRejectedValue(new TypeError("Failed to fetch"));
+    const { user } = renderPanel();
+    await user.type(nameField(), "Ola");
+    fireEvent.click(cell("pt 16, 19:00"));
+    await afterQuiet();
+
+    fireEvent.click(cell("pt 16, 20:00"));
+
+    expect(screen.getByRole("status")).toHaveTextContent("Nie zapisano");
+    expect(screen.getByRole("button", { name: "Spróbuj ponownie" })).toBeInTheDocument();
+  });
+
   it("lets the participant pick another name on Nie, zmienię imię", async () => {
-    vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason: "name-taken" });
+    vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola" });
     const { user } = renderPanel();
     await user.type(nameField(), "Ola");
     fireEvent.click(cell("pt 16, 19:00"));
@@ -173,7 +230,7 @@ describe("AnswerPanel", () => {
   it("asks again as a newcomer after another device took this row over", async () => {
     vi.mocked(saveAnswer)
       .mockResolvedValueOnce({ ok: false, reason: "not-yours" })
-      .mockResolvedValueOnce({ ok: false, reason: "name-taken" });
+      .mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola" });
     renderPanel({ name: "Ola", slots: [] });
 
     fireEvent.click(cell("pt 16, 19:00"));
@@ -181,6 +238,7 @@ describe("AnswerPanel", () => {
 
     expect(await screen.findByText("To ty, Ola?")).toBeInTheDocument();
     expect(saveAnswer).toHaveBeenCalledTimes(2);
+    expect(screen.queryByText(/Zmieniasz zdanie\?/)).not.toBeInTheDocument();
   });
 
   it.each([

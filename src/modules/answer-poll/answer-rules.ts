@@ -14,10 +14,10 @@ export function fitsPoll(poll: { dates: string[]; firstHour: number; lastHour: n
   return slots.every((slot) => poll.dates.includes(slot.date) && slot.hour >= poll.firstHour && slot.hour < poll.lastHour);
 }
 
-type Standing = { nameHeldByOther: boolean; newcomer: boolean; participantCount: number };
+type Standing = { nameHeldByOther?: string; newcomer: boolean; participantCount: number };
 
 export function refusalOf({ nameHeldByOther, newcomer, participantCount }: Standing) {
-  if (nameHeldByOther) return "name-taken" as const;
-  if (newcomer && participantCount >= maxParticipants) return "full" as const;
+  if (nameHeldByOther !== undefined) return { reason: "name-taken" as const, name: nameHeldByOther };
+  if (newcomer && participantCount >= maxParticipants) return { reason: "full" as const };
   return undefined;
 }

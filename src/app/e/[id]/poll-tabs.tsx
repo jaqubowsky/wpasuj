@@ -1,14 +1,27 @@
 "use client";
 
+import { withViewTransition } from "@/shared/view-transition";
 import { Segment } from "@/shared/ui/segment/segment";
 import { useState, type ReactNode } from "react";
+import styles from "./poll-page.module.css";
 
 const views = ["Moje", "Wszyscy"] as const;
 
 type View = (typeof views)[number];
 
-export function PollTabs({ opening, mine }: { opening: View; mine: ReactNode }) {
+type PollTabsProps = {
+  opening: View;
+  leads: Record<View, ReactNode>;
+  bodies: Record<View, ReactNode>;
+};
+
+export function PollTabs({ opening, leads, bodies }: PollTabsProps) {
   const [view, setView] = useState<View>(opening);
 
-  return <Segment label="Widok" options={views} selected={view} onSelect={setView} panels={{ Moje: mine, Wszyscy: null }} />;
+  return (
+    <>
+      {leads[view] && <div className={styles.lead}>{leads[view]}</div>}
+      <Segment label="Widok" options={views} selected={view} onSelect={(next) => withViewTransition(() => setView(next))} panels={bodies} />
+    </>
+  );
 }

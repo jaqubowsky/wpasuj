@@ -3,18 +3,18 @@ import { refusalOf } from "./answer-rules";
 
 describe("refusalOf", () => {
   it("refuses a name someone else already holds", () => {
-    expect(refusalOf({ nameHeldByOther: true, newcomer: false, participantCount: 3 })).toBe("name-taken");
+    expect(refusalOf({ nameHeldByOther: "Ola", newcomer: false, participantCount: 3 })).toEqual({ reason: "name-taken", name: "Ola" });
   });
 
   it("refuses a newcomer once 30 people answered", () => {
-    expect(refusalOf({ nameHeldByOther: false, newcomer: true, participantCount: 30 })).toBe("full");
+    expect(refusalOf({ newcomer: true, participantCount: 30 })).toEqual({ reason: "full" });
   });
 
   it("lets someone already in a full poll change their answer", () => {
-    expect(refusalOf({ nameHeldByOther: false, newcomer: false, participantCount: 30 })).toBeUndefined();
+    expect(refusalOf({ newcomer: false, participantCount: 30 })).toBeUndefined();
   });
 
   it("lets the 30th person in", () => {
-    expect(refusalOf({ nameHeldByOther: false, newcomer: true, participantCount: 29 })).toBeUndefined();
+    expect(refusalOf({ newcomer: true, participantCount: 29 })).toBeUndefined();
   });
 });

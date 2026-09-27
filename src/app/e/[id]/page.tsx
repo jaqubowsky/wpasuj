@@ -1,5 +1,5 @@
 import { findMyAnswer } from "@/modules/answer-poll";
-import { AnswerPanel } from "@/modules/answer-poll/client";
+import { AnswerBody, AnswerLead, AnswerProvider } from "@/modules/answer-poll/client";
 import { findPoll } from "@/modules/create-poll";
 import { Avatar } from "@/shared/ui/avatar/avatar";
 import { Text } from "@/shared/ui/text/text";
@@ -29,10 +29,13 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
           {poll.title}
         </Text>
         <div className={styles.tabs}>
-          <PollTabs
-            opening={mine ? "Wszyscy" : "Moje"}
-            mine={<AnswerPanel pollId={id} dates={poll.dates} hours={hours} mine={mine} />}
-          />
+          <AnswerProvider pollId={id} dates={poll.dates} hours={hours} mine={mine}>
+            <PollTabs
+              opening={mine ? "Wszyscy" : "Moje"}
+              leads={{ Moje: <AnswerLead />, Wszyscy: null }}
+              bodies={{ Moje: <AnswerBody />, Wszyscy: null }}
+            />
+          </AnswerProvider>
         </div>
       </main>
     </div>

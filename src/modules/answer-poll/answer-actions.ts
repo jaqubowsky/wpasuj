@@ -10,12 +10,17 @@ import { answerSchema, nameSchema, type AnswerInput, type Slot } from "./answer-
 import { findLivePoll, participantByToken, slotsOf } from "./answer-queries";
 import { nameKey } from "./name-rules";
 
-type SaveResult = { ok: true } | { ok: false; reason: "invalid" | "name-taken" | "not-yours" | "closed" | "full" | "gone" };
-type ClaimResult = { ok: true; slots: Slot[] } | { ok: false; reason: "invalid" | "closed" | "gone" };
+type SaveResult =
+  | { ok: true }
+  | { ok: false; reason: "name-taken"; name: string }
+  | { ok: false; reason: "invalid" | "not-yours" | "closed" | "full" | "gone" };
+type ClaimResult = { ok: true; name: string; slots: Slot[] } | { ok: false; reason: "invalid" | "closed" | "gone" };
+
+export type ClaimRefusal = Extract<ClaimResult, { ok: false }>["reason"];
 
 function participantNamed(pollId: string, normalisedName: string) {
   return getDb()
-    .select({ id: participants.id })
+    .select({ id: participants.id, name: participants.name })
     .from(participants)
     .where(and(eq(participants.pollId, pollId), eq(participants.normalisedName, normalisedName)))
     .get();
@@ -41,8 +46,9 @@ export async function saveAnswer(pollId: string, answer: AnswerInput): Promise<S
   const normalisedName = nameKey(name);
   const holder = participantNamed(pollId, normalisedName);
   const [{ participantCount }] = db.select({ participantCount: count() }).from(participants).where(eq(participants.pollId, pollId)).all();
-  const refusal = refusalOf({ nameHeldByOther: holder !== undefined && holder.id !== participant?.id, newcomer: !participant, participantCount });
-  if (refusal) return { ok: false, reason: refusal };
+  const nameHeldByOther = holder && holder.id !== participant?.id ? holder.name : undefined;
+  const refusal = refusalOf({ nameHeldByOther, newcomer: !participant, participantCount });
+  if (refusal) return { ok: false, ...refusal };
 
   const now = new Date();
   const newcomerToken = newToken();
@@ -67,17 +73,20 @@ export async function claimName(pollId: string, name: string): Promise<ClaimResu
   const parsed = nameSchema.safeParse(name);
   if (!parsed.success) return { ok: false, reason: "invalid" };
   if (poll.finalDate !== null) return { ok: false, reason: "closed" };
-  const claimed = participantNamed(pollId, nameKey(parsed.data));
-  if (!claimed) return { ok: false, reason: "invalid" };
 
   const cookieStore = await cookies();
   const heldToken = cookieStore.get(pollId)?.value;
-  const held = heldToken === undefined ? undefined : participantByToken(pollId, heldToken);
   const token = newToken();
-  getDb().transaction((tx) => {
-    if (held && held.id !== claimed.id) tx.delete(participants).where(eq(participants.id, held.id)).run();
-    tx.update(participants).set({ tokenHash: hashToken(token) }).where(eq(participants.id, claimed.id)).run();
+  const claimed = getDb().transaction((tx) => {
+    const row = participantNamed(pollId, nameKey(parsed.data));
+    if (!row) return undefined;
+    const held = heldToken === undefined ? undefined : participantByToken(pollId, heldToken);
+    if (held && held.id !== row.id) tx.delete(participants).where(eq(participants.id, held.id)).run();
+    tx.update(participants).set({ tokenHash: hashToken(token) }).where(eq(participants.id, row.id)).run();
+    return row;
   });
+  if (!claimed) return { ok: false, reason: "invalid" };
+
   cookieStore.set(pollId, token, tokenCookieOptions);
-  return { ok: true, slots: slotsOf(claimed.id) };
+  return { ok: true, name: claimed.name, slots: slotsOf(claimed.id) };
 }

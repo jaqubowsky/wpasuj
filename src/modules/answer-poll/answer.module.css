@@ -1,5 +1,9 @@
-.panel {
+.body {
   padding-top: var(--space-5);
+}
+
+.body > h2 {
+  margin: 0;
 }
 
 .name {
@@ -43,7 +47,7 @@
 }
 
 .hint {
-  margin: var(--space-5) 0 var(--space-3);
+  margin: var(--space-2) 0 var(--space-3);
   font-size: 15px;
   line-height: 20px;
   color: var(--muted);

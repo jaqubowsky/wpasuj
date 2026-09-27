@@ -49,7 +49,12 @@ test("a fresh participant answers with a name and one drag and sees Zapisane", a
   await saveScreenshot(page, testInfo, "answer-empty");
 
   await nameField(page).fill("Zuza");
-  await drag(page, testInfo, cellAt(page, 1, 0), cellAt(page, 3, 2), () => saveScreenshot(page, testInfo, "answer-painting"));
+  await drag(page, testInfo, cellAt(page, 1, 0), cellAt(page, 3, 2), async () => {
+    const shades = await page.locator('[data-state="adding"]').evaluateAll((cells) => cells.map((cell) => getComputedStyle(cell).backgroundColor));
+    expect(shades).toHaveLength(9);
+    expect(new Set(shades).size).toBe(1);
+    await saveScreenshot(page, testInfo, "answer-painting");
+  });
 
   await expect(status(page)).toHaveText("Zapisane");
   await expect(selected(page)).toHaveCount(9);
