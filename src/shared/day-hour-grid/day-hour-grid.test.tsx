@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { Cell } from "@/shared/ui/cell/cell";
@@ -15,7 +15,7 @@ function renderGrid(selected: string[] = []) {
       dates={dates}
       hours={hours}
       isSelected={({ date, hour }) => selected.includes(`${date} ${hour}`)}
-      renderCell={({ label, tabIndex, preview }) => <Cell pressed={false} state={preview} aria-label={label} tabIndex={tabIndex} />}
+      renderCell={({ label, tabIndex, preview }) => <Cell state={preview} aria-label={label} tabIndex={tabIndex} />}
       {...handlers}
     />,
   );
@@ -31,6 +31,32 @@ describe("DayHourGrid", () => {
     expect(screen.getAllByRole("columnheader").map((header) => header.textContent)).toEqual(["pt16", "sb17", "nd18"]);
     expect(screen.getAllByRole("rowheader").map((header) => header.textContent)).toEqual(["17:00", "18:00", "19:00"]);
     expect(screen.getAllByRole("gridcell", { selected: true })).toEqual([screen.getByRole("button", { name: "sb 17, 18:00" }).parentElement]);
+  });
+
+  it("tells each rendered cell whether it is selected", () => {
+    const renderCell = vi.fn<(cell: { date: string; selected: boolean }) => null>(() => null);
+
+    render(<DayHourGrid label="Kiedy możesz?" dates={dates} hours={[17]} isSelected={({ date }) => date === "2026-10-17"} renderCell={renderCell} onCellTap={vi.fn()} />);
+
+    expect(renderCell.mock.calls.map(([cell]) => [cell.date, cell.selected])).toEqual([
+      ["2026-10-16", false],
+      ["2026-10-17", true],
+      ["2026-10-18", false],
+    ]);
+  });
+
+  it("puts each date header over its own column of cells", () => {
+    renderGrid();
+
+    const columnOf = (element: HTMLElement) => element.getAttribute("aria-colindex");
+    const headerColumns = screen.getAllByRole("columnheader").map(columnOf);
+    const [, ...dataRows] = screen.getAllByRole("row");
+
+    expect(headerColumns).toEqual(["2", "3", "4"]);
+    for (const row of dataRows) {
+      expect(within(row).getByRole("rowheader")).toHaveAttribute("aria-colindex", "1");
+      expect(within(row).getAllByRole("gridcell").map(columnOf)).toEqual(headerColumns);
+    }
   });
 
   it("reports a tap on a cell", () => {

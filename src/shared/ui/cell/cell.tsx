@@ -4,7 +4,6 @@ import styles from "./cell.module.css";
 type CellButtonProps = Omit<ComponentProps<"button">, "type" | "aria-pressed" | "className">;
 
 type AnswerCellProps = Omit<CellButtonProps, "children"> & {
-  pressed: boolean;
   state?: "mine" | "adding" | "removing";
 };
 
@@ -29,6 +28,6 @@ export function Cell(props: AnswerCellProps | HeatCellProps) {
     );
   }
 
-  const { pressed, state, ...buttonProps } = props;
-  return <button type="button" className={styles.cell} aria-pressed={pressed} data-state={state} {...buttonProps} />;
+  const { state, ...buttonProps } = props;
+  return <button type="button" className={styles.cell} data-state={state} {...buttonProps} />;
 }
