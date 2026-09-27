@@ -5,6 +5,7 @@ import { readResults } from "@/modules/view-results";
 import { ResultsBody, ResultsLead, ResultsProvider } from "@/modules/view-results/client";
 import { Avatar } from "@/shared/ui/avatar/avatar";
 import { Text } from "@/shared/ui/text/text";
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { AppHeader } from "../../app-header";
 import frame from "../../page-frame.module.css";
@@ -12,6 +13,19 @@ import { answeredCount } from "./answered-count";
 import styles from "./poll-page.module.css";
 import { PollTabs } from "./poll-tabs";
 import { ZoneNote } from "./zone-note";
+
+export async function generateMetadata({ params }: PageProps<"/e/[id]">): Promise<Metadata> {
+  const { id } = await params;
+  const poll = findPoll(id, new Date());
+  if (!poll) return {};
+  const question = `Kiedy możesz? ${poll.title}`;
+  return {
+    metadataBase: new URL(process.env.SITE_URL!),
+    title: question,
+    description: question,
+    openGraph: { title: question, description: question },
+  };
+}
 
 export default async function PollPage({ params }: PageProps<"/e/[id]">) {
   const { id } = await params;
