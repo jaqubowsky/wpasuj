@@ -47,6 +47,25 @@
   --font-sans: var(--font-onest);
   --font-display: var(--font-bricolage);
 
+  --text-title: 30px;
+  --text-title--line-height: 34px;
+  --text-title-desktop: 40px;
+  --text-title-desktop--line-height: 44px;
+  --text-best-time: 30px;
+  --text-best-time--line-height: 34px;
+  --text-best-time-desktop: 32px;
+  --text-best-time-desktop--line-height: 36px;
+  --text-day: 22px;
+  --text-day--line-height: 26px;
+  --text-section: 18px;
+  --text-section--line-height: 24px;
+  --text-body: 16px;
+  --text-body--line-height: 24px;
+  --text-button: 16px;
+  --text-button--line-height: 20px;
+  --text-label: 13px;
+  --text-label--line-height: 18px;
+
   --font-weight-regular: 400;
   --font-weight-medium: 500;
   --font-weight-semibold: 600;

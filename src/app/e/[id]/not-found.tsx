@@ -14,7 +14,7 @@ export default function PollGone() {
         <Text as="p" variant="body">
           Organizator mógł ją usunąć albo jej terminy minęły dawno temu.
         </Text>
-        <Link href="/" className="mt-3 inline-flex h-button items-center rounded-control bg-ink px-6 text-[16px]/[20px] font-semibold text-surface no-underline transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink motion-safe:active:scale-97">
+        <Link href="/" className="mt-3 inline-flex h-button items-center rounded-control bg-ink px-6 text-button font-semibold text-surface no-underline transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink motion-safe:active:scale-97">
           Zrób nową ankietę
         </Link>
       </main>

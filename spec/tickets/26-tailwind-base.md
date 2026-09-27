@@ -32,4 +32,4 @@ The app builds with Tailwind v4 on our tokens only: no default palette, spacing 
 
 - Tokens moved to Tailwind namespaces (`--color-*`, `--spacing-*`), so every `var()` in the module CSS outside Scope was renamed with them; the only change in those files.
 - The `:has()` results grid in `e/[id]/poll-page.css` stays plain CSS: it places elements `view-results` renders, which `className` cannot reach.
-- Open for the host before 27 to 30: arbitrary values (`bg-[#f00]`, `text-[16px]/[20px]`) pass lint; banning arbitrary colours, and type tokens for the brief's type table, are host decisions.
+- Host decision in the pull request round: the brief's type table is `--text-<role>` tokens, and lint rejects a colour in brackets and an arbitrary text size; arbitrary lengths stay where no token exists.

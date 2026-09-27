@@ -14,7 +14,20 @@ const eslintConfig = defineConfig([
       "better-tailwindcss/no-unknown-classes": "error",
       "better-tailwindcss/no-restricted-classes": [
         "error",
-        { restrict: [{ pattern: "^(?!.*motion-safe:)(.*:)?-?scale-", message: "Put a scale behind motion-safe: so reduced motion keeps it still" }] },
+        {
+          restrict: [
+            { pattern: "^(?!.*motion-safe:)(.*:)?-?scale-", message: "Put a scale behind motion-safe: so reduced motion keeps it still" },
+            {
+              pattern: "\\[[^\\]]*(#|rgba?\\(|hsla?\\(|hwb\\(|lab\\(|lch\\(|oklab\\(|oklch\\(|color-mix\\(|color\\(|color:)",
+              message: "Colours come from tokens.css: use a colour token",
+            },
+            {
+              pattern: "^(.*:)?(bg|text|border|border-[trblxyse]|outline|ring|ring-offset|fill|stroke|decoration|accent|caret|divide|placeholder|from|via|to|shadow|inset-shadow)-\\[[a-z]+\\]$",
+              message: "Colours come from tokens.css: use a colour token",
+            },
+            { pattern: "^(.*:)?text-\\[(length:)?[\\d.]", message: "Type comes from tokens.css: use text-<role>" },
+          ],
+        },
       ],
     },
   },
