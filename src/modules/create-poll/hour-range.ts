@@ -1,4 +1,7 @@
-export type HourRange = { firstHour: number; lastHour: number };
+import type { z } from "zod";
+import type { createPollSchema } from "./poll-schema";
+
+export type HourRange = Pick<z.output<typeof createPollSchema>, "firstHour" | "lastHour">;
 
 export const hourRanges = {
   evening: { firstHour: 17, lastHour: 23 },

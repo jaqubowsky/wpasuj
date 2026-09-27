@@ -41,7 +41,7 @@ export function DatePicker({ dates, picker }: DatePickerProps) {
             aria-label={fullDate(date)}
             aria-pressed={dates.includes(date)}
             data-today={date === picker.today || undefined}
-            disabled={date < picker.today}
+            disabled={picker.isPast(date)}
             onClick={() => picker.tapDate(date)}
           >
             {dayNumber(date)}
@@ -68,6 +68,32 @@ export function DatePicker({ dates, picker }: DatePickerProps) {
           Maksymalnie 10 dni
         </p>
       )}
+    </>
+  );
+}
+
+const pendingStripCells = 21;
+
+export function PendingDatePicker() {
+  return (
+    <>
+      <div className={styles.chips}>
+        {presets.map(({ preset, label }) => (
+          <Chip key={preset} pressed={false}>
+            {label}
+          </Chip>
+        ))}
+      </div>
+      <div className={styles.strip} aria-hidden="true">
+        {Array.from({ length: pendingStripCells }, (_, index) => (
+          <span key={index} className={index < 7 ? styles.weekday : styles.pending}>
+            {"\u00a0"}
+          </span>
+        ))}
+      </div>
+      <div className={styles.more}>
+        <Button variant="text">Pokaż cały miesiąc</Button>
+      </div>
     </>
   );
 }

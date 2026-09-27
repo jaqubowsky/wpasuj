@@ -116,6 +116,20 @@ test("Własne, the month and the 10-day limit", async ({ page }, testInfo) => {
   await saveScreenshot(page, testInfo, "create-limit");
 });
 
+test("nothing below the dates moves when the page hydrates", async ({ page, browser }) => {
+  const firstPaint = await browser.newContext({ viewport: page.viewportSize(), javaScriptEnabled: false });
+  const serverRendered = await firstPaint.newPage();
+  await serverRendered.goto("http://localhost:3000/");
+  const whenHeading = (on: Page) => on.getByText("O której?", { exact: true });
+  const before = (await whenHeading(serverRendered).boundingBox())!.y;
+  await firstPaint.close();
+
+  await page.goto("/");
+  await expect(days(page).last()).toBeEnabled();
+
+  expect((await whenHeading(page).boundingBox())!.y).toBe(before);
+});
+
 test("inputs render at 16px or more", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Własne" }).click();
@@ -136,6 +150,29 @@ test("the create button sits above the safe area", async ({ page }, testInfo) =>
   const viewport = page.viewportSize()!;
   const button = (await createButton(page).boundingBox())!;
   expect(button.y + button.height).toBeLessThanOrEqual(viewport.height - 12);
+});
+
+test.describe("a viewer in London on a Warsaw poll", () => {
+  test.use({ timezoneId: "Europe/London" });
+
+  test("reads which zone the hours are in; a viewer in Warsaw does not", async ({ page, browser }, testInfo) => {
+    const warsaw = await browser.newContext({ timezoneId: "Europe/Warsaw", baseURL: testInfo.project.use.baseURL });
+    const organiser = await warsaw.newPage();
+    await stubShareSheet(organiser);
+    await organiser.goto("/");
+    await createPoll(organiser, { title: "Kino", day: "Jutro", name: "Ola" });
+    await expect(organiser).toHaveURL(/\/e\/[A-Za-z0-9_-]{10}$/);
+    await expect(organiser.getByText("Ola pyta")).toBeVisible();
+
+    await page.goto(organiser.url());
+
+    await expect(page.getByText("Godziny w strefie Europe/Warsaw")).toBeVisible();
+    await saveScreenshot(page, testInfo, "poll-zone-line");
+    await organiser.getByRole("tab", { name: "Wszyscy" }).click();
+    await expect(organiser.getByRole("tab", { name: "Wszyscy", selected: true })).toBeVisible();
+    await expect(organiser.getByText(/Godziny w strefie/)).toHaveCount(0);
+    await warsaw.close();
+  });
 });
 
 test("a poll that does not exist says it is gone and links to a new one", async ({ page }, testInfo) => {

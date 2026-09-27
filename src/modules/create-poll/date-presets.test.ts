@@ -18,6 +18,14 @@ describe("presets", () => {
     expect(presetDates("weekend", thursday)).toEqual(["2026-10-16", "2026-10-17", "2026-10-18"]);
   });
 
+  it("Ten weekend on a Friday is Friday to Sunday", () => {
+    expect(presetDates("weekend", "2026-10-16")).toEqual(["2026-10-16", "2026-10-17", "2026-10-18"]);
+  });
+
+  it("Ten weekend on a Monday is the coming Friday to Sunday", () => {
+    expect(presetDates("weekend", "2026-10-12")).toEqual(["2026-10-16", "2026-10-17", "2026-10-18"]);
+  });
+
   it("Ten weekend leaves out the days already past", () => {
     expect(presetDates("weekend", saturday)).toEqual(["2026-10-17", "2026-10-18"]);
     expect(presetDates("weekend", sunday)).toEqual(["2026-10-18"]);

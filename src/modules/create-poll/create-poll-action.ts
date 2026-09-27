@@ -8,9 +8,7 @@ import { inArray, lt, sql } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { randomBytes } from "node:crypto";
 import { createPollSchema, type CreatePollInput } from "./poll-schema";
-import { expiryCutoff, hasPastDate } from "./poll-rules";
-
-const lastZoneToReachToday = "Etc/GMT+12";
+import { cleanupCutoff, hasPastDate } from "./poll-rules";
 
 type CreatePollResult = { ok: true; id: string } | { ok: false; reason: "invalid" };
 
@@ -33,7 +31,7 @@ export async function createPoll(input: CreatePollInput): Promise<CreatePollResu
       tx.select({ id: participants.id }).from(participants).where(inArray(participants.tokenHash, heldTokenHashes)).get() !==
         undefined;
     tx.delete(polls)
-      .where(lt(sql`(select max(value) from json_each(${polls.dates}))`, expiryCutoff(todayIn(lastZoneToReachToday, now))))
+      .where(lt(sql`(select max(value) from json_each(${polls.dates}))`, cleanupCutoff(now)))
       .run();
     tx.insert(polls)
       .values({
