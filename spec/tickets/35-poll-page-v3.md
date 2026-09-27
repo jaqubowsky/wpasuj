@@ -1,6 +1,6 @@
 # 35: Poll page in the approved look
 
-Status: ready-for-agent
+Status: claimed
 Blocked by: 34-design-token-scale.md, 30-tailwind-landing.md
 
 ## Parent

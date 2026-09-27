@@ -22,6 +22,8 @@ export function readResults(id: string, poll: PollGrid, now: Date, participantTo
     .orderBy(asc(slots.date), asc(slots.hour))
     .all();
 
+  const tokenHash = participantToken === undefined ? undefined : hashToken(participantToken);
+
   return {
     dates: poll.dates,
     hours: Array.from({ length: poll.lastHour - poll.firstHour }, (_, index) => poll.firstHour + index),
@@ -33,6 +35,6 @@ export function readResults(id: string, poll: PollGrid, now: Date, participantTo
       slots: freeSlots.filter((slot) => slot.participantId === respondent.id).map(({ date, hour }) => ({ date, hour })),
     })),
     final: poll.final,
-    you: participantToken === undefined ? undefined : respondents.find((respondent) => respondent.tokenHash === hashToken(participantToken))?.normalisedName,
+    you: participantToken === undefined ? undefined : respondents.find((respondent) => respondent.tokenHash === tokenHash)?.normalisedName,
   };
 }

@@ -25,13 +25,13 @@ export function Segment<Option extends string>({ label, options, selected, onSel
 
   return (
     <>
-      <div className="flex rounded-[12px] bg-track p-1" role="tablist" aria-label={label}>
+      <div className="flex rounded-control bg-track p-1" role="tablist" aria-label={label}>
         {options.map((option, index) => (
           <button
             key={option}
             id={tabId(option)}
             type="button"
-            className="h-11 flex-1 cursor-pointer rounded-[9px] border-0 bg-transparent font-sans text-base leading-none font-semibold text-muted focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ink aria-selected:bg-surface aria-selected:text-ink aria-selected:shadow-lift"
+            className="h-11 flex-1 cursor-pointer rounded-cell border-0 bg-transparent font-sans text-base leading-none font-semibold text-muted focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ink aria-selected:bg-surface aria-selected:text-ink aria-selected:shadow-lift"
             role="tab"
             aria-selected={option === selected}
             aria-controls={panelId(option)}

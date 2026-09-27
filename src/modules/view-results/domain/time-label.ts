@@ -1,5 +1,3 @@
-import { shortWeekday } from "@/shared/dates/format";
-
 type TimeRange = { date: string; firstHour: number; lastHour: number };
 
 const longWeekday = new Intl.DateTimeFormat("pl", { timeZone: "UTC", weekday: "long" });
@@ -19,10 +17,6 @@ function longDay(date: string) {
 
 export function longRunLabel({ date, firstHour, lastHour }: TimeRange) {
   return `${longDay(date)}, ${firstHour}–${lastHour}`;
-}
-
-export function shortRunLabel({ date, firstHour, lastHour }: TimeRange) {
-  return `${shortWeekday(date)} ${dayAndMonth(date)}, ${firstHour}–${lastHour}`;
 }
 
 export function hourLabel({ date, hour }: { date: string; hour: number }) {

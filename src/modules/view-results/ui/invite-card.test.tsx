@@ -5,7 +5,7 @@ import { markFreshPoll } from "@/shared/fresh-poll";
 import { InviteCard } from "./invite-card";
 
 const pollId = "abcdefghij";
-const poll = { organiserName: "Kuba", title: "Planszówki u Michała", dates: ["2030-10-18", "2030-10-19", "2030-10-20"], firstHour: 17, lastHour: 23 };
+const title = "Planszówki u Michała";
 const invite = `Kiedy możecie? Planszówki u Michała ${location.origin}/e/${pollId}`;
 
 function stubSharing(share?: (data: ShareData) => Promise<void>) {
@@ -15,9 +15,16 @@ function stubSharing(share?: (data: ShareData) => Promise<void>) {
   return writeText;
 }
 
+function refuseClipboard() {
+  Object.defineProperty(navigator, "clipboard", {
+    value: { writeText: async () => Promise.reject(new DOMException("denied", "NotAllowedError")) },
+    configurable: true,
+  });
+}
+
 function renderFreshCard() {
   markFreshPoll(pollId);
-  return render(<InviteCard pollId={pollId} poll={poll} />);
+  return render(<InviteCard pollId={pollId} title={title} />);
 }
 
 const sendButton = () => screen.getByRole("button", { name: "Wyślij na grupę" });
@@ -31,22 +38,20 @@ afterEach(() => {
 });
 
 it("shows nothing on a poll this tab did not just create", () => {
-  render(<InviteCard pollId={pollId} poll={poll} />);
+  render(<InviteCard pollId={pollId} title={title} />);
 
   expect(screen.queryByRole("button", { name: "Wyślij na grupę" })).not.toBeInTheDocument();
 });
 
-it("shows the link preview friends will see, once", () => {
+it("shows the link to send, once", () => {
   const { unmount } = renderFreshCard();
 
-  expect(screen.getByText("Ankieta gotowa. Wyślij ją na grupę.")).toBeInTheDocument();
-  const preview = screen.getByRole("figure", { name: "Podgląd linku w czacie" });
-  expect(preview).toHaveTextContent("Kuba pyta, kiedy możesz");
-  expect(preview).toHaveTextContent("Planszówki u Michała");
-  expect(preview).toHaveTextContent("pt 18, sb 19, nd 20 października, wieczorem");
+  const card = screen.getByRole("region", { name: "Ankieta gotowa" });
+  expect(card).toHaveTextContent("Wyślij link znajomym na grupę");
+  expect(card).toHaveTextContent(`${location.host}/e/${pollId}`);
   unmount();
 
-  render(<InviteCard pollId={pollId} poll={poll} />);
+  render(<InviteCard pollId={pollId} title={title} />);
   expect(screen.queryByRole("button", { name: "Wyślij na grupę" })).not.toBeInTheDocument();
 });
 
@@ -77,20 +82,20 @@ it("copies the link, says Skopiowano for a moment and keeps the card", async () 
   renderFreshCard();
   vi.useFakeTimers({ toFake: ["setTimeout"] });
 
-  await act(async () => screen.getByRole("button", { name: "Kopiuj link" }).click());
+  await act(async () => screen.getByRole("button", { name: "Kopiuj" }).click());
 
   expect(writeText).toHaveBeenCalledWith(`${location.origin}/e/${pollId}`);
   expect(screen.getByRole("button", { name: "Skopiowano" })).toBeInTheDocument();
   expect(sendButton()).toBeInTheDocument();
   await act(() => vi.advanceTimersByTimeAsync(1600));
-  expect(screen.getByRole("button", { name: "Kopiuj link" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Kopiuj" })).toBeInTheDocument();
 });
 
 it("keeps Skopiowano for the full moment after a second copy", async () => {
   stubSharing();
   renderFreshCard();
   vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
-  const copyButton = () => screen.getByRole("button", { name: /Kopiuj link|Skopiowano/ });
+  const copyButton = () => screen.getByRole("button", { name: /Kopiuj|Skopiowano/ });
 
   await act(async () => copyButton().click());
   await act(() => vi.advanceTimersByTimeAsync(1000));
@@ -99,41 +104,27 @@ it("keeps Skopiowano for the full moment after a second copy", async () => {
 
   expect(screen.getByRole("button", { name: "Skopiowano" })).toBeInTheDocument();
   await act(() => vi.advanceTimersByTimeAsync(600));
-  expect(screen.getByRole("button", { name: "Kopiuj link" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Kopiuj" })).toBeInTheDocument();
 });
 
-it("points at Kopiuj link when sharing fails and the clipboard refuses", async () => {
+it("points at Kopiuj when sharing fails and the clipboard refuses", async () => {
   Object.defineProperty(navigator, "share", { value: async () => Promise.reject(new DOMException("denied", "NotAllowedError")), configurable: true });
-  Object.defineProperty(navigator, "clipboard", {
-    value: { writeText: async () => Promise.reject(new DOMException("denied", "NotAllowedError")) },
-    configurable: true,
-  });
+  refuseClipboard();
   renderFreshCard();
 
   await userEvent.click(sendButton());
 
-  expect(await screen.findByRole("alert")).toHaveTextContent("Nie udało się wysłać. Skopiuj link przyciskiem „Kopiuj link”.");
+  expect(await screen.findByRole("alert")).toHaveTextContent("Nie udało się wysłać. Skopiuj link przyciskiem „Kopiuj”.");
 });
 
 it("says to copy from the address bar when the clipboard refuses", async () => {
   stubSharing();
-  Object.defineProperty(navigator, "clipboard", {
-    value: { writeText: async () => Promise.reject(new DOMException("denied", "NotAllowedError")) },
-    configurable: true,
-  });
+  refuseClipboard();
   renderFreshCard();
 
-  await userEvent.click(screen.getByRole("button", { name: "Kopiuj link" }));
+  await userEvent.click(screen.getByRole("button", { name: "Kopiuj" }));
 
   expect(await screen.findByRole("alert")).toHaveTextContent("Nie udało się skopiować. Skopiuj link z paska adresu.");
-});
-
-it("closes with Gotowe", async () => {
-  renderFreshCard();
-
-  await userEvent.click(screen.getByRole("button", { name: "Gotowe" }));
-
-  expect(screen.queryByText("Ankieta gotowa. Wyślij ją na grupę.")).not.toBeInTheDocument();
 });
 
 it("copies the whole invite where sharing is unavailable", async () => {
@@ -144,5 +135,5 @@ it("copies the whole invite where sharing is unavailable", async () => {
 
   expect(writeText).toHaveBeenCalledWith(invite);
   expect(screen.getAllByRole("button", { name: "Skopiowano" })).toHaveLength(1);
-  expect(screen.getByRole("button", { name: "Kopiuj link" })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: "Kopiuj" })).toBeInTheDocument();
 });

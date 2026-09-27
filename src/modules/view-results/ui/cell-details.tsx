@@ -1,53 +1,44 @@
-import { Avatar } from "@/shared/ui/avatar/avatar";
 import { Button } from "@/shared/ui/button/button";
-import { Text } from "@/shared/ui/text/text";
-import "./cell-details.css";
-import type { Results } from "../server/results-schema";
+import type { GridCell } from "@/shared/day-hour-grid/day-hour-grid";
+import { cannotMake, freeAt } from "../domain/best-time";
 import { hourLabel } from "../domain/time-label";
+import type { Results } from "../server/results-schema";
+import { newestFirst } from "../domain/newest-first";
+import { PeopleList } from "./people-list";
 
-type Person = Pick<Results["respondents"][number], "name" | "normalisedName">;
+type CellDetailsProps = { cell: GridCell; results: Results; organiserKey: string };
 
-type CellDetailsProps = {
-  cell: { date: string; hour: number };
-  free: Person[];
-  cannot: Person[];
-  onClose: () => void;
-};
+function CellPeople({ cell, results, organiserKey }: CellDetailsProps) {
+  const respondents = newestFirst(results.respondents);
+  const free = freeAt(respondents, cell);
+  const groups = [
+    { label: "Może", people: free },
+    { label: "Nie może", people: cannotMake(respondents, free.map((person) => person.name)), cannot: true },
+  ];
+  return <PeopleList groups={groups} you={results.you} organiserKey={organiserKey} />;
+}
 
-function People({ label, people }: { label: string; people: Person[] }) {
-  if (people.length === 0) return null;
+export function CellSheetContent(props: CellDetailsProps) {
   return (
-    <div>
-      <Text as="h3" variant="meta">
-        {label}
-      </Text>
-      <ul className="m-0 list-none p-0" aria-label={label}>
-        {people.map(({ name, normalisedName }) => (
-          <li key={normalisedName} className="flex min-h-11 items-center gap-3">
-            <Avatar name={name} tintKey={normalisedName} />
-            {name}
-          </li>
-        ))}
-      </ul>
-    </div>
+    <>
+      <h2 className="m-0 mb-2 font-display text-2xl font-bold tracking-tighter">{hourLabel(props.cell)}</h2>
+      <CellPeople {...props} />
+    </>
   );
 }
 
-export function CellDetails({ cell, free, cannot, onClose }: CellDetailsProps) {
-  const label = hourLabel(cell);
+export function CellPanel({ onClose, ...props }: CellDetailsProps & { onClose: () => void }) {
+  const label = hourLabel(props.cell);
 
   return (
-    <section className="fixed inset-x-0 bottom-0 z-10 mx-auto box-border grid max-h-[60dvh] max-w-150 animate-[cell-details-slide-up_var(--duration-sheet)_ease-out] gap-3 overflow-y-auto rounded-t-card bg-surface px-5 pt-4 pb-[calc(--spacing(5)+env(safe-area-inset-bottom))] shadow-sheet lg:static lg:m-0 lg:max-h-none lg:max-w-none lg:animate-none lg:rounded-card lg:pb-5 lg:shadow-none" aria-label={label}>
+    <section aria-label={label}>
       <div className="flex items-center justify-between gap-3">
-        <Text as="h2" variant="heading">
-          {label}
-        </Text>
+        <h2 className="m-0 font-display text-lg font-bold tracking-tight">{label}</h2>
         <Button variant="text" onClick={onClose}>
           Zamknij
         </Button>
       </div>
-      <People label="Mogą" people={free} />
-      <People label="Nie mogą" people={cannot} />
+      <CellPeople {...props} />
     </section>
   );
 }

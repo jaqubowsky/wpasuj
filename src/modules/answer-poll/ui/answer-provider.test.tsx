@@ -31,7 +31,7 @@ function renderPanel(mine?: Mine) {
 
 const cell = (name: string) => screen.getByRole("button", { name });
 const slot = (name: string) => cell(name).closest("[role=gridcell]");
-const nameField = () => screen.getByRole("textbox", { name: "Jak masz na imię?" });
+const nameField = () => screen.getByRole("textbox", { name: "Twoje imię" });
 const cantButton = () => screen.getByRole("button", { name: "Nie mogę w żadnym terminie" });
 
 function stubReducedMotion(reduced: boolean) {
@@ -72,7 +72,6 @@ describe("the Moje lead and body", () => {
       ],
     });
     expect(await screen.findByRole("status")).toHaveTextContent("Zapisane");
-    expect(screen.getByText("Gotowe. Zmieniasz zdanie? Po prostu kliknij.")).toBeInTheDocument();
     expect(localStorage.getItem("last-name")).toBe("Ola");
   });
 
@@ -83,13 +82,13 @@ describe("the Moje lead and body", () => {
     fireEvent.click(cell("pt 16, 19:00"));
     await afterQuiet();
 
-    expect(await screen.findByRole("link", { name: "Zrób nową ankietę" })).toHaveAttribute("href", "/");
+    expect(await screen.findByRole("link", { name: "Zrób własną ankietę" })).toHaveAttribute("href", "/");
   });
 
-  it("heads the grid with Kiedy możesz?", () => {
+  it("says how to answer under the grid", () => {
     renderPanel();
 
-    expect(screen.getByRole("heading", { level: 2, name: "Kiedy możesz?" })).toBeInTheDocument();
+    expect(screen.getByText("Kliknij godziny, kiedy możesz. Możesz przeciągnąć.")).toBeInTheDocument();
   });
 
   it("prefills the name last used on this device", () => {
@@ -133,13 +132,11 @@ describe("the Moje lead and body", () => {
     expect(screen.getAllByRole("gridcell", { selected: true })).toHaveLength(1);
     await act(async () => vi.advanceTimersByTime(120));
     expect(screen.queryAllByRole("gridcell", { selected: true })).toHaveLength(0);
-    expect(screen.queryByText("Organizator zobaczy Twoją odpowiedź.")).not.toBeInTheDocument();
     await afterQuiet();
     expect(saveAnswer).toHaveBeenCalledExactlyOnceWith(pollId, { name: "Ola", slots: [] });
     expect(await screen.findByRole("status")).toHaveTextContent("Zapisane");
-    expect(screen.getByText("Nie możesz w żadnym terminie.")).toBeInTheDocument();
-    expect(screen.getByText("Organizator zobaczy Twoją odpowiedź.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Cofnij" })).toBeInTheDocument();
+    expect(screen.queryByText("Kliknij godziny, kiedy możesz. Możesz przeciągnąć.")).not.toBeInTheDocument();
   });
 
   it("clears the hours at once under reduced motion", async () => {
@@ -179,7 +176,6 @@ describe("the Moje lead and body", () => {
     expect(slot("pt 16, 19:00")).toHaveAttribute("aria-selected", "false");
     expect(cantButton()).toHaveAttribute("aria-pressed", "false");
     expect(screen.queryByRole("button", { name: "Cofnij" })).not.toBeInTheDocument();
-    expect(screen.queryByText("Organizator zobaczy Twoją odpowiedź.")).not.toBeInTheDocument();
   });
 
   it("a tap turns off the toggle of an answer saved with no hours, and the next saves no hours again", async () => {
@@ -199,7 +195,6 @@ describe("the Moje lead and body", () => {
     renderPanel({ name: "Ola", slots: [] });
 
     expect(cantButton()).toHaveAttribute("aria-pressed", "true");
-    expect(screen.getByText("Nie możesz w żadnym terminie. Zmieniasz zdanie? Po prostu kliknij.")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Cofnij" })).not.toBeInTheDocument();
   });
 
@@ -237,7 +232,7 @@ describe("the Moje lead and body", () => {
     await user.type(nameField(), "ola ");
     fireEvent.click(cell("pt 16, 19:00"));
     await afterQuiet();
-    expect(await screen.findByText("To ty, Ola?")).toBeInTheDocument();
+    expect(await screen.findByText("To Ty, Ola?")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Tak, to ja" }));
     await afterQuiet();
@@ -252,7 +247,7 @@ describe("the Moje lead and body", () => {
       ],
     });
     expect(await screen.findByRole("status")).toHaveTextContent("Zapisane");
-    expect(screen.queryByText("To ty, Ola?")).not.toBeInTheDocument();
+    expect(screen.queryByText("To Ty, Ola?")).not.toBeInTheDocument();
   });
 
   it("keeps hours painted while Tak, to ja is on its way", async () => {
@@ -292,16 +287,16 @@ describe("the Moje lead and body", () => {
     expect(screen.getByRole("button", { name: "Spróbuj ponownie" })).toBeInTheDocument();
   });
 
-  it("lets the participant pick another name on Nie, zmienię imię", async () => {
+  it("lets the participant pick another name on To nie ja", async () => {
     vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola", hours: 1 });
     const { user } = renderPanel();
     await user.type(nameField(), "Ola");
     fireEvent.click(cell("pt 16, 19:00"));
     await afterQuiet();
 
-    await user.click(await screen.findByRole("button", { name: "Nie, zmienię imię" }));
+    await user.click(await screen.findByRole("button", { name: "To nie ja" }));
 
-    expect(screen.queryByText("To ty, Ola?")).not.toBeInTheDocument();
+    expect(screen.queryByText("To Ty, Ola?")).not.toBeInTheDocument();
     expect(nameField()).toHaveFocus();
   });
 
@@ -314,15 +309,14 @@ describe("the Moje lead and body", () => {
     fireEvent.click(cell("pt 16, 19:00"));
     await afterQuiet();
 
-    expect(await screen.findByText("To ty, Ola?")).toBeInTheDocument();
+    expect(await screen.findByText("To Ty, Ola?")).toBeInTheDocument();
     expect(saveAnswer).toHaveBeenCalledTimes(2);
-    expect(screen.queryByText(/Zmieniasz zdanie\?/)).not.toBeInTheDocument();
   });
 
   it.each([
     ["closed", "Termin jest już ustalony, odpowiedzi są zamknięte. Zobacz go w zakładce Wszyscy."],
     ["full", "W tej ankiecie jest już 30 osób, więcej się nie zmieści. Napisz na grupie, kiedy możesz."],
-    ["gone", "Tej ankiety już nie ma. Zrób nową ankietę"],
+    ["gone", "Tej ankiety już nie ma. Zrób własną ankietę"],
   ] as const)("says what happened and what to do when the poll is %s", async (reason, copy) => {
     vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason });
     renderPanel({ name: "Ola", slots: [] });

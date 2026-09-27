@@ -10,7 +10,7 @@ import { useAutosave } from "./use-autosave";
 export type Answer = { name: string; slots: Slot[] };
 export type Problem = { kind: "name-taken"; heldName: string; hours?: number } | { kind: "invalid" | "organiser-name" | "closed" | "full" | "gone" };
 
-type AnswerOptions = { pollId: string; dates: string[]; hours: number[]; mine?: Answer };
+type AnswerOptions = { pollId: string; dates: string[]; hours: number[]; mine?: Answer; fixedName?: string };
 
 const keyOf = ({ date, hour }: GridCell) => `${date} ${hour}`;
 
@@ -38,7 +38,7 @@ function afterRefusedClaim(reason: ClaimRefusal): "save-as-newcomer" | Problem {
   }
 }
 
-export function useAnswer({ pollId, dates, hours, mine }: AnswerOptions) {
+export function useAnswer({ pollId, dates, hours, mine, fixedName }: AnswerOptions) {
   const lastName = useLastName();
   const [typedName, setTypedName] = useState(mine?.name);
   const [mySlots, setMySlots] = useState(() => new Set(mine?.slots.map(keyOf)));
@@ -49,12 +49,12 @@ export function useAnswer({ pollId, dates, hours, mine }: AnswerOptions) {
   const clearing = useRef<ReturnType<typeof setTimeout>[]>([]);
   const [problem, setProblem] = useState<Problem>();
   const nameRef = useRef<HTMLInputElement>(null);
-  const name = typedName ?? lastName;
+  const name = fixedName ?? typedName ?? lastName;
   const newHere = mine === undefined;
 
   useEffect(() => {
-    if (newHere && readLastName() === "") nameRef.current?.focus();
-  }, [newHere]);
+    if (newHere && readLastName() === "" && fixedName === undefined) nameRef.current?.focus();
+  }, [newHere, fixedName]);
 
   async function send(answer: Answer) {
     let result = await saveAnswer(pollId, answer);
@@ -137,8 +137,8 @@ export function useAnswer({ pollId, dates, hours, mine }: AnswerOptions) {
     },
     saveState: autosave.state,
     problem,
-    holdsRow,
-    canMakeIt: mySlots.size > 0,
+    asksName: fixedName === undefined,
+    asksToMark: fixedName !== undefined && !holdsRow,
     saidCant: beforeCant !== undefined || (holdsRow && mySlots.size === 0 && !cantTurnedOff),
     justSaidCant: beforeCant !== undefined,
     isMine: (cell: GridCell) => mySlots.has(keyOf(cell)),

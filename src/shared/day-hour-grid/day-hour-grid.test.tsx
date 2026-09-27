@@ -28,7 +28,7 @@ describe("DayHourGrid", () => {
 
     const grid = screen.getByRole("grid", { name: "Kiedy możesz?" });
     expect(grid).toHaveAttribute("aria-multiselectable", "true");
-    expect(screen.getAllByRole("columnheader").map((header) => header.textContent)).toEqual(["pt16", "sb17", "nd18"]);
+    expect(screen.getAllByRole("columnheader").map((header) => header.textContent)).toEqual(["pt 16", "sb 17", "nd 18"]);
     expect(screen.getAllByRole("rowheader").map((header) => header.textContent)).toEqual(["17:00", "18:00", "19:00"]);
     expect(screen.getAllByRole("gridcell", { selected: true })).toEqual([screen.getByRole("button", { name: "sb 17, 18:00" }).parentElement]);
   });
@@ -145,7 +145,7 @@ describe("DayHourGrid", () => {
       renderViewOnlyGrid();
 
       expect(screen.getByRole("grid", { name: "Ile osób może" })).not.toHaveAttribute("aria-multiselectable");
-      expect(screen.getAllByRole("columnheader").map((header) => header.textContent)).toEqual(["pt16", "sb17", "nd18"]);
+      expect(screen.getAllByRole("columnheader").map((header) => header.textContent)).toEqual(["pt 16", "sb 17", "nd 18"]);
       expect(screen.queryByRole("button", { name: "nd 18" })).not.toBeInTheDocument();
       expect(screen.queryByRole("button", { name: "18:00" })).not.toBeInTheDocument();
     });

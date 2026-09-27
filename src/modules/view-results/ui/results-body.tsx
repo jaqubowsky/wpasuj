@@ -1,36 +1,46 @@
 "use client";
 
-import { bestTimes, cannotMake, freeAt } from "../domain/best-time";
-import { CellDetails } from "./cell-details";
+import { Sheet } from "@/shared/ui/sheet/sheet";
+import { Text } from "@/shared/ui/text/text";
+import { useMediaQuery } from "@/shared/use-media-query";
+import { bestTimes } from "../domain/best-time";
+import { hourLabel } from "../domain/time-label";
+import { CellSheetContent } from "./cell-details";
 import { Heatmap } from "./heatmap";
-import { RespondentList } from "./respondent-list";
 import { useResultsContext } from "./results-provider";
-import { useSelectedCell } from "./use-selected-cell";
 
 export function ResultsBody() {
-  const { results, previous, gone } = useResultsContext();
-  const selection = useSelectedCell();
+  const { results, organiserKey, selection, refreshFailed } = useResultsContext();
+  const desktop = useMediaQuery("(min-width: 1024px)");
   const { dates, hours, respondents } = results;
 
-  if (gone || respondents.length === 0) return null;
+  const refreshProblem = refreshFailed && (
+    <Text as="p" variant="meta">
+      Nie udało się odświeżyć. Spróbujemy za chwilę.
+    </Text>
+  );
+
+  if (respondents.length === 0) {
+    return (
+      <section className="grid gap-3 rounded-card bg-surface p-5">
+        <Text variant="body">Nikt jeszcze nie odpowiedział. Wyślij link na grupę.</Text>
+        {refreshProblem}
+      </section>
+    );
+  }
 
   const [best] = bestTimes(dates, hours, respondents);
-  const selectedFree = selection.selected && freeAt(respondents, selection.selected);
 
   return (
-    <div className="grid gap-5" data-results-body>
+    <section className="grid gap-3 rounded-card bg-surface p-4 lg:gap-4 lg:p-6">
+      <p className="m-0 flex h-12 items-center text-base text-muted">Kliknij godzinę, żeby zobaczyć, kto może.</p>
       <Heatmap results={results} best={best} isSelected={selection.isSelected} onCellTap={selection.toggle} />
-      <aside className="grid gap-5 lg:content-start lg:gap-6" data-results-side>
-        {selection.selected && selectedFree && (
-          <CellDetails
-            cell={selection.selected}
-            free={selectedFree}
-            cannot={cannotMake(respondents, selectedFree.map((respondent) => respondent.name))}
-            onClose={selection.close}
-          />
-        )}
-        <RespondentList results={results} previous={previous} />
-      </aside>
-    </div>
+      {refreshProblem}
+      {selection.selected && !desktop && (
+        <Sheet label={hourLabel(selection.selected)} onClose={selection.close}>
+          <CellSheetContent cell={selection.selected} results={results} organiserKey={organiserKey} />
+        </Sheet>
+      )}
+    </section>
   );
 }

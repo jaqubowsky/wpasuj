@@ -45,5 +45,5 @@ export function useInviteCard(pollId: string, title: string) {
     }
   }
 
-  return { stage, copiedBy: (from: Copied["from"]) => copied?.from === from && copied.outcome === "copied", notCopiedBy: copied?.outcome === "not-copied" ? copied.from : undefined, host: () => location.host, send, copyLink, close: () => setStage("closed") };
+  return { stage, copiedBy: (from: Copied["from"]) => copied?.from === from && copied.outcome === "copied", notCopiedBy: copied?.outcome === "not-copied" ? copied.from : undefined, shownLink: () => `${location.host}/e/${pollId}`, send, copyLink };
 }
