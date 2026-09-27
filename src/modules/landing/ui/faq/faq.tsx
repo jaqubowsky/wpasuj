@@ -23,10 +23,10 @@ export function Faq() {
       aria-labelledby="faq-heading"
       className="mx-auto box-border flex max-w-[1280px] flex-col gap-6 px-5 py-[80px] lg:grid lg:grid-cols-[360px_minmax(0,1fr)] lg:gap-[56px] lg:px-[48px] lg:py-[60px]"
     >
-      <h2 id="faq-heading" className="m-[0] font-display text-title font-extrabold tracking-[-0.03em] lg:text-faq-heading">
+      <h2 id="faq-heading" className="m-[0] animate-rise [animation-range:entry_0%_cover_30%] [animation-timeline:view()] font-display text-title font-extrabold tracking-[-0.03em] lg:text-faq-heading">
         Pytania
       </h2>
-      <div>
+      <div className="animate-rise [animation-range:entry_0%_cover_30%] [animation-timeline:view()]">
         {questions.map(({ question, answer }) => (
           <details key={question} className="group border-t border-line last:border-b">
             <summary className="cursor-pointer py-[18px] font-display text-question font-bold tracking-[-0.03em] group-open:pb-[10px]">
