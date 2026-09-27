@@ -180,6 +180,18 @@ describe("Utwórz i wyślij na grupę", () => {
     expect(createPoll).toHaveBeenCalledTimes(1);
   });
 
+  it("a second tap while the share sheet is open creates nothing", async () => {
+    stubSharing(() => new Promise(() => {}));
+    createPoll.mockResolvedValue({ ok: true, id: "abcdefghij" });
+    render(<CreatePollForm />);
+    await fillIn("Jutro");
+    await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
+
+    await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
+
+    expect(createPoll).toHaveBeenCalledTimes(1);
+  });
+
   it("prefills the name used last on this device", async () => {
     stubSharing(async () => {});
     createPoll.mockResolvedValue({ ok: true, id: "abcdefghij" });
