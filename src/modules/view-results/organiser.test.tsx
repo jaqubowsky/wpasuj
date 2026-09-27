@@ -14,7 +14,7 @@ const readAt = Date.parse("2030-10-15T18:00:00Z");
 const saturdayEvening = { date: saturday, firstHour: 18, lastHour: 20 };
 
 function answer(name: string, cells: [string, number][]) {
-  return { name, savedAt: readAt, slots: cells.map(([date, hour]) => ({ date, hour })) };
+  return { name, normalisedName: name.toLocaleLowerCase("pl"), savedAt: readAt, slots: cells.map(([date, hour]) => ({ date, hour })) };
 }
 
 const threeAnswers: Results = {

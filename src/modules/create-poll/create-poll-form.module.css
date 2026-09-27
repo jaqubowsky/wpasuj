@@ -15,7 +15,8 @@
 .question > legend {
   padding: 0;
   margin-bottom: var(--space-3);
-  font: 600 15px/20px var(--font-sans);
+  font: 700 18px/24px var(--font-display);
+  letter-spacing: -0.01em;
 }
 
 .chips {

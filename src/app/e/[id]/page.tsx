@@ -1,4 +1,4 @@
-import { findMyAnswer } from "@/modules/answer-poll";
+import { findMyAnswer, nameKey } from "@/modules/answer-poll";
 import { AnswerBody, AnswerLead, AnswerProvider } from "@/modules/answer-poll/client";
 import { clearFinal, deletePoll, findPoll, organiserToken, setFinal } from "@/modules/create-poll";
 import { readResults } from "@/modules/view-results";
@@ -54,7 +54,7 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
           <ResultsProvider pollId={id} initial={readResults(id, poll, now)} organiser={organiser}>
             <div className={styles.head}>
               <div className={styles.asker}>
-                <Avatar name={poll.organiserName} />
+                <Avatar name={poll.organiserName} tintKey={nameKey(poll.organiserName)} />
                 <Text variant="meta">{poll.organiserName} pyta</Text>
               </div>
               <Text as="h1" variant="title">
