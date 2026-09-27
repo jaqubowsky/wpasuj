@@ -1,4 +1,5 @@
 import { addDays } from "@/shared/dates/iso-date";
+import { isPastDate } from "./poll-rules";
 
 export const maxDates = 10;
 
@@ -22,7 +23,7 @@ export function presetDates(preset: Preset, today: string) {
     case "tomorrow":
       return [addDays(today, 1)];
     case "weekend":
-      return run(addDays(monday, 4), 3).filter((date) => date >= today);
+      return run(addDays(monday, 4), 3).filter((date) => !isPastDate(date, today));
     case "next-week":
       return run(addDays(monday, 7), 7);
   }
