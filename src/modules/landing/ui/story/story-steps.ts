@@ -12,6 +12,7 @@ type StoryStep = {
   kicker: string;
   heading: string;
   body: string;
+  warm?: true;
   Scene?: ComponentType<SceneProps>;
 };
 
@@ -49,6 +50,7 @@ export const storySteps: StoryStep[] = [
     kicker: "Krok 4",
     heading: "Wspólne godziny robią się coraz cieplejsze.",
     body: "Im więcej osób może, tym mocniejszy kolor i większa liczba w kafelku.",
+    warm: true,
     Scene: HeatGrid,
   },
   {
@@ -56,6 +58,7 @@ export const storySteps: StoryStep[] = [
     kicker: "Krok 5",
     heading: "Najlepszy termin wyskakuje sam.",
     body: "Nie liczysz, kto kiedy może. Wpasuj pokazuje najlepszy termin i dwa zapasowe.",
+    warm: true,
   },
   {
     label: "Ustalone",
