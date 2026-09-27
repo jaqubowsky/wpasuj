@@ -1,7 +1,9 @@
 import type { ComponentType } from "react";
+import { BestTime } from "./scenes/best-time";
 import { CreateForm } from "./scenes/create-form";
 import { HeatGrid } from "./scenes/heat-grid";
 import { PaintPoll } from "./scenes/paint-poll";
+import { Settled } from "./scenes/settled";
 import { SharedLink } from "./scenes/shared-link";
 import { SilentGroup } from "./scenes/silent-group";
 
@@ -56,11 +58,13 @@ export const storySteps: StoryStep[] = [
     kicker: "Krok 5",
     heading: "Najlepszy termin wyskakuje sam.",
     body: "Nie liczysz, kto kiedy może. Wpasuj pokazuje najlepszy termin i dwa zapasowe.",
+    Scene: BestTime,
   },
   {
     label: "Ustalone",
     kicker: "Gotowe",
     heading: "Ustalone. Prosto do kalendarza.",
     body: "Jedno kliknięcie organizatora i każdy dodaje termin do swojego kalendarza.",
+    Scene: Settled,
   },
 ];
