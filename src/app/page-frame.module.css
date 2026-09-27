@@ -1,0 +1,13 @@
+.frame {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 var(--space-5);
+}
+
+@media (min-width: 1024px) {
+  .frame {
+    padding-top: var(--space-8);
+  }
+}

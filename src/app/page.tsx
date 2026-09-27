@@ -1,16 +1,14 @@
-import { productName } from "@/shared/brand";
-import { Text } from "@/shared/ui/text/text";
-import styles from "./page.module.css";
+import { CreatePollForm } from "@/modules/create-poll/client";
+import { AppHeader } from "./app-header";
+import frame from "./page-frame.module.css";
 
-export default function Home() {
+export default function CreatePollPage() {
   return (
-    <main className={styles.page}>
-      <Text as="h1" variant="wordmark">
-        {productName}
-      </Text>
-      <Text as="p" variant="body">
-        Wspólny termin dla paczki znajomych, w minutę i bez kont.
-      </Text>
-    </main>
+    <div className={frame.frame}>
+      <AppHeader />
+      <main>
+        <CreatePollForm />
+      </main>
+    </div>
   );
 }

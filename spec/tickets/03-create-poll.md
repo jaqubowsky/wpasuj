@@ -1,6 +1,6 @@
 # 03: Create a poll and land on its page
 
-Status: ready-for-agent
+Status: done
 Blocked by: 01-foundation.md
 
 ## Parent
@@ -24,8 +24,14 @@ On `/` the organiser types a title, picks dates with the chips or the two-week s
 
 ## Acceptance criteria
 
-- [ ] Unit tests for every preset (Dziś, Jutro, Ten weekend without past days, Przyszły tydzień), chip lit and toggle rules, the 10-date limit with "Maksymalnie 10 dni", the Własne range bounds
-- [ ] Action tests: success, and each failure reason the action can return, against a real SQLite file
-- [ ] Playwright on phone-chromium and phone-webkit: create with "Ten weekend", the default range and a title in under 30 seconds of steps, landing on the poll page; share stubbed and copy fallback both covered
-- [ ] Inputs render at 16px or more; the sticky button sits above the safe area
-- [ ] Screenshots at 390 and 1440 of create (empty, filled, Własne, month open, the 10-day message), the poll shell and the gone page; PR body names the mockup and parts compared
+- [x] Unit tests for every preset (Dziś, Jutro, Ten weekend without past days, Przyszły tydzień), chip lit and toggle rules, the 10-date limit with "Maksymalnie 10 dni", the Własne range bounds: `src/modules/create-poll/date-presets.test.ts`, `hour-range.test.ts`, `create-poll-form.test.tsx`
+- [x] Action tests: success, and each failure reason the action can return, against a real SQLite file: `create-poll-action.test.ts` (success, 12 `invalid` cases), `organiser-actions.test.ts` (`setFinal`, `deletePoll`: success, `not-organiser`, `gone`, `invalid`)
+- [x] Playwright on phone-chromium and phone-webkit: create with "Ten weekend", the default range and a title in under 30 seconds of steps, landing on the poll page; share stubbed and copy fallback both covered: `e2e/create-poll.spec.ts`; PR #2 CI run 36313103552, 23 passed across phone-chromium, phone-webkit, desktop-chromium
+- [x] Inputs render at 16px or more; the sticky button sits above the safe area: `e2e/create-poll.spec.ts` "inputs render at 16px or more", "the create button sits above the safe area"; `.bar` pads with `env(safe-area-inset-bottom)`
+- [x] Screenshots at 390 and 1440 of create (empty, filled, Własne, month open, the 10-day message), the poll shell and the gone page; PR body names the mockup and parts compared: CI run 36313103552 artifact `screenshots` holds all seven screens for the three projects; PR #2 body "Screens compared"
+
+## Comments
+
+- Segment now takes `panels` and owns the tabpanel; 04 and 05 pass their panel content through `src/app/e/[id]/poll-tabs.tsx`
+- `src/shared/last-name.ts`, `share-link.ts`, `token-cookie.ts` and `src/shared/testing/*` are ready for 04 and 06
+- The time-zone note for viewers in another zone ("named once in small text") is not built; no ticket names it yet
