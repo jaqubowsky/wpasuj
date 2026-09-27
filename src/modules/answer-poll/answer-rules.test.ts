@@ -1,0 +1,20 @@
+import { describe, expect, it } from "vitest";
+import { refusalOf } from "./answer-rules";
+
+describe("refusalOf", () => {
+  it("refuses a name someone else already holds", () => {
+    expect(refusalOf({ nameHeldByOther: true, newcomer: false, participantCount: 3 })).toBe("name-taken");
+  });
+
+  it("refuses a newcomer once 30 people answered", () => {
+    expect(refusalOf({ nameHeldByOther: false, newcomer: true, participantCount: 30 })).toBe("full");
+  });
+
+  it("lets someone already in a full poll change their answer", () => {
+    expect(refusalOf({ nameHeldByOther: false, newcomer: false, participantCount: 30 })).toBeUndefined();
+  });
+
+  it("lets the 30th person in", () => {
+    expect(refusalOf({ nameHeldByOther: false, newcomer: true, participantCount: 29 })).toBeUndefined();
+  });
+});

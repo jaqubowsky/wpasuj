@@ -1,0 +1,77 @@
+.panel {
+  padding-top: var(--space-5);
+}
+
+.name {
+  position: relative;
+}
+
+.status {
+  position: absolute;
+  top: 1px;
+  right: 0;
+}
+
+.retry {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.claim {
+  margin-top: var(--space-4);
+  padding: var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.claim > p {
+  margin: 0 0 var(--space-4);
+}
+
+.claimActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.notice {
+  margin: var(--space-4) 0 0;
+  font-size: 15px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--accent-ink);
+}
+
+.hint {
+  margin: var(--space-5) 0 var(--space-3);
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--muted);
+}
+
+.done {
+  margin: var(--space-4) 0 0;
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--muted);
+}
+
+.cant {
+  display: block;
+  min-height: var(--size-target);
+  margin: var(--space-3) auto 0;
+  padding: 0 var(--space-4);
+  border: 0;
+  background: none;
+  font: 500 15px/20px var(--font-sans);
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--edge);
+  cursor: pointer;
+}
+
+.notice a {
+  color: inherit;
+  text-underline-offset: 3px;
+}

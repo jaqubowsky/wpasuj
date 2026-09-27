@@ -1,12 +1,14 @@
 "use client";
 
 import { Segment } from "@/shared/ui/segment/segment";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 const views = ["Moje", "Wszyscy"] as const;
 
-export function PollTabs() {
-  const [view, setView] = useState<(typeof views)[number]>("Moje");
+type View = (typeof views)[number];
 
-  return <Segment label="Widok" options={views} selected={view} onSelect={setView} panels={{ Moje: null, Wszyscy: null }} />;
+export function PollTabs({ opening, mine }: { opening: View; mine: ReactNode }) {
+  const [view, setView] = useState<View>(opening);
+
+  return <Segment label="Widok" options={views} selected={view} onSelect={setView} panels={{ Moje: mine, Wszyscy: null }} />;
 }

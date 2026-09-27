@@ -7,10 +7,14 @@ function subscribe(onChange: () => void) {
   return () => window.removeEventListener("storage", onChange);
 }
 
+export function readLastName() {
+  return localStorage.getItem(storageKey) ?? "";
+}
+
 export function useLastName() {
   return useSyncExternalStore(
     subscribe,
-    () => localStorage.getItem(storageKey) ?? "",
+    readLastName,
     () => "",
   );
 }
