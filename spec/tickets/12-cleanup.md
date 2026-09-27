@@ -1,7 +1,7 @@
 # 12: Cleanup of accepted notes
 
 Status: ready-for-agent
-Blocked by: 13-module-layers.md
+Blocked by: 25-create-and-cant-feedback.md
 
 ## Parent
 
