@@ -1,5 +1,6 @@
 import type { ComponentType } from "react";
 import { CreateForm } from "./scenes/create-form";
+import { HeatGrid } from "./scenes/heat-grid";
 import { SharedLink } from "./scenes/shared-link";
 import { SilentGroup } from "./scenes/silent-group";
 
@@ -46,6 +47,7 @@ export const storySteps: StoryStep[] = [
     kicker: "Krok 4",
     heading: "Wspólne godziny robią się coraz cieplejsze.",
     body: "Im więcej osób może, tym mocniejszy kolor i większa liczba w kafelku.",
+    Scene: HeatGrid,
   },
   {
     label: "Najlepszy termin",

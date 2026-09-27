@@ -91,6 +91,27 @@ test("the second scene fills in the create form and shows only at its step", asy
   await expect(story(page).getByText("Utwórz i wyślij na grupę")).toBeHidden();
 });
 
+test("at its step the heat scene switches to everyone and warms the grid as friends join, alone in the phone", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "the story pins from 1280px");
+  await page.goto("/");
+  await story(page).scrollIntoViewIfNeeded();
+  const avatar = (name: string) => story(page).getByRole("img", { name }).filter({ visible: true });
+
+  await scrollThroughStory(page, 4.62 / steps.length);
+
+  await expect(caption(page, steps[4].heading)).toBeVisible();
+  await expect(story(page).getByText("Wszyscy", { exact: true }).filter({ visible: true })).toHaveCount(1);
+  await expect(avatar("Bartek")).toBeVisible();
+  await expect(avatar("Kasia")).toHaveCount(0);
+  await settleAnimations(page);
+  await page.screenshot({ path: `e2e/screenshots/landing-story-5-${testInfo.project.name}.png` });
+
+  for (const other of [3.5, 5.5]) {
+    await scrollThroughStory(page, other / steps.length);
+    await expect(avatar("Bartek")).toHaveCount(0);
+  }
+});
+
 test("below 1280px the story is a still sequence, since the caption column is too narrow to pin", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("desktop"), "a laptop width");
   await page.setViewportSize({ width: 1100, height: 768 });
@@ -143,4 +164,19 @@ test("on the phone the create form shows filled in", async ({ page }, testInfo) 
   await expect(stepTwo.getByText("Planszówki u Michała")).toBeVisible();
   await expect(stepTwo.getByText("Utwórz i wyślij na grupę")).toBeVisible();
   await stepTwo.screenshot({ path: `e2e/screenshots/landing-story-2-${testInfo.project.name}.png`, style: "header { visibility: hidden; }" });
+});
+
+test("on the phone the heat scene shows everyone in and the grid at its warmest", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("phone"), "the sequence is the phone layout");
+  await page.goto("/#jak-to-dziala");
+  const stepFive = story(page).locator(":scope > div").nth(4);
+
+  await stepFive.scrollIntoViewIfNeeded();
+
+  for (const name of ["Kuba", "Ola", "Michał", "Zuza", "Bartek", "Kasia"]) {
+    await expect(stepFive.getByRole("img", { name })).toBeVisible();
+  }
+  await expect(stepFive.getByText("Wszyscy", { exact: true })).toBeVisible();
+  await settleAnimations(page);
+  await stepFive.screenshot({ path: `e2e/screenshots/landing-story-5-${testInfo.project.name}.png`, style: "header { visibility: hidden; }" });
 });
