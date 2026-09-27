@@ -45,11 +45,31 @@ test("the first scene is the group chat going silent", async ({ page }, testInfo
 
   await scrollThroughStory(page, 0.02);
 
-  await expect(story(page).getByText("Ej, planszówki w weekend? Kiedy możecie?")).toBeVisible();
-  await expect(story(page).getByText("Wyświetlone przez 5 osób")).toBeVisible();
+  await expect(story(page).getByText("Ej, planszówki w weekend? Kiedy możecie?").filter({ visible: true })).toBeVisible();
+  await expect(story(page).getByText("Wyświetlone przez 5 osób").filter({ visible: true })).toBeVisible();
   await expect(caption(page, steps[0].heading)).toBeVisible();
   await settleAnimations(page);
   await page.screenshot({ path: `e2e/screenshots/landing-story-1-${testInfo.project.name}.png` });
+});
+
+test("at its step the link scene drops the preview and the reply into the chat, alone in the phone", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "the story pins from 1280px");
+  await page.goto("/");
+  await story(page).scrollIntoViewIfNeeded();
+
+  await scrollThroughStory(page, 2.5 / steps.length);
+
+  await expect(story(page).getByText("Kuba pyta, kiedy możesz")).toBeVisible();
+  await expect(story(page).getByText("wpasuj.app · pt 17 – nd 19 października")).toBeVisible();
+  await expect(story(page).getByText("Zaznaczcie tu, zajmie wam to 20 sekund")).toBeVisible();
+  await expect(story(page).getByText("Ej, planszówki w weekend? Kiedy możecie?").filter({ visible: true })).toHaveCount(1);
+  await expect(caption(page, steps[2].heading)).toBeVisible();
+  await settleAnimations(page);
+  await page.screenshot({ path: `e2e/screenshots/landing-story-3-${testInfo.project.name}.png` });
+
+  await scrollThroughStory(page, 0.5 / steps.length);
+
+  await expect(story(page).getByText("Zaznaczcie tu, zajmie wam to 20 sekund")).toBeHidden();
 });
 
 test("below 1280px the story is a still sequence, since the caption column is too narrow to pin", async ({ page }, testInfo) => {
@@ -89,6 +109,7 @@ test("on the phone the story is a sequence of every step", async ({ page }, test
     await caption(page, step.heading).scrollIntoViewIfNeeded();
     await expect(caption(page, step.heading)).toBeInViewport();
   }
-  await expect(story(page).getByText("Ej, planszówki w weekend? Kiedy możecie?")).toBeVisible();
+  await expect(story(page).getByText("Ej, planszówki w weekend? Kiedy możecie?").first()).toBeVisible();
+  await expect(story(page).getByText("Zaznaczcie tu, zajmie wam to 20 sekund")).toBeVisible();
   await story(page).screenshot({ path: `e2e/screenshots/landing-story-${testInfo.project.name}.png` });
 });

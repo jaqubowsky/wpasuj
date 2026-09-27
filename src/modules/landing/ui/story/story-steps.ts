@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import { SharedLink } from "./scenes/shared-link";
 import { SilentGroup } from "./scenes/silent-group";
 
 export type SceneProps = { time: number };
@@ -30,6 +31,7 @@ export const storySteps: StoryStep[] = [
     kicker: "Krok 2",
     heading: "Jeden link zamiast pytania.",
     body: "W podglądzie od razu widać, o co chodzi. Otwiera się w Messengerze, bez logowania.",
+    Scene: SharedLink,
   },
   {
     label: "Każdy klika godziny",
