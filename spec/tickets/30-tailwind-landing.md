@@ -15,6 +15,8 @@ The landing on `/` looks and behaves exactly as before, reduced motion included,
 
 - `src/modules/landing/**/*.module.css` (1 file, 220 lines) to utilities, the pattern from 26; scroll-driven animation keyframes may stay in the theme CSS
 
+- Host notes carried here (`~/.sandboxes/wpasuj/host-acceptance/notes-landing.md`): move the FAQ between the reasons and the final call as the canvas orders it; the `rise` reveal keyframes into the theme so the FAQ and sections reveal; add `--spacing-0` so `m-0`, `p-0`, `inset-0` pass lint and replace the `[0]` brackets; fold landing type tokens of equal value (decision 50)
+
 ## Out of scope
 
 - Other modules: the sibling tickets 27 to 30

@@ -6,14 +6,13 @@ Every ticket whose blockers have landed runs at once, one container each, up to 
 
 ## Now
 
-- `tickets/33-architecture-gates.md`
-- `tickets/15-story-frame.md`
-- `tickets/21-landing-demo.md`
-- `tickets/22-landing-faq-footer.md`
+- `tickets/15-story-frame.md`: claude-wpasuj-t15-story-frame, PR #23
+- `tickets/28-tailwind-create-answer.md`: claude-wpasuj-t28-tailwind-create-answer
+- `tickets/29-tailwind-view-results.md`: claude-wpasuj-t29-tailwind-view-results
 
 ## Next
 
-- `tickets/27-tailwind-shared.md`, `28-tailwind-create-answer.md`, `29-tailwind-view-results.md`, `30-tailwind-landing.md` (after 26, 33; in parallel)
+- `tickets/30-tailwind-landing.md` (after 15)
 - `tickets/25-create-and-cant-feedback.md` (after 27, 28, 29)
 - `tickets/16-story-create.md` … `tickets/20-story-best.md` (after 15)
 - `tickets/12-cleanup.md` (after 25)
@@ -37,3 +36,7 @@ Every ticket whose blockers have landed runs at once, one container each, up to 
 - `tickets/13-module-layers.md`: PR #15
 - `tickets/14-landing-skeleton.md`: PR #13
 - `tickets/26-tailwind-base.md`: PR #18
+- `tickets/33-architecture-gates.md`: PR #20
+- `tickets/21-landing-demo.md`: PR #21
+- `tickets/22-landing-faq-footer.md`: PR #22
+- `tickets/27-tailwind-shared.md`: PR #24
