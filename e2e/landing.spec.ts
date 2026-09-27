@@ -26,6 +26,15 @@ test("the create form is in the first viewport and creates a poll", async ({ pag
   await expect(page.getByRole("heading", { name: "Kino w piątek" })).toBeVisible();
 });
 
+test("the hero opens with the product name above the headline", async ({ page }) => {
+  await page.goto("/");
+
+  const hero = page.getByRole("region", { name: "Kiedy się widzimy? Ustalcie to w minutę." });
+  const kicker = await hero.getByText("Wpasuj", { exact: true }).boundingBox();
+  const headline = await hero.getByRole("heading", { level: 1 }).boundingBox();
+  expect(kicker!.y + kicker!.height).toBeLessThanOrEqual(headline!.y);
+});
+
 test("the questions sit between the reasons and the final call", async ({ page }) => {
   await page.goto("/");
 

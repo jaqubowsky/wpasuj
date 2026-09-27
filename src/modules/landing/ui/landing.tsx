@@ -30,7 +30,15 @@ export function Landing({ hero }: { hero: ReactNode }) {
   return (
     <>
       <header className="sticky top-[0] z-1 box-border flex h-[72px] items-center justify-between bg-paper px-5 lg:px-[48px]">
-        <Text variant="wordmark">{productName}</Text>
+        <div className="flex items-center gap-[10px]">
+          <span aria-hidden className="grid grid-cols-[repeat(2,var(--spacing-2))] gap-[2px]">
+            <span className="h-2 rounded-[2px] bg-accent" />
+            <span className="h-2 rounded-[2px] bg-tint-coral" />
+            <span className="h-2 rounded-[2px] bg-tint-coral" />
+            <span className="h-2 rounded-[2px] bg-accent" />
+          </span>
+          <Text variant="wordmark">{productName}</Text>
+        </div>
         <GoToFormButton formId={formId}>Utwórz ankietę</GoToFormButton>
       </header>
       <main>
@@ -39,6 +47,7 @@ export function Landing({ hero }: { hero: ReactNode }) {
           aria-labelledby="hero-heading"
         >
           <div className="flex flex-col gap-3">
+            <span className="text-bubble font-semibold text-accent-ink">{productName}</span>
             <h1 id="hero-heading" className="m-[0] font-display font-extrabold tracking-[-0.03em] text-balance text-title-desktop/[42px] lg:[font-size:84px] lg:leading-[84px]">
               Kiedy się widzimy? Ustalcie to w minutę.
             </h1>
