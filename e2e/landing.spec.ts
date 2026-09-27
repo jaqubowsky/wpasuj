@@ -62,11 +62,25 @@ test("the story and the demo load after the form is interactive", async ({ page,
   await page.getByRole("button", { name: "Dziś", exact: true }).click();
   await expect(page.getByRole("button", { name: "Dziś", pressed: true })).toBeVisible();
   releaseLateChunks();
+  await page.goto("/#jak-to-dziala");
+  await expect(page.getByRole("region", { name: "Jak to działa" })).toBeAttached();
   await finalCall(page).scrollIntoViewIfNeeded();
 
-  await expect(page.getByRole("region", { name: "Jak to działa" })).toBeAttached();
   await expect(page.getByRole("region", { name: "Wypróbuj na żywo" })).toBeAttached();
   expect(lateChunks.length).toBeGreaterThan(0);
+});
+
+test("the demo loads only once the reader nears it", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "on the phone the hero keeps both far below");
+  const demo = page.getByRole("region", { name: "Wypróbuj na żywo" });
+  await page.goto("/");
+  await expect(page.getByRole("region", { name: "Jak to działa" })).toBeAttached();
+  await page.waitForLoadState("networkidle");
+
+  await expect(demo).not.toBeAttached();
+
+  await finalCall(page).scrollIntoViewIfNeeded();
+  await expect(demo).toBeAttached();
 });
 
 test.describe("with reduced motion", () => {

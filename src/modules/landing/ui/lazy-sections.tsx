@@ -4,17 +4,25 @@ import dynamic from "next/dynamic";
 import type { ReactNode } from "react";
 import { useNearViewport } from "./use-near-viewport";
 
-const Story = dynamic(() => import("./story/story").then((module) => module.Story), { ssr: false });
-const Demo = dynamic(() => import("./demo/demo").then((module) => module.Demo), { ssr: false });
+function Placeholder() {
+  return <div className="min-h-dvh" />;
+}
 
-function NearViewport({ children }: { children: ReactNode }) {
+const Story = dynamic(() => import("./story/story").then((module) => module.Story), { ssr: false, loading: Placeholder });
+const Demo = dynamic(() => import("./demo/demo").then((module) => module.Demo), { ssr: false, loading: Placeholder });
+
+function NearViewport({ id, children }: { id?: string; children: ReactNode }) {
   const { ref, near } = useNearViewport();
-  return <div ref={ref}>{near && children}</div>;
+  return (
+    <div id={id} ref={ref} className="scroll-mt-[72px]">
+      {near ? children : <Placeholder />}
+    </div>
+  );
 }
 
 export function LazyStory() {
   return (
-    <NearViewport>
+    <NearViewport id="jak-to-dziala">
       <Story />
     </NearViewport>
   );
