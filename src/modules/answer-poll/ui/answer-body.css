@@ -1,0 +1,10 @@
+[data-answer-declined] {
+  animation: answer-declined-in var(--duration-sheet) var(--ease-out);
+}
+
+@keyframes answer-declined-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}

@@ -26,6 +26,7 @@ async function openAsNewDevice(browser: Browser, link: string) {
 const nameField = (page: Page) => page.getByRole("textbox", { name: "Jak masz na imię?" });
 const status = (page: Page) => page.getByRole("status");
 const selected = (page: Page) => page.getByRole("gridcell", { selected: true });
+const cantButton = (page: Page) => page.getByRole("button", { name: "Nie mogę w żadnym terminie" });
 
 function cellAt(page: Page, hourIndex: number, dateIndex: number) {
   return page.getByRole("grid", { name: "Kiedy możesz?" }).getByRole("row").nth(hourIndex + 1).getByRole("button").nth(dateIndex + 1);
@@ -176,12 +177,28 @@ test("save states: Zapisuję, Nie zapisano with Spróbuj ponownie, and nie może
   await page.getByRole("button", { name: "Spróbuj ponownie" }).click();
   await expect(status(page)).toHaveText("Zapisane");
 
-  await page.getByRole("button", { name: "Nie mogę w żadnym terminie" }).click();
-  await expect(page.getByText("Nie możesz w żadnym terminie. Zmieniasz zdanie? Po prostu kliknij.")).toBeVisible();
-  await expect(status(page)).toHaveText("Zapisane");
+  await cantButton(page).click();
+  await expect(page.getByRole("button", { name: "Nie mogę w żadnym terminie", pressed: true })).toBeVisible();
   await expect(selected(page)).toHaveCount(0);
+  await expect(status(page)).toHaveText("Zapisane");
+  await expect(page.getByText("Organizator zobaczy Twoją odpowiedź.")).toBeVisible();
   await saveScreenshot(page, testInfo, "answer-nie-moze");
+
+  await page.getByRole("button", { name: "Cofnij" }).click();
+  await expect(selected(page)).toHaveCount(2);
+  await expect(page.getByRole("button", { name: "Nie mogę w żadnym terminie", pressed: false })).toBeVisible();
+  await expect(status(page)).toHaveText("Zapisane");
   await page.reload();
   await page.getByRole("tab", { name: "Moje" }).click();
+  await expect(selected(page)).toHaveCount(2);
+
+  await cantButton(page).click();
   await expect(selected(page)).toHaveCount(0);
+  await cellAt(page, 2, 0).click();
+  await expect(page.getByRole("button", { name: "Nie mogę w żadnym terminie", pressed: false })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Cofnij" })).toHaveCount(0);
+  await expect(status(page)).toHaveText("Zapisane");
+  await page.reload();
+  await page.getByRole("tab", { name: "Moje" }).click();
+  await expect(selected(page)).toHaveCount(1);
 });

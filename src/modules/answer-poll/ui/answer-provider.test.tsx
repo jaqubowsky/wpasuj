@@ -32,6 +32,11 @@ function renderPanel(mine?: Mine) {
 const cell = (name: string) => screen.getByRole("button", { name });
 const slot = (name: string) => cell(name).closest("[role=gridcell]");
 const nameField = () => screen.getByRole("textbox", { name: "Jak masz na imię?" });
+const cantButton = () => screen.getByRole("button", { name: "Nie mogę w żadnym terminie" });
+
+function stubReducedMotion(reduced: boolean) {
+  vi.stubGlobal("matchMedia", (query: string) => ({ matches: reduced && query === "(prefers-reduced-motion: reduce)" }));
+}
 
 async function afterQuiet() {
   await act(async () => vi.advanceTimersByTime(500));
@@ -41,11 +46,13 @@ beforeEach(() => {
   vi.useFakeTimers({ shouldAdvanceTime: true });
   vi.mocked(saveAnswer).mockResolvedValue({ ok: true });
   localStorage.clear();
+  stubReducedMotion(false);
 });
 
 afterEach(() => {
   vi.useRealTimers();
   vi.resetAllMocks();
+  vi.unstubAllGlobals();
 });
 
 describe("the Moje lead and body", () => {
@@ -115,15 +122,71 @@ describe("the Moje lead and body", () => {
     expect(saveAnswer).toHaveBeenLastCalledWith(pollId, { name: "Olaf", slots: [{ date: "2026-10-16", hour: 19 }] });
   });
 
-  it("saves an empty set for Nie mogę w żadnym terminie", async () => {
-    const { user } = renderPanel({ name: "Ola", slots: [{ date: "2026-10-16", hour: 19 }] });
+  it("Nie mogę w żadnym terminie selects the toggle, clears the hours one by one and saves an empty set", async () => {
+    const { user } = renderPanel({ name: "Ola", slots: [{ date: "2026-10-16", hour: 19 }, { date: "2026-10-17", hour: 19 }, { date: "2026-10-16", hour: 21 }] });
 
-    await user.click(screen.getByRole("button", { name: "Nie mogę w żadnym terminie" }));
+    await user.click(cantButton());
+
+    expect(screen.getByRole("button", { name: "Nie mogę w żadnym terminie", pressed: true })).toBeInTheDocument();
+    expect(screen.getAllByRole("gridcell", { selected: true })).toHaveLength(2);
+    await act(async () => vi.advanceTimersByTime(120));
+    expect(screen.getAllByRole("gridcell", { selected: true })).toHaveLength(1);
+    await act(async () => vi.advanceTimersByTime(120));
+    expect(screen.queryAllByRole("gridcell", { selected: true })).toHaveLength(0);
+    await afterQuiet();
+    expect(saveAnswer).toHaveBeenCalledExactlyOnceWith(pollId, { name: "Ola", slots: [] });
+    expect(await screen.findByRole("status")).toHaveTextContent("Zapisane");
+    expect(screen.getByText("Nie możesz w żadnym terminie.")).toBeInTheDocument();
+    expect(screen.getByText("Organizator zobaczy Twoją odpowiedź.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cofnij" })).toBeInTheDocument();
+  });
+
+  it("clears the hours at once under reduced motion", async () => {
+    stubReducedMotion(true);
+    const { user } = renderPanel({ name: "Ola", slots: [{ date: "2026-10-16", hour: 19 }, { date: "2026-10-17", hour: 19 }] });
+
+    await user.click(cantButton());
+
+    expect(screen.queryAllByRole("gridcell", { selected: true })).toHaveLength(0);
+  });
+
+  it("Cofnij restores and saves the hours from before", async () => {
+    const before = [{ date: "2026-10-16", hour: 19 }, { date: "2026-10-17", hour: 20 }];
+    const { user } = renderPanel({ name: "Ola", slots: before });
+    await user.click(cantButton());
     await afterQuiet();
 
-    expect(saveAnswer).toHaveBeenLastCalledWith(pollId, { name: "Ola", slots: [] });
+    await user.click(screen.getByRole("button", { name: "Cofnij" }));
+    await afterQuiet();
+
+    expect(saveAnswer).toHaveBeenLastCalledWith(pollId, { name: "Ola", slots: before });
+    expect(slot("pt 16, 19:00")).toHaveAttribute("aria-selected", "true");
+    expect(slot("sb 17, 20:00")).toHaveAttribute("aria-selected", "true");
+    expect(cantButton()).toHaveAttribute("aria-pressed", "false");
+    expect(screen.queryByRole("button", { name: "Cofnij" })).not.toBeInTheDocument();
+  });
+
+  it("painting an hour leaves Nie mogę and its Cofnij", async () => {
+    const { user } = renderPanel({ name: "Ola", slots: [{ date: "2026-10-16", hour: 19 }] });
+    await user.click(cantButton());
+    await afterQuiet();
+
+    fireEvent.click(cell("sb 17, 21:00"));
+    await afterQuiet();
+
+    expect(saveAnswer).toHaveBeenLastCalledWith(pollId, { name: "Ola", slots: [{ date: "2026-10-17", hour: 21 }] });
     expect(slot("pt 16, 19:00")).toHaveAttribute("aria-selected", "false");
-    expect(await screen.findByText("Nie możesz w żadnym terminie. Zmieniasz zdanie? Po prostu kliknij.")).toBeInTheDocument();
+    expect(cantButton()).toHaveAttribute("aria-pressed", "false");
+    expect(screen.queryByRole("button", { name: "Cofnij" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Organizator zobaczy Twoją odpowiedź.")).not.toBeInTheDocument();
+  });
+
+  it("opens with the toggle selected for an answer saved with no hours", () => {
+    renderPanel({ name: "Ola", slots: [] });
+
+    expect(cantButton()).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByText("Nie możesz w żadnym terminie. Zmieniasz zdanie? Po prostu kliknij.")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Cofnij" })).not.toBeInTheDocument();
   });
 
   it("shows Nie zapisano until Spróbuj ponownie succeeds", async () => {
