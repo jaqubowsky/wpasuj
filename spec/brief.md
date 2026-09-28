@@ -74,7 +74,7 @@ The page opens on "Moje" when this device has not answered and on "Wszyscy" when
 The organiser is whoever holds the organiser cookie, set on create. The results tab shows, nothing else: "Przypomnij" and the "Więcej" menu in one row under the title, and "Ustal ten termin" inside the best-time card:
 
 - **Przypomnij**: a message that names who already answered, because a request addressed to named people gets more replies than one to everyone: "Już są: Bartek, Ola i Michał. Reszta, kiedy możecie? {title} {link}" ("Już jest: Ola." for one). With nobody answered: "Kiedy możecie? {title} {link}". Share sheet on the phone, copy elsewhere.
-- **Ustal termin**: on the best time. The page then leads with "Ustalone: sobota 18.10, 19:00" for everyone, with "Dodaj do kalendarza" (an `.ics` with DTSTART and DTEND in UTC); answering closes. "Zmień" clears the final time and reopens answering.
+- **Ustal termin**: on the best time. The page then leads with "Ustalone: sobota 18.10, 19:00" for everyone, with "Dodaj do kalendarza", a menu of Kalendarz Google and Outlook (their prefilled web editors) and Kalendarz Apple (an `.ics` served inline, DTSTART and DTEND in UTC), each carrying the poll link; answering closes. "Zmień" clears the final time and reopens answering.
 - **Zrób własną ankietę**: a quiet link at the bottom of every poll page, for everyone, because every participant who sees a poll is the next organiser.
 - **Więcej** menu: "Kopiuj link", "Link organizatora" (a URL that sets the organiser cookie on another device, with one line saying to keep it private), and "Usuń ankietę", confirmed inline.
 
@@ -206,17 +206,17 @@ A 1200×630 PNG under 1 MB, rendered by `next/og` with flexbox layout only: "{im
 
 ## Out of scope
 
-Accounts and sign-in, notifications of any kind, calendar integrations beyond the `.ics` file, time zones beyond the organiser's, per-person invite links, recurring polls, comments or chat, a description field, a per-name filter in results, dark theme, English, analytics inside the app, the marketing site.
+Accounts and sign-in, notifications of any kind, calendar integrations beyond the prefilled links and the `.ics` file, time zones beyond the organiser's, per-person invite links, recurring polls, comments or chat, a description field, a per-name filter in results, dark theme, English, analytics inside the app, the marketing site.
 
 ## Acceptance
 
 - A first-time participant on a 390px phone (Chromium and WebKit) answers a fresh poll with a name and one drag, sees "Zapisane" without pressing any button, and the same with taps only.
 - Three participants in separate browser contexts answer; the best time, the heatmap counts, the per-cell names and "Kto odpowiedział" agree with a hand count, including a poll where the free set changes while the count stays the same.
-- The organiser creates a poll with "Ten weekend", the default range and a title, reminds (the message names who answered), sets the time, and a participant downloads an `.ics` with the right UTC times.
+- The organiser creates a poll with "Ten weekend", the default range and a title, reminds (the message names who answered), sets the time, and a participant gets the calendar links and the `.ics` with the right UTC times.
 - A second browser context typing an existing name gets "To ty, Ola?" and takes the row over; the organiser link restores organiser controls in a fresh context.
 - `GET` of the Open Graph image returns a 1200×630 PNG under 1 MB, and the page's `og:image` is an absolute URL to it.
 - Playwright saves every screen and state at 390 and 1440 as a CI artifact of the pull request that introduces it; the pull request body names each screen and the mockup or design-system parts it was compared with.
-- CI green on `main`; unit tests cover runs and best time, buckets, date presets, ranges and name rules; action tests cover success and every failure reason; one end-to-end test runs create, share, three answers, remind, set the time and download the `.ics`.
+- CI green on `main`; unit tests cover runs and best time, buckets, date presets, ranges and name rules; action tests cover success and every failure reason; one end-to-end test runs create, share, three answers, remind, set the time and get the calendar links and the `.ics`.
 
 ## Environment
 

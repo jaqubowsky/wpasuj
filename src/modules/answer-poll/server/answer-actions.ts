@@ -12,7 +12,7 @@ import { nameKey } from "../domain/name-rules";
 
 type SaveResult =
   | { ok: true }
-  | { ok: false; reason: "name-taken"; name: string; hours: number }
+  | { ok: false; reason: "name-taken"; name: string; hours: number; yours?: { name: string; hours: number } }
   | { ok: false; reason: "invalid" | "organiser-name" | "not-yours" | "closed" | "full" | "gone" };
 type ClaimResult = { ok: true; name: string; slots: Slot[] } | { ok: false; reason: "invalid" | "organiser-name" | "closed" | "gone" };
 
@@ -47,7 +47,8 @@ export async function saveAnswer(pollId: string, answer: AnswerInput): Promise<S
   const holder = participantNamed(pollId, normalisedName);
   const [{ participantCount }] = db.select({ participantCount: count() }).from(participants).where(eq(participants.pollId, pollId)).all();
   const ownsName = holder !== undefined && holder.id === participant?.id;
-  const nameHeldByOther = holder && !ownsName ? { name: holder.name, hours: slotsOf(holder.id).length } : undefined;
+  const yours = participant && { yours: { name: participant.name, hours: slotsOf(participant.id).length } };
+  const nameHeldByOther = holder && !ownsName ? { name: holder.name, hours: slotsOf(holder.id).length, ...yours } : undefined;
   const organiserDevice = await isOrganiserDevice(poll);
   const refusal = refusalOf({
     takesOrganiserName: takesOrganiserName({ name, organiserName: poll.organiserName, organiserDevice, ownsName }),
@@ -89,7 +90,11 @@ export async function claimName(pollId: string, name: string): Promise<ClaimResu
     const row = participantNamed(pollId, nameKey(parsed.data));
     if (!row) return undefined;
     const held = heldToken === undefined ? undefined : participantByToken(pollId, heldToken);
-    if (held && held.id !== row.id) tx.delete(participants).where(eq(participants.id, held.id)).run();
+    if (held && held.id !== row.id) {
+      const heldSlots = slotsOf(held.id);
+      if (heldSlots.length > 0) tx.insert(slots).values(heldSlots.map((slot) => ({ participantId: row.id, ...slot }))).onConflictDoNothing().run();
+      tx.delete(participants).where(eq(participants.id, held.id)).run();
+    }
     tx.update(participants).set({ tokenHash: hashToken(token) }).where(eq(participants.id, row.id)).run();
     return row;
   });

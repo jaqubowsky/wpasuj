@@ -7,7 +7,7 @@ import { useResultsContext } from "./results-provider";
 import { SetTime } from "./set-time";
 import { WhoComes } from "./who-comes";
 
-export function Invitation({ title }: { title: string }) {
+export function Invitation({ title, timeZone }: { title: string; timeZone: string }) {
   const { results, refreshFailed } = useResultsContext();
   const { final } = results;
 
@@ -16,7 +16,7 @@ export function Invitation({ title }: { title: string }) {
   return (
     <>
       <div className="lg:col-start-1 lg:row-start-2">
-        <SetTime final={final} title={title} />
+        <SetTime final={final} title={title} timeZone={timeZone} />
       </div>
       <div className="contents lg:col-start-2 lg:row-start-2 lg:flex lg:flex-col lg:gap-4">
         <OrganiserCard />
