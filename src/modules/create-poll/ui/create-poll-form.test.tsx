@@ -142,21 +142,22 @@ describe("O której?", () => {
 
     await userEvent.click(within(tiles).getByRole("button", { name: "22:00" }));
     expect(screen.getByText("Od 22:00, teraz kliknij koniec")).toBeInTheDocument();
-    expect(within(tiles).queryAllByRole("button", { pressed: true })).toEqual([]);
+    expect(within(tiles).getAllByRole("button", { pressed: true }).map((tile) => tile.textContent)).toEqual(["22"]);
     await userEvent.click(within(tiles).getByRole("button", { name: "3:00" }));
 
     expect(within(tiles).getAllByRole("button", { pressed: true }).map((tile) => tile.textContent)).toEqual(["22", "23", "0", "1", "2", "3"]);
     expect(screen.getAllByText("22:00 → 4:00 · 6 godzin")).not.toHaveLength(0);
   });
 
-  it("starts again from a tile before the start", async () => {
+  it("ends on a tile before the start in the next morning", async () => {
     render(<CreatePollForm />);
     const tiles = screen.getByRole("group", { name: "Godziny" });
 
-    await userEvent.click(within(tiles).getByRole("button", { name: "20:00" }));
-    await userEvent.click(within(tiles).getByRole("button", { name: "18:00" }));
+    await userEvent.click(within(tiles).getByRole("button", { name: "2:00" }));
+    await userEvent.click(within(tiles).getByRole("button", { name: "8:00" }));
 
-    expect(screen.getByText("Od 18:00, teraz kliknij koniec")).toBeInTheDocument();
+    expect(within(tiles).getAllByRole("button", { pressed: true }).map((tile) => tile.textContent)).toEqual(["6", "7", "8", "2", "3", "4", "5"]);
+    expect(screen.getAllByText("2:00 → 9:00 · 7 godzin")).not.toHaveLength(0);
   });
 });
 

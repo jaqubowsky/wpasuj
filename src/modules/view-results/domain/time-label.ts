@@ -16,20 +16,29 @@ function capitalised(text: string) {
   return text.charAt(0).toLocaleUpperCase("pl") + text.slice(1);
 }
 
+function calendarDate(date: string, hour: number) {
+  return hour >= hoursInDay ? addDays(date, 1) : date;
+}
+
 function longDay(date: string) {
   return `${capitalised(longWeekday.format(new Date(`${date}T00:00:00Z`)))} ${dayAndMonth(date)}`;
 }
 
-export function longRunLabel({ date, firstHour, lastHour }: TimeRange) {
-  return `${longDay(date)}, ${clockHour(firstHour)}–${clockEndHour(lastHour)}`;
+export function runParts({ date, firstHour, lastHour }: TimeRange) {
+  return { day: longDay(calendarDate(date, firstHour)), hours: `${clockHour(firstHour)}–${clockEndHour(lastHour)}` };
+}
+
+export function longRunLabel(run: TimeRange) {
+  const { day, hours } = runParts(run);
+  return `${day}, ${hours}`;
 }
 
 export function hourLabel({ date, hour }: { date: string; hour: number }) {
-  return `${longDay(date)}, ${clockHour(hour)}:00`;
+  return `${longDay(calendarDate(date, hour))}, ${clockHour(hour)}:00`;
 }
 
 export function setTimeShown({ date, firstHour, lastHour }: TimeRange) {
-  const day = new Date(`${firstHour >= hoursInDay ? addDays(date, 1) : date}T00:00:00Z`);
+  const day = new Date(`${calendarDate(date, firstHour)}T00:00:00Z`);
   return {
     weekday: capitalised(longWeekday.format(day)),
     day: dayAndMonthLong.format(day),

@@ -8,6 +8,8 @@ it("keeps the later of two steps from the theme's own scales", () => {
   expect(cn("font-regular", "font-semibold")).toBe("font-semibold");
   expect(cn("ease-pop", "ease-out")).toBe("ease-out");
   expect(cn("animate-rise", "animate-none")).toBe("animate-none");
+  expect(cn("shadow-lift", "shadow-sheet")).toBe("shadow-sheet");
+  expect(cn("shadow-sheet", "shadow-menu")).toBe("shadow-menu");
 });
 
 it("keeps a type size beside a text colour", () => {

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 
 type SaveState = "saving" | "saved" | "failed";
 
@@ -41,13 +41,9 @@ export function useAutosave<Value>(send: (value: Value) => Promise<boolean>, ini
     if (current.pending && current.timer === undefined) void flush();
   }
 
-  const flushRef = useRef(flush);
-  useEffect(() => {
-    flushRef.current = flush;
-  });
+  const flushNow = useEffectEvent(() => void flush());
 
   useEffect(() => {
-    const flushNow = () => void flushRef.current();
     const flushWhenHidden = () => {
       if (document.visibilityState === "hidden") flushNow();
     };
@@ -71,6 +67,8 @@ export function useAutosave<Value>(send: (value: Value) => Promise<boolean>, ini
     },
     retry() {
       const current = queue.current;
+      setState("saving");
+      if (current.inFlight) return;
       current.pending ??= current.unsaved;
       void flush();
     },

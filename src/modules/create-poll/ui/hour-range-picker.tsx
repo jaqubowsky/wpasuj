@@ -29,7 +29,7 @@ function HourColumn({ label, hours, picked, onPick }: { label: string; hours: nu
   return (
     <div className="flex min-w-0 flex-col gap-1">
       <span className="mb-1 text-sm font-semibold">{label}</span>
-      <div role="group" aria-label={label} className="flex h-59 flex-col gap-1 overflow-y-auto">
+      <div role="group" aria-label={label} className="flex h-59 flex-col gap-1.5 overflow-y-auto">
         {hours.map((hour) => (
           <button
             key={hour}
@@ -79,7 +79,7 @@ function HourSheet({ hours, sheet }: { hours: HourRangeState; sheet: HourSheetSt
 }
 
 function HourTiles({ hours }: { hours: HourRangeState }) {
-  const picked = hours.pickingEnd ? [] : hoursOf(hours.range).map(clockHour);
+  const picked = hoursOf(hours.range).map(clockHour);
   const edges = [picked[0], picked.at(-1)];
 
   return (

@@ -64,12 +64,12 @@ function OrganiserControls({ organiser }: { organiser: LiveOrganiser }) {
       </h2>
       <div className="grid grid-cols-[auto_minmax(0,1fr)_--spacing(11)] gap-2 data-final:grid-cols-[minmax(0,1fr)_--spacing(11)]" data-final={results.final || !best ? true : undefined}>
         {!results.final && best && (
-          <Button variant="primary" size="small" block onClick={() => organiser.setFinal({ date: best.date, firstHour: best.firstHour, lastHour: best.lastHour })}>
+          <Button variant="primary" size="small" block disabled={organiser.pending} onClick={() => organiser.setFinal({ date: best.date, firstHour: best.firstHour, lastHour: best.lastHour })}>
             Ustal termin
           </Button>
         )}
         {results.final ? (
-          <Button size="small" block onClick={organiser.clearFinal}>
+          <Button size="small" block disabled={organiser.pending} onClick={organiser.clearFinal}>
             Zmień termin
           </Button>
         ) : (
@@ -98,7 +98,7 @@ function OrganiserControls({ organiser }: { organiser: LiveOrganiser }) {
               <h2 className="m-0 font-display text-2xl font-bold tracking-tighter">Usunąć ankietę?</h2>
               <p className="m-0 text-base">{deleteWarning(results.respondents.length)}</p>
               <div className="mt-1 grid gap-2">
-                <Button variant="danger" block onClick={organiser.deletePoll}>
+                <Button variant="danger" block disabled={organiser.pending} onClick={organiser.deletePoll}>
                   Tak, usuń
                 </Button>
                 <Button block onClick={card.closeMenu}>

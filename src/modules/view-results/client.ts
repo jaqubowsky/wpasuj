@@ -5,7 +5,7 @@ export { OrganiserCard } from "./ui/organiser-card";
 export { PeoplePanel } from "./ui/people-panel";
 export { RespondentCount } from "./ui/respondent-count";
 export { ResultsBody } from "./ui/results-body";
-export { ResultsProvider } from "./ui/results-provider";
+export { ResultsProvider, useForgetTappedHour } from "./ui/results-provider";
 export { SetBadge } from "./ui/set-time";
 export { UntilSet } from "./ui/until-set";
 export { WhilePollLives } from "./ui/while-poll-lives";

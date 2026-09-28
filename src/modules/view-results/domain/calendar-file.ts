@@ -46,14 +46,15 @@ function folded(line: string) {
   return pieces.join("\r\n ");
 }
 
-export function calendarFile({ id, title, timeZone, final }: { id: string; title: string; timeZone: string; final: FinalTime }, now: Date) {
+export function calendarFile({ id, site, title, timeZone, final }: { id: string; site: string; title: string; timeZone: string; final: FinalTime }, now: Date) {
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
     `PRODID:-//${productName}//PL`,
     "BEGIN:VEVENT",
-    `UID:${id}`,
+    `UID:${id}@${site}`,
     `DTSTAMP:${utcStamp(now)}`,
+    `SEQUENCE:${Math.floor(now.getTime() / 60_000)}`,
     `DTSTART:${utcStamp(instantOf(final.date, final.firstHour, timeZone))}`,
     `DTEND:${utcStamp(instantOf(final.date, final.lastHour, timeZone))}`,
     `SUMMARY:${escaped(title)}`,

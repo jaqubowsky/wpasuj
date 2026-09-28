@@ -12,8 +12,8 @@ function renderStroke() {
   return { result, onStroke, onTap };
 }
 
-const finger = { pointerId: 1, buttons: 1 };
-const secondFinger = { pointerId: 2, buttons: 1 };
+const finger = { pointerId: 1, buttons: 1, isPrimary: true };
+const secondFinger = { pointerId: 2, buttons: 1, isPrimary: false };
 
 function drag(result: ReturnType<typeof renderStroke>["result"]) {
   act(() => result.current.start({ date: "2026-10-16", hour: 17 }, false, finger));
@@ -107,6 +107,17 @@ describe("usePaintStroke", () => {
     act(() => result.current.end(finger));
 
     expect(onStroke).toHaveBeenCalledExactlyOnceWith({ dates: ["2026-10-16", "2026-10-17"], hours: [17, 18], mode: "add" });
+  });
+
+  it("lets a new press replace a stroke whose pointer went away unseen", () => {
+    const { result, onStroke } = renderStroke();
+
+    act(() => result.current.start({ date: "2026-10-16", hour: 17 }, false, finger));
+    act(() => result.current.start({ date: "2026-10-18", hour: 20 }, true, finger));
+    act(() => result.current.move({ date: "2026-10-18", hour: 19 }, finger));
+    act(() => result.current.end(finger));
+
+    expect(onStroke).toHaveBeenCalledExactlyOnceWith({ dates: ["2026-10-18"], hours: [19, 20], mode: "remove" });
   });
 
   it("drops a stroke the browser cancels", () => {

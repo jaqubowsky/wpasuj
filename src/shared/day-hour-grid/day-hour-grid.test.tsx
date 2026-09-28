@@ -22,7 +22,46 @@ function renderGrid(selected: string[] = []) {
   return handlers;
 }
 
+function dragFrom(fromLabel: string, toLabel: string) {
+  const from = screen.getByRole("button", { name: fromLabel });
+  const to = screen.getByRole("button", { name: toLabel });
+  document.elementFromPoint = () => to;
+  Element.prototype.setPointerCapture ??= () => {};
+  fireEvent.pointerDown(from, { button: 0, buttons: 1, pointerId: 1, isPrimary: true });
+  fireEvent.pointerMove(from, { buttons: 1, pointerId: 1, isPrimary: true });
+  return screen.getByRole("grid");
+}
+
 describe("DayHourGrid", () => {
+  it("paints the rectangle of a drag", () => {
+    const { onStroke } = renderGrid();
+
+    const grid = dragFrom("pt 16, 17:00", "sb 17, 18:00");
+    fireEvent.pointerUp(grid, { pointerId: 1 });
+
+    expect(onStroke).toHaveBeenCalledExactlyOnceWith({ dates: ["2026-10-16", "2026-10-17"], hours: [17, 18], mode: "add" });
+  });
+
+  it("drops a drag the browser cancels", () => {
+    const { onStroke } = renderGrid();
+
+    const grid = dragFrom("pt 16, 17:00", "sb 17, 18:00");
+    fireEvent.pointerCancel(grid, { pointerId: 1 });
+    fireEvent.pointerUp(grid, { pointerId: 1 });
+
+    expect(onStroke).not.toHaveBeenCalled();
+  });
+
+  it("drops a drag once the pointer moves with no button pressed", () => {
+    const { onStroke } = renderGrid();
+
+    const grid = dragFrom("pt 16, 17:00", "sb 17, 18:00");
+    fireEvent.pointerMove(grid, { buttons: 0, pointerId: 1 });
+    fireEvent.pointerUp(grid, { pointerId: 1 });
+
+    expect(onStroke).not.toHaveBeenCalled();
+  });
+
   it("is a multiselectable grid with dates as columns and hours as rows", () => {
     renderGrid(["2026-10-17 18"]);
 
