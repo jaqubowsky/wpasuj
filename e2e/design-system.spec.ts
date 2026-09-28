@@ -1,6 +1,6 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { saveScreenshot } from "./screenshot";
-import { seedPoll } from "./seed";
+import { seedAnswer, seedPoll } from "./seed";
 
 const ink = "rgb(30, 27, 24)";
 
@@ -15,7 +15,9 @@ async function expectTargetsAtLeast44(page: Page) {
   await expect(targets.first()).toBeVisible();
   for (const target of await targets.all()) {
     const box = await target.boundingBox();
-    expect(box?.height, await target.evaluate((element) => element.outerHTML)).toBeGreaterThanOrEqual(44);
+    const html = await target.evaluate((element) => element.outerHTML);
+    expect(box?.height, html).toBeGreaterThanOrEqual(44);
+    expect(box?.width, html).toBeGreaterThanOrEqual(44);
   }
 }
 
@@ -30,7 +32,7 @@ test("the components page shows every component", async ({ page }, testInfo) => 
   await saveScreenshot(page, testInfo, "components");
 });
 
-test("every button, chip and tab is at least 44px tall", async ({ page }, testInfo) => {
+test("every button, chip and tab is at least 44px tall and wide", async ({ page }, testInfo) => {
   await page.goto("/dev/components");
   await expectTargetsAtLeast44(page);
 
@@ -40,6 +42,34 @@ test("every button, chip and tab is at least 44px tall", async ({ page }, testIn
     await page.getByRole("button", { name: "Od 17:00" }).click();
     await expectTargetsAtLeast44(page);
   }
+});
+
+test("every target on the poll page is at least 44px tall and wide", async ({ browser }, testInfo) => {
+  const organiserToken = "organiser-token-for-the-44px-sweep-0123456";
+  const pollId = seedPoll({ dates: ["2031-10-17", "2031-10-18", "2031-10-19"], firstHour: 18, hourCount: 4, organiserToken });
+  const kuba = seedAnswer(pollId, "Kuba", Date.now() - 60_000, [["2031-10-17", 19], ["2031-10-18", 19]]);
+  seedAnswer(pollId, "Ola", Date.now() - 30_000, [["2031-10-18", 19]]);
+  const context = await browser.newContext(testInfo.project.use);
+  await context.addCookies([
+    { name: pollId, value: kuba, url: "http://localhost:3000" },
+    { name: `${pollId}-org`, value: organiserToken, url: "http://localhost:3000" },
+  ]);
+  const page = await context.newPage();
+  await page.goto(`/e/${pollId}`);
+
+  await expectTargetsAtLeast44(page);
+  await page.getByRole("button", { name: "sb 18, 19:00, 2 z 2 może" }).click();
+  await expectTargetsAtLeast44(page);
+  await page.keyboard.press("Escape");
+  await page.getByRole("tab", { name: "Moje" }).click();
+  await expectTargetsAtLeast44(page);
+
+  const newcomer = await browser.newPage(testInfo.project.use);
+  await newcomer.goto(`/e/${pollId}`);
+  await newcomer.getByRole("textbox", { name: "Twoje imię" }).fill("Ola");
+  await newcomer.getByRole("grid", { name: "Kiedy możesz?" }).getByRole("row").nth(1).getByRole("button").nth(1).click();
+  await expect(newcomer.getByRole("button", { name: "Tak, to ja" })).toBeVisible();
+  await expectTargetsAtLeast44(newcomer);
 });
 
 test("the create form's questions are section headings", async ({ page }, testInfo) => {
