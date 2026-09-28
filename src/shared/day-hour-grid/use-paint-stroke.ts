@@ -3,7 +3,7 @@ import { useRef, useState } from "react";
 export type GridCell = { date: string; hour: number };
 export type PaintedRectangle = { dates: string[]; hours: number[]; mode: "add" | "remove" };
 
-type Pointer = { pointerId: number; buttons: number };
+type Pointer = { pointerId: number; buttons: number; isPrimary: boolean };
 
 type Stroke = { pointerId: number; anchor: GridCell; current: GridCell; mode: PaintedRectangle["mode"]; spread: boolean };
 
@@ -43,8 +43,8 @@ export function usePaintStroke({ dates, hours, onStroke, onTap }: PaintStrokeOpt
   }
 
   return {
-    start(cell: GridCell, filled: boolean, { pointerId }: Pointer) {
-      if (strokeRef.current) return;
+    start(cell: GridCell, filled: boolean, { pointerId, isPrimary }: Pick<Pointer, "pointerId" | "isPrimary">) {
+      if (strokeRef.current && !isPrimary) return;
       paintedRef.current = false;
       update({ pointerId, anchor: cell, current: cell, mode: filled ? "remove" : "add", spread: false });
     },
