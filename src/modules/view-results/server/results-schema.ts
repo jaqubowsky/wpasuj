@@ -1,6 +1,5 @@
+import { lastSlotHour } from "@/shared/poll-hours";
 import * as z from "zod/mini";
-
-const lastSlotHour = 46;
 
 const finalTimeSchema = z.object({
   date: z.iso.date(),
