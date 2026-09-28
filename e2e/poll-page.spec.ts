@@ -115,6 +115,16 @@ test("OrganiserName: the organiser's name cannot be taken", async ({ browser }, 
   await saveScreenshot(page, testInfo, "v3-organiser-name");
 });
 
+test("the organiser's avatar in the header takes the tint of the organiser's row", async ({ browser }, testInfo) => {
+  test.skip(isPhone(testInfo), "the people card sits beside the grid on a desktop");
+  const page = await asZuza(browser, seedBoardPoll());
+
+  const header = page.getByRole("main").getByRole("img", { name: "Kuba" }).first();
+  const row = page.getByRole("list", { name: "Odpowiedzieli" }).getByRole("img", { name: "Kuba" });
+
+  await expect(header).toHaveAttribute("data-tint", (await row.getAttribute("data-tint"))!);
+});
+
 test("CellSheet: tapping an hour shows who can and who cannot", async ({ browser }, testInfo) => {
   const page = await asZuza(browser, seedBoardPoll());
   await tab(page, "Wszyscy").click();
