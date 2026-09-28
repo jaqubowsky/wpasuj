@@ -50,3 +50,12 @@ test("the card is a 1200×630 PNG under 1 MB", async ({ page, request }) => {
   await page.goto(`file://${resolve("spec/design/v2/og.html")}`);
   await page.screenshot({ path: "e2e/screenshots/link-preview-mockup.png" });
 });
+
+test("the poll page asks search engines not to index or follow it, while robots.txt lets them read that", async ({ page, request }) => {
+  const pollId = seedPoll({ dates: ["2030-10-18"], firstHour: 17, hourCount: 6, title: "Kino u Oli" });
+
+  await page.goto(`/e/${pollId}`);
+
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, nofollow");
+  expect(await (await request.get("/robots.txt")).text()).not.toContain("Disallow: /e/");
+});
