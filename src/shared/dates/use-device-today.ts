@@ -1,8 +1,9 @@
 import { useSyncExternalStore } from "react";
 import { todayIn } from "./iso-date";
+import { deviceTimeZone } from "./use-device-time-zone";
 
 function deviceToday() {
-  return todayIn(Intl.DateTimeFormat().resolvedOptions().timeZone, new Date());
+  return todayIn(deviceTimeZone(), new Date());
 }
 
 export function useDeviceToday() {

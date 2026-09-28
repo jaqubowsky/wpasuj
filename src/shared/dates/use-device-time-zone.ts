@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 
-function deviceTimeZone() {
+export function deviceTimeZone() {
   return Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
 
