@@ -12,7 +12,7 @@ A no-account availability poll for a group of friends: one link in the group cha
 
 ## Scripts
 
-Declared in `package.json` by ticket 01; a change passes all of them:
+Declared in `package.json` by WPA-10; a change passes all of them:
 
 - `npm ci`
 - `npm run lint`
@@ -24,7 +24,7 @@ Declared in `package.json` by ticket 01; a change passes all of them:
 
 CI (`.github/workflows/ci.yml`, skipped when a change touches only `*.md`): `quick` runs lint, typecheck, knip and test; `build` uploads the standalone build; an `e2e` matrix runs each Playwright project in its own job on that build and uploads `screenshots-<project>` and `memory-<project>` (memory sampled every 5 s); `perf` reuses the build; `docker` builds the image.
 
-Hooks (husky, installed by `npm ci`): pre-commit runs `eslint` on staged files through `lint-staged`; pre-push runs `typecheck`, `knip` and `test`. `e2e` runs in CI only. In a fleet container npm runs with `ignore-scripts`, so run `npx husky` once after install (decision 52).
+Hooks (husky, installed by `npm ci`): pre-commit runs `eslint` on staged files through `lint-staged`; pre-push runs `typecheck`, `knip` and `test`. `e2e` runs in CI only.
 
 ## Testing
 
@@ -61,13 +61,7 @@ Tailwind v4 utilities written inline in `className`; `src/app/` is the reference
 - CSS that `className` cannot carry (rules on DOM another module renders, `:has()` layouts, `@keyframes` the ticket keeps out of the theme) goes in a plain `<name>.css` beside its component, selected by `data-*` attributes, tokens through `var(--color-…)` and `calc(var(--spacing) * n)`: `shared/ui/sheet/sheet.css`. Plain CSS is global, so every attribute and keyframe name there carries the owner's prefix (`data-sheet`, `sheet-up`); a state on the component's own DOM is a `data-[…]:` utility instead
 - Token names inside `var()`: `--color-<name>`, `--spacing` (a step is `calc(var(--spacing) * n)` in plain CSS, `--spacing(n)` inside a Tailwind bracket), `--text-<step>` with `--text-<step>--line-height`, `--tracking-*`, `--container-*`, `--radius-*`, `--shadow-*`, `--ease-*`, `--duration-*`, `--font-sans`, `--font-display`
 
-## Tickets
-
-A ticket is a file in `spec/tickets/`, in the shape of `spec/ticket.md`. It is claimed by setting `Status: claimed` before any work, and closed once its work is committed: every acceptance criterion ticked beside its evidence, `Status: done`.
-
 ## Work
 
-- Work comes from `spec/board.md`; the host plans in `spec/` and decides what the brief leaves open, listed in `spec/decisions.md`
-- One ticket per container, one pull request per ticket against `main`
+- Work lives in the Linear team the project overlay names: one issue per ticket, one pull request per issue against `main`. The host plans there and decides what the brief leaves open, listed in `spec/decisions.md`
 - Done means a pull request with CI green for the host to merge; containers never merge
-- The host merges only after its acceptance finds no open point: each ticked criterion checked against one piece of evidence, the changed files against Scope, the brief sections named in Parent, the last commit's screenshots against `spec/design/v2`, and an independent review of the diff against the brief. It writes the result to `acceptance.md` in the task directory; a pull request sent back closes every open point listed there
