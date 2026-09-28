@@ -1,4 +1,5 @@
-import { expect, test, type Browser, type Page } from "@playwright/test";
+import type { Browser, Page } from "@playwright/test";
+import { expect, test } from "./fixtures";
 import { readFile } from "node:fs/promises";
 import { stubClipboardWithoutShareSheet } from "./clipboard";
 import { saveScreenshot } from "./screenshot";

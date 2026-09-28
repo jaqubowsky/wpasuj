@@ -6,15 +6,11 @@ Every ticket whose blockers have landed runs at once, one container each, up to 
 
 ## Now
 
-- `tickets/23-landing-seo-perf.md`: claude-wpasuj-t23-landing-seo-perf, PR #39
-- `tickets/12-cleanup.md`: claude-wpasuj-t12-cleanup, PR #44
+- `tickets/40-landing-v3-follow-up.md`: claude-wpasuj-t40-landing-follow-up, PR #50
 
 ## Next
 
-- `tickets/39-ci-parallel.md` (after 23)
-- `tickets/40-landing-v3-follow-up.md` (after 23)
-- `tickets/41-webkit-answer-flake.md` (after 23; beside 39 and 40)
-- `tickets/31-security-audit.md`, `tickets/32-architecture-audit.md` (after 12, 23, 40; in parallel; 39 beside them)
+- `tickets/31-security-audit.md`, `tickets/32-architecture-audit.md` (after 40; in parallel)
 - `tickets/08-acceptance.md` (after 31, 32 and their fix tickets)
 - `tickets/24-readme.md` (after 08)
 
@@ -52,3 +48,8 @@ Every ticket whose blockers have landed runs at once, one container each, up to 
 - `tickets/35-poll-page-v3.md`: PR #41
 - `tickets/38-production-readiness.md`: PR #42
 - `tickets/36-finalised-poll.md`: PR #43
+- `tickets/12-cleanup.md`: PR #44
+- `tickets/23-landing-seo-perf.md`: PR #39
+- `tickets/41-webkit-answer-flake.md`: PR #47
+- `tickets/39-ci-parallel.md`: PR #48
+- Production crash without SITE_URL (no ticket): PR #46
