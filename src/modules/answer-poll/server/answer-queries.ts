@@ -1,10 +1,10 @@
-import { hashToken } from "@/shared/token-cookie";
+import { hashToken, organiserCookie } from "@/shared/token-cookie";
 import { cookies } from "next/headers";
 import { pollIdSchema } from "./answer-schema";
 import { participantByToken, slotsOf } from "./answer-store";
 
 export async function isOrganiserDevice(poll: { id: string; organiserTokenHash: string }) {
-  const token = (await cookies()).get(`${poll.id}-org`)?.value;
+  const token = (await cookies()).get(organiserCookie(poll.id))?.value;
 
   return token !== undefined && hashToken(token) === poll.organiserTokenHash;
 }

@@ -2,10 +2,9 @@
 
 import { todayIn } from "@/shared/dates/iso-date";
 import { fail, ok, parse, type Result } from "@/shared/result";
-import { hashToken, newToken, tokenCookieOptions } from "@/shared/token-cookie";
+import { hashToken, newToken, organiserCookie, tokenCookieOptions } from "@/shared/token-cookie";
 import { cookies } from "next/headers";
 import { randomBytes } from "node:crypto";
-import { organiserCookie } from "./organiser-access";
 import { createPollSchema, type CreatePollInput } from "./poll-schema";
 import { hasPastDate } from "../domain/poll-rules";
 import { insertPoll } from "./poll-store";
