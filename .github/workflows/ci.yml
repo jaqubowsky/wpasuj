@@ -28,6 +28,11 @@ jobs:
           name: screenshots
           path: e2e/screenshots/
           if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: ${{ failure() }}
+        with:
+          name: test-results
+          path: test-results/
 
   perf:
     runs-on: ubuntu-latest
