@@ -2,9 +2,10 @@
 
 import { Button } from "@/shared/ui/button/button";
 import { Sheet } from "@/shared/ui/sheet/sheet";
-import { useId, useRef, type ReactNode } from "react";
+import { useId, useRef } from "react";
 import { bestTimes } from "../domain/best-time";
 import { deleteWarning } from "../domain/people-count";
+import { MenuItem } from "./menu-item";
 import { OrganiserProblem } from "./organiser-problem";
 import { useResultsContext } from "./results-provider";
 import { useOrganiserCard, type CardNotice } from "./use-organiser-card";
@@ -15,38 +16,6 @@ const notices: Record<CardNotice, string> = {
   "organiser-link-copied": "Link organizatora skopiowany. Otwórz go na swoim drugim urządzeniu. Nie wysyłaj go na grupę: kto go ma, może ustalić termin i usunąć ankietę.",
   "not-copied": "Nie udało się skopiować. Spróbuj jeszcze raz.",
 };
-
-const icons = {
-  copy: (
-    <>
-      <rect x="9" y="9" width="12" height="12" rx="2" />
-      <path d="M5 15V5a2 2 0 0 1 2-2h10" />
-    </>
-  ),
-  phone: (
-    <>
-      <rect x="6" y="2" width="12" height="20" rx="2" />
-      <path d="M11 18h2" />
-    </>
-  ),
-  trash: <path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3" />,
-};
-
-function MenuItem({ icon, danger, onClick, children }: { icon: keyof typeof icons; danger?: boolean; onClick: () => void; children: ReactNode }) {
-  return (
-    <button
-      type="button"
-      className="flex h-13 w-full cursor-pointer items-center gap-3 rounded-cell border-0 bg-transparent px-0 text-left font-sans text-base text-ink focus-visible:outline-2 focus-visible:outline-ink data-danger:font-semibold data-danger:text-accent-ink lg:h-11 lg:px-3"
-      data-danger={danger || undefined}
-      onClick={onClick}
-    >
-      <svg className="size-4.5 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        {icons[icon]}
-      </svg>
-      {children}
-    </button>
-  );
-}
 
 type LiveOrganiser = NonNullable<ReturnType<typeof useResultsContext>["organiser"]>;
 
