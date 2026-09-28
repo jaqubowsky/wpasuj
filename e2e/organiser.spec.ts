@@ -262,6 +262,34 @@ test("Zobacz wszystkie głosy shows every vote read-only to a participant", asyn
   await saveScreenshot(participant, testInfo, "set-votes");
 });
 
+test("a tap opens the votes sheet without a focus ring", async ({ browser }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("phone"), "the sheet is phone only");
+  const { pollId, zuza } = seedBoardPoll(saturdayEvening);
+  const participant = await openAsNewDevice(browser, `/e/${pollId}`, undefined, zuza);
+
+  await participant.getByRole("button", { name: "Zobacz wszystkie głosy" }).tap();
+
+  const votes = participant.getByRole("dialog", { name: "Wszystkie głosy" });
+
+  await expect(votes.getByRole("grid", { name: "Kto może" })).toBeVisible();
+  await expect(participant.locator(":focus-visible")).toHaveCount(0);
+  await saveScreenshot(participant, testInfo, "set-votes-tap");
+});
+
+test("the keyboard opens the votes sheet with the focus ring on the sheet", async ({ browser }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("phone"), "the sheet is phone only");
+  const { pollId, zuza } = seedBoardPoll(saturdayEvening);
+  const participant = await openAsNewDevice(browser, `/e/${pollId}`, undefined, zuza);
+
+  await participant.getByRole("button", { name: "Zobacz wszystkie głosy" }).press("Enter");
+
+  const votes = participant.getByRole("dialog", { name: "Wszystkie głosy" });
+
+  await expect(votes).toBeFocused();
+  await expect(participant.locator(":focus-visible")).toHaveCount(1);
+  await saveScreenshot(participant, testInfo, "set-votes-keyboard");
+});
+
 test("Zmień termin returns the organiser and a participant to the open poll", async ({ browser }, testInfo) => {
   const { pollId, zuza, kuba } = seedBoardPoll(saturdayEvening);
   const organiser = await openAsNewDevice(browser, `/e/${pollId}`, pollId, kuba);
