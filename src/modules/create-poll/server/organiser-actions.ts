@@ -1,5 +1,6 @@
 "use server";
 
+import { writeLogLine } from "@/shared/log-line";
 import { lastSlotHour } from "@/shared/poll-hours";
 import { fail, ok, parse, type Result } from "@/shared/result";
 import { z } from "zod";
@@ -42,6 +43,7 @@ export async function setFinal(id: string, final: FinalTime): Promise<OrganiserR
   if (!fitsPoll(found.poll, parsed.data)) return fail("invalid");
 
   saveFinal(id, parsed.data);
+  writeLogLine({ level: "info", message: "time_set", pollId: id });
 
   return ok();
 }

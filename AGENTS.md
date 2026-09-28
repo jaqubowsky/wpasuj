@@ -10,6 +10,7 @@ A no-account availability poll for a group of friends: one link in the group cha
 - `output: 'standalone'`, a `Dockerfile`; production runs on Railway at https://wpasuj.pl: one service with a volume at `/data`, `SITE_URL` set on the service (ADR 0014)
 - `GET /api/health` answers 200 once the database takes a write and `SITE_URL` is an http(s) URL, 503 when either fails (with the SQLite error code for the write); a database that cannot open still throws, a 500; `railway.json` builds the `Dockerfile` and gates each deploy on that route
 - Every server error is one JSON line on stderr from `onRequestError` in `src/instrumentation.ts`: `{"level":"error","message","path","digest","routeType"}`, `path` without its query and with the organiser token as `[token]`; Railway's Log Explorer finds them with `@level:error`
+- Usage events are one JSON line each on stdout through `writeLogLine` (`src/shared/log-line.ts`, which `onRequestError` also uses), written after the action's store call succeeds, with no title, name or token (ADR 0032): `{"level":"info","message":"poll_created","pollId","createdByParticipant"}` from `createPoll`, `answer_saved` (a first or changed answer) from `saveAnswer`, `time_set` from `setFinal`. In Railway's Log Explorer, the phrase search `"poll_created"` counts new polls and adding `@createdByParticipant:true` counts those created from a device that had answered another poll (Railway's documented syntax: a quoted phrase searches `message`, `@<key>:<value>` any other key)
 
 ## System
 

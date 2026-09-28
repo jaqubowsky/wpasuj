@@ -1,6 +1,7 @@
 "use server";
 
 import { todayIn } from "@/shared/dates/iso-date";
+import { writeLogLine } from "@/shared/log-line";
 import { fail, ok, parse, type Result } from "@/shared/result";
 import { hashToken, newToken, organiserCookie, tokenCookieOptions } from "@/shared/token-cookie";
 import { cookies } from "next/headers";
@@ -23,7 +24,9 @@ export async function createPoll(input: CreatePollInput): Promise<CreatePollResu
   const id = randomBytes(8).toString("base64url").slice(0, 10);
   const organiserToken = newToken();
 
-  insertPoll({ id, ...parsed.data, organiserTokenHash: hashToken(organiserToken) }, heldTokenHashes, now);
+  const createdByParticipant = insertPoll({ id, ...parsed.data, organiserTokenHash: hashToken(organiserToken) }, heldTokenHashes, now);
+
+  writeLogLine({ level: "info", message: "poll_created", pollId: id, createdByParticipant });
   cookieStore.set(organiserCookie(id), organiserToken, await tokenCookieOptions());
 
   return ok({ id });
