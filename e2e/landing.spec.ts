@@ -87,7 +87,7 @@ test("the story and the demo load after the form is interactive", async ({ page,
   releaseLateChunks();
   await page.goto("/#jak-to-dziala");
   await expect(page.getByRole("region", { name: "Jak to działa" })).toBeAttached();
-  await finalCall(page).scrollIntoViewIfNeeded();
+  await demoSlot(page).scrollIntoViewIfNeeded();
 
   await expect(page.getByRole("region", { name: "Wypróbuj na żywo" })).toBeAttached();
   const chunksHolding = async (chunks: Iterable<string>, marker: string) => {
