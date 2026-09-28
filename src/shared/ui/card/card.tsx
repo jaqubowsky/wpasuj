@@ -14,7 +14,7 @@ export function Card({ tone, size, label, children }: CardProps) {
       data-tone={tone}
       data-size={size}
     >
-      {label && <span className="block text-label font-medium text-muted group-data-[tone=ink]/card:text-on-dark-muted">{label}</span>}
+      {label && <span className="block text-sm font-medium text-muted group-data-[tone=ink]/card:text-on-dark-muted">{label}</span>}
       {children}
     </div>
   );

@@ -21,18 +21,18 @@ export function Faq() {
   return (
     <section
       aria-labelledby="faq-heading"
-      className="mx-auto box-border flex max-w-[1280px] flex-col gap-6 px-5 py-[80px] lg:grid lg:grid-cols-[360px_minmax(0,1fr)] lg:gap-[56px] lg:px-[48px] lg:py-[60px]"
+      className="mx-auto box-border flex max-w-wide flex-col gap-6 px-5 py-20 lg:grid lg:grid-cols-[360px_minmax(0,1fr)] lg:gap-14 lg:px-12 lg:py-15"
     >
-      <h2 id="faq-heading" className="m-[0] animate-rise [animation-range:entry_0%_cover_30%] [animation-timeline:view()] font-display text-title font-extrabold tracking-[-0.03em] lg:text-faq-heading">
+      <h2 id="faq-heading" className="m-0 animate-rise [animation-range:entry_0%_cover_30%] [animation-timeline:view()] font-display text-3xl font-extrabold tracking-tightest lg:text-4xl">
         Pytania
       </h2>
       <div className="animate-rise [animation-range:entry_0%_cover_30%] [animation-timeline:view()]">
         {questions.map(({ question, answer }) => (
           <details key={question} className="group border-t border-line last:border-b">
-            <summary className="cursor-pointer py-[18px] font-display text-question font-bold tracking-[-0.03em] group-open:pb-[10px]">
+            <summary className="cursor-pointer py-4.5 font-display text-xl font-bold tracking-tightest group-open:pb-2.5">
               {question}
             </summary>
-            <p className="m-[0] max-w-[60ch] pb-[18px] text-body text-muted">{answer}</p>
+            <p className="m-0 max-w-165 pb-4.5 text-base text-muted">{answer}</p>
           </details>
         ))}
       </div>

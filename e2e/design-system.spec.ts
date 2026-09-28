@@ -46,7 +46,7 @@ test("the create form's questions are section headings and its steppers carry la
   for (const question of ["Co robimy?", "Twoje imię"]) await expectSectionHeading(page.locator("label", { hasText: question }));
   for (const question of ["Kiedy?", "O której?"]) await expectSectionHeading(page.locator("legend", { hasText: question }));
   for (const stepper of ["od", "do"]) {
-    expect(await styleOf(page.getByText(stepper, { exact: true }))).toMatchObject({ fontSize: "13px", fontWeight: "500" });
+    expect(await styleOf(page.getByText(stepper, { exact: true }))).toMatchObject({ fontSize: "14px", fontWeight: "500" });
   }
   const titleSize = testInfo.project.name.startsWith("desktop") ? "40px" : "30px";
   expect(await styleOf(page.getByRole("textbox", { name: "Co robimy?" }))).toMatchObject({ fontSize: titleSize });
@@ -58,7 +58,7 @@ test("day numbers are tracked tight", async ({ page }) => {
   const dayNumber = page.getByRole("region", { name: "Text" }).getByText("17", { exact: true });
   const stepperValue = page.getByRole("group", { name: "od" }).first().getByRole("status");
   for (const number of [dayNumber, stepperValue]) {
-    expect(await number.evaluate((element) => getComputedStyle(element).letterSpacing)).toBe("-0.44px");
+    expect(await number.evaluate((element) => getComputedStyle(element).letterSpacing)).toBe("-0.4px");
   }
 });
 

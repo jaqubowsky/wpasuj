@@ -23,7 +23,7 @@ const Demo = dynamic(() => import("./demo/demo").then((module) => module.Demo), 
 function NearViewport({ id, screens, reach, children }: { id?: string; screens: number; reach: string; children: ReactNode }) {
   const { ref, near } = useNearViewport(reach);
   return (
-    <div id={id} ref={ref} className="scroll-mt-[72px]">
+    <div id={id} ref={ref} className="scroll-mt-18">
       {near ? children : <Placeholder screens={screens} />}
     </div>
   );

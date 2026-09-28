@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/shared/ui/button/button";
-import { useId, type ReactNode } from "react";
+import { useId, type CSSProperties, type ReactNode } from "react";
 import { linkPreview } from "../domain/link-preview";
 import "./invite-card.css";
 import { useInviteCard } from "./use-invite-card";
@@ -43,7 +43,7 @@ export function InviteCard({ pollId, poll }: InviteCardProps) {
 
   if (card.stage === "sent") {
     return (
-      <p className="m-[0] mt-4 flex items-center gap-[10px] rounded-control bg-surface px-4 py-3 text-caption font-medium" role="status" data-invite-sent>
+      <p className="m-0 mt-4 flex items-center gap-2.5 rounded-control bg-surface px-4 py-3 text-sm font-medium" role="status" data-invite-sent>
         <Check />
         Wysłane. Odpowiedzi pojawią się tutaj.
       </p>
@@ -55,26 +55,26 @@ export function InviteCard({ pollId, poll }: InviteCardProps) {
   return (
     <section className="mt-4 flex flex-col gap-3 rounded-card bg-surface p-4" aria-labelledby={headingId} data-invite-card>
       <div className="flex items-start justify-between gap-3">
-        <h2 id={headingId} className="m-[0] pt-3 font-display text-section font-bold tracking-[-0.02em]">
+        <h2 id={headingId} className="m-0 pt-3 font-display text-lg font-bold tracking-tighter">
           Ankieta gotowa. Wyślij ją na grupę.
         </h2>
         <Button variant="text" onClick={card.close}>
           Gotowe
         </Button>
       </div>
-      <figure className="m-[0] overflow-hidden rounded-control shadow-[inset_0_0_0_1px_var(--color-line)]" aria-label="Podgląd linku w czacie">
-        <div className="grid grid-cols-[minmax(0,1fr)_64px] items-center gap-[10px] bg-paper p-3">
-          <div className="min-w-[0]">
-            <span className="mb-[3px] block text-mini font-medium text-muted">{asker}</span>
-            <span className="block font-display text-section font-extrabold tracking-[-0.02em] [overflow-wrap:anywhere]">{title}</span>
+      <figure className="m-0 overflow-hidden rounded-control shadow-[inset_0_0_0_1px_var(--color-line)]" aria-label="Podgląd linku w czacie">
+        <div className="grid grid-cols-[minmax(0,1fr)_64px] items-center gap-2.5 bg-paper p-3">
+          <div className="min-w-0">
+            <span className="mb-1 block text-xs font-medium text-muted">{asker}</span>
+            <span className="block font-display text-lg font-extrabold tracking-tighter wrap-anywhere">{title}</span>
           </div>
-          <div className="grid gap-[3px]" style={{ gridTemplateColumns: `repeat(${poll.dates.length}, minmax(0, 1fr))` }} aria-hidden="true">
+          <div className="grid grid-cols-[repeat(var(--date-count),minmax(0,1fr))] gap-1" style={{ "--date-count": poll.dates.length } as CSSProperties} aria-hidden="true">
             {Array.from({ length: poll.dates.length * miniRows }, (_, index) => (
-              <i key={index} className="block h-[8px] rounded-[3px] bg-surface shadow-[inset_0_0_0_1px_var(--color-edge)]" />
+              <i key={index} className="block h-2 rounded-[3px] bg-surface shadow-[inset_0_0_0_1px_var(--color-edge)]" />
             ))}
           </div>
         </div>
-        <figcaption className="bg-surface px-3 py-[7px] text-mini font-medium text-muted">
+        <figcaption className="bg-surface px-3 py-2 text-xs font-medium text-muted">
           {card.host()} · {when}
         </figcaption>
       </figure>
@@ -87,7 +87,7 @@ export function InviteCard({ pollId, poll }: InviteCardProps) {
         </Button>
       </div>
       {card.notCopiedBy && (
-        <p className="m-[0] text-label font-medium text-accent-ink" role="alert">
+        <p className="m-0 text-sm font-medium text-accent-ink" role="alert">
           {notCopied[card.notCopiedBy]}
         </p>
       )}

@@ -79,7 +79,7 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
         </AnswerProvider>
       </main>
       <footer className="flex justify-center pb-8">
-        <Link href="/" className="inline-flex min-h-target items-center text-button font-medium text-muted underline underline-offset-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink">
+        <Link href="/" className="inline-flex min-h-11 items-center text-base font-medium text-muted underline underline-offset-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink">
           Zrób własną ankietę
         </Link>
       </footer>

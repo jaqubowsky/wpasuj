@@ -10,7 +10,7 @@ export function PollGone() {
       <Text as="p" variant="body">
         Organizator mógł ją usunąć albo jej terminy minęły dawno temu.
       </Text>
-      <Link href="/" className="box-border inline-flex h-button items-center rounded-control bg-ink px-6 font-sans text-button font-semibold normal-nums text-surface no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink">
+      <Link href="/" className="box-border inline-flex h-13 items-center rounded-control bg-ink px-6 font-sans text-base font-semibold normal-nums text-surface no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink">
         Zrób nową ankietę
       </Link>
     </div>

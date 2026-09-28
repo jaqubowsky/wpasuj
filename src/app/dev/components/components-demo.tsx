@@ -39,7 +39,7 @@ export function ComponentsDemo() {
   const [hour, setHour] = useState(19);
 
   return (
-    <main className="mx-auto box-border grid max-w-[720px] gap-8 px-5 pt-6 pb-10">
+    <main className="mx-auto box-border grid max-w-narrow gap-8 px-5 pt-6 pb-10">
       <Section name="Text">
         <div className="grid w-full gap-3">
           <Text variant="wordmark">{productName}</Text>

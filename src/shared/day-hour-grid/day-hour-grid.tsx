@@ -49,7 +49,7 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
         role="grid"
         aria-label={label}
         aria-multiselectable={onStroke && true}
-        className="grid [scrollbar-width:none] grid-cols-[var(--hour-column)_repeat(var(--date-count),minmax(56px,1fr))] grid-rows-[auto] auto-rows-(--spacing-cell) gap-cell-gap overflow-x-auto overscroll-x-contain scroll-pl-[calc(var(--hour-column)+var(--spacing-cell-gap))] [--hour-column:48px] snap-x snap-mandatory @max-[600px]:data-scrolls:grid-cols-[var(--hour-column)_repeat(var(--date-count),max(56px,calc((100cqi_-_var(--hour-column)_-_5_*_var(--spacing-cell-gap))_/_4.4)))] [&::-webkit-scrollbar]:hidden"
+        className="grid [scrollbar-width:none] grid-cols-[var(--hour-column)_repeat(var(--date-count),minmax(56px,1fr))] grid-rows-[auto] auto-rows-12 gap-1.5 overflow-x-auto overscroll-x-contain scroll-pl-[calc(var(--hour-column)+--spacing(1.5))] [--hour-column:--spacing(12)] snap-x snap-mandatory @max-grid-fit:data-scrolls:grid-cols-[var(--hour-column)_repeat(var(--date-count),max(56px,calc((100cqi_-_var(--hour-column)_-_5_*_--spacing(1.5))_/_4.4)))] [&::-webkit-scrollbar]:hidden"
         style={{ "--date-count": dates.length } as CSSProperties}
         data-scrolls={dates.length > 4 || undefined}
         data-paints={onStroke && true}
@@ -60,14 +60,14 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
         onLostPointerCapture={stroke.cancel}
       >
         <div role="row" className="contents">
-          <div className="sticky left-[0] z-1 touch-pan-y bg-paper shadow-[var(--spacing-cell-gap)_0_0_var(--color-paper)]" aria-hidden />
+          <div className="sticky left-0 z-1 touch-pan-y bg-paper shadow-[--spacing(1.5)_0_0_var(--color-paper)]" aria-hidden />
           {dates.map((date, index) => {
             const day = dayOf(date);
             const position = { row: 0, column: index + 1 };
             const label = (
               <>
                 <Text variant="meta">
-                  <span className="@min-[600px]:[font-size:0] @min-[600px]:after:text-label @min-[600px]:after:content-[attr(data-long)]" data-long={day.longWeekday}>{day.weekday}</span>
+                  <span className="@grid-fit:[font-size:0] @grid-fit:after:text-sm @grid-fit:after:content-[attr(data-long)]" data-long={day.longWeekday}>{day.weekday}</span>
                 </Text>
                 <Text variant="day-number">{day.number}</Text>
               </>
@@ -85,7 +85,7 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
                   {onDateTap ? (
                     <button
                       type="button"
-                      className="box-border min-h-target w-full cursor-pointer rounded-cell border-0 bg-track font-sans text-ink tabular-nums transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink motion-safe:active:scale-96 grid h-full justify-items-center px-[0] pt-1 pb-2"
+                      className="box-border min-h-11 w-full cursor-pointer rounded-cell border-0 bg-track font-sans text-ink tabular-nums transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink motion-safe:active:scale-96 grid h-full justify-items-center px-0 pt-1 pb-2"
                       aria-label={`${day.weekday} ${day.number}`}
                       tabIndex={keyboard.tabIndexOf(position)}
                       onFocus={() => keyboard.onFocus(position)}
@@ -105,9 +105,9 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
           const header = { row: rowIndex + 1, column: 0 };
           return (
             <div key={hour} role="row" className="contents">
-              <div role="rowheader" aria-colindex={header.column + 1} className="sticky left-[0] z-1 touch-pan-y bg-paper shadow-[var(--spacing-cell-gap)_0_0_var(--color-paper)]" data-row={header.row} data-column={header.column}>
+              <div role="rowheader" aria-colindex={header.column + 1} className="sticky left-0 z-1 touch-pan-y bg-paper shadow-[--spacing(1.5)_0_0_var(--color-paper)]" data-row={header.row} data-column={header.column}>
                 {onHourTap ? (
-                  <button type="button" className="box-border min-h-target w-full cursor-pointer rounded-cell border-0 bg-track font-sans text-ink tabular-nums transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink motion-safe:active:scale-96 h-full p-[0]" tabIndex={keyboard.tabIndexOf(header)} onFocus={() => keyboard.onFocus(header)} onClick={() => onHourTap(hour)}>
+                  <button type="button" className="box-border min-h-11 w-full cursor-pointer rounded-cell border-0 bg-track font-sans text-ink tabular-nums transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink motion-safe:active:scale-96 h-full p-0" tabIndex={keyboard.tabIndexOf(header)} onFocus={() => keyboard.onFocus(header)} onClick={() => onHourTap(hour)}>
                     <Text variant="meta">{hour}:00</Text>
                   </button>
                 ) : (
