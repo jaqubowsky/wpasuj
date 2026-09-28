@@ -13,7 +13,7 @@ const sunday = "2030-10-20";
 const minutesAgo = (minutes: number) => Date.now() - minutes * 60_000;
 
 function seedThreeAnswers() {
-  const pollId = seedPoll({ dates: [saturday, sunday], firstHour: 17, lastHour: 21 });
+  const pollId = seedPoll({ dates: [saturday, sunday], firstHour: 17, hourCount: 4 });
   seedAnswer(pollId, "Ola", minutesAgo(120), [[saturday, 17], [saturday, 18], [saturday, 19], [sunday, 19], [sunday, 20]]);
   seedAnswer(pollId, "Bartek", minutesAgo(20), [[saturday, 18], [saturday, 19], [saturday, 20], [sunday, 18]]);
   seedAnswer(pollId, "Kasia", minutesAgo(0), [[saturday, 18], [saturday, 19], [saturday, 20], [sunday, 17], [sunday, 18], [sunday, 19], [sunday, 20]]);
@@ -84,7 +84,7 @@ test("the heatmap lets the page scroll under a finger", async ({ page }) => {
 });
 
 test("with nobody answered it asks to send the link", async ({ page }, testInfo) => {
-  await openResults(page, seedPoll({ dates: [saturday, sunday], firstHour: 17, lastHour: 21 }));
+  await openResults(page, seedPoll({ dates: [saturday, sunday], firstHour: 17, hourCount: 4 }));
 
   await expect(page.getByText("Nikt jeszcze nie odpowiedział. Wyślij link na grupę.")).toBeVisible();
   await saveScreenshot(page, testInfo, "results-empty");

@@ -19,3 +19,7 @@ vi.mock("react", async (importOriginal) => ({
   ...(await importOriginal<typeof import("react")>()),
   ViewTransition: ({ children }: { children: ReactNode }) => children,
 }));
+
+HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) {
+  this.open = true;
+};

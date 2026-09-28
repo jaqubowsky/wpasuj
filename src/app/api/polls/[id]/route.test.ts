@@ -26,7 +26,7 @@ async function seedPoll(dates: string[]) {
     organiserName: "Kuba",
     dates,
     firstHour: 17,
-    lastHour: 20,
+    hourCount: 3,
     timeZone: "Europe/Warsaw",
     organiserTokenHash: "organiser",
     createdByParticipant: false,
@@ -96,6 +96,20 @@ it("names the viewer's own row from the participant cookie", async () => {
 
   const { resultsSchema } = await import("@/modules/view-results/server/results-schema");
   expect(resultsSchema.parse(await response.json()).you).toBe("bartek");
+});
+
+it("lists the hours of a night after the evening's own", async () => {
+  await seedPoll(["2030-10-19"]);
+  await db.update(polls).set({ firstHour: 22, hourCount: 4, finalDate: "2030-10-19", finalFirstHour: 23, finalLastHour: 25 });
+  await seedAnswer("Ola", new Date("2030-10-15T08:00:00Z"), [["2030-10-19", 24]]);
+
+  const response = await get(pollId);
+
+  const { resultsSchema } = await import("@/modules/view-results/server/results-schema");
+  const results = resultsSchema.parse(await response.json());
+  expect(results.hours).toEqual([22, 23, 24, 25]);
+  expect(results.respondents[0].slots).toEqual([{ date: "2030-10-19", hour: 24 }]);
+  expect(results.final).toEqual({ date: "2030-10-19", firstHour: 23, lastHour: 25 });
 });
 
 it("carries the time the organiser set", async () => {

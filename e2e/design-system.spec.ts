@@ -11,7 +11,7 @@ const styleOf = (locator: Locator) =>
   });
 
 async function expectTargetsAtLeast44(page: Page) {
-  const targets = page.locator("button, [role=tab]");
+  const targets = page.locator("button:visible, [role=tab]:visible");
   await expect(targets.first()).toBeVisible();
   for (const target of await targets.all()) {
     const box = await target.boundingBox();
@@ -30,24 +30,23 @@ test("the components page shows every component", async ({ page }, testInfo) => 
   await saveScreenshot(page, testInfo, "components");
 });
 
-test("every button, chip and tab is at least 44px tall", async ({ page }) => {
+test("every button, chip and tab is at least 44px tall", async ({ page }, testInfo) => {
   await page.goto("/dev/components");
   await expectTargetsAtLeast44(page);
 
   await page.goto("/");
-  await page.getByRole("button", { name: "Własne" }).click();
   await expectTargetsAtLeast44(page);
+  if (testInfo.project.name.startsWith("phone")) {
+    await page.getByRole("button", { name: "Od 17:00" }).click();
+    await expectTargetsAtLeast44(page);
+  }
 });
 
-test("the create form's questions are section headings and its steppers carry labels", async ({ page }, testInfo) => {
+test("the create form's questions are section headings", async ({ page }, testInfo) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Własne" }).click();
 
   for (const question of ["Co robimy?", "Twoje imię"]) await expectSectionHeading(page.locator("label", { hasText: question }));
   for (const question of ["Kiedy?", "O której?"]) await expectSectionHeading(page.locator("legend", { hasText: question }));
-  for (const stepper of ["od", "do"]) {
-    expect(await styleOf(page.getByText(stepper, { exact: true }))).toMatchObject({ fontSize: "14px", fontWeight: "500" });
-  }
   const titleSize = testInfo.project.name.startsWith("desktop") ? "40px" : "30px";
   expect(await styleOf(page.getByRole("textbox", { name: "Co robimy?" }))).toMatchObject({ fontSize: titleSize });
 });
@@ -76,7 +75,7 @@ test("a cell reached by keyboard shows its focus ring", async ({ page }, testInf
 });
 
 test("the answer's name label is small, with the save state beside it", async ({ page }) => {
-  const pollId = seedPoll({ dates: ["2030-10-19"], firstHour: 17, lastHour: 21 });
+  const pollId = seedPoll({ dates: ["2030-10-19"], firstHour: 17, hourCount: 4 });
 
   await page.goto(`/e/${pollId}`);
 

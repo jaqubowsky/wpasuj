@@ -45,7 +45,7 @@ beforeEach(async () => {
       organiserName: "Kuba",
       dates: ["2026-10-16", "2026-10-17"],
       firstHour: 17,
-      lastHour: 23,
+      hourCount: 6,
       timeZone: "Europe/Warsaw",
       organiserTokenHash: hashToken(organiserToken),
       createdByParticipant: false,
@@ -116,6 +116,17 @@ describe("saveAnswer", () => {
     expect(await saveAnswer(pollId, { name: "Ola", slots: [{ date: "2026-10-18", hour: 19 }] })).toEqual({ ok: false, reason: "invalid" });
     expect(await saveAnswer(pollId, { name: "Ola", slots: [friday19, friday19] })).toEqual({ ok: false, reason: "invalid" });
     expect(await myAnswer()).toBeUndefined();
+  });
+
+  it("keeps an hour past midnight under the evening's date", async () => {
+    db.update(polls).set({ firstHour: 22, hourCount: 6 }).run();
+    const { saveAnswer } = await actions();
+    const fridayOneAm = { date: "2026-10-16", hour: 25 };
+
+    expect(await saveAnswer(pollId, { name: "Ola", slots: [{ date: "2026-10-16", hour: 28 }] })).toEqual({ ok: false, reason: "invalid" });
+    await saveAnswer(pollId, { name: "Ola", slots: [fridayOneAm] });
+
+    expect(await myAnswer()).toEqual({ name: "Ola", slots: [fridayOneAm] });
   });
 
   it("tells a newcomer that a name already in the poll is taken, ignoring case", async () => {

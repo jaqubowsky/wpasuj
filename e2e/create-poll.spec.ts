@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { stubClipboardWithoutShareSheet } from "./clipboard";
-import { saveScreenshot } from "./screenshot";
+import { saveScreenshot, settleAnimations } from "./screenshot";
 
 declare global {
   interface Window {
@@ -66,7 +66,7 @@ test("the organiser creates a weekend evening poll, lands on the invite card and
 
   await page.getByRole("textbox", { name: "Co robimy?" }).fill("Planszówki u Michała");
   await page.getByRole("button", { name: "Ten weekend" }).click();
-  await expect(page.getByRole("button", { name: "Wieczór 17–23", pressed: true })).toBeVisible();
+  await expect(page.getByText("17:00 → 23:00 · 6 godzin").filter({ visible: true })).toBeVisible();
   await page.getByRole("textbox", { name: "Twoje imię" }).fill("Kuba");
   await saveScreenshot(page, testInfo, "create-filled");
   const action = await holdCreateAction(page);
@@ -166,12 +166,48 @@ test("the name used last on this device is prefilled", async ({ page }) => {
   await expect(page.getByRole("textbox", { name: "Twoje imię" })).toHaveValue("Ola");
 });
 
-test("Własne, the month and the 10-day limit", async ({ page }, testInfo) => {
+test("the organiser asks for 22:00 to 4:00 and a night run reads 23–1", async ({ page }, testInfo) => {
+  await stubShareSheet(page);
   await page.goto("/");
+  await expect(days(page).last()).toBeEnabled();
 
-  await page.getByRole("button", { name: "Własne" }).click();
-  await expect(page.getByRole("group", { name: "od" })).toBeVisible();
-  await saveScreenshot(page, testInfo, "create-wlasne");
+  if (testInfo.project.name.startsWith("desktop")) {
+    const tiles = page.getByRole("group", { name: "Godziny" });
+    await tiles.getByRole("button", { name: "22:00", exact: true }).click();
+    await expect(page.getByText("Od 22:00, teraz kliknij koniec").filter({ visible: true })).toBeVisible();
+    await tiles.getByRole("button", { name: "3:00", exact: true }).click();
+    await expect(tiles.getByRole("button", { pressed: true })).toHaveText(["22", "23", "0", "1", "2", "3"]);
+    await expect(page.getByText("22:00 → 4:00 · 6 godzin").filter({ visible: true })).toBeVisible();
+    await saveScreenshot(page, testInfo, "create-hours");
+  } else {
+    await page.getByRole("button", { name: "Od 17:00" }).click();
+    const sheet = page.getByRole("dialog", { name: "O której?" });
+    await sheet.getByRole("group", { name: "Od" }).getByRole("button", { name: "22:00", exact: true }).click();
+    await sheet.getByRole("group", { name: "Do" }).getByRole("button", { name: "4:00", exact: true }).click();
+    await expect(sheet.getByText("22:00 → 4:00 · 6 godzin")).toBeVisible();
+    await settleAnimations(page);
+    await page.screenshot({ path: `e2e/screenshots/create-hours-${testInfo.project.name}.png` });
+    await sheet.getByRole("button", { name: "Gotowe" }).click();
+    await expect(sheet).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Od 22:00" })).toBeFocused();
+    await expect(page.getByRole("button", { name: "Do 4:00" })).toBeVisible();
+  }
+  await createPoll(page, { title: "Nocne granie", day: "Jutro", name: "Kuba" });
+  await expect(page).toHaveURL(/\/e\/[A-Za-z0-9_-]{10}$/);
+
+  const grid = page.getByRole("grid", { name: "Kiedy możesz?" });
+  await expect(grid.getByRole("rowheader")).toHaveText(["22:00", "23:00", "0:00", "1:00", "2:00", "3:00"]);
+  await grid.getByRole("button", { name: /, 23:00$/ }).click();
+  await grid.getByRole("button", { name: /, 0:00$/ }).click();
+  await expect(page.getByRole("status")).toHaveText("Zapisane");
+  await page.reload();
+  await expect(page.getByRole("tab", { name: "Wszyscy", selected: true })).toBeVisible();
+
+  await expect(page.getByRole("region", { name: "Najlepiej" }).getByText(/, 23–1$/)).toBeVisible();
+});
+
+test("the month and the 10-day limit", async ({ page }, testInfo) => {
+  await page.goto("/");
 
   await page.getByRole("button", { name: "Pokaż cały miesiąc" }).click();
   await expect(days(page)).toHaveCount(42);
@@ -205,7 +241,6 @@ test("nothing below the dates moves when the page hydrates", async ({ page, brow
 
 test("inputs render at 16px or more", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Własne" }).click();
 
   for (const input of await page.locator("input, output").all()) {
     const size = await input.evaluate((element) => parseFloat(getComputedStyle(element).fontSize));

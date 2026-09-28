@@ -11,7 +11,7 @@ const organiserToken = "organiser-token-for-the-v3-poll-0123456789";
 type Seeded = { pollId: string; zuza: string; kuba: string };
 
 function seedBoardPoll(): Seeded {
-  const pollId = seedPoll({ dates: [friday, saturday, sunday], firstHour: 18, lastHour: 22, organiserToken });
+  const pollId = seedPoll({ dates: [friday, saturday, sunday], firstHour: 18, hourCount: 4, organiserToken });
   const at = (minutes: number) => Date.now() - minutes * 60_000;
   seedAnswer(pollId, "Bartek", at(50), []);
   seedAnswer(pollId, "Michał", at(40), [[friday, 18], [friday, 19], [friday, 20], [saturday, 19], [saturday, 20], [saturday, 21], [sunday, 20]]);

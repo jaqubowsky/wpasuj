@@ -1,3 +1,5 @@
+import { clockEndHour, clockHour } from "@/shared/dates/format";
+
 type TimeRange = { date: string; firstHour: number; lastHour: number };
 
 const longWeekday = new Intl.DateTimeFormat("pl", { timeZone: "UTC", weekday: "long" });
@@ -16,9 +18,9 @@ function longDay(date: string) {
 }
 
 export function longRunLabel({ date, firstHour, lastHour }: TimeRange) {
-  return `${longDay(date)}, ${firstHour}–${lastHour}`;
+  return `${longDay(date)}, ${clockHour(firstHour)}–${clockEndHour(lastHour)}`;
 }
 
 export function hourLabel({ date, hour }: { date: string; hour: number }) {
-  return `${longDay(date)}, ${hour}:00`;
+  return `${longDay(date)}, ${clockHour(hour)}:00`;
 }

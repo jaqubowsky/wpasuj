@@ -12,7 +12,7 @@ import { pollIdSchema } from "./poll-schema";
 type OrganiserResult = { ok: true } | { ok: false; reason: "invalid" | "not-organiser" | "gone" };
 
 const finalTimeSchema = z
-  .object({ date: z.iso.date(), firstHour: z.int().min(0).max(23), lastHour: z.int().min(1).max(24) })
+  .object({ date: z.iso.date(), firstHour: z.int().min(0).max(46), lastHour: z.int().min(1).max(47) })
   .refine((final) => final.lastHour > final.firstHour);
 
 type FinalTime = z.infer<typeof finalTimeSchema>;

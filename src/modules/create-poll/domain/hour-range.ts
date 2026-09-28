@@ -1,28 +1,40 @@
+import { clockHour } from "@/shared/dates/format";
 import type { z } from "zod";
 import type { createPollSchema } from "../server/poll-schema";
 
-export type HourRange = Pick<z.output<typeof createPollSchema>, "firstHour" | "lastHour">;
+export type HourRange = Pick<z.output<typeof createPollSchema>, "firstHour" | "hourCount">;
 
-export const hourRanges = {
-  evening: { firstHour: 17, lastHour: 23 },
-  "all-day": { firstHour: 10, lastHour: 23 },
-} satisfies Record<string, HourRange>;
+const hoursInDay = 24;
+const firstTileHour = 6;
 
-export const startBounds = { min: 0, max: 23 };
+const hourWord = { one: "godzina", few: "godziny", many: "godzin" };
+const plural = new Intl.PluralRules("pl");
 
-export function endBounds(range: HourRange) {
-  return { min: range.firstHour + 1, max: 24 };
+export const defaultRange: HourRange = { firstHour: 17, hourCount: 6 };
+
+export const startHours = Array.from({ length: hoursInDay }, (_, index) => (firstTileHour + index) % hoursInDay);
+
+export function endHours(range: HourRange) {
+  return Array.from({ length: hoursInDay }, (_, index) => range.firstHour + index + 1);
 }
 
-function clamp(value: number, { min, max }: { min: number; max: number }) {
-  return Math.min(Math.max(value, min), max);
+export function hoursOf(range: HourRange) {
+  return Array.from({ length: range.hourCount }, (_, index) => range.firstHour + index);
 }
 
-export function withStart(range: HourRange, start: number): HourRange {
-  const firstHour = clamp(start, startBounds);
-  return { firstHour, lastHour: Math.max(range.lastHour, firstHour + 1) };
+export function withStart(range: HourRange, firstHour: number): HourRange {
+  return { firstHour, hourCount: range.hourCount };
 }
 
-export function withEnd(range: HourRange, end: number): HourRange {
-  return { firstHour: range.firstHour, lastHour: clamp(end, endBounds(range)) };
+export function withEnd(range: HourRange, endHour: number): HourRange {
+  return { firstHour: range.firstHour, hourCount: endHour - range.firstHour };
+}
+
+export function withTiles(firstHour: number, lastHour: number): HourRange {
+  return { firstHour, hourCount: startHours.indexOf(lastHour) - startHours.indexOf(firstHour) + 1 };
+}
+
+export function rangeSummary({ firstHour, hourCount }: HourRange) {
+  const word = hourWord[plural.select(hourCount) as keyof typeof hourWord];
+  return `${firstHour}:00 → ${clockHour(firstHour + hourCount)}:00 · ${hourCount} ${word}`;
 }

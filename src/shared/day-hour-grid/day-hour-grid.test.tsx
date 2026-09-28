@@ -33,6 +33,13 @@ describe("DayHourGrid", () => {
     expect(screen.getAllByRole("gridcell", { selected: true })).toEqual([screen.getByRole("button", { name: "sb 17, 18:00" }).parentElement]);
   });
 
+  it("reads hours past midnight by the clock, after the evening's", () => {
+    render(<DayHourGrid label="Kiedy możesz?" dates={dates} hours={[23, 24, 25]} isSelected={() => false} renderCell={({ label }) => <Cell aria-label={label} />} onCellTap={vi.fn()} />);
+
+    expect(screen.getAllByRole("rowheader").map((header) => header.textContent)).toEqual(["23:00", "0:00", "1:00"]);
+    expect(screen.getByRole("button", { name: "pt 16, 1:00" })).toBeInTheDocument();
+  });
+
   it("tells each rendered cell whether it is selected", () => {
     const renderCell = vi.fn<(cell: { date: string; selected: boolean }) => null>(() => null);
 

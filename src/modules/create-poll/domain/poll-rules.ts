@@ -25,6 +25,6 @@ export function isExpired(dates: string[], today: string) {
   return dates.every((date) => date < expiryCutoff(today));
 }
 
-export function fitsPoll(poll: HourRange & { dates: string[] }, final: HourRange & { date: string }) {
-  return poll.dates.includes(final.date) && final.firstHour >= poll.firstHour && final.lastHour <= poll.lastHour;
+export function fitsPoll(poll: HourRange & { dates: string[] }, final: { date: string; firstHour: number; lastHour: number }) {
+  return poll.dates.includes(final.date) && final.firstHour >= poll.firstHour && final.lastHour <= poll.firstHour + poll.hourCount;
 }

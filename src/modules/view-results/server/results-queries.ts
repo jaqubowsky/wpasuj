@@ -4,7 +4,7 @@ import { hashToken } from "@/shared/token-cookie";
 import { asc, eq } from "drizzle-orm";
 import type { Results } from "./results-schema";
 
-type PollGrid = Pick<Results, "dates" | "final"> & { firstHour: number; lastHour: number };
+type PollGrid = Pick<Results, "dates" | "final"> & { firstHour: number; hourCount: number };
 
 export function readResults(id: string, poll: PollGrid, now: Date, participantToken?: string): Results {
   const db = getDb();
@@ -26,7 +26,7 @@ export function readResults(id: string, poll: PollGrid, now: Date, participantTo
 
   return {
     dates: poll.dates,
-    hours: Array.from({ length: poll.lastHour - poll.firstHour }, (_, index) => poll.firstHour + index),
+    hours: Array.from({ length: poll.hourCount }, (_, index) => poll.firstHour + index),
     readAt: now.getTime(),
     respondents: respondents.map((respondent) => ({
       name: respondent.name,
