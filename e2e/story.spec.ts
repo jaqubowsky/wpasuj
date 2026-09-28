@@ -61,7 +61,7 @@ test("at its step the link scene drops the preview and the reply into the chat, 
   await scrollThroughStory(page, 2.5 / steps.length);
 
   await expect(story(page).getByText("Kuba pyta, kiedy możesz")).toBeVisible();
-  await expect(story(page).getByText("wpasuj.pl · pt 17 – nd 19 października")).toBeVisible();
+  await expect(story(page).getByText("wpasuj.pl · pt 17 – nd 19 paź")).toBeVisible();
   await expect(story(page).getByText("Zaznaczcie tu, zajmie wam to 20 sekund")).toBeVisible();
   await expect(story(page).getByText("Ej, planszówki w weekend? Kiedy możecie?").filter({ visible: true })).toHaveCount(1);
   await expect(caption(page, steps[2].heading)).toBeVisible();
@@ -256,6 +256,24 @@ test("on the phone the create form shows filled in", async ({ page }, testInfo) 
   await expect(stepTwo.getByText("Planszówki u Michała")).toBeVisible();
   await expect(stepTwo.getByText("Utwórz i wyślij na grupę")).toBeVisible();
   await stepTwo.screenshot({ path: `e2e/screenshots/landing-story-2-${testInfo.project.name}.png`, style: "header { visibility: hidden; }" });
+});
+
+test("on the phone the link preview carries the tile mark and a one-line footer", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("phone"), "the sequence is the phone layout");
+  await page.goto("/#jak-to-dziala");
+  const stepThree = story(page).locator(":scope > div").nth(2);
+
+  await stepThree.scrollIntoViewIfNeeded();
+
+  const footer = stepThree.getByText(/^wpasuj\.pl · /);
+  await expect(footer).toBeVisible();
+  const { height, lineHeight } = await footer.evaluate((element) => ({
+    height: element.getBoundingClientRect().height,
+    lineHeight: parseFloat(getComputedStyle(element).lineHeight) + parseFloat(getComputedStyle(element).paddingTop) + parseFloat(getComputedStyle(element).paddingBottom),
+  }));
+  expect(height).toBeLessThanOrEqual(lineHeight);
+  await expect(stepThree.locator("[data-tile-mark] > span")).toHaveCount(4);
+  await stepThree.screenshot({ path: `e2e/screenshots/landing-story-3-${testInfo.project.name}.png`, style: "header { visibility: hidden; }" });
 });
 
 test("on the phone the poll shows its seven painted hours", async ({ page }, testInfo) => {
