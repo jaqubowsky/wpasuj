@@ -85,7 +85,26 @@ describe("saveAnswer", () => {
       sameSite: "lax",
       path: "/",
       maxAge: 31_536_000,
+      secure: false,
     });
+  });
+
+  it("writes nothing when the site's address is missing", async () => {
+    vi.stubEnv("SITE_URL", undefined);
+    const { saveAnswer } = await actions();
+
+    await expect(saveAnswer(pollId, { name: "Ola", slots: [] })).rejects.toThrow("SITE_URL");
+
+    expect(await db.select().from(participants).where(eq(participants.pollId, pollId))).toEqual([]);
+  });
+
+  it("keeps the participant cookie off plain http when the site runs on https", async () => {
+    vi.stubEnv("SITE_URL", "https://wpasuj.pl");
+    const { saveAnswer } = await actions();
+
+    await saveAnswer(pollId, { name: "Ola", slots: [] });
+
+    expect(cookieJar.get(pollId)).toMatchObject({ secure: true });
   });
 
   it("saves an empty set for someone who can't make any time", async () => {
@@ -203,6 +222,18 @@ describe("saveAnswer", () => {
 });
 
 describe("claimName", () => {
+  it("keeps the row's token when the site's address is missing", async () => {
+    const { saveAnswer, claimName } = await actions();
+    await saveAnswer(pollId, { name: "Ola", slots: [friday19] });
+    const [before] = await db.select({ tokenHash: participants.tokenHash }).from(participants);
+    onAnotherDevice();
+    vi.stubEnv("SITE_URL", undefined);
+
+    await expect(claimName(pollId, "Ola")).rejects.toThrow("SITE_URL");
+
+    expect(await db.select({ tokenHash: participants.tokenHash }).from(participants)).toEqual([before]);
+  });
+
   it("moves the row to this device and hands back its slots", async () => {
     const { saveAnswer, claimName } = await actions();
     await saveAnswer(pollId, { name: "Ola", slots: [friday19] });

@@ -82,9 +82,28 @@ describe("createPoll", () => {
       sameSite: "lax",
       path: "/",
       maxAge: 31_536_000,
+      secure: false,
     });
     const [row] = await db.select().from(polls);
     expect(row.organiserTokenHash).toBe(hashToken(cookieJar.get(`${id}-org`)!.value));
+  });
+
+  it("writes nothing when the site's address is missing", async () => {
+    vi.stubEnv("SITE_URL", undefined);
+    const { createPoll } = await actions();
+
+    await expect(createPoll(input)).rejects.toThrow("SITE_URL");
+
+    expect(await db.select().from(polls)).toEqual([]);
+  });
+
+  it("keeps the organiser cookie off plain http when the site runs on https", async () => {
+    vi.stubEnv("SITE_URL", "https://wpasuj.pl");
+    const { createPoll } = await actions();
+
+    const result = await createPoll(input);
+
+    expect(cookieJar.get(`${result.ok ? result.id : ""}-org`)).toMatchObject({ secure: true });
   });
 
   it("records whether the organiser already answered another poll", async () => {

@@ -9,7 +9,7 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
-    env: { TZ: "Europe/Warsaw" },
+    env: { TZ: "Europe/Warsaw", SITE_URL: "http://localhost:3000" },
     include: ["src/**/*.test.{ts,tsx}"],
     setupFiles: ["./vitest.setup.ts"],
   },

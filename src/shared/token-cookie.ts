@@ -1,6 +1,9 @@
 import { createHash, randomBytes } from "node:crypto";
+import { siteUrl } from "./site-url";
 
-export const tokenCookieOptions = { httpOnly: true, sameSite: "lax", path: "/", maxAge: 365 * 24 * 60 * 60 } as const;
+export function tokenCookieOptions() {
+  return { httpOnly: true, sameSite: "lax", path: "/", maxAge: 365 * 24 * 60 * 60, secure: siteUrl().protocol === "https:" } as const;
+}
 
 export function newToken() {
   return randomBytes(32).toString("base64url");
