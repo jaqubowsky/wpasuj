@@ -87,5 +87,7 @@ test("a 60-character title with ten dates leaves the wordmark untouched", async 
   await mkdir("e2e/screenshots", { recursive: true });
   await writeFile("e2e/screenshots/link-preview-long.png", longCard);
 
-  expect(await pixelsIn(page, longCard)).toBe(await pixelsIn(page, shortCard));
+  const wordmark = await pixelsIn(page, shortCard);
+  expect(new Set(wordmark.match(/\d+,\d+,\d+,\d+/g)).size).toBeGreaterThan(1);
+  expect(await pixelsIn(page, longCard)).toBe(wordmark);
 });
