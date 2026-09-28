@@ -17,8 +17,11 @@ export function Segment<Option extends string>({ label, options, selected, onSel
 
   function moveWithArrows(event: KeyboardEvent<HTMLButtonElement>, index: number) {
     const step = steps[event.key];
+
     if (!step) return;
+
     const next = options[(index + step + options.length) % options.length];
+
     document.getElementById(tabId(next))?.focus();
     onSelect(next);
   }

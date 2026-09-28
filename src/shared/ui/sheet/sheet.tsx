@@ -15,14 +15,19 @@ export function Sheet({ onClose, label, menuBelow, children }: SheetProps) {
 
   useEffect(() => {
     const dialog = ref.current;
+
     if (!dialog) return;
+
     const opener = document.activeElement instanceof HTMLElement ? document.activeElement : undefined;
     const anchor = menuBelow?.current?.getBoundingClientRect();
+
     if (anchor) {
       dialog.style.setProperty("--sheet-top", `${anchor.bottom + menuGap}px`);
       dialog.style.setProperty("--sheet-right", `${document.documentElement.clientWidth - anchor.right}px`);
     }
+
     dialog.showModal();
+
     return () => {
       dialog.close();
       opener?.focus();

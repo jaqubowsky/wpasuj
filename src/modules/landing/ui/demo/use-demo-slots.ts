@@ -18,6 +18,7 @@ export function useDemoSlots() {
     stroke: ({ dates, hours, mode }: Rectangle) => {
       const painted = dates.flatMap((date) => hours.map((hour) => ({ date, hour })));
       const rest = mine.filter((slot) => !painted.some((cell) => sameSlot(cell, slot)));
+
       setMine(mode === "add" ? [...rest, ...painted] : rest);
     },
     clear: () => setMine([]),

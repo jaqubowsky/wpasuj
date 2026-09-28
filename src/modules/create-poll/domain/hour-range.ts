@@ -36,5 +36,6 @@ export function withTiles(firstHour: number, lastHour: number): HourRange {
 
 export function rangeSummary({ firstHour, hourCount }: HourRange) {
   const word = hourWord[plural.select(hourCount) as keyof typeof hourWord];
+
   return `${firstHour}:00 → ${clockHour(firstHour + hourCount)}:00 · ${hourCount} ${word}`;
 }

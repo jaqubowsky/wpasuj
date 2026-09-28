@@ -9,6 +9,7 @@ export function useSendSetTime(pollId: string, title: string, final: FinalTime) 
   async function send() {
     const message = setTimeMessage(final, { title, link: `${location.origin}/e/${pollId}` });
     const outcome = await shareOrCopy({ text: message, link: message });
+
     setNotice(outcome === "copied" || outcome === "not-copied" ? outcome : undefined);
   }
 

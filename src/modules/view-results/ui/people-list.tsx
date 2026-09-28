@@ -19,7 +19,10 @@ export function PeopleList({ groups, you, organiserKey, arrived }: PeopleListPro
   return groups
     .filter((group) => group.people.length > 0)
     .map((group, index) => (
-      <div key={group.label} className="not-first-of-type:mt-2 not-first-of-type:border-0 not-first-of-type:border-t not-first-of-type:border-solid not-first-of-type:border-line">
+      <div
+        key={group.label}
+        className="not-first-of-type:mt-2 not-first-of-type:border-0 not-first-of-type:border-t not-first-of-type:border-solid not-first-of-type:border-line"
+      >
         <div className="flex h-9 items-baseline justify-between pt-2 text-sm font-semibold">
           <h3 id={`${id}-${index}`} className="m-0 text-sm font-semibold">
             {group.label}
@@ -32,9 +35,20 @@ export function PeopleList({ groups, you, organiserKey, arrived }: PeopleListPro
             const isOrganiser = person.normalisedName === organiserKey;
             const cannot = group.cannot || person.slots.length === 0;
             const states = [isYou && "to Ty", isOrganiser && "organizator", cannot && "nie może"].filter(Boolean);
+
             return (
-              <li key={person.normalisedName} className="flex h-11 items-center gap-3 text-base data-cannot:text-muted" data-cannot={cannot || undefined}>
-                <Avatar name={person.name} tintKey={person.normalisedName} you={isYou} mark={cannot ? "cannot" : isOrganiser ? "organiser" : undefined} pop={arrived?.(person)} />
+              <li
+                key={person.normalisedName}
+                className="flex h-11 items-center gap-3 text-base data-cannot:text-muted"
+                data-cannot={cannot || undefined}
+              >
+                <Avatar
+                  name={person.name}
+                  tintKey={person.normalisedName}
+                  you={isYou}
+                  mark={cannot ? "cannot" : isOrganiser ? "organiser" : undefined}
+                  pop={arrived?.(person)}
+                />
                 {person.name}
                 {states.length > 0 && <span className="sr-only">, {states.join(", ")}</span>}
               </li>

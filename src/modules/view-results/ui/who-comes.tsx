@@ -11,6 +11,7 @@ export function WhoComes({ final }: { final: FinalTime }) {
   if (results.respondents.length === 0) return null;
 
   const { coming, cannot } = whoComes(results.respondents, final);
+
   const groups = [
     { label: "Będzie", people: coming },
     { label: "Nie może", people: cannot, cannot: true },

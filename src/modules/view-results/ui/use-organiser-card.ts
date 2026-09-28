@@ -13,6 +13,7 @@ export function useOrganiserCard({ pollId, title, token, respondentNames }: Card
 
   async function copy(text: string, copied: CardNotice) {
     setMenu(undefined);
+
     try {
       await navigator.clipboard.writeText(text);
       setNotice(copied);
@@ -24,6 +25,7 @@ export function useOrganiserCard({ pollId, title, token, respondentNames }: Card
   async function remind() {
     const message = reminderText(respondentNames, { title, link: pollLink() });
     const outcome = await shareOrCopy({ text: message, link: message });
+
     setNotice(outcome === "copied" ? "reminder-copied" : outcome === "not-copied" ? "not-copied" : undefined);
   }
 

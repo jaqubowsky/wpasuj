@@ -10,8 +10,10 @@ const invite = `Kiedy możecie? Planszówki u Michała ${location.origin}/e/${po
 
 function stubSharing(share?: (data: ShareData) => Promise<void>) {
   const writeText = vi.fn(async () => {});
+
   Object.defineProperty(navigator, "share", { value: share, configurable: true });
   Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+
   return writeText;
 }
 
@@ -24,6 +26,7 @@ function refuseClipboard() {
 
 function renderFreshCard() {
   markFreshPoll(pollId);
+
   return render(<InviteCard pollId={pollId} title={title} />);
 }
 
@@ -47,6 +50,7 @@ it("shows the link to send, once", () => {
   const { unmount } = renderFreshCard();
 
   const card = screen.getByRole("region", { name: "Ankieta gotowa" });
+
   expect(card).toHaveTextContent("Wyślij link znajomym na grupę");
   expect(card).toHaveTextContent(`${location.host}/e/${pollId}`);
   unmount();
@@ -57,6 +61,7 @@ it("shows the link to send, once", () => {
 
 it("opens the share sheet from its own tap with the invite and folds after sending", async () => {
   const share = vi.fn(async () => {});
+
   stubSharing(share);
   renderFreshCard();
 
@@ -79,6 +84,7 @@ it("keeps the card when the share sheet is closed without sending", async () => 
 
 it("copies the link, says Skopiowano for a moment and keeps the card", async () => {
   const writeText = stubSharing();
+
   renderFreshCard();
   vi.useFakeTimers({ toFake: ["setTimeout"] });
 
@@ -108,7 +114,11 @@ it("keeps Skopiowano for the full moment after a second copy", async () => {
 });
 
 it("points at Kopiuj when sharing fails and the clipboard refuses", async () => {
-  Object.defineProperty(navigator, "share", { value: async () => Promise.reject(new DOMException("denied", "NotAllowedError")), configurable: true });
+  Object.defineProperty(navigator, "share", {
+    value: async () => Promise.reject(new DOMException("denied", "NotAllowedError")),
+    configurable: true,
+  });
+
   refuseClipboard();
   renderFreshCard();
 
@@ -129,6 +139,7 @@ it("says to copy from the address bar when the clipboard refuses", async () => {
 
 it("copies the whole invite where sharing is unavailable", async () => {
   const writeText = stubSharing();
+
   renderFreshCard();
 
   await userEvent.click(sendButton());

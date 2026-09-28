@@ -19,6 +19,7 @@ export function runParts({ date, firstHour, lastHour }: TimeRange) {
 
 export function longRunLabel(run: TimeRange) {
   const { day, hours } = runParts(run);
+
   return `${day}, ${hours}`;
 }
 
@@ -28,6 +29,7 @@ export function hourLabel({ date, hour }: { date: string; hour: number }) {
 
 export function setTimeShown({ date, firstHour, lastHour }: TimeRange) {
   const day = calendarDate(date, firstHour);
+
   return {
     weekday: longWeekday(day),
     day: dayAndMonthLong(day),

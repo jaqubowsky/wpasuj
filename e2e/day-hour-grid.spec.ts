@@ -12,13 +12,16 @@ test.describe("day-hour grid", () => {
       await page.goto(`/dev/day-hour-grid?dates=${count}`);
 
       const grid = page.getByRole("grid", { name: "Kiedy możesz?" });
+
       await expect(page.getByRole("columnheader")).toHaveCount(count);
       await expect(grid).toHaveCSS("column-gap", "6px");
       await expect(grid).toHaveCSS("row-gap", "6px");
       const tile = cell(page, "pt 16, 19:00");
+
       await expect(tile).toHaveCSS("height", "48px");
       await expect(tile).toHaveCSS("border-radius", "10px");
       const width = await tile.evaluate((element) => element.getBoundingClientRect().width);
+
       expect(width).toBeGreaterThanOrEqual(56);
       await saveScreenshot(page, testInfo, `day-hour-grid-${count}-dates`);
     });
@@ -36,10 +39,15 @@ test.describe("day-hour grid", () => {
     test.skip(!isMobile, "all 7 dates fit at 1440");
     await page.goto("/dev/day-hour-grid?dates=7");
     const grid = page.getByRole("grid", { name: "Kiedy możesz?" });
-    const pitch = await page.getByRole("columnheader").nth(1).evaluate((second) => {
-      const first = second.previousElementSibling as HTMLElement;
-      return second.getBoundingClientRect().left - first.getBoundingClientRect().left;
-    });
+
+    const pitch = await page
+      .getByRole("columnheader")
+      .nth(1)
+      .evaluate((second) => {
+        const first = second.previousElementSibling as HTMLElement;
+
+        return second.getBoundingClientRect().left - first.getBoundingClientRect().left;
+      });
 
     await grid.evaluate((element) => element.scrollBy({ left: 60, behavior: "instant" }));
 
@@ -54,6 +62,7 @@ test.describe("day-hour grid", () => {
     for (const name of ["pt 16, 13:00", "sb 17, 14:00", "nd 18, 15:00"]) {
       await expect(page.getByRole("gridcell", { selected: true }).filter({ has: cell(page, name) })).toHaveCount(1);
     }
+
     await expect(page.getByRole("gridcell", { selected: true })).toHaveCount(9);
   });
 
@@ -64,6 +73,7 @@ test.describe("day-hour grid", () => {
       await page.goto("/dev/day-hour-grid?dates=7");
 
       const width = await cell(page, "pt 16, 19:00").evaluate((element) => element.getBoundingClientRect().width);
+
       expect(width).toBeGreaterThanOrEqual(56);
     });
   });
@@ -73,7 +83,12 @@ test.describe("day-hour grid", () => {
     await page.goto("/dev/day-hour-grid?dates=7");
 
     const gridRight = await page.getByRole("grid", { name: "Kiedy możesz?" }).evaluate((element) => element.getBoundingClientRect().right);
-    const fifth = await page.getByRole("columnheader").nth(4).evaluate((element) => element.getBoundingClientRect().toJSON() as DOMRect);
+
+    const fifth = await page
+      .getByRole("columnheader")
+      .nth(4)
+      .evaluate((element) => element.getBoundingClientRect().toJSON() as DOMRect);
+
     const shown = (gridRight - fifth.left) / fifth.width;
 
     expect(shown).toBeGreaterThan(0.3);
@@ -81,7 +96,10 @@ test.describe("day-hour grid", () => {
   });
 
   test.describe("on a touch screen", () => {
-    test.skip(({ browserName, isMobile }) => browserName !== "chromium" || !isMobile, "Playwright drives touch moves only through Chromium's CDP");
+    test.skip(
+      ({ browserName, isMobile }) => browserName !== "chromium" || !isMobile,
+      "Playwright drives touch moves only through Chromium's CDP",
+    );
 
     test("a drag across cells paints them and scrolls nothing", async ({ page }) => {
       await page.goto("/dev/day-hour-grid?dates=7");
@@ -93,6 +111,7 @@ test.describe("day-hour grid", () => {
       for (const name of ["pt 16, 13:00", "sb 17, 14:00", "nd 18, 15:00"]) {
         await expect(page.getByRole("gridcell", { selected: true }).filter({ has: cell(page, name) })).toHaveCount(1);
       }
+
       await expect(page.getByRole("gridcell", { selected: true })).toHaveCount(9);
       expect(await page.evaluate(() => window.scrollY)).toBe(100);
       expect(await grid.evaluate((element) => element.scrollLeft)).toBe(0);

@@ -5,7 +5,9 @@ import { GoToFormButton } from "./go-to-form-button";
 
 it("brings the form into view and puts the cursor in its first field", async () => {
   const scrollIntoView = vi.fn();
+
   Element.prototype.scrollIntoView = scrollIntoView;
+
   render(
     <>
       <div id="utworz">

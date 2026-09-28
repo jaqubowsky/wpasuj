@@ -19,11 +19,13 @@ export function dayNumber(date: string) {
 
 export function dayAndMonth(date: string) {
   const [, month, day] = date.split("-");
+
   return `${Number(day)}.${month}`;
 }
 
 export function longWeekday(date: string) {
   const weekday = weekdayLong.format(asDate(date));
+
   return weekday.charAt(0).toLocaleUpperCase("pl") + weekday.slice(1);
 }
 
@@ -40,6 +42,7 @@ export function summaryOfDates(dates: string[]) {
     .map((date, index) => {
       const closesMonth = dates[index + 1]?.slice(0, 7) !== date.slice(0, 7);
       const day = closesMonth ? monthGenitive.format(asDate(date)) : dayNumber(date);
+
       return `${shortWeekday(date)} ${day}`;
     })
     .join(", ");

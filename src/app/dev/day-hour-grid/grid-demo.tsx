@@ -14,10 +14,12 @@ export function GridDemo({ dates, hours }: GridDemoProps) {
   function paint(cells: GridCell[], add: boolean) {
     setMine((current) => {
       const next = new Set(current);
+
       for (const cell of cells) {
         if (add) next.add(keyOf(cell));
         else next.delete(keyOf(cell));
       }
+
       return next;
     });
   }

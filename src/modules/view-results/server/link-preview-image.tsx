@@ -15,7 +15,16 @@ const clockIcon = "M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M12 7v5l3 2";
 
 function Icon({ path }: { path: string }) {
   return (
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={accent} strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="32"
+      height="32"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={accent}
+      strokeWidth="2.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d={path} />
     </svg>
   );
@@ -34,6 +43,7 @@ const avatarStyle = {
 export async function linkPreviewImage(poll: PreviewedPoll) {
   const { asker, title, days, hours, respondents } = linkPreview(poll);
   const titleSize = title.length > longTitle ? 64 : 84;
+
   const [display, sans500, sans600] = await Promise.all([
     ogFont("bricolage-grotesque-800.ttf"),
     ogFont("onest-500.ttf"),
@@ -86,12 +96,25 @@ export async function linkPreviewImage(poll: PreviewedPoll) {
           {respondents.avatars.length > 0 && (
             <div style={{ display: "flex" }}>
               {respondents.avatars.map(({ initial, tint }, index) => (
-                <div key={index} style={{ ...avatarStyle, width: avatarSize, marginLeft: index === 0 ? 0 : -avatarSize / 4, background: tints[tint], fontSize: 28 }}>
+                <div
+                  key={index}
+                  style={{
+                    ...avatarStyle,
+                    width: avatarSize,
+                    marginLeft: index === 0 ? 0 : -avatarSize / 4,
+                    background: tints[tint],
+                    fontSize: 28,
+                  }}
+                >
                   {initial}
                 </div>
               ))}
               {respondents.more > 0 && (
-                <div style={{ ...avatarStyle, padding: "0 14px", marginLeft: -avatarSize / 4, background: ink, color: surface, fontSize: 26 }}>+{respondents.more}</div>
+                <div
+                  style={{ ...avatarStyle, padding: "0 14px", marginLeft: -avatarSize / 4, background: ink, color: surface, fontSize: 26 }}
+                >
+                  +{respondents.more}
+                </div>
               )}
             </div>
           )}

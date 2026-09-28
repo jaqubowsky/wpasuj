@@ -3,7 +3,11 @@ import { refusalOf, takesOrganiserName } from "./answer-rules";
 
 describe("refusalOf", () => {
   it("refuses a name someone else already holds, saying how many hours they marked", () => {
-    expect(refusalOf({ nameHeldByOther: { name: "Ola", hours: 2 }, newcomer: false, participantCount: 3 })).toEqual({ reason: "name-taken", name: "Ola", hours: 2 });
+    expect(refusalOf({ nameHeldByOther: { name: "Ola", hours: 2 }, newcomer: false, participantCount: 3 })).toEqual({
+      reason: "name-taken",
+      name: "Ola",
+      hours: 2,
+    });
   });
 
   it("refuses a newcomer once 30 people answered", () => {

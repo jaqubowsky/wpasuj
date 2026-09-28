@@ -11,10 +11,19 @@ type CellDetailsProps = { cell: GridCell; results: Results; organiserKey: string
 function CellPeople({ cell, results, organiserKey }: CellDetailsProps) {
   const respondents = newestFirst(results.respondents);
   const free = freeAt(respondents, cell);
+
   const groups = [
     { label: "Może", people: free },
-    { label: "Nie może", people: cannotMake(respondents, free.map((person) => person.name)), cannot: true },
+    {
+      label: "Nie może",
+      people: cannotMake(
+        respondents,
+        free.map((person) => person.name),
+      ),
+      cannot: true,
+    },
   ];
+
   return <PeopleList groups={groups} you={results.you} organiserKey={organiserKey} />;
 }
 

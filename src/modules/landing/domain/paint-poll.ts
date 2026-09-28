@@ -15,5 +15,6 @@ const path: Cell[] = [
 
 export function paintPollAt(time: number) {
   const painted = path.slice(0, Math.floor(Math.min(time * 1.3, 1) * path.length));
+
   return { painted, finger: time < 1 ? painted.at(-1) : undefined };
 }

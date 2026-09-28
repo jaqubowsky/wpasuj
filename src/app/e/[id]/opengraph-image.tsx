@@ -9,6 +9,8 @@ export default async function OpengraphImage({ params }: { params: Promise<{ id:
   const { id } = await params;
   const now = new Date();
   const poll = findPoll(id, now);
+
   if (!poll) notFound();
+
   return linkPreviewImage({ ...poll, respondents: readResults(id, poll, now).respondents });
 }

@@ -20,6 +20,7 @@ export function RespondentCount() {
   if (count === 0) return <Text variant="meta">{answeredCount(0)}</Text>;
 
   const newest = newestFirst(results.respondents);
+
   const groups = [
     { label: "Zaznaczyli godziny", people: newest.filter((person) => person.slots.length > 0) },
     { label: "Nie może w żadnym", people: newest.filter((person) => person.slots.length === 0) },

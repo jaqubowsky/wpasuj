@@ -1,6 +1,7 @@
 export function storyMoment(progress: number, steps: number) {
   const position = Math.min(Math.max(progress, 0), 1) * steps;
   const step = Math.min(Math.floor(position), steps - 1);
+
   return { step, time: position - step };
 }
 
@@ -12,5 +13,6 @@ export function railFill({ step, time }: StoryMoment, steps: number) {
 
 export function sceneTime(index: number, { step, time }: StoryMoment) {
   if (index === step) return time;
+
   return index < step ? 1 : 0;
 }

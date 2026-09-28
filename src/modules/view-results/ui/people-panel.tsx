@@ -17,7 +17,12 @@ export function PeoplePanel() {
       {selection.selected ? (
         <CellPanel cell={selection.selected} results={results} organiserKey={organiserKey} onClose={selection.close} />
       ) : (
-        <PeopleList groups={[{ label: "Odpowiedzieli", people: newestFirst(results.respondents) }]} you={results.you} organiserKey={organiserKey} arrived={(person) => seen !== undefined && !seen.has(person.normalisedName)} />
+        <PeopleList
+          groups={[{ label: "Odpowiedzieli", people: newestFirst(results.respondents) }]}
+          you={results.you}
+          organiserKey={organiserKey}
+          arrived={(person) => seen !== undefined && !seen.has(person.normalisedName)}
+        />
       )}
     </div>
   );

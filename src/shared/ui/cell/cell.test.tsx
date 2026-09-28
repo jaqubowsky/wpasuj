@@ -19,6 +19,7 @@ describe("Cell", () => {
 
   it("asks to toggle on a tap", async () => {
     const onClick = vi.fn();
+
     render(<Cell aria-label="sb 19:00" onClick={onClick} />);
 
     await userEvent.click(screen.getByRole("button", { name: "sb 19:00" }));
@@ -40,6 +41,7 @@ describe("Cell", () => {
 
   it("shows the count of a heat cell with its level and asks who can on a tap", async () => {
     const onClick = vi.fn();
+
     render(
       <Cell heat={3} aria-label="sb 19:00" onClick={onClick}>
         3
@@ -47,6 +49,7 @@ describe("Cell", () => {
     );
 
     const cell = screen.getByRole("button", { name: "sb 19:00" });
+
     expect(cell).toHaveTextContent("3");
     expect(cell).toHaveAttribute("data-heat", "3");
     expect(cell).not.toHaveAttribute("aria-pressed");
@@ -59,5 +62,4 @@ describe("Cell", () => {
 
     expect(screen.getByRole("button", { name: "sb 19:00" })).not.toHaveAttribute("data-heat");
   });
-
 });

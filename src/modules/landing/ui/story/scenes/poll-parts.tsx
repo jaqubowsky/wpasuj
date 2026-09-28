@@ -46,7 +46,7 @@ type PollGridProps = {
 
 export function PollGrid({ days, hours, cell, children }: PollGridProps) {
   return (
-    <div className="relative grid grid-cols-[--spacing(11)_repeat(3,minmax(0,1fr))] grid-rows-[auto] auto-rows-12 gap-1.5">
+    <div className="relative grid auto-rows-12 grid-cols-[--spacing(11)_repeat(3,minmax(0,1fr))] grid-rows-[auto] gap-1.5">
       <span />
       {days.map((day) => (
         <span key={day} className="grid h-9 place-items-center text-sm font-semibold">
@@ -70,9 +70,12 @@ export function PeoplePill({ names, count }: { names: string[]; count: string })
   return (
     <span className="inline-flex h-9 items-center gap-2 rounded-pill bg-surface px-2.5 text-sm font-semibold shadow-[inset_0_0_0_1px_var(--color-edge)]">
       <span className="inline-flex" aria-hidden>
-        {names.slice(-stackSize).toReversed().map((name) => (
-          <Avatar key={name} name={name} tintKey={name.toLocaleLowerCase("pl")} size="dot" pop />
-        ))}
+        {names
+          .slice(-stackSize)
+          .toReversed()
+          .map((name) => (
+            <Avatar key={name} name={name} tintKey={name.toLocaleLowerCase("pl")} size="dot" pop />
+          ))}
       </span>
       {count}
     </span>

@@ -18,7 +18,9 @@ function Votes() {
   return (
     <div className="grid gap-4">
       <Heatmap results={results} isSelected={selection.isSelected} onCellTap={selection.toggle} />
-      {selection.selected && <CellPanel cell={selection.selected} results={results} organiserKey={organiserKey} onClose={selection.close} />}
+      {selection.selected && (
+        <CellPanel cell={selection.selected} results={results} organiserKey={organiserKey} onClose={selection.close} />
+      )}
     </div>
   );
 }
@@ -38,11 +40,25 @@ export function AllVotes() {
       >
         <span className="grid grid-cols-[repeat(3,--spacing(2.5))] gap-0.5" aria-hidden="true">
           {thumbnail.map((heat, index) => (
-            <span key={index} className="size-2.5 rounded-[2px] data-[heat=heat-1]:bg-heat-1 data-[heat=heat-2]:bg-heat-2 data-[heat=heat-3]:bg-heat-3 data-[heat=heat-4]:bg-heat-4" data-heat={heat} />
+            <span
+              key={index}
+              className="size-2.5 rounded-[2px] data-[heat=heat-1]:bg-heat-1 data-[heat=heat-2]:bg-heat-2 data-[heat=heat-3]:bg-heat-3 data-[heat=heat-4]:bg-heat-4"
+              data-heat={heat}
+            />
           ))}
         </span>
         <span className="grow">Zobacz wszystkie głosy</span>
-        <svg className="size-4.5 flex-none data-open:rotate-90 motion-safe:transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" data-open={(desktop && open) || undefined}>
+        <svg
+          className="size-4.5 flex-none data-open:rotate-90 motion-safe:transition-transform"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+          data-open={(desktop && open) || undefined}
+        >
           <path d="m9 18 6-6-6-6" />
         </svg>
       </button>

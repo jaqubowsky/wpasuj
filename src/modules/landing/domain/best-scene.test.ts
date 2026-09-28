@@ -5,6 +5,7 @@ describe("bestPoll", () => {
   it("counts who can make each hour, Friday 17 to Sunday 19 by hours 17 to 22", () => {
     expect(bestPoll.days).toEqual(["pt 17", "sb 18", "nd 19"]);
     expect(bestPoll.rows.map((row) => row.hour)).toEqual([17, 18, 19, 20, 21, 22]);
+
     expect(bestPoll.rows.map((row) => row.cells.map((cell) => cell.count))).toEqual([
       [2, 1, 5],
       [4, 3, 4],

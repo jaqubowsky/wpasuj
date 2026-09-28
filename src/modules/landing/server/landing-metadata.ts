@@ -9,7 +9,15 @@ export function landingMetadata(site: URL): Metadata {
     title: { absolute: tagline },
     description: pitch,
     alternates: { canonical: "/" },
-    openGraph: { type: "website", url: "/", siteName: productName, locale: "pl_PL", title: tagline, description: pitch, images: [{ url: "/og.png", ...ogCardSize }] },
+    openGraph: {
+      type: "website",
+      url: "/",
+      siteName: productName,
+      locale: "pl_PL",
+      title: tagline,
+      description: pitch,
+      images: [{ url: "/og.png", ...ogCardSize }],
+    },
     twitter: { card: "summary_large_image" },
   };
 }

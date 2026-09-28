@@ -6,6 +6,8 @@ export async function GET(_request: Request, { params }: RouteContext<"/api/poll
   const { id } = await params;
   const now = new Date();
   const poll = findPoll(id, now);
+
   if (!poll) return Response.json({ reason: "gone" }, { status: 404 });
+
   return Response.json(readResults(id, poll, now, (await cookies()).get(id)?.value));
 }

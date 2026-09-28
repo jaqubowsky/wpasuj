@@ -30,6 +30,7 @@ describe("Segment", () => {
 
   it("switches to the tapped view", async () => {
     const onSelect = vi.fn();
+
     render(<Segment label="Widok" options={views} selected="Wszyscy" onSelect={onSelect} panels={panels} />);
 
     await userEvent.click(screen.getByRole("tab", { name: "Moje" }));
@@ -39,6 +40,7 @@ describe("Segment", () => {
 
   it("is one tab stop, and arrows move to the next view and select it", async () => {
     const onSelect = vi.fn();
+
     render(<Segment label="Widok" options={views} selected="Moje" onSelect={onSelect} panels={panels} />);
 
     await userEvent.tab();

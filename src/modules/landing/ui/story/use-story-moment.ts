@@ -7,17 +7,22 @@ export function useStoryMoment(steps: number) {
 
   useEffect(() => {
     let frame = 0;
+
     const read = () => {
       frame = 0;
       const box = ref.current!.getBoundingClientRect();
+
       setMoment(storyMoment(-box.top / (box.height - window.innerHeight), steps));
     };
+
     const schedule = () => {
       frame ||= requestAnimationFrame(read);
     };
+
     schedule();
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
+
     return () => {
       cancelAnimationFrame(frame);
       window.removeEventListener("scroll", schedule);

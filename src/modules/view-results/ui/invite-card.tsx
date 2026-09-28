@@ -12,7 +12,16 @@ const notCopied = {
 
 function Icon({ children }: { children: ReactNode }) {
   return (
-    <svg className="size-4.5 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      className="size-4.5 flex-none"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       {children}
     </svg>
   );
@@ -21,7 +30,15 @@ function Icon({ children }: { children: ReactNode }) {
 function Check() {
   return (
     <span className="grid size-5 flex-none place-items-center rounded-pill bg-accent text-ink" aria-hidden="true">
-      <svg className="size-3" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        className="size-3"
+        viewBox="0 0 12 12"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M2.5 6.2 5 8.5 9.5 3.5" />
       </svg>
     </span>
@@ -30,6 +47,7 @@ function Check() {
 
 function Copied({ when, children }: { when: boolean; children: ReactNode }) {
   if (!when) return children;
+
   return (
     <span className="inline-flex items-center gap-2" data-invite-copied>
       <Check />
@@ -46,7 +64,11 @@ export function InviteCard({ pollId, title }: { pollId: string; title: string })
 
   if (card.stage === "sent") {
     return (
-      <p className="m-0 mt-2 flex items-center gap-2.5 rounded-control bg-surface px-4 py-3 text-sm font-medium" role="status" data-invite-sent>
+      <p
+        className="m-0 mt-2 flex items-center gap-2.5 rounded-control bg-surface px-4 py-3 text-sm font-medium"
+        role="status"
+        data-invite-sent
+      >
         <Check />
         Wysłane. Odpowiedzi pojawią się tutaj.
       </p>
@@ -57,7 +79,15 @@ export function InviteCard({ pollId, title }: { pollId: string; title: string })
     <section className="mt-2 grid gap-4 rounded-card bg-surface p-5 shadow-lift" aria-labelledby={headingId} data-invite-card>
       <div className="flex items-center gap-3">
         <span className="grid size-10 flex-none place-items-center rounded-pill bg-accent text-surface" aria-hidden="true">
-          <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            className="size-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M20 6 9 17l-5-5" />
           </svg>
         </span>

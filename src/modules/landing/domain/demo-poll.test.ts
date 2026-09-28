@@ -6,6 +6,7 @@ describe("demoPoll", () => {
     const poll = demoPoll([]);
 
     expect(poll.best).toEqual({ label: "Sobota 18.10, 19–21", share: "4 z 5", cannot: ["Ty"] });
+
     expect(poll.others).toEqual([
       { label: "pt 17.10, 20–21", share: "4 z 5" },
       { label: "pt 17.10, 19–20", share: "3 z 5" },
@@ -24,6 +25,7 @@ describe("demoPoll", () => {
     const poll = demoPoll([{ date: "2025-10-18", hour: 19 }]);
 
     expect(poll.best).toEqual({ label: "Sobota 18.10, 19–20", share: "5 z 5", cannot: [] });
+
     expect(poll.others).toEqual([
       { label: "pt 17.10, 20–21", share: "4 z 5" },
       { label: "sb 18.10, 20–21", share: "4 z 5" },
@@ -37,6 +39,7 @@ describe("demoPoll", () => {
     ]);
 
     expect(poll.best).toEqual({ label: "Piątek 17.10, 20–21", share: "5 z 5", cannot: [] });
+
     expect(poll.others).toEqual([
       { label: "sb 18.10, 19–21", share: "4 z 5" },
       { label: "pt 17.10, 19–20", share: "4 z 5" },

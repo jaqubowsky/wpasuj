@@ -25,7 +25,10 @@ export function Faq() {
       aria-labelledby="faq-heading"
       className="mx-auto box-border flex max-w-wide flex-col gap-6 px-5 py-20 lg:grid lg:grid-cols-[360px_minmax(0,1fr)] lg:gap-14 lg:px-12 lg:py-15"
     >
-      <h2 id="faq-heading" className="m-0 animate-rise [animation-range:entry_0%_cover_30%] [animation-timeline:view()] font-display text-3xl font-extrabold tracking-tightest lg:text-4xl">
+      <h2
+        id="faq-heading"
+        className="m-0 animate-rise font-display text-3xl font-extrabold tracking-tightest [animation-range:entry_0%_cover_30%] [animation-timeline:view()] lg:text-4xl"
+      >
         Pytania
       </h2>
       <div className="animate-rise [animation-range:entry_0%_cover_30%] [animation-timeline:view()]">

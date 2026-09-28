@@ -7,6 +7,7 @@ describe("Button", () => {
   it("runs its action on a tap without submitting a surrounding form", async () => {
     const onSubmit = vi.fn((event: Event) => event.preventDefault());
     const onClick = vi.fn();
+
     render(
       <form onSubmit={(event) => onSubmit(event.nativeEvent)}>
         <Button onClick={onClick}>Przypomnij</Button>
@@ -21,6 +22,7 @@ describe("Button", () => {
 
   it("submits its form when asked to", async () => {
     const onSubmit = vi.fn((event: Event) => event.preventDefault());
+
     render(
       <form onSubmit={(event) => onSubmit(event.nativeEvent)}>
         <Button type="submit" variant="primary" block>
@@ -50,6 +52,7 @@ describe("Button", () => {
     );
 
     const primary = screen.getByRole("button", { name: "Utwórz i wyślij na grupę" });
+
     expect(primary).toHaveAttribute("data-variant", "primary");
     expect(primary).toHaveAttribute("data-block");
     expect(screen.getByRole("button", { name: "Przypomnij" })).not.toHaveAttribute("data-variant");
@@ -60,6 +63,7 @@ describe("Button", () => {
 
   it("ignores taps while disabled", async () => {
     const onClick = vi.fn();
+
     render(
       <Button variant="primary" disabled onClick={onClick}>
         Wyłączony

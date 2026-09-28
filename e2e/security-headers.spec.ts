@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test";
 import { seedPoll } from "./seed";
 
-const pollId = () => seedPoll({ dates: ["2030-10-17"], firstHour: 19, hourCount: 3, final: { date: "2030-10-17", firstHour: 19, lastHour: 21 } });
+const pollId = () =>
+  seedPoll({ dates: ["2030-10-17"], firstHour: 19, hourCount: 3, final: { date: "2030-10-17", firstHour: 19, lastHour: 21 } });
 
 for (const [what, path] of [
   ["the create page", () => "/"],
@@ -19,6 +20,7 @@ for (const [what, path] of [
       "referrer-policy": "same-origin",
       "x-content-type-options": "nosniff",
     });
+
     expect(response.headers()).not.toHaveProperty("x-powered-by");
   });
 }

@@ -23,9 +23,28 @@ const threeAnswers: Results = {
   hours: [17, 18, 19, 20],
   readAt,
   respondents: [
-    answer("Ola", minutesBefore(120), [[saturday, 17], [saturday, 18], [saturday, 19], [sunday, 19], [sunday, 20]]),
-    answer("Bartek", minutesBefore(20), [[saturday, 18], [saturday, 19], [saturday, 20], [sunday, 18]]),
-    answer("Kasia", minutesBefore(0), [[saturday, 18], [saturday, 19], [saturday, 20], [sunday, 17], [sunday, 18], [sunday, 19], [sunday, 20]]),
+    answer("Ola", minutesBefore(120), [
+      [saturday, 17],
+      [saturday, 18],
+      [saturday, 19],
+      [sunday, 19],
+      [sunday, 20],
+    ]),
+    answer("Bartek", minutesBefore(20), [
+      [saturday, 18],
+      [saturday, 19],
+      [saturday, 20],
+      [sunday, 18],
+    ]),
+    answer("Kasia", minutesBefore(0), [
+      [saturday, 18],
+      [saturday, 19],
+      [saturday, 20],
+      [sunday, 17],
+      [sunday, 18],
+      [sunday, 19],
+      [sunday, 20],
+    ]),
   ],
   final: null,
 };
@@ -47,7 +66,10 @@ function renderResults(results: Results) {
   return render(<Tabs results={results} />);
 }
 
-const answered = () => within(screen.getByRole("list", { name: "Odpowiedzieli" })).getAllByRole("listitem").map((row) => row.textContent);
+const answered = () =>
+  within(screen.getByRole("list", { name: "Odpowiedzieli" }))
+    .getAllByRole("listitem")
+    .map((row) => row.textContent);
 
 describe("Results", () => {
   it("shows only the best time, never who cannot make it", () => {
@@ -73,8 +95,19 @@ describe("Results", () => {
     await userEvent.click(screen.getByRole("button", { name: "nd 20, 18:00, 2 z 3 może" }));
 
     const details = screen.getByRole("dialog", { name: "Niedziela 20.10, 18:00" });
-    expect(within(within(details).getByRole("list", { name: "Może" })).getAllByRole("listitem").map((item) => item.textContent)).toEqual(["KKasia", "BBartek"]);
-    expect(within(within(details).getByRole("list", { name: "Nie może" })).getAllByRole("listitem").map((item) => item.textContent)).toEqual(["OOla, organizator, nie może"]);
+
+    expect(
+      within(within(details).getByRole("list", { name: "Może" }))
+        .getAllByRole("listitem")
+        .map((item) => item.textContent),
+    ).toEqual(["KKasia", "BBartek"]);
+
+    expect(
+      within(within(details).getByRole("list", { name: "Nie może" }))
+        .getAllByRole("listitem")
+        .map((item) => item.textContent),
+    ).toEqual(["OOla, organizator, nie może"]);
+
     fireEvent.click(details);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
@@ -91,18 +124,27 @@ describe("Results", () => {
     await userEvent.click(screen.getByRole("button", { name: "4 osoby" }));
 
     const sheet = screen.getByRole("dialog", { name: "Odpowiedzieli" });
+
     expect(within(within(sheet).getByRole("list", { name: "Zaznaczyli godziny" })).getAllByRole("listitem")).toHaveLength(3);
-    expect(within(within(sheet).getByRole("list", { name: "Nie może w żadnym" })).getAllByRole("listitem").map((item) => item.textContent)).toEqual(["ZZosia, nie może"]);
+
+    expect(
+      within(within(sheet).getByRole("list", { name: "Nie może w żadnym" }))
+        .getAllByRole("listitem")
+        .map((item) => item.textContent),
+    ).toEqual(["ZZosia, nie może"]);
   });
 
   it("keeps a respondent's tint through a case-only rename", async () => {
     const tintsOf = async (name: string) => {
       const { unmount } = renderResults({ ...threeAnswers, respondents: [{ ...threeAnswers.respondents[0], name }] });
       const listed = within(screen.getByRole("list", { name: "Odpowiedzieli" })).getByRole("img", { name });
+
       await userEvent.click(screen.getByRole("button", { name: "sb 19, 17:00, 1 z 1 może" }));
       const free = within(within(screen.getByRole("dialog")).getByRole("list", { name: "Może" })).getByRole("img", { name });
       const tints = [listed.dataset.tint, free.dataset.tint];
+
       unmount();
+
       return tints;
     };
 
@@ -124,7 +166,9 @@ describe("Results refreshing", () => {
 
   function answerWith(...responses: Response[]) {
     const fetch = vi.fn(async () => responses.shift() ?? Response.json(withZosia));
+
     vi.stubGlobal("fetch", fetch);
+
     return fetch;
   }
 
@@ -151,6 +195,7 @@ describe("Results refreshing", () => {
     vi.useFakeTimers();
     const fetch = answerWith(Response.json(withZosia));
     const { rerender } = renderResults(threeAnswers);
+
     await wait(9_000);
 
     rerender(<Tabs results={threeAnswers} panel={false} />);
@@ -163,6 +208,7 @@ describe("Results refreshing", () => {
   it("asks at once when the window regains focus", async () => {
     vi.useFakeTimers();
     const fetch = answerWith(Response.json(withZosia));
+
     renderResults(threeAnswers);
 
     fireEvent.focus(window);
@@ -175,6 +221,7 @@ describe("Results refreshing", () => {
   it("says the poll is gone once the read answers 404, and stops asking", async () => {
     vi.useFakeTimers();
     const fetch = answerWith(Response.json({ reason: "gone" }, { status: 404 }));
+
     renderResults(threeAnswers);
 
     await wait(60_000);

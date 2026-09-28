@@ -7,7 +7,9 @@ function stubReducedMotion(reduced: boolean) {
 
 function stubViewTransitions() {
   const start = vi.fn((update: () => void) => update());
+
   Object.defineProperty(document, "startViewTransition", { configurable: true, value: start });
+
   return start;
 }
 

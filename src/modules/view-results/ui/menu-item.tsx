@@ -35,7 +35,16 @@ const itemLook =
 
 function ItemIcon({ icon }: { icon: Icon }) {
   return (
-    <svg className="size-4.5 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg
+      className="size-4.5 flex-none"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
       {icons[icon]}
     </svg>
   );
@@ -50,7 +59,19 @@ export function MenuItem({ icon, danger, onClick, children }: { icon: Icon; dang
   );
 }
 
-export function MenuLink({ icon, href, newTab, onClick, children }: { icon: Icon; href: string; newTab?: boolean; onClick: () => void; children: ReactNode }) {
+export function MenuLink({
+  icon,
+  href,
+  newTab,
+  onClick,
+  children,
+}: {
+  icon: Icon;
+  href: string;
+  newTab?: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}) {
   return (
     <a className={itemLook} href={href} target={newTab ? "_blank" : undefined} rel={newTab ? "noopener" : undefined} onClick={onClick}>
       <ItemIcon icon={icon} />

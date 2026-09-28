@@ -14,9 +14,32 @@ const minutesAgo = (minutes: number) => Date.now() - minutes * 60_000;
 
 function seedThreeAnswers() {
   const pollId = seedPoll({ dates: [saturday, sunday], firstHour: 17, hourCount: 4 });
-  seedAnswer(pollId, "Ola", minutesAgo(120), [[saturday, 17], [saturday, 18], [saturday, 19], [sunday, 19], [sunday, 20]]);
-  seedAnswer(pollId, "Bartek", minutesAgo(20), [[saturday, 18], [saturday, 19], [saturday, 20], [sunday, 18]]);
-  seedAnswer(pollId, "Kasia", minutesAgo(0), [[saturday, 18], [saturday, 19], [saturday, 20], [sunday, 17], [sunday, 18], [sunday, 19], [sunday, 20]]);
+
+  seedAnswer(pollId, "Ola", minutesAgo(120), [
+    [saturday, 17],
+    [saturday, 18],
+    [saturday, 19],
+    [sunday, 19],
+    [sunday, 20],
+  ]);
+
+  seedAnswer(pollId, "Bartek", minutesAgo(20), [
+    [saturday, 18],
+    [saturday, 19],
+    [saturday, 20],
+    [sunday, 18],
+  ]);
+
+  seedAnswer(pollId, "Kasia", minutesAgo(0), [
+    [saturday, 18],
+    [saturday, 19],
+    [saturday, 20],
+    [sunday, 17],
+    [sunday, 18],
+    [sunday, 19],
+    [sunday, 20],
+  ]);
+
   return pollId;
 }
 
@@ -35,6 +58,7 @@ test("three answers agree with a hand count", async ({ page }, testInfo) => {
   await openResults(page, pollId);
 
   await expect(page.getByRole("region", { name: "Najlepiej teraz" })).toHaveText("Najlepiej terazSobota 19.10, 18–20");
+
   const handCount: [string, number][] = [
     ["sb 19, 17:00", 1],
     ["sb 19, 18:00", 3],
@@ -45,10 +69,13 @@ test("three answers agree with a hand count", async ({ page }, testInfo) => {
     ["nd 20, 19:00", 2],
     ["nd 20, 20:00", 2],
   ];
+
   for (const [hour, count] of handCount) {
     await expect(page.getByRole("button", { name: `${hour}, ${count} z 3 może` })).toHaveText(String(count));
   }
+
   if (isPhone(testInfo)) await page.getByRole("button", { name: "3 osoby" }).click();
+
   await expect(itemsOf(page, isPhone(testInfo) ? "Zaznaczyli godziny" : "Odpowiedzieli")).toHaveText(["KKasia", "BBartek", "OOla"]);
   await saveScreenshot(page, testInfo, "results-three-answers");
   if (isPhone(testInfo)) await page.keyboard.press("Escape");
@@ -56,16 +83,19 @@ test("three answers agree with a hand count", async ({ page }, testInfo) => {
   await page.getByRole("button", { name: "nd 20, 18:00, 2 z 3 może" }).click();
 
   const details = page.getByRole(isPhone(testInfo) ? "dialog" : "region", { name: "Niedziela 20.10, 18:00" });
+
   await expect(details.getByRole("list", { name: "Może", exact: true }).getByRole("listitem")).toHaveText(["KKasia", "BBartek"]);
   await expect(details.getByRole("list", { name: "Nie może" }).getByRole("listitem")).toHaveText(["OOla, nie może"]);
   await saveScreenshot(page, testInfo, isPhone(testInfo) ? "results-sheet" : "results-side-panel");
   if (isPhone(testInfo)) await page.keyboard.press("Escape");
   else await details.getByRole("button", { name: "Zamknij" }).click();
+
   await expect(details).toBeHidden();
 });
 
 test("an answer written elsewhere shows within 10 seconds", async ({ page }) => {
   const pollId = seedThreeAnswers();
+
   await openResults(page, pollId);
   await expect(counted(page, "3 osoby")).toBeVisible();
 
@@ -92,6 +122,7 @@ test("with nobody answered it asks to send the link", async ({ page }, testInfo)
 
 test("a fresh answer stays across tab switches", async ({ page }) => {
   const pollId = seedThreeAnswers();
+
   await openResults(page, pollId);
   seedAnswer(pollId, "Zosia", Date.now(), []);
   await expect(counted(page, "4 osoby")).toBeVisible({ timeout: 10_000 });
@@ -106,13 +137,18 @@ test("a fresh answer stays across tab switches", async ({ page }) => {
 test("a count that rises twice bumps twice", async ({ page }) => {
   await page.addInitScript(() => {
     const animate = Element.prototype.animate;
+
     window.bumps = [];
+
     Element.prototype.animate = function (keyframes, options) {
       if (JSON.stringify(keyframes).includes("1.08")) window.bumps!.push(this.getAttribute("aria-label") ?? "");
+
       return animate.call(this, keyframes, options);
     };
   });
+
   const pollId = seedThreeAnswers();
+
   await openResults(page, pollId);
   const cell = (count: number) => page.getByRole("button", { name: `sb 19, 17:00, ${count} z ` });
 
@@ -132,17 +168,21 @@ test("the best time leads the page on a phone and sits beside the heatmap on a d
   const tabs = (await page.getByRole("tablist", { name: "Widok" }).boundingBox())!;
   const grid = (await page.getByRole("grid", { name: "Kto może" }).boundingBox())!;
   const bestHours = page.getByRole("region", { name: "Najlepiej teraz" }).getByText(/^\d+–\d+$/);
+
   expect(await bestHours.evaluate((element) => element.getClientRects().length)).toBe(1);
 
   if (testInfo.project.name.startsWith("phone")) {
     expect(best.y + best.height).toBeLessThanOrEqual(tabs.y);
+
     return;
   }
+
   expect(best.x).toBeGreaterThanOrEqual(grid.x + grid.width);
   expect(best.y).toBe(tabs.y);
   expect(grid.y - (tabs.y + tabs.height)).toBeLessThan(120);
   await page.getByRole("button", { name: "nd 20, 18:00, 2 z 3 może" }).click();
   const details = (await page.getByRole("region", { name: "Niedziela 20.10, 18:00" }).boundingBox())!;
+
   expect(details.x).toBeGreaterThanOrEqual(best.x);
   expect(details.y).toBeGreaterThan(best.y + best.height);
 });

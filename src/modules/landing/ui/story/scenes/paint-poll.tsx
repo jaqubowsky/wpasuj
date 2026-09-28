@@ -49,7 +49,7 @@ export function PaintPoll({ time }: SceneProps) {
           <span
             aria-hidden
             data-touching={poll.finger ? true : undefined}
-            className="absolute inset-0 col-start-2 col-end-3 row-start-2 row-end-3 grid place-items-center opacity-0 translate-x-[calc(var(--finger-column)*(100%+--spacing(1.5)))] translate-y-[calc(var(--finger-row)*(100%+--spacing(1.5)))] transition-[opacity,translate] duration-(--duration-sheet) ease-out data-touching:opacity-100"
+            className="absolute inset-0 col-start-2 col-end-3 row-start-2 row-end-3 grid translate-x-[calc(var(--finger-column)*(100%+--spacing(1.5)))] translate-y-[calc(var(--finger-row)*(100%+--spacing(1.5)))] place-items-center opacity-0 transition-[opacity,translate] duration-(--duration-sheet) ease-out data-touching:opacity-100"
             style={poll.finger && ({ "--finger-column": poll.finger.column, "--finger-row": poll.finger.row } as CSSProperties)}
           >
             <span className="size-8.5 rounded-pill bg-ink/18 ring-6 ring-ink/6" />

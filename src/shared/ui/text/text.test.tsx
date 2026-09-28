@@ -11,9 +11,9 @@ describe("Text", () => {
     );
 
     const title = screen.getByRole("heading", { level: 1, name: "Planszówki u Michała" });
+
     expect(title).toHaveAttribute("data-variant", "title");
   });
-
 
   it("renders a span when no element is named", () => {
     render(<Text variant="meta">sb · 19:00</Text>);

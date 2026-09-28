@@ -61,7 +61,10 @@ export function CreateForm({ time }: SceneProps) {
           </span>
         ))}
         {week.map(({ day, weekend }) => (
-          <span key={day} className="relative grid h-9 place-items-center rounded-cell bg-surface text-sm font-medium shadow-[inset_0_0_0_1px_var(--color-edge)]">
+          <span
+            key={day}
+            className="relative grid h-9 place-items-center rounded-cell bg-surface text-sm font-medium shadow-[inset_0_0_0_1px_var(--color-edge)]"
+          >
             {day}
             <span
               aria-hidden

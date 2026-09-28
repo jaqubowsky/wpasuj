@@ -3,6 +3,7 @@ import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 import betterTailwindcss from "eslint-plugin-better-tailwindcss";
 import { plugin as shadcn } from "@shadcn/lint";
+import stylistic from "@stylistic/eslint-plugin";
 import { readdirSync } from "node:fs";
 
 const modules = readdirSync("src/modules", { withFileTypes: true })
@@ -14,7 +15,9 @@ const moduleBlocks = (name) => {
     group: modules.filter((other) => other !== name).flatMap((other) => [`**/${other}`, `**/${other}/**`]),
     message: "A module never imports another module",
   };
+
   const restrict = (options) => ({ "@typescript-eslint/no-restricted-imports": ["error", options] });
+
   return [
     { files: [`src/modules/${name}/**`], rules: restrict({ patterns: [otherModules] }) },
     {
@@ -32,6 +35,21 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   {
+    plugins: { "@stylistic": stylistic },
+    rules: {
+      "@stylistic/padding-line-between-statements": [
+        "error",
+        { blankLine: "always", prev: ["const", "let"], next: "*" },
+        { blankLine: "any", prev: ["const", "let"], next: ["const", "let"] },
+        { blankLine: "always", prev: "if", next: "*" },
+        { blankLine: "any", prev: "if", next: "if" },
+        { blankLine: "always", prev: "*", next: ["multiline-block-like", "multiline-expression", "multiline-const", "multiline-let"] },
+        { blankLine: "always", prev: ["multiline-block-like", "multiline-expression", "multiline-const", "multiline-let"], next: "*" },
+        { blankLine: "always", prev: "*", next: "return" },
+      ],
+    },
+  },
+  {
     files: ["src/**/*.tsx"],
     plugins: { "better-tailwindcss": betterTailwindcss, shadcn },
     settings: {
@@ -46,7 +64,8 @@ const eslintConfig = defineConfig([
           restrict: [
             { pattern: "^(?!.*motion-safe:)(.*:)?-?scale-", message: "Put a scale behind motion-safe: so reduced motion keeps it still" },
             {
-              pattern: "^(.*:)?(shadow|inset-shadow|drop-shadow|\\[(box-shadow|text-shadow|filter):)\\S*(#|rgba?\\(|hsla?\\(|hwb\\(|lab\\(|lch\\(|oklab\\(|oklch\\(|color-mix\\(|color\\()",
+              pattern:
+                "^(.*:)?(shadow|inset-shadow|drop-shadow|\\[(box-shadow|text-shadow|filter):)\\S*(#|rgba?\\(|hsla?\\(|hwb\\(|lab\\(|lch\\(|oklab\\(|oklch\\(|color-mix\\(|color\\()",
               message: "Colours come from tokens.css: use var(--color-<name>) inside a shadow",
             },
           ],
@@ -85,13 +104,23 @@ const eslintConfig = defineConfig([
       "no-restricted-syntax": [
         "error",
         { selector: "JSXAttribute[name.name='className'] TemplateLiteral", message: "Combine classes with cn() from @/shared/ui/cn" },
-        { selector: "JSXAttribute[name.name='className'] BinaryExpression[operator='+']", message: "Combine classes with cn() from @/shared/ui/cn" },
-        { selector: "JSXAttribute[name.name='className'] CallExpression[callee.property.name='join']", message: "Combine classes with cn() from @/shared/ui/cn" },
+        {
+          selector: "JSXAttribute[name.name='className'] BinaryExpression[operator='+']",
+          message: "Combine classes with cn() from @/shared/ui/cn",
+        },
+        {
+          selector: "JSXAttribute[name.name='className'] CallExpression[callee.property.name='join']",
+          message: "Combine classes with cn() from @/shared/ui/cn",
+        },
       ],
     },
   },
   {
-    files: ["src/modules/view-results/server/link-preview-image.tsx", "src/modules/landing/server/landing-card-image.tsx", "src/app/apple-icon.tsx"],
+    files: [
+      "src/modules/view-results/server/link-preview-image.tsx",
+      "src/modules/landing/server/landing-card-image.tsx",
+      "src/app/apple-icon.tsx",
+    ],
     rules: { "shadcn/no-inline-styles": "off" },
   },
   {
@@ -99,7 +128,14 @@ const eslintConfig = defineConfig([
     rules: {
       "@typescript-eslint/no-restricted-imports": [
         "error",
-        { patterns: [{ group: ["**/modules/*/**", "!**/modules/*/index", "!**/modules/*/client"], message: "Import a module through its index.ts or client.ts" }] },
+        {
+          patterns: [
+            {
+              group: ["**/modules/*/**", "!**/modules/*/index", "!**/modules/*/client"],
+              message: "Import a module through its index.ts or client.ts",
+            },
+          ],
+        },
       ],
     },
   },
@@ -108,7 +144,14 @@ const eslintConfig = defineConfig([
     rules: {
       "@typescript-eslint/no-restricted-imports": [
         "error",
-        { patterns: [{ group: ["@/modules", "@/modules/**", "@/app/**", "../**/modules/**", "../**/app/**"], message: "shared sits below modules and app" }] },
+        {
+          patterns: [
+            {
+              group: ["@/modules", "@/modules/**", "@/app/**", "../**/modules/**", "../**/app/**"],
+              message: "shared sits below modules and app",
+            },
+          ],
+        },
       ],
     },
   },

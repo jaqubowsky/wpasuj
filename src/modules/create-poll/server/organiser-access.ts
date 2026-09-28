@@ -9,6 +9,7 @@ export const organiserCookie = (id: string) => `${id}-org`;
 
 function organiserTokenHash(id: string) {
   if (!isPollId(id)) return undefined;
+
   return getDb().select({ organiserTokenHash: polls.organiserTokenHash }).from(polls).where(eq(polls.id, id)).get()?.organiserTokenHash;
 }
 
@@ -18,6 +19,7 @@ function isOrganiserToken(id: string, token: string) {
 
 export async function organiserTokenOf(poll: { id: string; organiserTokenHash: string | undefined }) {
   const token = (await cookies()).get(organiserCookie(poll.id))?.value;
+
   return token !== undefined && poll.organiserTokenHash === hashToken(token) ? token : undefined;
 }
 

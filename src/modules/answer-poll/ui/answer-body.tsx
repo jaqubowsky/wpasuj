@@ -20,14 +20,26 @@ export function AnswerBody() {
           onClick={answer.saidCant ? answer.undoCant : answer.cantMakeAny}
         >
           {answer.saidCant && (
-            <svg className="size-4.5 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <svg
+              className="size-4.5 flex-none"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
               <path d="M20 6 9 17l-5-5" />
             </svg>
           )}
           Nie mogę w żadnym terminie
         </button>
       )}
-      <div className="transition-opacity duration-(--duration-fill) ease-out data-faded:opacity-45" data-faded={answer.saidCant || undefined}>
+      <div
+        className="transition-opacity duration-(--duration-fill) ease-out data-faded:opacity-45"
+        data-faded={answer.saidCant || undefined}
+      >
         <DayHourGrid
           label="Kiedy możesz?"
           dates={answer.dates}

@@ -7,8 +7,7 @@ export function useSelectedCell() {
   return {
     selected,
     isSelected: (cell: GridCell) => selected?.date === cell.date && selected.hour === cell.hour,
-    toggle: (cell: GridCell) =>
-      setSelected((current) => (current?.date === cell.date && current.hour === cell.hour ? undefined : cell)),
+    toggle: (cell: GridCell) => setSelected((current) => (current?.date === cell.date && current.hour === cell.hour ? undefined : cell)),
     close: () => setSelected(undefined),
   };
 }

@@ -9,6 +9,7 @@ type Place = "past" | "now" | "next";
 
 function placeOf(index: number, step: number): Place {
   if (index < step) return "past";
+
   return index === step ? "now" : "next";
 }
 
@@ -16,9 +17,7 @@ function Caption({ step }: { step: (typeof storySteps)[number] }) {
   return (
     <>
       <span className="text-sm font-semibold text-accent-ink">{step.kicker}</span>
-      <h2 className="m-0 font-display text-4xl font-extrabold tracking-tightest text-balance lg:text-6xl">
-        {step.heading}
-      </h2>
+      <h2 className="m-0 font-display text-4xl font-extrabold tracking-tightest text-balance lg:text-6xl">{step.heading}</h2>
       <p className="m-0 max-w-150 text-base text-muted lg:text-xl">{step.body}</p>
     </>
   );
@@ -28,9 +27,11 @@ function Phone({ pinned, children }: { pinned?: boolean; children: ReactNode }) 
   return (
     <div
       data-pinned={pinned || undefined}
-      className="box-border h-185 w-full data-pinned:h-[min(740px,82dvh)] max-w-90 self-center justify-self-center rounded-[52px] bg-ink p-3"
+      className="box-border h-185 w-full max-w-90 self-center justify-self-center rounded-[52px] bg-ink p-3 data-pinned:h-[min(740px,82dvh)]"
     >
-      <div data-screen className="relative size-full overflow-hidden rounded-[41px] bg-paper">{children}</div>
+      <div data-screen className="relative size-full overflow-hidden rounded-[41px] bg-paper">
+        {children}
+      </div>
     </div>
   );
 }
@@ -61,7 +62,7 @@ function PinnedStory() {
           <div className="relative pl-5">
             <span className="absolute top-1.5 bottom-1.5 left-1 w-0.5 rounded-[1px] bg-line" />
             <span
-              className="absolute top-1.5 bottom-1.5 left-1 w-0.5 origin-top rounded-[1px] bg-ink [transform:scaleY(var(--rail-fill))]"
+              className="absolute top-1.5 bottom-1.5 left-1 w-0.5 origin-top [transform:scaleY(var(--rail-fill))] rounded-[1px] bg-ink"
               style={{ "--rail-fill": railFill(moment, storySteps.length) } as CSSProperties}
             />
             <ol aria-label="Kroki" className="m-0 flex list-none flex-col gap-4.5 p-0">
@@ -102,10 +103,7 @@ function PinnedStory() {
 
 function StorySequence() {
   return (
-    <section
-      aria-label="Jak to działa"
-      className="mx-auto box-border flex max-w-wide flex-col gap-20 px-5 py-20 lg:px-12"
-    >
+    <section aria-label="Jak to działa" className="mx-auto box-border flex max-w-wide flex-col gap-20 px-5 py-20 lg:px-12">
       {storySteps.map(({ Scene, ...step }) => (
         <div key={step.label} className="flex flex-col gap-8 lg:grid lg:grid-cols-[minmax(0,1fr)_380px] lg:items-center lg:gap-14">
           <div className="flex flex-col gap-3 lg:gap-4.5">

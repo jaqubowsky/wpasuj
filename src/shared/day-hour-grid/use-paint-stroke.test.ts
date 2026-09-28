@@ -9,6 +9,7 @@ function renderStroke() {
   const onStroke = vi.fn();
   const onTap = vi.fn();
   const { result } = renderHook(() => usePaintStroke({ dates, hours, onStroke, onTap }));
+
   return { result, onStroke, onTap };
 }
 

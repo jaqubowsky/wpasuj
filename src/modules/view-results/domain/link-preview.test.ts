@@ -27,8 +27,13 @@ describe("linkPreview", () => {
   });
 
   it("names three or more days in a row as a range, across a month too", () => {
-    expect(linkPreview({ ...poll, dates: ["2030-10-30", "2030-10-31", "2030-11-01"] }).days).toBe(`śr${nbsp}30 października – pt${nbsp}1 listopada`);
-    expect(linkPreview({ ...poll, dates: ["2030-10-14", "2030-10-16", "2030-10-17", "2030-10-18"] }).days).toBe(`pn${nbsp}14, śr${nbsp}16 – pt${nbsp}18 października`);
+    expect(linkPreview({ ...poll, dates: ["2030-10-30", "2030-10-31", "2030-11-01"] }).days).toBe(
+      `śr${nbsp}30 października – pt${nbsp}1 listopada`,
+    );
+
+    expect(linkPreview({ ...poll, dates: ["2030-10-14", "2030-10-16", "2030-10-17", "2030-10-18"] }).days).toBe(
+      `pn${nbsp}14, śr${nbsp}16 – pt${nbsp}18 października`,
+    );
   });
 
   it("lists two days in a row one by one", () => {

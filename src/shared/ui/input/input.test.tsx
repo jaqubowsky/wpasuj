@@ -21,6 +21,7 @@ describe("Input", () => {
     render(<Input label="Jak masz na imię?" placeholder="Twoje imię" autoComplete="given-name" />);
 
     const name = screen.getByRole("textbox", { name: "Jak masz na imię?" });
+
     await userEvent.type(name, "Ola");
 
     expect(name).toHaveValue("Ola");
@@ -38,6 +39,7 @@ describe("Input", () => {
     render(<Input label="Jak masz na imię?" defaultValue="Ola" error="To imię już jest w tej ankiecie." />);
 
     const name = screen.getByRole("textbox", { name: "Jak masz na imię?" });
+
     expect(name).toBeInvalid();
     expect(name).toHaveAccessibleDescription("To imię już jest w tej ankiecie.");
   });
@@ -46,6 +48,7 @@ describe("Input", () => {
     render(<Input label="Jak masz na imię?" />);
 
     const name = screen.getByRole("textbox", { name: "Jak masz na imię?" });
+
     expect(name).toBeValid();
     expect(name).not.toHaveAccessibleDescription();
   });
@@ -59,6 +62,7 @@ describe("Input", () => {
 
   it("keeps what was typed before the page hydrated", () => {
     const container = document.body.appendChild(document.createElement("div"));
+
     container.innerHTML = renderToString(<TitleField />);
     (screen.getByRole("textbox", { name: "Co robimy?" }) as HTMLInputElement).value = "Kino";
 

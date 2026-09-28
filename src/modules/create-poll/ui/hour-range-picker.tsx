@@ -8,7 +8,15 @@ function Summary({ children }: { children: string }) {
   return <p className="m-0 mt-3 grid h-12 place-items-center rounded-control bg-track font-display text-lg font-bold">{children}</p>;
 }
 
-function HourField({ label, hour, onOpen }: { label: "Od" | "Do"; hour: number; onOpen: (button: HTMLElement, column: "Od" | "Do") => void }) {
+function HourField({
+  label,
+  hour,
+  onOpen,
+}: {
+  label: "Od" | "Do";
+  hour: number;
+  onOpen: (button: HTMLElement, column: "Od" | "Do") => void;
+}) {
   return (
     <span className="flex flex-col gap-1.5 text-sm text-muted">
       <span aria-hidden="true">{label}</span>
@@ -67,7 +75,12 @@ function HourSheet({ hours, sheet }: { hours: HourRangeState; sheet: HourSheetSt
         </h2>
         <div className="grid grid-cols-2 gap-3">
           <HourColumn label="Od" hours={startHours} picked={hours.range.firstHour} onPick={hours.setStart} />
-          <HourColumn label="Do" hours={endHours(hours.range)} picked={hours.range.firstHour + hours.range.hourCount} onPick={hours.setEnd} />
+          <HourColumn
+            label="Do"
+            hours={endHours(hours.range)}
+            picked={hours.range.firstHour + hours.range.hourCount}
+            onPick={hours.setEnd}
+          />
         </div>
         <Summary>{rangeSummary(hours.range)}</Summary>
         <Button variant="primary" block onClick={sheet.close}>
@@ -92,7 +105,7 @@ function HourTiles({ hours }: { hours: HourRangeState }) {
             aria-label={`${hour}:00`}
             aria-pressed={picked.includes(hour)}
             data-edge={edges.includes(hour) || undefined}
-            className="box-border h-14 cursor-pointer rounded-cell border-0 bg-surface font-sans text-lg font-semibold text-ink tabular-nums shadow-[inset_0_0_0_1px_var(--color-edge)] transition-transform duration-(--duration-fill) ease-out hover:shadow-[inset_0_0_0_2px_var(--color-ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink motion-safe:active:scale-96 aria-pressed:bg-heat-2 aria-pressed:shadow-none data-edge:bg-ink data-edge:text-surface"
+            className="box-border h-14 cursor-pointer rounded-cell border-0 bg-surface font-sans text-lg font-semibold text-ink tabular-nums shadow-[inset_0_0_0_1px_var(--color-edge)] transition-transform duration-(--duration-fill) ease-out hover:shadow-[inset_0_0_0_2px_var(--color-ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink aria-pressed:bg-heat-2 aria-pressed:shadow-none data-edge:bg-ink data-edge:text-surface motion-safe:active:scale-96"
             onClick={() => hours.pickTile(hour)}
           >
             {hour}

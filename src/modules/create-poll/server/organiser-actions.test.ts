@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 let cookieJar = fakeCookies();
+
 vi.mock("next/headers", () => ({ cookies: async () => cookieJar, headers: async () => new Headers() }));
 
 let db: Awaited<ReturnType<typeof openTestDatabase>>;
@@ -18,6 +19,7 @@ beforeEach(async () => {
   vi.setSystemTime(new Date("2026-10-15T10:00:00Z"));
   db = await openTestDatabase();
   const { createPoll } = await import("./create-poll-action");
+
   const result = await createPoll({
     title: "Kino",
     dates: ["2026-10-16", "2026-10-17"],
@@ -26,6 +28,7 @@ beforeEach(async () => {
     timeZone: "Europe/Warsaw",
     organiserName: "Kuba",
   });
+
   pollId = result.ok ? result.id : "";
 });
 
@@ -43,6 +46,7 @@ async function finalOf(id: string) {
     .select({ date: polls.finalDate, firstHour: polls.finalFirstHour, lastHour: polls.finalLastHour })
     .from(polls)
     .where(eq(polls.id, id));
+
   return row;
 }
 
@@ -56,6 +60,7 @@ describe("setFinal", () => {
 
   it("refuses someone without the organiser cookie", async () => {
     const { setFinal } = await import("./organiser-actions");
+
     asStranger();
 
     expect(await setFinal(pollId, saturdayEvening)).toEqual({ ok: false, reason: "not-organiser" });
@@ -82,6 +87,7 @@ describe("setFinal", () => {
 describe("clearFinal", () => {
   it("reopens the poll for the organiser", async () => {
     const { clearFinal, setFinal } = await import("./organiser-actions");
+
     await setFinal(pollId, saturdayEvening);
 
     expect(await clearFinal(pollId)).toEqual({ ok: true });
@@ -90,6 +96,7 @@ describe("clearFinal", () => {
 
   it("refuses someone without the organiser cookie", async () => {
     const { clearFinal, setFinal } = await import("./organiser-actions");
+
     await setFinal(pollId, saturdayEvening);
     asStranger();
 
@@ -107,6 +114,7 @@ describe("clearFinal", () => {
 describe("a poll 60 days past its last date", () => {
   it("is gone for the organiser too", async () => {
     const { clearFinal, deletePoll, setFinal } = await import("./organiser-actions");
+
     vi.setSystemTime(new Date("2026-12-17T10:00:00Z"));
 
     expect(await setFinal(pollId, saturdayEvening)).toEqual({ ok: false, reason: "gone" });
@@ -127,6 +135,7 @@ describe("deletePoll", () => {
   it("refuses someone without the organiser cookie", async () => {
     const { deletePoll } = await import("./organiser-actions");
     const { findPoll } = await import("./poll-queries");
+
     asStranger();
 
     expect(await deletePoll(pollId)).toEqual({ ok: false, reason: "not-organiser" });
