@@ -14,7 +14,7 @@ Severity: **critical** loses or leaks every poll, **high** takes over a poll or 
 | 4 | Anyone with the poll link creates up to 30 participants and fills the poll (`full`), or creates polls without limit until the volume is full | medium | a loop of `saveAnswer` with a fresh cookie jar and a new name refuses the 31st with `full` (`answer-rules.ts:23`, `answer-actions.test.ts:202`); `createPoll` has no per-client cap (`create-poll-action.ts:16`) | accepted: rate limits at the edge are the owner's (WPA-5, "Out of scope"); the 30-person cap is the brief's ("Data") |
 | 5 | Anyone with the poll link types an existing name, answers "Tak, to ja" and takes the row, its hours and its cookie | low | `claimName(pollId, "Ola")` from a fresh jar moves the row (`answer-actions.ts:77-100`) | accepted: the brief's "Identity" rule ("Friends are trusted; there is no password") |
 | 6 | Names differing only by a zero-width or look-alike character read as the same person | low | `saveAnswer` with `"Ola​"` next to `"Ola"`: two rows, one look (`name-rules.ts:3-9` collapses only `\s`) | accepted: the same trust as finding 5, and taking the real name is already one tap |
-| 7 | No script-src CSP | low | response headers above; only `frame-ancestors` is set | accepted, decision `security-headers`: no user text reaches an HTML sink, and a nonce CSP would make every page dynamic |
+| 7 | No script-src CSP | low | response headers above; only `frame-ancestors` is set | accepted, ADR 0027: no user text reaches an HTML sink, and a nonce CSP would make every page dynamic |
 | 8 | No HSTS | low | response headers above | accepted: TLS and the domain are Railway's and the owner's; finding 3's `Secure` closes the token exposure without it |
 | 9 | The image runs as root | low | `Dockerfile` has no `USER` | accepted: WPA-45, Railway mounts the volume root-owned and a non-root image failed with `SQLITE_CANTOPEN` |
 
@@ -49,7 +49,7 @@ Every action is behind Next's origin check (`node_modules/next/dist/server/app-r
 - Poll id: 60 random bits (`create-poll-action.ts:26`). At a million live polls a guess hits one in 2^40 tries; a hit gives what the link gives, nothing more.
 - Tokens: 32 random bytes, stored as SHA-256, compared by hash (`token-cookie.ts`); guessing one is out of reach.
 - Participant cookie named by the poll id, organiser cookie `<id>-org`, both `HttpOnly`, `SameSite=Lax`, path `/`, one year, `Secure` on a request that arrived over https (finding 3).
-- The organiser token reaches only the page of a device that already holds it (decision `organiser-token-payload`), and that page is dynamic (`ƒ /e/[id]` in the build's route table), which Next answers with `cache-control: private, no-cache, no-store` (prod `GET /e/abcdefghij`, the same route's gone page), so no shared cache keeps it.
+- The organiser token reaches only the page of a device that already holds it (ADR 0016), and that page is dynamic (`ƒ /e/[id]` in the build's route table), which Next answers with `cache-control: private, no-cache, no-store` (prod `GET /e/abcdefghij`, the same route's gone page), so no shared cache keeps it.
 - `Referer`: the organiser link never renders a page; it redirects to `/e/<id>` before anything loads, so no request carries the token as a referrer. `Referrer-Policy: same-origin` now also keeps the poll id off other sites.
 
 ### Abuse without an account
