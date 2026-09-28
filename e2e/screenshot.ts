@@ -8,7 +8,7 @@ export async function settleAnimations(page: Page) {
       document
         .getAnimations()
         .filter((animation) => animation.timeline === document.timeline && animation.effect?.getTiming().iterations !== Infinity)
-        .map((animation) => animation.finished),
+        .map((animation) => animation.finished.catch(() => undefined)),
     ),
   );
 }
