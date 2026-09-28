@@ -27,5 +27,5 @@ Before the MVP ships, someone who wants to break Wpasuj without an account has b
 ## Acceptance criteria
 
 - [x] `spec/audits/security.md` lists every boundary above with its verdict and the evidence (test, command output or file and line): sections "Server actions", "Route handlers", "Cookies and the organiser token", "Abuse without an account", "Headers", "Dependencies and the image"
-- [x] Every critical or high finding is fixed with a test that failed before the fix; medium and low are tickets or accepted with a reason: no critical or high; mediums 1–3 fixed test-first in `7c4f248`, `c17503a`, `643bb80`; 4–9 accepted with their reasons in the findings table and decision 80
+- [x] Every critical or high finding is fixed with a test that failed before the fix; medium and low are tickets or accepted with a reason: no critical or high; mediums 1–3 fixed test-first in `7c4f248`, `c17503a` with `969645b`, `643bb80`; 4–9 accepted with their reasons in the findings table and decision 80
 - [x] `npm run lint`, `typecheck`, `test`, `build` and `e2e` green: each exit 0 locally (450 tests; e2e phone-chromium and desktop-chromium 201 passed, 31 skipped); phone-webkit in the pull request's CI
