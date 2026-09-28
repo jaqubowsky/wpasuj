@@ -1,11 +1,11 @@
 # 38: Production readiness
 
-Status: claimed
+Status: done
 Blocked by: none
 
 ## Parent
 
-`spec/brief.md` "Stack" (one Railway service, volume at `/data`, migrations on start, `DATABASE_PATH`); decisions 39 and 61.
+`spec/brief.md` "Stack" (one Railway service, volume at `/data`, migrations on start, `DATABASE_PATH`); decisions 39 and 66.
 
 ## Outcome
 
@@ -26,8 +26,8 @@ The Docker image that CI builds is the one production runs, and CI proves it ser
 
 ## Acceptance criteria
 
-- [ ] CI `docker` job fails on the current `main` image for a missing static asset or missing migrations (shown in the PR body with the failing run), then passes on this branch
-- [ ] In CI the container serves a `/_next/static/**.css` asset with 200, creates and answers a poll, and after a restart the poll is still there
-- [ ] `PRAGMA journal_mode` reads `wal` (unit test on a real file)
-- [ ] The health route returns 200 in the running container; `railway.json` names it
-- [ ] `lint`, `typecheck`, `test`, `knip`, `build`, `e2e` green
+- [x] CI `docker` job fails on the current `main` image for a missing static asset or missing migrations (shown in the PR body with the failing run), then passes on this branch: run 36385904129 on 9d54fc7 (the job over `main`'s image) fails before migrating, `SQLITE_CANTOPEN` on the root-owned volume because the image ran as `node`; `main` already copied `.next/static` and `drizzle/`; run 36388039773 on 7dc4cb3 passes
+- [x] In CI the container serves a `/_next/static/**.css` asset with 200, creates and answers a poll, and after a restart the poll is still there: run 36388039773, docker job steps "serves a stylesheet" (`text/css; charset=UTF-8`), the answer-poll test (1 passed) and "reads the answered poll back after the restart" (`true`)
+- [x] `PRAGMA journal_mode` reads `wal` (unit test on a real file): `src/shared/db/client.test.ts` "opens the database file in WAL mode", red on `delete` before the change
+- [x] The health route returns 200 in the running container; `railway.json` names it: run 36388039773, `curl --fail $URL/api/health` after the restart printed `ok`; `railway.json` `deploy.healthcheckPath`
+- [x] `lint`, `typecheck`, `test`, `knip`, `build`, `e2e` green: all exit 0 on 371bdf2 (e2e phone and desktop Chromium, 161 passed); CI `check` runs WebKit
