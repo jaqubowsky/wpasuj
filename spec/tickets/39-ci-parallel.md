@@ -1,6 +1,6 @@
 # 39: CI in parallel jobs
 
-Status: claimed
+Status: done
 Blocked by: 23-landing-seo-perf.md
 
 ## Parent
@@ -25,8 +25,13 @@ A pull request that changes only Markdown runs no CI. Any other pull request's C
 
 ## Acceptance criteria
 
-- [ ] On a PR, a deliberate lint error fails the `quick` job in under 5 minutes (run link in the PR body, then reverted)
-- [ ] A green run on the PR head: wall-clock time from first job start to last job end, next to main's 17 min, in the PR body
-- [ ] The three e2e projects run as separate jobs on one build; screenshots of all three are downloadable
-- [ ] A pull request changing only a `.md` file starts no CI run (the run list for its branch is empty, link in the PR body)
-- [ ] `lint`, `typecheck`, `test`, `knip`, `build`, `e2e` green
+- [x] On a PR, a deliberate lint error fails the `quick` job in under 5 minutes (run link in the PR body, then reverted): https://github.com/jaqubowsky/wpasuj/actions/runs/36409099370, `quick` failed 37 s after the run started; reverted in 59094c5
+- [x] A green run on the PR head: wall-clock time from first job start to last job end, next to main's 17 min, in the PR body: https://github.com/jaqubowsky/wpasuj/actions/runs/36409279216, 4 min 33 s
+- [x] The three e2e projects run as separate jobs on one build; screenshots of all three are downloadable: artifacts `screenshots-phone-chromium`, `screenshots-phone-webkit`, `screenshots-desktop-chromium` on run 36409279216
+- [x] A pull request changing only a `.md` file starts no CI run (the run list for its branch is empty, link in the PR body): #49, `actions/runs?branch=t39-md-only-probe` total_count 0
+- [x] `lint`, `typecheck`, `test`, `knip`, `build`, `e2e` green: run 36409279216, all seven jobs success
+
+## Notes
+
+- Browser cache dropped (host decision): a hit saved about 5 s per chromium job, within noise
+- Owner decision: an auto fixture in `e2e/fixtures.ts` closes every browser context a test opens; the leak had grown WebKit to 14.7 GB RSS and exhausted the 8 GB runner
