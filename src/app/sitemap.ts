@@ -1,6 +1,8 @@
 import { siteUrl } from "@/shared/site-url";
 import type { MetadataRoute } from "next";
+import { connection } from "next/server";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  return [{ url: new URL("/", await siteUrl()).href }];
+  await connection();
+  return [{ url: new URL("/", siteUrl()).href }];
 }

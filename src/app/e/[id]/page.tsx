@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: PageProps<"/e/[id]">): Promis
   if (!poll) return { robots: unlisted };
   const question = `Kiedy możesz? ${poll.title}`;
   return {
-    metadataBase: await siteUrl(),
+    metadataBase: siteUrl(),
     title: question,
     description: question,
     openGraph: { title: question, description: question },

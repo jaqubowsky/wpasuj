@@ -1,6 +1,6 @@
 # 41: WebKit answer saves fail on CI
 
-Status: ready-for-agent
+Status: claimed
 Blocked by: 23-landing-seo-perf.md (its ac68b66 uploads `test-results/` with traces on an e2e failure)
 
 ## Parent
@@ -23,7 +23,7 @@ Blocked by: 23-landing-seo-perf.md (its ac68b66 uploads `test-results/` with tra
 
 ## Acceptance criteria
 
-- [ ] The cause, with the trace or log line that shows it, in the PR body
-- [ ] A test that fails for that cause before the fix and passes after it
-- [ ] Three consecutive CI runs on the PR head with `phone-webkit` passing on the first attempt (run links in the PR body)
-- [ ] `lint`, `typecheck`, `test`, `knip`, `build`, `e2e` green
+- [x] The cause, with the trace or log line that shows it, in the PR body: PR #47, "Cause" (run 36398271419 traces, React `initInput` hydration branch)
+- [x] A test that fails for that cause before the fix and passes after it: `input.test.tsx` "keeps what was typed before the page hydrated" and `create-poll.spec.ts` "what the organiser types before the page hydrates still creates the poll", both red without the fix
+- [x] Three consecutive CI runs on the PR head with `phone-webkit` passing on the first attempt (run links in the PR body): 1 of 3. Host decision: the runs are PR #47's run 36401661625, main's push run after the merge and PR #39's run after it merges main. Run 36401661625: every answer and create test passed on phone-webkit on the first attempt; `poll-page.spec.ts:156` failed once in fixture setup ("trace recording" timeout of 30000ms) and passed on retry
+- [x] `lint`, `typecheck`, `test`, `knip`, `build`, `e2e` green: locally (e2e Chromium projects, 176 passed) and CI run 36401661625

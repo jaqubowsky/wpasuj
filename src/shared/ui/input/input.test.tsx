@@ -1,7 +1,20 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { useState } from "react";
+import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { Input } from "./input";
+
+function TitleField() {
+  const [title, setTitle] = useState("");
+
+  return (
+    <>
+      <Input label="Co robimy?" value={title} onChange={(event) => setTitle(event.target.value)} />
+      <output>{title}</output>
+    </>
+  );
+}
 
 describe("Input", () => {
   it("is found by its label and takes typing", async () => {
@@ -42,5 +55,16 @@ describe("Input", () => {
 
     expect(screen.getByRole("textbox", { name: "Twoje imię" })).toHaveAttribute("data-variant", "compact");
     expect(screen.getByText("Zapisane")).toBeVisible();
+  });
+
+  it("keeps what was typed before the page hydrated", () => {
+    const container = document.body.appendChild(document.createElement("div"));
+    container.innerHTML = renderToString(<TitleField />);
+    (screen.getByRole("textbox", { name: "Co robimy?" }) as HTMLInputElement).value = "Kino";
+
+    render(<TitleField />, { container, hydrate: true });
+
+    expect(screen.getByRole("status")).toHaveTextContent("Kino");
+    expect(screen.getByRole("textbox", { name: "Co robimy?" })).toHaveValue("Kino");
   });
 });
