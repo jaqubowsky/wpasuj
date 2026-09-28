@@ -50,6 +50,10 @@ describe("hour tiles", () => {
     expect(withTiles(16, 20)).toEqual({ firstHour: 16, hourCount: 5 });
   });
 
+  it("a last tile earlier in the order runs on into the next morning", () => {
+    expect(withTiles(2, 8)).toEqual({ firstHour: 2, hourCount: 7 });
+  });
+
   it("the same tile twice is one hour", () => {
     expect(withTiles(5, 5)).toEqual({ firstHour: 5, hourCount: 1 });
   });

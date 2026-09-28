@@ -5,8 +5,12 @@ import { count, eq } from "drizzle-orm";
 import { isExpired } from "../domain/poll-rules";
 import { pollIdSchema } from "./poll-schema";
 
+export function isPollId(id: string) {
+  return pollIdSchema.safeParse(id).success;
+}
+
 export function findPoll(id: string, now: Date) {
-  if (!pollIdSchema.safeParse(id).success) return undefined;
+  if (!isPollId(id)) return undefined;
   const poll = getDb()
     .select({
       title: polls.title,

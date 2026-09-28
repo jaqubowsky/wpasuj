@@ -107,6 +107,40 @@ describe("useAutosave", () => {
     expect(result.current.state).toBe("saved");
   });
 
+  it("says saving at once on a retry, and a second tap while it runs sends nothing more", async () => {
+    const sends = deferredSends();
+    const { result } = renderHook(() => useAutosave(sends.send));
+    act(() => result.current.schedule("a"));
+    await wait(500);
+    await settle(sends, 0, false);
+
+    act(() => result.current.retry());
+    expect(result.current.state).toBe("saving");
+    act(() => result.current.retry());
+    await settle(sends, 1, true);
+    await wait(10_000);
+
+    expect(sends.send).toHaveBeenCalledTimes(2);
+    expect(result.current.state).toBe("saved");
+  });
+
+  it("says saving on a retry tapped while a newer set is already on its way", async () => {
+    const sends = deferredSends();
+    const { result } = renderHook(() => useAutosave(sends.send));
+    act(() => result.current.schedule("a"));
+    await wait(500);
+    await settle(sends, 0, false);
+    act(() => result.current.schedule("b"));
+    await wait(500);
+
+    act(() => result.current.retry());
+
+    expect(result.current.state).toBe("saving");
+    await settle(sends, 1, true);
+    expect(sends.send).toHaveBeenCalledTimes(2);
+    expect(result.current.state).toBe("saved");
+  });
+
   it("keeps saying failed through new strokes until a save succeeds", async () => {
     const sends = deferredSends();
     const { result } = renderHook(() => useAutosave(sends.send));

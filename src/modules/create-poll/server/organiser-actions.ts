@@ -5,9 +5,9 @@ import { getDb } from "@/shared/db/client";
 import { polls } from "@/shared/db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { organiserToken } from "./organiser-access";
+import { organiserTokenOf } from "./organiser-access";
 import { fitsPoll, isExpired } from "../domain/poll-rules";
-import { pollIdSchema } from "./poll-schema";
+import { isPollId } from "./poll-queries";
 
 type OrganiserResult = { ok: true } | { ok: false; reason: "invalid" | "not-organiser" | "gone" };
 
@@ -18,10 +18,10 @@ const finalTimeSchema = z
 type FinalTime = z.infer<typeof finalTimeSchema>;
 
 async function organisersPoll(id: string) {
-  if (!pollIdSchema.safeParse(id).success) return "gone";
+  if (!isPollId(id)) return "gone";
   const poll = getDb().select().from(polls).where(eq(polls.id, id)).get();
   if (!poll || isExpired(poll.dates, todayIn(poll.timeZone, new Date()))) return "gone";
-  if ((await organiserToken(id)) === undefined) return "not-organiser";
+  if ((await organiserTokenOf(poll)) === undefined) return "not-organiser";
   return poll;
 }
 

@@ -16,10 +16,13 @@ export type OrganiserProblem = "invalid" | "not-organiser" | "failed";
 export function useIsOrganiser(given: Organiser | undefined, refreshResults: () => void) {
   const [revoked, setRevoked] = useState(false);
   const [problem, setProblem] = useState<OrganiserProblem>();
+  const [pending, setPending] = useState(false);
 
   async function settle(request: () => Promise<Outcome>, onDone: () => void) {
     setProblem(undefined);
+    setPending(true);
     const outcome = await request().catch(() => undefined);
+    setPending(false);
     if (!outcome) return setProblem("failed");
     if (outcome.ok) return onDone();
     switch (outcome.reason) {
@@ -37,6 +40,7 @@ export function useIsOrganiser(given: Organiser | undefined, refreshResults: () 
     !revoked && {
       title: given.title,
       token: given.token,
+      pending,
       setFinal: (final: FinalTime) => settle(() => given.setFinal(final), refreshResults),
       clearFinal: () => settle(given.clearFinal, refreshResults),
       deletePoll: () => settle(given.deletePoll, refreshResults),

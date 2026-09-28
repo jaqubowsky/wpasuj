@@ -131,6 +131,8 @@ test("the best time leads the page on a phone and sits beside the heatmap on a d
   const best = (await page.getByRole("region", { name: "Najlepiej teraz" }).boundingBox())!;
   const tabs = (await page.getByRole("tablist", { name: "Widok" }).boundingBox())!;
   const grid = (await page.getByRole("grid", { name: "Kto może" }).boundingBox())!;
+  const bestHours = page.getByRole("region", { name: "Najlepiej teraz" }).getByText(/^\d+–\d+$/);
+  expect(await bestHours.evaluate((element) => element.getClientRects().length)).toBe(1);
 
   if (testInfo.project.name.startsWith("phone")) {
     expect(best.y + best.height).toBeLessThanOrEqual(tabs.y);

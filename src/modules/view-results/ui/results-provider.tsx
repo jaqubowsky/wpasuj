@@ -33,6 +33,10 @@ export function ResultsProvider(props: ResultsProviderProps) {
   );
 }
 
+export function useForgetTappedHour() {
+  return useResultsContext().selection.close;
+}
+
 export function useResultsContext() {
   const results = use(ResultsContext);
   if (!results) throw new Error("The poll's results parts render inside ResultsProvider");

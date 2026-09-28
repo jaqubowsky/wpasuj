@@ -60,7 +60,7 @@ const eslintConfig = defineConfig([
             "effects",
             "motion",
             "grid-cols",
-            "grid-rows",
+            "grid-rows-[auto]",
             "h-[800dvh]",
             "h-[min(740px,82dvh)]",
             "max-h-[60dvh]",

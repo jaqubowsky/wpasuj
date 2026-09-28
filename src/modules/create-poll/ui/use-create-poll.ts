@@ -1,3 +1,4 @@
+import { deviceTimeZone } from "@/shared/dates/use-device-time-zone";
 import { markFreshPoll } from "@/shared/fresh-poll";
 import { rememberName } from "@/shared/last-name";
 import { useRouter } from "next/navigation";
@@ -12,7 +13,7 @@ export function useCreatePoll(input: Omit<CreatePollInput, "timeZone">) {
   const router = useRouter();
   const [attempted, setAttempted] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
-  const fullInput = { ...input, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone };
+  const fullInput = { ...input, timeZone: deviceTimeZone() };
   const parsed = createPollSchema.safeParse(fullInput);
   const invalidFields = new Set(attempted && !parsed.success ? parsed.error.issues.map((issue) => issue.path[0] as Field) : []);
 
