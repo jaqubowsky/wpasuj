@@ -212,17 +212,29 @@ describe("saveAnswer", () => {
     expect(await saveAnswer(pollId, { name: "Ola", slots: [friday19] })).toEqual({ ok: false, reason: "closed" });
   });
 
-  it("refuses a 31st participant", async () => {
+  it("accepts a 30th participant and refuses a 31st", async () => {
     const { saveAnswer } = await actions();
 
-    for (let friend = 1; friend <= 30; friend++) {
-      onAnotherDevice();
-      await saveAnswer(pollId, { name: `Osoba ${friend}`, slots: [] });
-    }
+    db.insert(participants)
+      .values(
+        Array.from({ length: 29 }, (_, friend) => ({
+          pollId,
+          name: `Osoba ${friend + 1}`,
+          normalisedName: `osoba ${friend + 1}`,
+          tokenHash: hashToken(`osoba-${friend + 1}`),
+          createdAt: thursdayNoonInWarsaw,
+          updatedAt: thursdayNoonInWarsaw,
+        })),
+      )
+      .run();
 
     onAnotherDevice();
 
-    expect(await saveAnswer(pollId, { name: "Ola", slots: [friday19] })).toEqual({ ok: false, reason: "full" });
+    expect(await saveAnswer(pollId, { name: "Ola", slots: [friday19] })).toEqual({ ok: true });
+
+    onAnotherDevice();
+
+    expect(await saveAnswer(pollId, { name: "Bartek", slots: [friday19] })).toEqual({ ok: false, reason: "full" });
   });
 
   it("says gone for a deleted, expired or malformed poll", async () => {
