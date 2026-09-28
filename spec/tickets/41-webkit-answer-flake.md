@@ -1,6 +1,6 @@
 # 41: WebKit answer saves fail on CI
 
-Status: ready-for-agent
+Status: claimed
 Blocked by: 23-landing-seo-perf.md (its ac68b66 uploads `test-results/` with traces on an e2e failure)
 
 ## Parent
