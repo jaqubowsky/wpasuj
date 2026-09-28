@@ -51,3 +51,21 @@ test("the sitemap lists the home page and robots points to it", async ({ request
   expect(robots).toContain("User-Agent: *\nAllow: /\nDisallow: /api/");
   expect(robots).toContain(`Sitemap: ${siteUrl}/sitemap.xml`);
 });
+
+test("the head links the app icons and both load", async ({ page, request }) => {
+  await page.goto("/");
+
+  const icon = await page.locator('link[rel="icon"][type="image/svg+xml"]').getAttribute("href");
+  const appleIcon = await page.locator('link[rel="apple-touch-icon"]').getAttribute("href");
+
+  expect(new URL(icon!, siteUrl).pathname).toBe("/icon.svg");
+  expect(new URL(appleIcon!, siteUrl).pathname).toBe("/apple-icon");
+  const svg = await request.get("/icon.svg");
+  expect(svg.status()).toBe(200);
+  expect(svg.headers()["content-type"]).toContain("image/svg+xml");
+  const png = await request.get("/apple-icon");
+  expect(png.status()).toBe(200);
+  expect(png.headers()["content-type"]).toBe("image/png");
+  const body = await png.body();
+  expect([body.readUInt32BE(16), body.readUInt32BE(20)]).toEqual([180, 180]);
+});

@@ -1,9 +1,8 @@
 import { productName } from "@/shared/brand";
-import { accent, edge, ink, muted, ogCardSize, ogFont, paper, surface } from "@/shared/og-card";
+import { accent, edge, ink, muted, ogCardSize, ogFont, paper, surface, tintCoral } from "@/shared/og-card";
 import { ImageResponse } from "next/og";
 import { headline, pitch } from "../domain/pitch";
 
-const tintCoral = "#FAD3C3";
 const heat = ["#FDEDE6", "#FAD3C3", "#F6AE93", "#F18463", "#CC4420"];
 
 const heatRows = [

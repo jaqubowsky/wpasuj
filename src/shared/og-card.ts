@@ -9,6 +9,7 @@ export const ink = "#1E1B18";
 export const muted = "#72695F";
 export const edge = "#958A7E";
 export const accent = "#F0603F";
+export const tintCoral = "#FAD3C3";
 
 export function ogFont(file: string) {
   return readFile(join(process.cwd(), "src/shared/fonts", file));
