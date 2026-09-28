@@ -1,6 +1,6 @@
 # Cell
 
-One hour on one date: the only thing a participant touches. A `button` with `aria-pressed` on "Moje"; a plain cell with its count on "Wszyscy".
+One hour on one date: the only thing a participant touches. A `button` on "Moje", whose selected state the grid announces as `aria-selected` on its gridcell (decision 10); a button with its count on "Wszyscy".
 
 - The consumer provides the state (`data-state` = `mine`, `adding`, `removing`, or none for free) or the heat (`data-heat` 1–5 from the share of respondents free), the count as text, and `data-everyone` / `data-best` where they apply.
 - Free cells carry a 1px `edge` border so they read as controls; filled cells carry none.
