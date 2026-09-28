@@ -6,12 +6,13 @@ Every ticket whose blockers have landed runs at once, one container each, up to 
 
 ## Now
 
-- `tickets/40-landing-v3-follow-up.md`: claude-wpasuj-t40-landing-follow-up, PR #50
+- `tickets/31-security-audit.md`: claude-wpasuj-t31-security-audit
+- `tickets/32-architecture-audit.md`: claude-wpasuj-t32-architecture-audit
 
 ## Next
 
-- `tickets/31-security-audit.md`, `tickets/32-architecture-audit.md` (after 40; in parallel)
-- `tickets/08-acceptance.md` (after 31, 32 and their fix tickets)
+- `tickets/42-observability.md` (after 31, 32)
+- `tickets/08-acceptance.md` (after 31, 32, their fix tickets and 42)
 - `tickets/24-readme.md` (after 08)
 
 ## Landed
@@ -53,3 +54,4 @@ Every ticket whose blockers have landed runs at once, one container each, up to 
 - `tickets/41-webkit-answer-flake.md`: PR #47
 - `tickets/39-ci-parallel.md`: PR #48
 - Production crash without SITE_URL (no ticket): PR #46
+- `tickets/40-landing-v3-follow-up.md`: PR #50

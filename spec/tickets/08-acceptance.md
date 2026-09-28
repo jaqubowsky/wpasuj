@@ -1,7 +1,7 @@
 # 08: End-to-end acceptance
 
 Status: ready-for-agent
-Blocked by: 31-security-audit.md, 32-architecture-audit.md, 38-production-readiness.md
+Blocked by: 31-security-audit.md, 32-architecture-audit.md, 38-production-readiness.md, 42-observability.md
 
 ## Parent
 
