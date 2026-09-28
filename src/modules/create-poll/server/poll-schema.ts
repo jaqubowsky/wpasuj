@@ -1,3 +1,4 @@
+import { latestFirstHour, maxHourCount } from "@/shared/poll-hours";
 import * as z from "zod/mini";
 import { maxDates } from "../domain/date-presets";
 
@@ -27,8 +28,8 @@ export const createPollSchema = z.object({
     ),
     z.transform((dates: string[]) => dates.toSorted()),
   ),
-  firstHour: z.int().check(z.minimum(0), z.maximum(23)),
-  hourCount: z.int().check(z.minimum(1), z.maximum(24)),
+  firstHour: z.int().check(z.minimum(0), z.maximum(latestFirstHour)),
+  hourCount: z.int().check(z.minimum(1), z.maximum(maxHourCount)),
   timeZone: z.string().check(z.refine(isTimeZone)),
   organiserName: z.pipe(
     z.pipe(

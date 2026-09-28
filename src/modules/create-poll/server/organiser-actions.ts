@@ -1,5 +1,6 @@
 "use server";
 
+import { lastSlotHour } from "@/shared/poll-hours";
 import { fail, ok, parse, type Result } from "@/shared/result";
 import { z } from "zod";
 import { organiserTokenOf } from "./organiser-access";
@@ -9,7 +10,14 @@ import { livePoll, removePoll, saveFinal } from "./poll-store";
 type OrganiserResult = Result<object, "invalid" | "not-organiser" | "gone">;
 
 const finalTimeSchema = z
-  .object({ date: z.iso.date(), firstHour: z.int().min(0).max(46), lastHour: z.int().min(1).max(47) })
+  .object({
+    date: z.iso.date(),
+    firstHour: z.int().min(0).max(lastSlotHour),
+    lastHour: z
+      .int()
+      .min(1)
+      .max(lastSlotHour + 1),
+  })
   .refine((final) => final.lastHour > final.firstHour);
 
 type FinalTime = z.infer<typeof finalTimeSchema>;
