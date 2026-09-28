@@ -24,7 +24,7 @@ export default defineConfig({
   webServer: containerUrl
     ? undefined
     : {
-        command: `rm -f ${databasePath} && npm run start`,
+        command: `rm -f ${databasePath} ${databasePath}-wal ${databasePath}-shm && npm run start`,
         url: "http://localhost:3000",
         env: { DATABASE_PATH: databasePath, DEMO_ROUTES: "1", SITE_URL: siteUrl },
         reuseExistingServer: false,
