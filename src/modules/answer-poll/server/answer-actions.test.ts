@@ -187,7 +187,7 @@ describe("saveAnswer", () => {
     const firstDevice = cookieJar;
 
     onAnotherDevice();
-    await claimName(pollId, "Ola");
+    await claimName(pollId, { name: "Ola", slots: [] });
     cookieJar = firstDevice;
 
     const result = await saveAnswer(pollId, { name: "Ola", slots: [saturday17] });
@@ -242,7 +242,7 @@ describe("claimName", () => {
     await saveAnswer(pollId, { name: "Ola", slots: [friday19] });
     onAnotherDevice();
 
-    const result = await claimName(pollId, " ola ");
+    const result = await claimName(pollId, { name: " ola ", slots: [] });
 
     expect(result).toEqual({ ok: true, name: "Ola", slots: [friday19] });
     expect(await myAnswer()).toEqual({ name: "Ola", slots: [friday19] });
@@ -255,7 +255,7 @@ describe("claimName", () => {
     onAnotherDevice();
     await saveAnswer(pollId, { name: "O", slots: [saturday17] });
 
-    await claimName(pollId, "Ola");
+    await claimName(pollId, { name: "Ola", slots: [saturday17] });
 
     expect(db.select({ name: participants.name }).from(participants).all()).toEqual([{ name: "Ola" }]);
   });
@@ -267,10 +267,23 @@ describe("claimName", () => {
     onAnotherDevice();
     await saveAnswer(pollId, { name: "Bartek", slots: [friday19, friday20] });
 
-    const result = await claimName(pollId, "Ola");
+    const result = await claimName(pollId, { name: "Ola", slots: [friday19, friday20] });
 
     expect(result).toEqual({ ok: true, name: "Ola", slots: [friday19, friday20, saturday17] });
     expect(await myAnswer()).toEqual({ name: "Ola", slots: [friday19, friday20, saturday17] });
+  });
+
+  it("folds only the hours still on this device's grid, not one turned off since the last save", async () => {
+    const { saveAnswer, claimName } = await actions();
+
+    await saveAnswer(pollId, { name: "Ola", slots: [saturday17] });
+    onAnotherDevice();
+    await saveAnswer(pollId, { name: "Bartek", slots: [friday19, friday20] });
+
+    const result = await claimName(pollId, { name: "Ola", slots: [friday19] });
+
+    expect(result).toEqual({ ok: true, name: "Ola", slots: [friday19, saturday17] });
+    expect(await myAnswer()).toEqual({ name: "Ola", slots: [friday19, saturday17] });
   });
 
   it("refuses the organiser's name and changes no row", async () => {
@@ -282,7 +295,7 @@ describe("claimName", () => {
 
     onAnotherDevice();
 
-    const result = await claimName(pollId, " kuba ");
+    const result = await claimName(pollId, { name: " kuba ", slots: [] });
 
     expect(result).toEqual({ ok: false, reason: "organiser-name" });
     expect(db.select().from(participants).all()).toEqual(rowsBefore);
@@ -296,13 +309,27 @@ describe("claimName", () => {
     await saveAnswer(pollId, { name: "Kuba", slots: [friday19] });
     onOrganiserDevice();
 
-    expect(await claimName(pollId, "Kuba")).toEqual({ ok: true, name: "Kuba", slots: [friday19] });
+    expect(await claimName(pollId, { name: "Kuba", slots: [] })).toEqual({ ok: true, name: "Kuba", slots: [friday19] });
   });
 
   it("refuses a name nobody in the poll has", async () => {
     const { claimName } = await actions();
 
-    expect(await claimName(pollId, "Ola")).toEqual({ ok: false, reason: "invalid" });
+    expect(await claimName(pollId, { name: "Ola", slots: [] })).toEqual({ ok: false, reason: "invalid" });
+  });
+
+  it("refuses an hour outside the poll and changes no row", async () => {
+    const { saveAnswer, claimName } = await actions();
+
+    await saveAnswer(pollId, { name: "Ola", slots: [friday19] });
+    onAnotherDevice();
+    await saveAnswer(pollId, { name: "Bartek", slots: [friday20] });
+    const rowsBefore = db.select().from(participants).all();
+
+    const result = await claimName(pollId, { name: "Ola", slots: [{ date: "2026-10-18", hour: 19 }] });
+
+    expect(result).toEqual({ ok: false, reason: "invalid" });
+    expect(db.select().from(participants).all()).toEqual(rowsBefore);
   });
 
   it("refuses once the final time is set, and for a gone poll", async () => {
@@ -312,7 +339,7 @@ describe("claimName", () => {
     onAnotherDevice();
     db.update(polls).set({ finalDate: "2026-10-16", finalFirstHour: 19, finalLastHour: 22 }).where(eq(polls.id, pollId)).run();
 
-    expect(await claimName(pollId, "Ola")).toEqual({ ok: false, reason: "closed" });
-    expect(await claimName("abcdefghij", "Ola")).toEqual({ ok: false, reason: "gone" });
+    expect(await claimName(pollId, { name: "Ola", slots: [] })).toEqual({ ok: false, reason: "closed" });
+    expect(await claimName("abcdefghij", { name: "Ola", slots: [] })).toEqual({ ok: false, reason: "gone" });
   });
 });

@@ -177,7 +177,7 @@ export function useAnswer({ pollId, dates, hours, mine, fixedName }: AnswerOptio
     undoCant: () => (beforeCant ? replaceSlots(beforeCant) : setCantTurnedOff(true)),
     retry: autosave.retry,
     async claim(heldName: string) {
-      const result = await claimName(pollId, heldName);
+      const result = await claimName(pollId, { name: heldName, slots: slotsOf(slotsRef.current) });
 
       if (result.ok) {
         setProblem(undefined);
