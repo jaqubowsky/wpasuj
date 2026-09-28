@@ -3,7 +3,7 @@ import { openTestDatabase } from "@/shared/testing/test-database";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 let cookieJar = fakeCookies();
-vi.mock("next/headers", () => ({ cookies: async () => cookieJar }));
+vi.mock("next/headers", () => ({ cookies: async () => cookieJar, headers: async () => new Headers() }));
 
 let pollId: string;
 let organiserCookie: string;

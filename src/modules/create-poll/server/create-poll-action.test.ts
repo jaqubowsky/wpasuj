@@ -5,7 +5,8 @@ import { hashToken } from "@/shared/token-cookie";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 let cookieJar = fakeCookies();
-vi.mock("next/headers", () => ({ cookies: async () => cookieJar }));
+let requestHeaders = new Headers();
+vi.mock("next/headers", () => ({ cookies: async () => cookieJar, headers: async () => requestHeaders }));
 
 const thursdayNoonInWarsaw = new Date("2026-10-15T10:00:00Z");
 
@@ -30,6 +31,7 @@ async function queries() {
 
 beforeEach(async () => {
   cookieJar = fakeCookies();
+  requestHeaders = new Headers();
   vi.useFakeTimers({ toFake: ["Date"] });
   vi.setSystemTime(thursdayNoonInWarsaw);
   db = await openTestDatabase();
@@ -88,17 +90,8 @@ describe("createPoll", () => {
     expect(row.organiserTokenHash).toBe(hashToken(cookieJar.get(`${id}-org`)!.value));
   });
 
-  it("writes nothing when the site's address is missing", async () => {
-    vi.stubEnv("SITE_URL", undefined);
-    const { createPoll } = await actions();
-
-    await expect(createPoll(input)).rejects.toThrow("SITE_URL");
-
-    expect(await db.select().from(polls)).toEqual([]);
-  });
-
-  it("keeps the organiser cookie off plain http when the site runs on https", async () => {
-    vi.stubEnv("SITE_URL", "https://wpasuj.pl");
+  it("marks the organiser cookie Secure on a request that arrived over https", async () => {
+    requestHeaders = new Headers({ "x-forwarded-proto": "https" });
     const { createPoll } = await actions();
 
     const result = await createPoll(input);

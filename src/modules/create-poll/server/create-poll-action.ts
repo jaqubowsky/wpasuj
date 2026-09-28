@@ -25,7 +25,6 @@ export async function createPoll(input: CreatePollInput): Promise<CreatePollResu
   const heldTokenHashes = cookieStore.getAll().map((cookie) => hashToken(cookie.value));
   const id = randomBytes(8).toString("base64url").slice(0, 10);
   const organiserToken = newToken();
-  const cookieOptions = tokenCookieOptions();
 
   db.transaction((tx) => {
     const createdByParticipant =
@@ -46,6 +45,6 @@ export async function createPoll(input: CreatePollInput): Promise<CreatePollResu
       .run();
   });
 
-  cookieStore.set(organiserCookie(id), organiserToken, cookieOptions);
+  cookieStore.set(organiserCookie(id), organiserToken, await tokenCookieOptions());
   return { ok: true, id };
 }

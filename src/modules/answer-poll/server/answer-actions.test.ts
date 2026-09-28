@@ -6,7 +6,8 @@ import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 let cookieJar = fakeCookies();
-vi.mock("next/headers", () => ({ cookies: async () => cookieJar }));
+let requestHeaders = new Headers();
+vi.mock("next/headers", () => ({ cookies: async () => cookieJar, headers: async () => requestHeaders }));
 
 const thursdayNoonInWarsaw = new Date("2026-10-15T10:00:00Z");
 const pollId = "Planszowki";
@@ -35,6 +36,7 @@ function onOrganiserDevice() {
 
 beforeEach(async () => {
   cookieJar = fakeCookies();
+  requestHeaders = new Headers();
   vi.useFakeTimers({ toFake: ["Date"] });
   vi.setSystemTime(thursdayNoonInWarsaw);
   db = await openTestDatabase();
@@ -89,22 +91,22 @@ describe("saveAnswer", () => {
     });
   });
 
-  it("writes nothing when the site's address is missing", async () => {
-    vi.stubEnv("SITE_URL", undefined);
-    const { saveAnswer } = await actions();
-
-    await expect(saveAnswer(pollId, { name: "Ola", slots: [] })).rejects.toThrow("SITE_URL");
-
-    expect(await db.select().from(participants).where(eq(participants.pollId, pollId))).toEqual([]);
-  });
-
-  it("keeps the participant cookie off plain http when the site runs on https", async () => {
-    vi.stubEnv("SITE_URL", "https://wpasuj.pl");
+  it("marks the participant cookie Secure on a request that arrived over https", async () => {
+    requestHeaders = new Headers({ "x-forwarded-proto": "https" });
     const { saveAnswer } = await actions();
 
     await saveAnswer(pollId, { name: "Ola", slots: [] });
 
     expect(cookieJar.get(pollId)).toMatchObject({ secure: true });
+  });
+
+  it("leaves Secure off a cookie set over plain http, so a browser on http://localhost keeps it", async () => {
+    requestHeaders = new Headers({ "x-forwarded-proto": "http" });
+    const { saveAnswer } = await actions();
+
+    await saveAnswer(pollId, { name: "Ola", slots: [] });
+
+    expect(cookieJar.get(pollId)).toMatchObject({ secure: false });
   });
 
   it("saves an empty set for someone who can't make any time", async () => {
@@ -222,18 +224,6 @@ describe("saveAnswer", () => {
 });
 
 describe("claimName", () => {
-  it("keeps the row's token when the site's address is missing", async () => {
-    const { saveAnswer, claimName } = await actions();
-    await saveAnswer(pollId, { name: "Ola", slots: [friday19] });
-    const [before] = await db.select({ tokenHash: participants.tokenHash }).from(participants);
-    onAnotherDevice();
-    vi.stubEnv("SITE_URL", undefined);
-
-    await expect(claimName(pollId, "Ola")).rejects.toThrow("SITE_URL");
-
-    expect(await db.select({ tokenHash: participants.tokenHash }).from(participants)).toEqual([before]);
-  });
-
   it("moves the row to this device and hands back its slots", async () => {
     const { saveAnswer, claimName } = await actions();
     await saveAnswer(pollId, { name: "Ola", slots: [friday19] });

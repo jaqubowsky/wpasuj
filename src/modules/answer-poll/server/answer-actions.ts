@@ -59,7 +59,6 @@ export async function saveAnswer(pollId: string, answer: AnswerInput): Promise<S
 
   const now = new Date();
   const newcomerToken = newToken();
-  const cookieOptions = tokenCookieOptions();
   db.transaction((tx) => {
     const id = participant
       ? tx.update(participants).set({ name, normalisedName, updatedAt: now }).where(eq(participants.id, participant.id)).returning({ id: participants.id }).get().id
@@ -71,7 +70,7 @@ export async function saveAnswer(pollId: string, answer: AnswerInput): Promise<S
     tx.delete(slots).where(eq(slots.participantId, id)).run();
     if (mySlots.length > 0) tx.insert(slots).values(mySlots.map((slot) => ({ participantId: id, ...slot }))).run();
   });
-  if (!participant) cookieStore.set(pollId, newcomerToken, cookieOptions);
+  if (!participant) cookieStore.set(pollId, newcomerToken, await tokenCookieOptions());
   return { ok: true };
 }
 
@@ -86,7 +85,6 @@ export async function claimName(pollId: string, name: string): Promise<ClaimResu
   const cookieStore = await cookies();
   const heldToken = cookieStore.get(pollId)?.value;
   const token = newToken();
-  const cookieOptions = tokenCookieOptions();
   const claimed = getDb().transaction((tx) => {
     const row = participantNamed(pollId, nameKey(parsed.data));
     if (!row) return undefined;
@@ -97,6 +95,6 @@ export async function claimName(pollId: string, name: string): Promise<ClaimResu
   });
   if (!claimed) return { ok: false, reason: "invalid" };
 
-  cookieStore.set(pollId, token, cookieOptions);
+  cookieStore.set(pollId, token, await tokenCookieOptions());
   return { ok: true, name: claimed.name, slots: slotsOf(claimed.id) };
 }
