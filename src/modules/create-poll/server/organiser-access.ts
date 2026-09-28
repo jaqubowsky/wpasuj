@@ -3,12 +3,12 @@ import { polls } from "@/shared/db/schema";
 import { hashToken, tokenCookieOptions } from "@/shared/token-cookie";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
-import { pollIdSchema } from "./poll-schema";
+import { isPollId } from "./poll-queries";
 
 export const organiserCookie = (id: string) => `${id}-org`;
 
 function isOrganiserToken(id: string, token: string) {
-  if (!pollIdSchema.safeParse(id).success) return false;
+  if (!isPollId(id)) return false;
   const poll = getDb().select({ organiserTokenHash: polls.organiserTokenHash }).from(polls).where(eq(polls.id, id)).get();
   return poll?.organiserTokenHash === hashToken(token);
 }
