@@ -1,3 +1,4 @@
+import { productName } from "@/shared/brand";
 import type { ComponentType } from "react";
 import { BestTime } from "./scenes/best-time";
 import { CreateForm } from "./scenes/create-form";
@@ -59,7 +60,7 @@ export const storySteps: StoryStep[] = [
     label: "Najlepszy termin",
     kicker: "Krok 5",
     heading: "Najlepszy termin wyskakuje sam.",
-    body: "Nie liczysz, kto kiedy może. Wpasuj pokazuje najlepszy termin i dwa zapasowe.",
+    body: `Nie liczysz, kto kiedy może. ${productName} pokazuje najlepszy termin i dwa zapasowe.`,
     warm: true,
     Scene: BestTime,
   },
