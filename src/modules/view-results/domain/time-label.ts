@@ -1,8 +1,11 @@
 import { clockEndHour, clockHour } from "@/shared/dates/format";
+import { addDays } from "@/shared/dates/iso-date";
 
 type TimeRange = { date: string; firstHour: number; lastHour: number };
 
 const longWeekday = new Intl.DateTimeFormat("pl", { timeZone: "UTC", weekday: "long" });
+const dayAndMonthLong = new Intl.DateTimeFormat("pl", { timeZone: "UTC", day: "numeric", month: "long" });
+const hoursInDay = 24;
 
 function dayAndMonth(date: string) {
   const [, month, day] = date.split("-");
@@ -23,4 +26,13 @@ export function longRunLabel({ date, firstHour, lastHour }: TimeRange) {
 
 export function hourLabel({ date, hour }: { date: string; hour: number }) {
   return `${longDay(date)}, ${clockHour(hour)}:00`;
+}
+
+export function setTimeShown({ date, firstHour, lastHour }: TimeRange) {
+  const day = new Date(`${firstHour >= hoursInDay ? addDays(date, 1) : date}T00:00:00Z`);
+  return {
+    weekday: capitalised(longWeekday.format(day)),
+    day: dayAndMonthLong.format(day),
+    hours: `${clockHour(firstHour)}:00–${clockEndHour(lastHour)}:00`,
+  };
 }

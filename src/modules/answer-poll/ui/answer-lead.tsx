@@ -11,7 +11,7 @@ import { clashLine } from "../domain/clash-line";
 import { maxNameLength, nameKey } from "../domain/name-rules";
 
 const notices: Record<"closed" | "full" | "gone", ReactNode> = {
-  closed: "Termin jest już ustalony, odpowiedzi są zamknięte. Zobacz go w zakładce Wszyscy.",
+  closed: "Termin jest już ustalony, odpowiedzi są zamknięte.",
   full: "W tej ankiecie jest już 30 osób, więcej się nie zmieści. Napisz na grupie, kiedy możesz.",
   gone: (
     <>

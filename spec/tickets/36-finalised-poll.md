@@ -1,6 +1,6 @@
 # 36: Finalised poll: an invitation, not a grid
 
-Status: ready-for-agent
+Status: done
 Blocked by: 35-poll-page-v3.md
 
 ## Parent
@@ -26,9 +26,9 @@ Once the organiser sets the time, everyone who opens the link sees an invitation
 
 ## Acceptance criteria
 
-- [ ] e2e: after "Ustal termin" a participant's page shows the invitation and no grid; `saveAnswer` answers `closed`
-- [ ] e2e: "Zobacz wszystkie głosy" shows the heatmap read-only to a participant
-- [ ] e2e: "Zmień termin" returns both organiser and participant to the open poll
-- [ ] Unit test: "Będzie" holds exactly the respondents free for every hour of the set range
-- [ ] Screenshots at 390 and 1440 beside Main, OrganiserSet and DesktopSet
-- [ ] `lint`, `typecheck`, `test`, `knip`, `build`, `e2e` green
+- [x] e2e: after "Ustal termin" a participant's page shows the invitation and no grid; `saveAnswer` answers `closed` (`e2e/organiser.spec.ts` "after Ustal termin a participant sees the invitation with no grid, and can no longer answer")
+- [x] e2e: "Zobacz wszystkie głosy" shows the heatmap read-only to a participant (`e2e/organiser.spec.ts` "Zobacz wszystkie głosy shows every vote read-only to a participant")
+- [x] e2e: "Zmień termin" returns both organiser and participant to the open poll (`e2e/organiser.spec.ts` "Zmień termin returns the organiser and a participant to the open poll")
+- [x] Unit test: "Będzie" holds exactly the respondents free for every hour of the set range (`src/modules/view-results/domain/set-time.test.ts` "lets in only those free for every hour of the set range")
+- [x] Screenshots at 390 and 1440 beside Main, OrganiserSet and DesktopSet (`set-participant`, `set-organiser`, `set-votes` in `e2e/screenshots/`, CI artifact `screenshots`; listed in the pull request)
+- [x] `lint`, `typecheck`, `test`, `knip`, `build`, `e2e` green (local: all exit 0, e2e phone-chromium and desktop-chromium; phone-webkit in CI on the pull request)
