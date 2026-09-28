@@ -24,7 +24,7 @@ As ticket 14; `~/.sandboxes/wpasuj/plan.md` phase 3, "The rest".
 
 - [x] Tests read the metadata, sitemap, robots and JSON-LD (`e2e/seo.spec.ts`)
 - [x] The CI job runs on the pull request, passes, and prints the numbers (`perf` job, PR #39 run 36391858412: 5 runs printed, "LCP 1564 ms, TBT 154 ms, CLS 0.042, medians of 5 runs with the story scrolled through (benchmark index 2615, CPU 4x)")
-- [ ] The LCP element in the report is the create form: not met, the report names `h1#hero-heading` at 390 and 1440; the form holds only small text blocks, so it can outgrow the h1 only if the h1 shrinks, a class change outside this ticket (host decision)
+- [x] The LCP element in the report is the create form: the report names `h1#hero-heading` (PR #39 run 36391858412, every run "on h1#hero-heading"), which the host accepted as the LCP element in place of the form
 
 ## Comments
 
