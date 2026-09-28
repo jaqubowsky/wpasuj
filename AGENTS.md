@@ -9,6 +9,7 @@ A no-account availability poll for a group of friends: one link in the group cha
 - TanStack Query for polling server state; Tailwind v4 utilities on the `@theme` in `src/app/tokens.css` (default theme reset); fonts through `next/font/local` from `src/shared/fonts/` (latin and `latin-ext`), so no build fetches them
 - `output: 'standalone'`, a `Dockerfile`; production is one Railway service with a volume at `/data` (not deployed in this phase)
 - `GET /api/health` answers 200 once the database opens; `railway.json` builds the `Dockerfile` and gates each deploy on that route
+- Every server error is one JSON line on stderr from `onRequestError` in `src/instrumentation.ts`: `{"level":"error","message","path","digest","routeType"}`, `path` without its query and with the organiser token as `[token]`; Railway's Log Explorer finds them with `@level:error`
 
 ## Scripts
 
