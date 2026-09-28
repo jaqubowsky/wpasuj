@@ -136,8 +136,8 @@ jobs:
       - name: serves the poll page on SITE_URL and its card with the fonts in the image
         run: |
           poll=$(docker exec wpasuj node -e 'console.log(require("better-sqlite3")(process.env.DATABASE_PATH).prepare("select id from polls").pluck().get())')
-          curl --fail --silent $URL/e/$poll | grep --quiet "content=\"$URL/e/$poll/opengraph-image"
-          curl --fail --silent --output card.png --write-out '%{content_type}' $URL/e/$poll/opengraph-image | grep '^image/png'
+          card=$(curl --fail --silent $URL/e/$poll | grep --only-matching "content=\"$URL/e/$poll/opengraph-image/[^\"]*" | cut --delimiter '"' --fields 2)
+          curl --fail --silent --output card.png --write-out '%{content_type}' "$card" | grep '^image/png'
           test $(stat --format %s card.png) -gt 10000
       - if: ${{ failure() }}
         run: docker logs wpasuj

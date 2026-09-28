@@ -8,6 +8,7 @@ export const paper = "#FBF7F1";
 export const surface = "#FFFFFF";
 export const ink = "#1E1B18";
 export const muted = "#72695F";
+export const onDarkMuted = "#CFC7BC";
 export const edge = "#958A7E";
 export const accent = "#F0603F";
 export const tintCoral = "#FAD3C3";
