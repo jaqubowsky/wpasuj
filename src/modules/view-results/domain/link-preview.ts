@@ -1,7 +1,10 @@
 import { clockEndHour, dayNumber, shortWeekday, summaryOfDates } from "@/shared/dates/format";
 import { addDays } from "@/shared/dates/iso-date";
 import { tintOf } from "@/shared/tint";
-import { answeredCount } from "./people-count";
+import type { FinalTime, Results } from "../server/results-schema";
+import { answeredCount, peopleCount } from "./people-count";
+import { whoComes } from "./set-time";
+import { setTimeShown } from "./time-label";
 
 type Respondent = { name: string; normalisedName: string };
 type PreviewedPoll = {
@@ -55,13 +58,26 @@ function summaryOfDays(dates: string[]) {
     .join("");
 }
 
-function respondentsOf(respondents: Respondent[]) {
+type SetPoll = {
+  organiserName: string;
+  title: string;
+  final: FinalTime;
+  respondents: (Respondent & Pick<Results["respondents"][number], "slots">)[];
+};
+
+function avatarsOf(people: Respondent[]) {
   return {
-    avatars: respondents.slice(0, shownAvatars).map(({ name, normalisedName }) => ({
+    avatars: people.slice(0, shownAvatars).map(({ name, normalisedName }) => ({
       initial: Array.from(name.trim())[0].toLocaleUpperCase("pl"),
       tint: tintOf(normalisedName),
     })),
-    more: Math.max(0, respondents.length - shownAvatars),
+    more: Math.max(0, people.length - shownAvatars),
+  };
+}
+
+function respondentsOf(respondents: Respondent[]) {
+  return {
+    ...avatarsOf(respondents),
     answered: respondents.length === 0 ? "Zaznacz, kiedy możesz" : answeredCount(respondents.length),
   };
 }
@@ -74,4 +90,21 @@ export function linkPreview({ organiserName, title, dates, firstHour, hourCount,
     hours: hoursOfDay(firstHour, hourCount),
     respondents: respondentsOf(respondents),
   };
+}
+
+export function setTimePreview({ organiserName, title, final, respondents }: SetPoll) {
+  const { weekday, day, hours } = setTimeShown(final);
+  const { coming } = whoComes(respondents, final);
+
+  return {
+    setBy: `Ustalone przez: ${organiserName}`,
+    title,
+    day: `${weekday}, ${day}`,
+    hours,
+    coming: coming.length === 0 ? undefined : { ...avatarsOf(coming), label: `Będzie ${peopleCount(coming.length)}` },
+  };
+}
+
+export function linkPreviewVersion(final: FinalTime | null) {
+  return final ? `ustalone-${final.date}-${final.firstHour}-${final.lastHour}` : "otwarta";
 }

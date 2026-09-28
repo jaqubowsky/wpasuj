@@ -1,6 +1,6 @@
 import { tintOf } from "@/shared/tint";
 import { describe, expect, it } from "vitest";
-import { linkPreview } from "./link-preview";
+import { linkPreview, linkPreviewVersion, setTimePreview } from "./link-preview";
 
 const poll = {
   organiserName: "Kuba",
@@ -84,5 +84,60 @@ describe("linkPreview", () => {
     expect(avatars).toHaveLength(6);
     expect(more).toBe(24);
     expect(answered).toBe("30 osób już odpowiedziało");
+  });
+});
+
+const saturdayEvening = { date: "2030-10-26", firstHour: 19, lastHour: 21 };
+
+const setPoll = { organiserName: "Kuba", title: "Planszówki u Michała", final: saturdayEvening, respondents: [] };
+
+function answer(name: string, hours: number[]) {
+  return { name, normalisedName: name.toLocaleLowerCase("pl"), slots: hours.map((hour) => ({ date: saturdayEvening.date, hour })) };
+}
+
+describe("setTimePreview", () => {
+  it("says who set the time, and the day and hours as the invitation says them", () => {
+    expect(setTimePreview(setPoll)).toMatchObject({
+      setBy: "Ustalone przez: Kuba",
+      title: "Planszówki u Michała",
+      day: "Sobota, 26 października",
+      hours: "19:00–21:00",
+    });
+  });
+
+  it("shows only those free for the whole set time as coming", () => {
+    const respondents = [answer("Ola", [19, 20]), answer("Bartek", [19]), answer("Michał", [19, 20, 21])];
+
+    expect(setTimePreview({ ...setPoll, respondents }).coming).toEqual({
+      avatars: [
+        { initial: "O", tint: tintOf("ola") },
+        { initial: "M", tint: tintOf("michał") },
+      ],
+      more: 0,
+      label: "Będzie 2 osoby",
+    });
+  });
+
+  it("drops the coming row when nobody comes", () => {
+    expect(setTimePreview({ ...setPoll, respondents: [answer("Bartek", [])] }).coming).toBeUndefined();
+  });
+
+  it("caps the avatars of those coming at six and counts the rest", () => {
+    const respondents = Array.from({ length: 30 }, (_, index) => answer(`Osoba ${index + 1}`, [19, 20]));
+    const { avatars, more, label } = setTimePreview({ ...setPoll, respondents }).coming!;
+
+    expect(avatars).toHaveLength(6);
+    expect(more).toBe(24);
+    expect(label).toBe("Będzie 30 osób");
+  });
+});
+
+describe("linkPreviewVersion", () => {
+  it("names an open poll's card", () => {
+    expect(linkPreviewVersion(null)).toBe("otwarta");
+  });
+
+  it("names a set poll's card by its day and hours, so each set time has its own", () => {
+    expect(linkPreviewVersion(saturdayEvening)).toBe("ustalone-2030-10-26-19-21");
   });
 });

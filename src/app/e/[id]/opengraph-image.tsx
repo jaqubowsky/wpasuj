@@ -1,9 +1,15 @@
 import { findPoll } from "@/modules/create-poll";
-import { linkPreviewImage, linkPreviewSize, readResults } from "@/modules/view-results";
+import { linkPreviewImage, linkPreviewSize, linkPreviewVersion, readResults } from "@/modules/view-results";
 import { notFound } from "next/navigation";
 
-export const size = linkPreviewSize;
-export const contentType = "image/png";
+export const dynamic = "force-dynamic";
+
+export async function generateImageMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const poll = findPoll(id, new Date());
+
+  return poll ? [{ id: linkPreviewVersion(poll.final), size: linkPreviewSize, contentType: "image/png" }] : [];
+}
 
 export default async function OpengraphImage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
