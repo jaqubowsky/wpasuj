@@ -1,3 +1,4 @@
+import { loggedLines } from "@/shared/testing/logged-lines";
 import { afterEach, expect, it, vi } from "vitest";
 import { onRequestError } from "./instrumentation";
 
@@ -16,14 +17,8 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-function loggedLines() {
-  const log = vi.spyOn(console, "error").mockImplementation(() => {});
-
-  return () => log.mock.calls.map((args) => args.join(" "));
-}
-
 it("writes a server error as one JSON line with its path and digest", async () => {
-  const lines = loggedLines();
+  const lines = loggedLines("error");
 
   await onRequestError(Object.assign(new TypeError("Invalid URL"), { digest: "1007449423" }), request, context);
 
@@ -40,7 +35,7 @@ it("writes a server error as one JSON line with its path and digest", async () =
 });
 
 it("writes a thrown value that is not an Error as its text", async () => {
-  const lines = loggedLines();
+  const lines = loggedLines("error");
 
   await onRequestError("database locked", request, { ...context, routeType: "action" });
 
@@ -48,7 +43,7 @@ it("writes a thrown value that is not an Error as its text", async () => {
 });
 
 it("logs an error on the organiser route without its token or query", async () => {
-  const lines = loggedLines();
+  const lines = loggedLines("error");
 
   await onRequestError(
     new Error("boom"),
@@ -61,7 +56,7 @@ it("logs an error on the organiser route without its token or query", async () =
 });
 
 it("logs the path without its query", async () => {
-  const lines = loggedLines();
+  const lines = loggedLines("error");
 
   await onRequestError(new Error("boom"), { ...request, path: "/e/abc123?tab=wszyscy" }, context);
 
