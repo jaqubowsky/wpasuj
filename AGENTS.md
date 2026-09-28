@@ -40,6 +40,9 @@ Hooks (husky, installed by `npm ci`): pre-commit runs `prettier --write` (Tailwi
 
 Each module in `src/modules/` has `domain/` (pure functions and tests, no imports from React, `server/` or `ui/`), `server/` (schemas, queries, actions, the only I/O) and `ui/` (components, hooks), with `index.ts` (server) and `client.ts` (client) as the only public entries. ESLint `no-restricted-imports` enforces the direction. Rule source: `spec/brief.md`, "Code rules".
 
+- A server action reads parse, guard, store, result: `parse(schema, input)` and each guard (`organisersPoll`, `livePoll`, `openPoll`) return a `Result` from `src/shared/result.ts`, and the action goes on with `if (!found.ok) return found;` per step, ending in `ok(…)` or `fail("<reason>")`. A reason is a string literal; the UI maps it in a `switch` whose `default` returns the value `satisfies never`, so a new reason fails `typecheck` there
+- One `<name>-store.ts` per module holds every `getDb()` call and every `drizzle-orm` import, the module's live-poll lookup included (a copy per module, no shared repository). ESLint `no-restricted-imports` refuses `drizzle-orm` and `@/shared/db/client` everywhere else except `src/shared/db/`, `src/shared/testing/`, tests and `src/app/api/health/`
+
 ## Styling
 
 Tailwind v4 utilities written inline in `className`; `src/app/` is the reference (`app-header.tsx`, `page-frame.tsx`, `e/[id]/not-found.tsx`).

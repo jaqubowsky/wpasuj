@@ -1,15 +1,12 @@
 "use server";
 
-import { todayIn } from "@/shared/dates/iso-date";
-import { getDb } from "@/shared/db/client";
-import { polls } from "@/shared/db/schema";
-import { eq } from "drizzle-orm";
+import { fail, ok, parse, type Result } from "@/shared/result";
 import { z } from "zod";
 import { organiserTokenOf } from "./organiser-access";
-import { fitsPoll, isExpired } from "../domain/poll-rules";
-import { isPollId } from "./poll-queries";
+import { fitsPoll } from "../domain/poll-rules";
+import { livePoll, removePoll, saveFinal } from "./poll-store";
 
-type OrganiserResult = { ok: true } | { ok: false; reason: "invalid" | "not-organiser" | "gone" };
+type OrganiserResult = Result<object, "invalid" | "not-organiser" | "gone">;
 
 const finalTimeSchema = z
   .object({ date: z.iso.date(), firstHour: z.int().min(0).max(46), lastHour: z.int().min(1).max(47) })
@@ -18,49 +15,45 @@ const finalTimeSchema = z
 type FinalTime = z.infer<typeof finalTimeSchema>;
 
 async function organisersPoll(id: string) {
-  if (!isPollId(id)) return "gone";
+  const found = livePoll(id, new Date());
 
-  const poll = getDb().select().from(polls).where(eq(polls.id, id)).get();
+  if (!found.ok) return found;
+  if ((await organiserTokenOf(found.poll)) === undefined) return fail("not-organiser");
 
-  if (!poll || isExpired(poll.dates, todayIn(poll.timeZone, new Date()))) return "gone";
-  if ((await organiserTokenOf(poll)) === undefined) return "not-organiser";
-
-  return poll;
+  return found;
 }
 
 export async function setFinal(id: string, final: FinalTime): Promise<OrganiserResult> {
-  const parsed = finalTimeSchema.safeParse(final);
+  const parsed = parse(finalTimeSchema, final);
 
-  if (!parsed.success) return { ok: false, reason: "invalid" };
+  if (!parsed.ok) return parsed;
 
-  const poll = await organisersPoll(id);
+  const found = await organisersPoll(id);
 
-  if (typeof poll === "string") return { ok: false, reason: poll };
-  if (!fitsPoll(poll, parsed.data)) return { ok: false, reason: "invalid" };
+  if (!found.ok) return found;
+  if (!fitsPoll(found.poll, parsed.data)) return fail("invalid");
 
-  const { date, firstHour, lastHour } = parsed.data;
+  saveFinal(id, parsed.data);
 
-  getDb().update(polls).set({ finalDate: date, finalFirstHour: firstHour, finalLastHour: lastHour }).where(eq(polls.id, id)).run();
-
-  return { ok: true };
+  return ok();
 }
 
 export async function clearFinal(id: string): Promise<OrganiserResult> {
-  const poll = await organisersPoll(id);
+  const found = await organisersPoll(id);
 
-  if (typeof poll === "string") return { ok: false, reason: poll };
+  if (!found.ok) return found;
 
-  getDb().update(polls).set({ finalDate: null, finalFirstHour: null, finalLastHour: null }).where(eq(polls.id, id)).run();
+  saveFinal(id, null);
 
-  return { ok: true };
+  return ok();
 }
 
 export async function deletePoll(id: string): Promise<OrganiserResult> {
-  const poll = await organisersPoll(id);
+  const found = await organisersPoll(id);
 
-  if (typeof poll === "string") return { ok: false, reason: poll };
+  if (!found.ok) return found;
 
-  getDb().delete(polls).where(eq(polls.id, id)).run();
+  removePoll(id);
 
-  return { ok: true };
+  return ok();
 }

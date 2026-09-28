@@ -38,6 +38,8 @@ function afterRefusedClaim(reason: ClaimRefusal): "save-as-newcomer" | Problem {
     case "closed":
     case "gone":
       return { kind: reason };
+    default:
+      return reason satisfies never;
   }
 }
 
@@ -92,6 +94,8 @@ export function useAnswer({ pollId, dates, hours, mine, fixedName }: AnswerOptio
         setProblem({ kind: result.reason });
 
         return false;
+      default:
+        return result satisfies never;
     }
   }
 
