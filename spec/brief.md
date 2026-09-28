@@ -64,7 +64,7 @@ The page opens on "Moje" when this device has not answered and on "Wszyscy" when
 ### Results ("Wszyscy" tab)
 
 - **The best time**, as the page's headline block: "Najlepiej: sobota 18.10, 19–22", "5 z 6 może" and "Nie może: Ola". Runs are ranked by the size of their free set, then length, then earliest start. The best time is the top run; no other runs are listed (the owner removed "Też dobre", as the approved boards draw it). A run with nobody free is never shown. With no respondents the block reads "Nikt jeszcze nie odpowiedział. Wyślij link na grupę."
-- The heatmap: each cell coloured by the share of respondents free, five buckets, with the count in the cell; a cell where every respondent is free carries an ink border.
+- The heatmap: each cell coloured by the share of respondents free, five buckets, with the count in the cell, and nothing else: no border marks the hours everyone can make or the best time, which the best-time card names.
 - A tap on a cell shows who can and who can't, in a sheet from the bottom on the phone and a side panel on desktop.
 - **Kto odpowiedział**: each respondent with when they last saved ("20 min temu"), or "nie może"; newest first.
 - Other people's changes appear within 10 seconds while the tab is visible, and at once when it regains focus.
@@ -183,7 +183,7 @@ Sentence case everywhere; no all-caps labels, no letter-spaced eyebrows.
 
 Counts on heat cells are `ink`, white only on `heat-5`. Avatars take their tint from the normalised name.
 
-**Grid**: separate rounded tiles (10px radius) with a 6px gap, at least 48px tall and 56px wide on the phone. Free is `surface` with an `edge` border; mine is `accent`; add preview is `accent` at 35%; remove preview is `line`; heat 1 to 5 carry the count; every respondent free adds a 2px inset `ink` border; the best and the chosen time get a 2px `ink` outline with a 2px offset; focus is a 2px `ink` ring. The date header is the weekday small and muted over the day number large ("pt" over "17").
+**Grid**: separate rounded tiles (10px radius) with a 6px gap, at least 48px tall and 56px wide on the phone. Free is `surface` with an `edge` border; mine is `accent`; add preview is `accent` at 35%; remove preview is `line`; heat 1 to 5 carry the count and no other mark; focus is a 2px `ink` ring. The date header is the weekday small and muted over the day number large ("pt" over "17").
 
 **Shape and space**: one 4px grid (`--spacing: 4px`), so `p-7` is 28px and 44, 48 and 52 are `11`, `12` and `13`. Radius 10 on cells, 14 on buttons and inputs, 20 on cards, full pill on chips. No borders on cards and no shadows, except the selected segment's 1px lift and the bottom sheet's one soft shadow. Buttons 52px tall on the phone, the main action full width; the primary is `ink` with white text. The best time sits in an `ink` card with the count in `heat-3`.
 

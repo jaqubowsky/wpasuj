@@ -22,7 +22,7 @@ export function BestTime({ time }: SceneProps) {
         <PollGrid
           days={bestPoll.days}
           hours={bestPoll.rows.map((row) => row.hour)}
-          cell={(row, column) => <HeatCell {...bestPoll.rows[row].cells[column]} ringed={risen} />}
+          cell={(row, column) => <HeatCell {...bestPoll.rows[row].cells[column]} />}
         />
       </Card>
     </>

@@ -34,6 +34,6 @@ export function demoPoll(mine: Slot[]) {
     },
     respondentCount: respondents.length,
     others: others.map((run) => ({ label: shortRunLabel(run), share: share(run) })),
-    cellAt: (cell: Slot) => heatCellOf(respondents, cell, best),
+    cellAt: (cell: Slot) => heatCellOf(respondents, cell),
   };
 }
