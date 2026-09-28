@@ -1,24 +1,7 @@
 import type { Metadata, Viewport } from "next";
-import localFont from "next/font/local";
 import { productName } from "@/shared/brand";
-import { cn } from "@/shared/ui/cn";
+import { fontVariables } from "./fonts";
 import "./globals.css";
-
-const BricolageGrotesque = localFont({
-  src: "../shared/fonts/bricolage-grotesque.woff2",
-  weight: "700 800",
-  variable: "--font-bricolage",
-  fallback: ["Bricolage Grotesque Fallback", "sans-serif"],
-  adjustFontFallback: false,
-});
-
-const Onest = localFont({
-  src: "../shared/fonts/onest.woff2",
-  weight: "400 600",
-  variable: "--font-onest",
-  fallback: ["Onest Fallback", "sans-serif"],
-  adjustFontFallback: false,
-});
 
 export const metadata: Metadata = {
   title: productName,
@@ -30,7 +13,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pl" className={cn(BricolageGrotesque.variable, Onest.variable)}>
+    <html lang="pl" className={fontVariables}>
       <body>{children}</body>
     </html>
   );
