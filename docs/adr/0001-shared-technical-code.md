@@ -12,7 +12,7 @@ A module imports no other module (`spec/brief.md`, "Code rules"), yet `participa
 ## Decision
 
 - Drizzle tables live in one file, `src/shared/db/schema.ts`, with one migration history. Modules own their zod schemas, queries and writes; the table file is the database's technical shape
-- Design-system components (Text, Button, Chip, Segment, Input, Stepper, Cell, Card, Avatar, Status) live in `src/shared/ui/<component>/`: they carry look, no business rule
+- Design-system components (Text, Button, TextLink, Chip, Segment, Input, Stepper, Cell, Card, Avatar, Status) live in `src/shared/ui/<component>/`: they carry look, no business rule
 - The product name and wordmark are one constant, `src/shared/brand.ts`
 - The last name used on a device lives in `localStorage` under `last-name` (`src/shared/last-name.ts`), written and read by create and answer alike
 

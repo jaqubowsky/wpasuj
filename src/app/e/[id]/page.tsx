@@ -17,11 +17,11 @@ import {
 } from "@/modules/view-results/client";
 import { Avatar } from "@/shared/ui/avatar/avatar";
 import { Text } from "@/shared/ui/text/text";
+import { TextLink } from "@/shared/ui/text-link/text-link";
 import { Morph, pollTitleMorph } from "@/shared/morph";
 import { siteUrl } from "@/shared/site-url";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AppHeader } from "../../app-header";
 import { PageFrame } from "../../page-frame";
@@ -130,12 +130,7 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
               </UntilSet>
             </main>
             <footer className="flex justify-center pb-8">
-              <Link
-                href="/"
-                className="inline-flex min-h-11 items-center text-base font-medium text-muted underline underline-offset-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
-              >
-                Zrób własną ankietę
-              </Link>
+              <TextLink href="/">Zrób własną ankietę</TextLink>
             </footer>
           </WhilePollLives>
         </ResultsProvider>

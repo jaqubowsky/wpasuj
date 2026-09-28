@@ -15,7 +15,7 @@ test("a server error shows the Polish error page, and trying again renders the p
 test("the error page links to a new poll", async ({ page }) => {
   await page.goto(`/dev/error?run=${randomUUID()}`);
 
-  await page.getByRole("link", { name: "Zrób nową ankietę" }).click();
+  await page.getByRole("link", { name: "Zrób własną ankietę" }).click();
 
   await expect(page.getByRole("textbox", { name: "Co robimy?" })).toBeVisible();
 });
