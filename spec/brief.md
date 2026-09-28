@@ -64,7 +64,7 @@ The page opens on "Moje" when this device has not answered and on "Wszyscy" when
 ### Results ("Wszyscy" tab)
 
 - **The best time**, as the page's headline block: "Najlepiej: sobota 18.10, 19–22", "5 z 6 może" and "Nie może: Ola". Runs are ranked by the size of their free set, then length, then earliest start. The best time is the top run; no other runs are listed (the owner removed "Też dobre", as the approved boards draw it). A run with nobody free is never shown. With no respondents the block reads "Nikt jeszcze nie odpowiedział. Wyślij link na grupę."
-- The heatmap: each cell coloured by the share of respondents free, five buckets, with the count in the cell; a cell where every respondent is free carries an ink border.
+- The heatmap: each cell coloured by the share of respondents free, five buckets, with the count in the cell, and nothing else: no border marks the hours everyone can make or the best time, which the best-time card names.
 - A tap on a cell shows who can and who can't, in a sheet from the bottom on the phone and a side panel on desktop.
 - **Kto odpowiedział**: each respondent with when they last saved ("20 min temu"), or "nie może"; newest first.
 - Other people's changes appear within 10 seconds while the tab is visible, and at once when it regains focus.
@@ -74,7 +74,7 @@ The page opens on "Moje" when this device has not answered and on "Wszyscy" when
 The organiser is whoever holds the organiser cookie, set on create. The results tab shows, nothing else: "Przypomnij" and the "Więcej" menu in one row under the title, and "Ustal ten termin" inside the best-time card:
 
 - **Przypomnij**: a message that names who already answered, because a request addressed to named people gets more replies than one to everyone: "Już są: Bartek, Ola i Michał. Reszta, kiedy możecie? {title} {link}" ("Już jest: Ola." for one). With nobody answered: "Kiedy możecie? {title} {link}". Share sheet on the phone, copy elsewhere.
-- **Ustal termin**: on the best time. The page then leads with "Ustalone: sobota 18.10, 19:00" for everyone, with "Dodaj do kalendarza" (an `.ics` with DTSTART and DTEND in UTC); answering closes. "Zmień" clears the final time and reopens answering.
+- **Ustal termin**: on the best time. The page then leads with "Ustalone: sobota 18.10, 19:00" for everyone, with "Dodaj do kalendarza", a menu of Kalendarz Google and Outlook (their prefilled web editors) and Kalendarz Apple (an `.ics` served inline, DTSTART and DTEND in UTC), each carrying the poll link; answering closes. "Zmień" clears the final time and reopens answering.
 - **Zrób własną ankietę**: a quiet link at the bottom of every poll page, for everyone, because every participant who sees a poll is the next organiser.
 - **Więcej** menu: "Kopiuj link", "Link organizatora" (a URL that sets the organiser cookie on another device, with one line saying to keep it private), and "Usuń ankietę", confirmed inline.
 
@@ -183,7 +183,7 @@ Sentence case everywhere; no all-caps labels, no letter-spaced eyebrows.
 
 Counts on heat cells are `ink`, white only on `heat-5`. Avatars take their tint from the normalised name.
 
-**Grid**: separate rounded tiles (10px radius) with a 6px gap, at least 48px tall and 56px wide on the phone. Free is `surface` with an `edge` border; mine is `accent`; add preview is `accent` at 35%; remove preview is `line`; heat 1 to 5 carry the count; every respondent free adds a 2px inset `ink` border; the best and the chosen time get a 2px `ink` outline with a 2px offset; focus is a 2px `ink` ring. The date header is the weekday small and muted over the day number large ("pt" over "17").
+**Grid**: separate rounded tiles (10px radius) with a 6px gap, at least 48px tall and 56px wide on the phone. Free is `surface` with an `edge` border; mine is `accent`; add preview is `accent` at 35%; remove preview is `line`; heat 1 to 5 carry the count and no other mark; focus is a 2px `ink` ring. The date header is the weekday small and muted over the day number large ("pt" over "17").
 
 **Shape and space**: one 4px grid (`--spacing: 4px`), so `p-7` is 28px and 44, 48 and 52 are `11`, `12` and `13`. Radius 10 on cells, 14 on buttons and inputs, 20 on cards, full pill on chips. No borders on cards and no shadows, except the selected segment's 1px lift and the bottom sheet's one soft shadow. Buttons 52px tall on the phone, the main action full width; the primary is `ink` with white text. The best time sits in an `ink` card with the count in `heat-3`.
 
@@ -206,17 +206,17 @@ A 1200×630 PNG under 1 MB, rendered by `next/og` with flexbox layout only: "{im
 
 ## Out of scope
 
-Accounts and sign-in, notifications of any kind, calendar integrations beyond the `.ics` file, time zones beyond the organiser's, per-person invite links, recurring polls, comments or chat, a description field, a per-name filter in results, dark theme, English, analytics inside the app, the marketing site.
+Accounts and sign-in, notifications of any kind, calendar integrations beyond the prefilled links and the `.ics` file, time zones beyond the organiser's, per-person invite links, recurring polls, comments or chat, a description field, a per-name filter in results, dark theme, English, analytics inside the app, the marketing site.
 
 ## Acceptance
 
 - A first-time participant on a 390px phone (Chromium and WebKit) answers a fresh poll with a name and one drag, sees "Zapisane" without pressing any button, and the same with taps only.
 - Three participants in separate browser contexts answer; the best time, the heatmap counts, the per-cell names and "Kto odpowiedział" agree with a hand count, including a poll where the free set changes while the count stays the same.
-- The organiser creates a poll with "Ten weekend", the default range and a title, reminds (the message names who answered), sets the time, and a participant downloads an `.ics` with the right UTC times.
+- The organiser creates a poll with "Ten weekend", the default range and a title, reminds (the message names who answered), sets the time, and a participant gets the calendar links and the `.ics` with the right UTC times.
 - A second browser context typing an existing name gets "To ty, Ola?" and takes the row over; the organiser link restores organiser controls in a fresh context.
 - `GET` of the Open Graph image returns a 1200×630 PNG under 1 MB, and the page's `og:image` is an absolute URL to it.
 - Playwright saves every screen and state at 390 and 1440 as a CI artifact of the pull request that introduces it; the pull request body names each screen and the mockup or design-system parts it was compared with.
-- CI green on `main`; unit tests cover runs and best time, buckets, date presets, ranges and name rules; action tests cover success and every failure reason; one end-to-end test runs create, share, three answers, remind, set the time and download the `.ics`.
+- CI green on `main`; unit tests cover runs and best time, buckets, date presets, ranges and name rules; action tests cover success and every failure reason; one end-to-end test runs create, share, three answers, remind, set the time and get the calendar links and the `.ics`.
 
 ## Environment
 

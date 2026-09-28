@@ -49,7 +49,7 @@ function renderPage(results: Results, asOrganiser?: Organiser) {
     <ResultsProvider pollId="Pl4nszowki" initial={results} organiser={asOrganiser} organiserKey="kuba">
       <UntilSet invitation={<SetBadge />}>{null}</UntilSet>
       <WhilePollLives gone={<h1>Tej ankiety już nie ma</h1>}>
-        <UntilSet invitation={<Invitation title="Planszówki" />}>
+        <UntilSet invitation={<Invitation title="Planszówki" timeZone="Europe/Warsaw" />}>
           <OrganiserCard />
           <ResultsBody />
         </UntilSet>
@@ -91,7 +91,7 @@ describe("a participant", () => {
     expect(screen.queryByRole("button", { name: "Ustal termin" })).not.toBeInTheDocument();
   });
 
-  it("sees the set day and hours with a calendar file, and nothing to change or paint", () => {
+  it("sees the set day and hours with a way to the calendar, and nothing to change or paint", () => {
     renderPage(withFinal(saturdayEvening));
 
     const setTime = screen.getByRole("region", { name: "Termin" });
@@ -99,9 +99,30 @@ describe("a participant", () => {
     expect(setTime).toHaveTextContent("Sobota");
     expect(setTime).toHaveTextContent("19 października");
     expect(setTime).toHaveTextContent("18:00–20:00");
-    expect(within(setTime).getByRole("link", { name: "Dodaj do kalendarza" })).toHaveAttribute("href", "/e/Pl4nszowki/termin.ics");
+    expect(within(setTime).getByRole("button", { name: "Dodaj do kalendarza" })).toBeVisible();
     expect(screen.queryByRole("button", { name: "Zmień termin" })).not.toBeInTheDocument();
     expect(screen.queryByRole("grid")).not.toBeInTheDocument();
+  });
+
+  it("picks Google, Apple or Outlook from Dodaj do kalendarza, each with the set time", async () => {
+    renderPage(withFinal(saturdayEvening));
+
+    await userEvent.click(screen.getByRole("button", { name: "Dodaj do kalendarza" }));
+
+    const menu = screen.getByRole("dialog", { name: "Dodaj do kalendarza" });
+    const google = new URL(within(menu).getByRole("link", { name: "Kalendarz Google" }).getAttribute("href")!);
+    expect(google.hostname).toBe("calendar.google.com");
+    expect(google.searchParams.get("text")).toBe("Planszówki");
+    expect(google.searchParams.get("dates")).toBe("20301019T160000Z/20301019T180000Z");
+    expect(google.searchParams.get("details")).toBe(`${location.origin}/e/Pl4nszowki`);
+    const apple = within(menu).getByRole("link", { name: "Kalendarz Apple" });
+    expect(apple).toHaveAttribute("href", "/e/Pl4nszowki/termin.ics");
+    expect(apple).not.toHaveAttribute("download");
+    const outlook = new URL(within(menu).getByRole("link", { name: "Outlook" }).getAttribute("href")!);
+    expect(outlook.hostname).toBe("outlook.live.com");
+    expect(outlook.searchParams.get("startdt")).toBe("2030-10-19T16:00:00Z");
+    expect(within(menu).getByRole("link", { name: "Kalendarz Google" })).toHaveAttribute("target", "_blank");
+    expect(within(menu).getByRole("link", { name: "Outlook" })).toHaveAttribute("target", "_blank");
   });
 
   it("sees who comes and who cannot", () => {
@@ -122,7 +143,7 @@ describe("a participant", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Wiadomość skopiowana. Wklej ją na grupę.");
   });
 
-  it("sees every vote read-only, the set hours marked", async () => {
+  it("sees every vote read-only, the set hours unmarked", async () => {
     renderPage(withFinal(sundayEvening));
 
     await userEvent.click(screen.getByRole("button", { name: "Zobacz wszystkie głosy" }));
@@ -130,8 +151,7 @@ describe("a participant", () => {
     const votes = screen.getByRole("dialog", { name: "Wszystkie głosy" });
     const heatmap = within(votes).getByRole("grid", { name: "Kto może" });
     expect(heatmap).not.toHaveAttribute("aria-multiselectable");
-    expect(within(heatmap).getByRole("button", { name: "nd 20, 20:00, 2 z 3 może" })).toHaveAttribute("data-best");
-    expect(within(heatmap).getByRole("button", { name: "sb 19, 18:00, 3 z 3 może" })).not.toHaveAttribute("data-best");
+    expect(within(heatmap).getByRole("button", { name: "nd 20, 20:00, 2 z 3 może" })).not.toHaveAttribute("data-best");
   });
 
   it("finds no hour left open from the votes once the time is cleared", async () => {

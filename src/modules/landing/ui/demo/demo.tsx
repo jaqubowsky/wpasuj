@@ -47,10 +47,10 @@ export function Demo({ formId }: { formId: string }) {
             hours={demoHours}
             isSelected={slots.isMine}
             renderCell={({ date, hour, selected, label, tabIndex, preview }) => {
-              const { count, heat, everyone, best } = poll.cellAt({ date, hour });
+              const { count, heat } = poll.cellAt({ date, hour });
               const marked = preview ? preview === "adding" : selected;
               return (
-                <Cell heat={heat} everyone={everyone} best={best} aria-label={`${label}, ${count} z ${poll.respondentCount} może`} tabIndex={tabIndex}>
+                <Cell heat={heat} aria-label={`${label}, ${count} z ${poll.respondentCount} może`} tabIndex={tabIndex}>
                   <span className="col-start-1 row-start-1">{count || ""}</span>
                   {marked && <span aria-hidden className="col-start-1 row-start-1 mb-1 size-1.5 self-end rounded-pill bg-current" />}
                 </Cell>

@@ -1,6 +1,5 @@
 import type { Browser, Page } from "@playwright/test";
 import { expect, test } from "./fixtures";
-import { readFile } from "node:fs/promises";
 import { stubClipboardWithoutShareSheet } from "./clipboard";
 import { saveScreenshot } from "./screenshot";
 import { seedAnswer, seedPoll } from "./seed";
@@ -148,10 +147,23 @@ test("after Ustal termin a participant sees the invitation with no grid, and can
   await expect(participant.getByRole("button", { name: "Zmień termin" })).toHaveCount(0);
   await saveScreenshot(participant, testInfo, "set-participant");
 
-  const download = participant.waitForEvent("download");
-  await setTime.getByRole("link", { name: "Dodaj do kalendarza" }).click();
-  const calendar = await readFile((await (await download).path())!, "utf8");
-  expect(calendar.split("\r\n")).toEqual(expect.arrayContaining(["DTSTART:20301026T170000Z", "DTEND:20301026T190000Z"]));
+  await setTime.getByRole("button", { name: "Dodaj do kalendarza" }).click();
+  const calendarMenu = participant.getByRole("dialog", { name: "Dodaj do kalendarza" });
+  await expect(calendarMenu).toBeVisible();
+  await saveScreenshot(participant, testInfo, "set-calendar-menu");
+  const google = new URL((await calendarMenu.getByRole("link", { name: "Kalendarz Google" }).getAttribute("href"))!);
+  expect(`${google.origin}${google.pathname}`).toBe("https://calendar.google.com/calendar/render");
+  expect(Object.fromEntries(google.searchParams)).toEqual({ action: "TEMPLATE", text: "Planszówki u Michała", dates: "20301026T170000Z/20301026T190000Z", details: `http://localhost:3000/e/${pollId}` });
+  const outlook = new URL((await calendarMenu.getByRole("link", { name: "Outlook" }).getAttribute("href"))!);
+  expect(`${outlook.origin}${outlook.pathname}`).toBe("https://outlook.live.com/calendar/0/deeplink/compose");
+  expect(outlook.searchParams.get("startdt")).toBe("2030-10-26T17:00:00Z");
+  expect(outlook.searchParams.get("enddt")).toBe("2030-10-26T19:00:00Z");
+  const apple = await participant.request.get((await calendarMenu.getByRole("link", { name: "Kalendarz Apple" }).getAttribute("href"))!);
+  expect(apple.headers()["content-type"]).toBe("text/calendar; charset=utf-8");
+  expect(apple.headers()["content-disposition"]).toBe('inline; filename="termin.ics"');
+  expect((await apple.text()).split("\r\n")).toEqual(expect.arrayContaining(["DTSTART:20301026T170000Z", "DTEND:20301026T190000Z", `URL:https://wpasuj.example/e/${pollId}`]));
+  await participant.keyboard.press("Escape");
+  await expect(calendarMenu).toHaveCount(0);
 
   await participant.getByRole("button", { name: "Wyślij termin na grupę" }).click();
   await expect.poll(() => copied(participant)).toBe(`Planszówki u Michała: Sobota 26 października, 19:00–21:00. http://localhost:3000/e/${pollId}`);
@@ -167,7 +179,7 @@ test("Zobacz wszystkie głosy shows every vote read-only to a participant", asyn
   const heatmap = votes.getByRole("grid", { name: "Kto może" });
   await expect(heatmap).toBeVisible();
   await expect(heatmap).not.toHaveAttribute("aria-multiselectable");
-  await expect(heatmap.getByRole("button", { name: "sb 26, 19:00, 4 z 5 może" })).toHaveAttribute("data-best");
+  await expect(heatmap.getByRole("button", { name: "sb 26, 19:00, 4 z 5 może" })).not.toHaveAttribute("data-best");
   await expect(participant.getByRole("textbox", { name: "Twoje imię" })).toHaveCount(0);
   await saveScreenshot(participant, testInfo, "set-votes");
 });

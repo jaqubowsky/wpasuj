@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { calendarFile } from "./calendar-file";
 
-const poll = { id: "abcdefghij", site: "wpasuj.example", title: "Planszówki, u Michała", timeZone: "Europe/Warsaw" };
+const poll = { id: "abcdefghij", site: "wpasuj.example", link: "https://wpasuj.example/e/abcdefghij", title: "Planszówki, u Michała", timeZone: "Europe/Warsaw" };
 const now = new Date("2026-10-20T12:00:00Z");
 
 function linesOf(file: string) {
@@ -55,6 +55,13 @@ describe("calendarFile", () => {
     expect(lines).toContain("DTSTAMP:20261020T120000Z");
     expect(lines.filter((line) => line === "BEGIN:VEVENT")).toHaveLength(1);
     expect(lines.at(-2)).toBe("END:VCALENDAR");
+  });
+
+  it("links the event back to the poll", () => {
+    const lines = linesOf(calendarFile({ ...poll, final: { date: "2026-10-24", firstHour: 19, lastHour: 22 } }, now));
+
+    expect(lines).toContain("URL:https://wpasuj.example/e/abcdefghij");
+    expect(lines).toContain("DESCRIPTION:https://wpasuj.example/e/abcdefghij");
   });
 
   it("names the event by the poll and the site, so a changed time replaces it on the next import", () => {

@@ -1,7 +1,12 @@
 "use client";
 
+import { Button } from "@/shared/ui/button/button";
+import { Sheet } from "@/shared/ui/sheet/sheet";
+import { useRef, useState, type ComponentProps, type RefObject } from "react";
 import type { FinalTime } from "../server/results-schema";
+import { googleCalendarLink, outlookCalendarLink } from "../domain/calendar-links";
 import { setTimeShown } from "../domain/time-label";
+import { MenuLink } from "./menu-item";
 import { useResultsContext } from "./results-provider";
 import { useSendSetTime } from "./use-send-set-time";
 
@@ -23,17 +28,48 @@ export function SetBadge() {
   );
 }
 
-export function SetTime({ final, title }: { final: FinalTime; title: string }) {
+function CardAction({ primary, ...props }: { primary?: boolean } & ComponentProps<"button">) {
+  return (
+    <button
+      type="button"
+      className="box-border inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-control border-0 bg-transparent px-6 font-sans text-base font-semibold text-surface shadow-[inset_0_0_0_1px_var(--color-muted)] transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface motion-safe:active:scale-97 data-[emphasis=primary]:h-13 data-[emphasis=primary]:bg-surface data-[emphasis=primary]:text-ink data-[emphasis=primary]:shadow-none lg:h-13"
+      data-emphasis={primary ? "primary" : undefined}
+      {...props}
+    />
+  );
+}
+
+function CalendarMenu({ pollId, title, timeZone, final, opener, onClose }: { pollId: string; title: string; timeZone: string; final: FinalTime; opener: RefObject<HTMLButtonElement | null>; onClose: () => void }) {
+  const event = { title, link: `${location.origin}/e/${pollId}`, timeZone, final };
+
+  return (
+    <Sheet label="Dodaj do kalendarza" menuBelow={opener} onClose={onClose}>
+      <MenuLink icon="calendar" href={googleCalendarLink(event)} newTab onClick={onClose}>
+        Kalendarz Google
+      </MenuLink>
+      <MenuLink icon="calendar" href={`/e/${pollId}/termin.ics`} onClick={onClose}>
+        Kalendarz Apple
+      </MenuLink>
+      <MenuLink icon="mail" href={outlookCalendarLink(event)} newTab onClick={onClose}>
+        Outlook
+      </MenuLink>
+      <div className="mt-2 lg:hidden">
+        <Button block onClick={onClose}>
+          Zamknij
+        </Button>
+      </div>
+    </Sheet>
+  );
+}
+
+export function SetTime({ final, title, timeZone }: { final: FinalTime; title: string; timeZone: string }) {
   const { pollId, organiser } = useResultsContext();
   const { notice, send } = useSendSetTime(pollId, title, final);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const calendarOpener = useRef<HTMLButtonElement>(null);
   const { weekday, day, hours } = setTimeShown(final);
   const calendarAction = (
-    <a
-      className="box-border inline-flex h-12 items-center justify-center gap-2 rounded-control px-6 font-sans text-base font-semibold text-surface no-underline shadow-[inset_0_0_0_1px_var(--color-muted)] transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface motion-safe:active:scale-97 data-[emphasis=primary]:h-13 data-[emphasis=primary]:bg-surface data-[emphasis=primary]:text-ink data-[emphasis=primary]:shadow-none lg:h-13"
-      data-emphasis={organiser ? undefined : "primary"}
-      href={`/e/${pollId}/termin.ics`}
-      download
-    >
+    <CardAction ref={calendarOpener} primary={!organiser} aria-haspopup="dialog" aria-expanded={calendarOpen} onClick={() => setCalendarOpen(true)}>
       {!organiser && (
         <svg className="size-4.5 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <rect x="3" y="4" width="18" height="18" rx="2" />
@@ -41,17 +77,12 @@ export function SetTime({ final, title }: { final: FinalTime; title: string }) {
         </svg>
       )}
       Dodaj do kalendarza
-    </a>
+    </CardAction>
   );
   const sendAction = (
-    <button
-      type="button"
-      className="box-border inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-control border-0 bg-transparent px-6 font-sans text-base font-semibold text-surface shadow-[inset_0_0_0_1px_var(--color-muted)] transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface motion-safe:active:scale-97 data-[emphasis=primary]:h-13 data-[emphasis=primary]:bg-surface data-[emphasis=primary]:text-ink data-[emphasis=primary]:shadow-none lg:h-13"
-      data-emphasis={organiser ? "primary" : undefined}
-      onClick={send}
-    >
+    <CardAction primary={!!organiser} onClick={send}>
       Wyślij termin na grupę
-    </button>
+    </CardAction>
   );
 
   return (
@@ -70,6 +101,7 @@ export function SetTime({ final, title }: { final: FinalTime; title: string }) {
         {calendarAction}
         {!organiser && sendAction}
       </div>
+      {calendarOpen && <CalendarMenu pollId={pollId} title={title} timeZone={timeZone} final={final} opener={calendarOpener} onClose={() => setCalendarOpen(false)} />}
       {notice && (
         <p className="m-0 text-sm text-on-dark-muted" role="status">
           {notices[notice]}

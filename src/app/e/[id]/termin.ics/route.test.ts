@@ -36,7 +36,7 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 
-it("downloads the set time as a calendar file", async () => {
+it("serves the set time as a calendar file the browser opens, linked to the poll", async () => {
   await db.update(polls).set({ finalDate: "2030-10-19", finalFirstHour: 19, finalLastHour: 22 });
   vi.stubEnv("SITE_URL", "https://wpasuj.example");
 
@@ -44,8 +44,8 @@ it("downloads the set time as a calendar file", async () => {
 
   expect(response.status).toBe(200);
   expect(response.headers.get("content-type")).toBe("text/calendar; charset=utf-8");
-  expect(response.headers.get("content-disposition")).toBe('attachment; filename="termin.ics"');
-  expect((await response.text()).split("\r\n")).toEqual(expect.arrayContaining([`UID:${pollId}@wpasuj.example`, "DTSTART:20301019T170000Z", "DTEND:20301019T200000Z"]));
+  expect(response.headers.get("content-disposition")).toBe('inline; filename="termin.ics"');
+  expect((await response.text()).split("\r\n")).toEqual(expect.arrayContaining([`UID:${pollId}@wpasuj.example`, "DTSTART:20301019T170000Z", "DTEND:20301019T200000Z", `URL:https://wpasuj.example/e/${pollId}`]));
 });
 
 it("answers 404 while no time is set", async () => {

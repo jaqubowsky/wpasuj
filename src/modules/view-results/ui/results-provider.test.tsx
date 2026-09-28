@@ -56,15 +56,15 @@ describe("Results", () => {
     expect(screen.getByRole("region", { name: "Najlepiej teraz" })).toHaveTextContent(/^Najlepiej terazSobota 19\.10, 18–20$/);
   });
 
-  it("counts who can in every hour and marks where everyone can", () => {
+  it("counts who can in every hour and marks neither the best time nor where everyone can", () => {
     renderResults(threeAnswers);
 
     expect(screen.getByRole("button", { name: "sb 19, 18:00, 3 z 3 może" })).toHaveTextContent("3");
-    expect(screen.getByRole("button", { name: "sb 19, 18:00, 3 z 3 może" })).toHaveAttribute("data-everyone");
-    expect(screen.getByRole("button", { name: "sb 19, 18:00, 3 z 3 może" })).toHaveAttribute("data-best");
+    expect(screen.getByRole("button", { name: "sb 19, 18:00, 3 z 3 może" })).toHaveAttribute("data-heat", "5");
+    expect(screen.getByRole("button", { name: "sb 19, 18:00, 3 z 3 może" })).not.toHaveAttribute("data-everyone");
+    expect(screen.getByRole("button", { name: "sb 19, 18:00, 3 z 3 może" })).not.toHaveAttribute("data-best");
     expect(screen.getByRole("button", { name: "nd 20, 18:00, 2 z 3 może" })).toHaveAttribute("data-heat", "4");
     expect(screen.getByRole("button", { name: "sb 19, 17:00, 1 z 3 może" })).toHaveAttribute("data-heat", "2");
-    expect(screen.getByRole("button", { name: "sb 19, 17:00, 1 z 3 może" })).not.toHaveAttribute("data-everyone");
   });
 
   it("shows who can and who can't for a tapped hour in a sheet, and closes again", async () => {

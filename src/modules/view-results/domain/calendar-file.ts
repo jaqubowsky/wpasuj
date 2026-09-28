@@ -1,6 +1,6 @@
 import { productName } from "@/shared/brand";
 
-type FinalTime = { date: string; firstHour: number; lastHour: number };
+export type FinalTime = { date: string; firstHour: number; lastHour: number };
 
 const maxLineOctets = 75;
 
@@ -27,7 +27,11 @@ function instantOf(date: string, hour: number, timeZone: string) {
   return new Date(wallClock - offsetAt(firstGuess, timeZone));
 }
 
-function utcStamp(instant: Date) {
+export function eventTimes(final: FinalTime, timeZone: string) {
+  return { start: instantOf(final.date, final.firstHour, timeZone), end: instantOf(final.date, final.lastHour, timeZone) };
+}
+
+export function utcStamp(instant: Date) {
   return instant.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 }
 
@@ -46,7 +50,8 @@ function folded(line: string) {
   return pieces.join("\r\n ");
 }
 
-export function calendarFile({ id, site, title, timeZone, final }: { id: string; site: string; title: string; timeZone: string; final: FinalTime }, now: Date) {
+export function calendarFile({ id, site, link, title, timeZone, final }: { id: string; site: string; link: string; title: string; timeZone: string; final: FinalTime }, now: Date) {
+  const { start, end } = eventTimes(final, timeZone);
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -55,9 +60,11 @@ export function calendarFile({ id, site, title, timeZone, final }: { id: string;
     `UID:${id}@${site}`,
     `DTSTAMP:${utcStamp(now)}`,
     `SEQUENCE:${Math.floor(now.getTime() / 60_000)}`,
-    `DTSTART:${utcStamp(instantOf(final.date, final.firstHour, timeZone))}`,
-    `DTEND:${utcStamp(instantOf(final.date, final.lastHour, timeZone))}`,
+    `DTSTART:${utcStamp(start)}`,
+    `DTEND:${utcStamp(end)}`,
     `SUMMARY:${escaped(title)}`,
+    `DESCRIPTION:${escaped(link)}`,
+    `URL:${link}`,
     "END:VEVENT",
     "END:VCALENDAR",
     "",

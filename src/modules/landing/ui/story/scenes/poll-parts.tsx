@@ -79,23 +79,15 @@ export function PeoplePill({ names, count }: { names: string[]; count: string })
   );
 }
 
-type HeatCellProps = { count: number; heat: number; best?: boolean; ringed?: boolean };
+type HeatCellProps = { count: number; heat: number };
 
-export function HeatCell({ count, heat, best, ringed }: HeatCellProps) {
+export function HeatCell({ count, heat }: HeatCellProps) {
   return (
     <span
       data-heat={heat || undefined}
-      className="relative grid place-items-center rounded-cell bg-surface text-sm font-semibold shadow-[inset_0_0_0_1px_var(--color-edge)] data-heat:shadow-none data-[heat=1]:bg-heat-1 data-[heat=2]:bg-heat-2 data-[heat=3]:bg-heat-3 data-[heat=4]:bg-heat-4 data-[heat=5]:bg-heat-5 data-[heat=5]:text-surface"
+      className="grid place-items-center rounded-cell bg-surface text-sm font-semibold shadow-[inset_0_0_0_1px_var(--color-edge)] data-heat:shadow-none data-[heat=1]:bg-heat-1 data-[heat=2]:bg-heat-2 data-[heat=3]:bg-heat-3 data-[heat=4]:bg-heat-4 data-[heat=5]:bg-heat-5 data-[heat=5]:text-surface"
     >
       {count || ""}
-      {best && (
-        <span
-          aria-hidden
-          data-best
-          data-ringed={ringed || undefined}
-          className="absolute -inset-1 rounded-[14px] opacity-0 shadow-[inset_0_0_0_2px_var(--color-ink)] transition-opacity duration-(--duration-pop) ease-out data-ringed:opacity-100"
-        />
-      )}
     </span>
   );
 }
