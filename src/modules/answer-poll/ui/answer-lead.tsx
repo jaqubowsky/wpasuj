@@ -7,7 +7,7 @@ import { Status } from "@/shared/ui/status/status";
 import Link from "next/link";
 import { useId, type ReactNode } from "react";
 import { useAnswerContext } from "./answer-provider";
-import { clashLine } from "../domain/clash-line";
+import { clashLine, mergeLine } from "../domain/clash-line";
 import { maxNameLength, nameKey } from "../domain/name-rules";
 
 const notices: Record<"closed" | "full" | "gone", ReactNode> = {
@@ -20,7 +20,7 @@ const notices: Record<"closed" | "full" | "gone", ReactNode> = {
   ),
 };
 
-function NameClash({ heldName, hours, onClaim, onDecline }: { heldName: string; hours?: number; onClaim: () => void; onDecline?: () => void }) {
+function NameClash({ heldName, hours, yours, onClaim, onDecline }: { heldName: string; hours?: number; yours?: { name: string; hours: number }; onClaim: () => void; onDecline?: () => void }) {
   const headingId = useId();
 
   return (
@@ -32,6 +32,7 @@ function NameClash({ heldName, hours, onClaim, onDecline }: { heldName: string; 
             To Ty, {heldName}?
           </h2>
           {hours !== undefined && <span className="text-sm text-muted">{clashLine(hours)}</span>}
+          {yours && <span className="text-sm text-muted">{mergeLine(yours)}</span>}
         </div>
       </div>
       <div className="grid grid-cols-2 gap-2">
@@ -86,7 +87,7 @@ export function AnswerLead() {
         </p>
       )}
       {problem?.kind === "name-taken" && (
-        <NameClash heldName={problem.heldName} hours={problem.hours} onClaim={() => answer.claim(problem.heldName)} onDecline={answer.asksName ? answer.declineClaim : undefined} />
+        <NameClash heldName={problem.heldName} hours={problem.hours} yours={problem.yours} onClaim={() => answer.claim(problem.heldName)} onDecline={answer.asksName ? answer.declineClaim : undefined} />
       )}
       {(problem?.kind === "closed" || problem?.kind === "full" || problem?.kind === "gone") && (
         <p className="m-0 text-sm font-medium text-accent-ink" role="alert">

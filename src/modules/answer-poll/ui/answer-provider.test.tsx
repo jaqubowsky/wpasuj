@@ -250,6 +250,18 @@ describe("the Moje lead and body", () => {
     expect(screen.queryByText("To Ty, Ola?")).not.toBeInTheDocument();
   });
 
+  it("tells a device that answered as Bartek that Tak, to ja folds its hours into Ola", async () => {
+    vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola", hours: 1, yours: { name: "Bartek", hours: 2 } });
+    const { user } = renderPanel();
+    await user.type(nameField(), "Ola");
+    fireEvent.click(cell("pt 16, 19:00"));
+    await afterQuiet();
+
+    const clash = await screen.findByRole("region", { name: "To Ty, Ola?" });
+
+    expect(clash).toHaveTextContent("Twoje godziny jako Bartek dołączą do tych.");
+  });
+
   it("keeps hours painted while Tak, to ja is on its way", async () => {
     vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola", hours: 1 });
     let finishClaim: (result: Awaited<ReturnType<typeof claimName>>) => void = () => {};
