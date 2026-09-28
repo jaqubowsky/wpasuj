@@ -5,7 +5,7 @@ import { getDb } from "@/shared/db/client";
 import { polls } from "@/shared/db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { organiserToken } from "./organiser-access";
+import { organiserTokenOf } from "./organiser-access";
 import { fitsPoll, isExpired } from "../domain/poll-rules";
 import { isPollId } from "./poll-queries";
 
@@ -21,7 +21,7 @@ async function organisersPoll(id: string) {
   if (!isPollId(id)) return "gone";
   const poll = getDb().select().from(polls).where(eq(polls.id, id)).get();
   if (!poll || isExpired(poll.dates, todayIn(poll.timeZone, new Date()))) return "gone";
-  if ((await organiserToken(id)) === undefined) return "not-organiser";
+  if ((await organiserTokenOf(poll)) === undefined) return "not-organiser";
   return poll;
 }
 
