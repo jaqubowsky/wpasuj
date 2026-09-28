@@ -1,7 +1,7 @@
 import type { Browser, Page } from "@playwright/test";
 import { expect, test } from "./fixtures";
 import { stubClipboardWithoutShareSheet } from "./clipboard";
-import { saveScreenshot } from "./screenshot";
+import { saveScreenshot, settleAnimations } from "./screenshot";
 import { seedAnswer, seedPoll } from "./seed";
 
 const saturday = "2030-10-26";
@@ -244,6 +244,33 @@ test("after Ustal termin a participant sees the invitation with no grid, and can
   await expect
     .poll(() => copied(participant))
     .toBe(`Planszówki u Michała: Sobota 26 października, 19:00–21:00. http://localhost:3000/e/${pollId}`);
+});
+
+test("on a desktop the calendar menu drops from its button and stays inside the card", async ({ browser }, testInfo) => {
+  test.skip(testInfo.project.name.startsWith("phone"), "the calendar menu is a bottom sheet on a phone");
+  const { pollId } = seedBoardPoll(saturdayEvening);
+
+  for (const width of [1024, 1440]) {
+    for (const asOrganiserOf of [undefined, pollId]) {
+      const page = await openAsNewDevice(browser, `/e/${pollId}`, asOrganiserOf);
+      const setTime = page.getByRole("region", { name: "Termin" });
+      const opener = setTime.getByRole("button", { name: "Dodaj do kalendarza" });
+      const menu = page.getByRole("dialog", { name: "Dodaj do kalendarza" });
+
+      await page.setViewportSize({ width, height: 900 });
+      await opener.click({ delay: 300 });
+      await expect(menu).toBeVisible();
+      await settleAnimations(page);
+      const [button, card, box] = await Promise.all([opener.boundingBox(), setTime.boundingBox(), menu.boundingBox()]);
+
+      expect(box!.x).toBeCloseTo(button!.x, 0);
+      expect(box!.width).toBeCloseTo(button!.width, 0);
+      expect(box!.x).toBeGreaterThanOrEqual(card!.x);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(card!.x + card!.width);
+      await saveScreenshot(page, testInfo, `set-calendar-menu-${width}${asOrganiserOf ? "-organiser" : ""}`);
+      await page.context().close();
+    }
+  }
 });
 
 test("Zobacz wszystkie głosy shows every vote read-only to a participant", async ({ browser }, testInfo) => {

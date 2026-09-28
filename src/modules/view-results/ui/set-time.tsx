@@ -51,7 +51,7 @@ function CalendarMenu({
   const event = { title, link: `${location.origin}/e/${pollId}`, timeZone, final };
 
   return (
-    <Sheet label="Dodaj do kalendarza" menuBelow={opener} onClose={onClose}>
+    <Sheet label="Dodaj do kalendarza" menuBelow={opener} menuFitsAnchor onClose={onClose}>
       <MenuLink icon="calendar" href={googleCalendarLink(event)} newTab onClick={onClose}>
         Kalendarz Google
       </MenuLink>
