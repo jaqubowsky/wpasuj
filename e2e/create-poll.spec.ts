@@ -45,7 +45,7 @@ async function countViewTransitions(page: Page) {
 const namedForTransition = (page: Page) =>
   page.evaluate(() => [...document.querySelectorAll("*")].map((element) => getComputedStyle(element).viewTransitionName).filter((name) => name !== "none" && name !== "root"));
 
-const inviteCard = (page: Page) => page.getByRole("region", { name: "Ankieta gotowa. Wyślij ją na grupę." });
+const inviteCard = (page: Page) => page.getByRole("region", { name: "Ankieta gotowa" });
 
 const createButton = (page: Page) => page.getByRole("button", { name: "Utwórz i wyślij na grupę" });
 async function createPoll(page: Page, { title, day, name }: { title: string; day: string; name: string }) {
@@ -82,10 +82,7 @@ test("the organiser creates a weekend evening poll, lands on the invite card and
   expect(Date.now() - started).toBeLessThan(30_000);
   expect(await page.evaluate(() => window.shared)).toBeUndefined();
   await expect(page.getByRole("heading", { level: 1, name: "Planszówki u Michała" })).toBeVisible();
-  const preview = inviteCard(page).getByRole("figure", { name: "Podgląd linku w czacie" });
-  await expect(preview).toContainText("Kuba pyta, kiedy możesz");
-  await expect(preview).toContainText("Planszówki u Michała");
-  await expect(preview).toContainText("wieczorem");
+  await expect(inviteCard(page)).toContainText(`localhost:3000${new URL(page.url()).pathname}`);
   await saveScreenshot(page, testInfo, "invite-card");
 
   await inviteCard(page).getByRole("button", { name: "Wyślij na grupę" }).click();
@@ -96,7 +93,7 @@ test("the organiser creates a weekend evening poll, lands on the invite card and
   await saveScreenshot(page, testInfo, "invite-sent");
 
   await page.reload();
-  await expect(page.getByText("Kuba pyta")).toBeVisible();
+  await expect(page.getByText("Pytasz jako Kuba")).toBeVisible();
   await expect(page.getByText("Bądź pierwszy")).toBeVisible();
   await expect(page.getByRole("tab", { name: "Moje", selected: true })).toBeVisible();
   await expect(page.getByRole("tabpanel", { name: "Moje" })).toBeAttached();
@@ -144,20 +141,18 @@ test("on a slow network the spinner keeps moving and the form morphs only once t
   expect(await namedForTransition(page)).toEqual([]);
 });
 
-test("Kopiuj link copies the link, says Skopiowano and keeps the card", async ({ page }, testInfo) => {
+test("Kopiuj copies the link, says Skopiowano and keeps the card", async ({ page }, testInfo) => {
   await stubClipboardWithoutShareSheet(page);
   await page.goto("/");
 
   await createPoll(page, { title: "Kino", day: "Jutro", name: "Ola" });
   await expect(page).toHaveURL(/\/e\/[A-Za-z0-9_-]{10}$/);
-  await inviteCard(page).getByRole("button", { name: "Kopiuj link" }).click();
+  await inviteCard(page).getByRole("button", { name: "Kopiuj" }).click();
 
   await expect(inviteCard(page).getByRole("button", { name: "Skopiowano" })).toBeVisible();
   expect(await page.evaluate(() => window.copied)).toBe(page.url());
   await saveScreenshot(page, testInfo, "invite-copied");
-  await expect(inviteCard(page).getByRole("button", { name: "Kopiuj link" })).toBeVisible();
-  await inviteCard(page).getByRole("button", { name: "Gotowe" }).click();
-  await expect(inviteCard(page)).toHaveCount(0);
+  await expect(inviteCard(page).getByRole("button", { name: "Kopiuj" })).toBeVisible();
 });
 
 test("the name used last on this device is prefilled", async ({ page }) => {
@@ -275,7 +270,7 @@ test.describe("a viewer in London on a Warsaw poll", () => {
     await organiser.goto("/");
     await createPoll(organiser, { title: "Kino", day: "Jutro", name: "Ola" });
     await expect(organiser).toHaveURL(/\/e\/[A-Za-z0-9_-]{10}$/);
-    await expect(organiser.getByText("Ola pyta", { exact: true })).toBeVisible();
+    await expect(organiser.getByText("Pytasz jako Ola", { exact: true })).toBeVisible();
 
     await page.goto(organiser.url());
 
@@ -293,7 +288,7 @@ test("a poll that does not exist says it is gone and links to a new one", async 
 
   await expect(page.getByRole("heading", { name: "Tej ankiety już nie ma" })).toBeVisible();
   await saveScreenshot(page, testInfo, "poll-gone");
-  await page.getByRole("link", { name: "Zrób nową ankietę" }).click();
+  await page.getByRole("link", { name: "Zrób własną ankietę" }).click();
 
   await expect(page.getByRole("textbox", { name: "Co robimy?" })).toBeVisible();
 });

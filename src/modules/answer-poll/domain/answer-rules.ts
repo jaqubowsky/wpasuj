@@ -1,5 +1,6 @@
 import { addDays } from "@/shared/dates/iso-date";
 import type { Slot } from "../server/answer-schema";
+import { nameKey } from "./name-rules";
 
 const maxParticipants = 30;
 
@@ -14,10 +15,17 @@ export function fitsPoll(poll: { dates: string[]; firstHour: number; hourCount: 
   return slots.every((slot) => poll.dates.includes(slot.date) && slot.hour >= poll.firstHour && slot.hour < poll.firstHour + poll.hourCount);
 }
 
-type Standing = { nameHeldByOther?: string; newcomer: boolean; participantCount: number };
+type Standing = { takesOrganiserName?: boolean; nameHeldByOther?: { name: string; hours: number }; newcomer: boolean; participantCount: number };
 
-export function refusalOf({ nameHeldByOther, newcomer, participantCount }: Standing) {
-  if (nameHeldByOther !== undefined) return { reason: "name-taken" as const, name: nameHeldByOther };
+export function refusalOf({ takesOrganiserName, nameHeldByOther, newcomer, participantCount }: Standing) {
+  if (takesOrganiserName) return { reason: "organiser-name" as const };
+  if (nameHeldByOther !== undefined) return { reason: "name-taken" as const, ...nameHeldByOther };
   if (newcomer && participantCount >= maxParticipants) return { reason: "full" as const };
   return undefined;
+}
+
+type NameClaim = { name: string; organiserName: string; organiserDevice: boolean; ownsName?: boolean };
+
+export function takesOrganiserName({ name, organiserName, organiserDevice, ownsName }: NameClaim) {
+  return nameKey(name) === nameKey(organiserName) && !organiserDevice && !ownsName;
 }

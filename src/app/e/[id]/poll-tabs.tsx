@@ -10,7 +10,7 @@ type View = (typeof views)[number];
 
 type PollTabsProps = {
   opening: View;
-  leads: Record<View, ReactNode>;
+  leads: Partial<Record<View, ReactNode>>;
   bodies: Record<View, ReactNode>;
 };
 
@@ -18,9 +18,9 @@ export function PollTabs({ opening, leads, bodies }: PollTabsProps) {
   const [view, setView] = useState<View>(opening);
 
   return (
-    <>
-      {leads[view] && <div data-poll-lead className="mb-4">{leads[view]}</div>}
+    <div className="flex flex-col gap-4 lg:[&>[role=tablist]]:-order-1">
+      {leads[view]}
       <Segment label="Widok" options={views} selected={view} onSelect={(next) => withViewTransition(() => setView(next))} panels={bodies} />
-    </>
+    </div>
   );
 }
