@@ -1,8 +1,6 @@
-import { hashToken, tokenCookieOptions } from "@/shared/token-cookie";
+import { hashToken, organiserCookie, tokenCookieOptions } from "@/shared/token-cookie";
 import { cookies } from "next/headers";
 import { organiserTokenHashOf } from "./poll-store";
-
-export const organiserCookie = (id: string) => `${id}-org`;
 
 function isOrganiserToken(id: string, token: string) {
   return organiserTokenHashOf(id) === hashToken(token);

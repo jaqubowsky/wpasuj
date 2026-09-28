@@ -1,6 +1,8 @@
 import { headers } from "next/headers";
 import { createHash, randomBytes } from "node:crypto";
 
+export const organiserCookie = (id: string) => `${id}-org`;
+
 export async function tokenCookieOptions() {
   const secure = (await headers()).get("x-forwarded-proto") === "https";
 
