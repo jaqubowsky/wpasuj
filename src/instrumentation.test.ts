@@ -43,3 +43,20 @@ it("writes a thrown value that is not an Error as its text", async () => {
 
   expect(JSON.parse(lines()[0])).toEqual({ level: "error", message: "database locked", path: "/e/abc123", routeType: "action" });
 });
+
+it("logs an error on the organiser route without its token or query", async () => {
+  const lines = loggedLines();
+
+  await onRequestError(new Error("boom"), { ...request, path: "/e/abc123/organizator/s3cr3tT0k3n-_x?from=share" }, { ...context, routeType: "route", routePath: "/e/[id]/organizator/[token]" });
+
+  expect(lines()[0]).not.toContain("s3cr3tT0k3n");
+  expect(JSON.parse(lines()[0]).path).toBe("/e/abc123/organizator/[token]");
+});
+
+it("logs the path without its query", async () => {
+  const lines = loggedLines();
+
+  await onRequestError(new Error("boom"), { ...request, path: "/e/abc123?tab=wszyscy" }, context);
+
+  expect(JSON.parse(lines()[0]).path).toBe("/e/abc123");
+});
