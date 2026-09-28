@@ -259,7 +259,8 @@ test("⋯ opens a sheet on a phone and a menu on a desktop; Escape and the scrim
     const trigger = (await more(page).boundingBox())!;
 
     expect(sheet.y).toBeGreaterThan(trigger.y + trigger.height);
-    expect(sheet.width).toBeLessThan(400);
+    expect(sheet.x + sheet.width).toBeCloseTo(trigger.x + trigger.width, 0);
+    expect(sheet.width).toBe(320);
   }
 
   await saveScreenshot(page, testInfo, "v3-organiser-sheet");
