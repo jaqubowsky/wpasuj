@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/shared/ui/button/button";
+import { SettledBadge } from "@/shared/ui/settled-badge/settled-badge";
 import { Sheet } from "@/shared/ui/sheet/sheet";
 import { useRef, useState, type ComponentProps, type RefObject } from "react";
 import type { FinalTime } from "../server/results-schema";
@@ -18,23 +19,7 @@ const notices = {
 export function SetBadge() {
   if (useResultsContext().gone) return null;
 
-  return (
-    <span className="inline-flex items-center gap-1.5 rounded-pill bg-ink px-3 py-1.5 text-sm font-semibold text-surface">
-      <svg
-        className="size-3.5"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M20 6 9 17l-5-5" />
-      </svg>
-      Ustalone
-    </span>
-  );
+  return <SettledBadge />;
 }
 
 function CardAction({ primary, ...props }: { primary?: boolean } & ComponentProps<"button">) {
