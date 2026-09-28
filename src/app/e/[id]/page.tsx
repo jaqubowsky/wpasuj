@@ -88,7 +88,7 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
                   <InviteCard pollId={id} title={poll.title} />
                 </UntilSet>
               </div>
-              <UntilSet invitation={<Invitation title={poll.title} />}>
+              <UntilSet invitation={<Invitation title={poll.title} timeZone={poll.timeZone} />}>
                 <div className="contents lg:col-start-2 lg:row-start-2 lg:flex lg:flex-col lg:gap-4" data-poll-panel>
                   <BestNow />
                   <OrganiserCard />
