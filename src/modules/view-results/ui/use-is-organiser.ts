@@ -1,3 +1,4 @@
+import { reportFailedSave } from "@/shared/failed-save";
 import type { Result } from "@/shared/result";
 import { useState } from "react";
 import type { FinalTime } from "../server/results-schema";
@@ -19,10 +20,10 @@ export function useIsOrganiser(given: Organiser | undefined, refreshResults: () 
   const [problem, setProblem] = useState<OrganiserProblem>();
   const [pending, setPending] = useState(false);
 
-  async function settle(request: () => Promise<Outcome>, onDone: () => void) {
+  async function settle(action: "setFinal" | "clearFinal" | "deletePoll", request: () => Promise<Outcome>, onDone: () => void) {
     setProblem(undefined);
     setPending(true);
-    const outcome = await request().catch(() => undefined);
+    const outcome = await request().catch(reportFailedSave(action));
 
     setPending(false);
     if (!outcome) return setProblem("failed");
@@ -47,9 +48,9 @@ export function useIsOrganiser(given: Organiser | undefined, refreshResults: () 
       title: given.title,
       token: given.token,
       pending,
-      setFinal: (final: FinalTime) => settle(() => given.setFinal(final), refreshResults),
-      clearFinal: () => settle(given.clearFinal, refreshResults),
-      deletePoll: () => settle(given.deletePoll, refreshResults),
+      setFinal: (final: FinalTime) => settle("setFinal", () => given.setFinal(final), refreshResults),
+      clearFinal: () => settle("clearFinal", given.clearFinal, refreshResults),
+      deletePoll: () => settle("deletePoll", given.deletePoll, refreshResults),
     };
 
   return { organiser: organiser || undefined, organiserProblem: problem };

@@ -27,3 +27,5 @@ vi.mock("react", async (importOriginal) => ({
 HTMLDialogElement.prototype.showModal ??= function (this: HTMLDialogElement) {
   this.open = true;
 };
+
+navigator.sendBeacon = () => true;

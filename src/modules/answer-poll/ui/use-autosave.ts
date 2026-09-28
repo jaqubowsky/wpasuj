@@ -1,3 +1,4 @@
+import { reportFailedSave } from "@/shared/failed-save";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 
 type SaveState = "saving" | "saved" | "failed";
@@ -35,7 +36,7 @@ export function useAutosave<Value>(send: (value: Value) => Promise<boolean>, ini
     current.inFlight = true;
     setState(unlessFailed);
 
-    const saved = await sendRef.current(value).catch(() => false);
+    const saved = await sendRef.current(value).catch(reportFailedSave("saveAnswer"));
 
     current.inFlight = false;
     current.unsaved = saved ? undefined : { value };

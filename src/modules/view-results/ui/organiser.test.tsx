@@ -289,6 +289,18 @@ describe("the organiser", () => {
     );
   });
 
+  it("reports a change that throws to the server log with the action it tried", async () => {
+    const sendBeacon = vi.spyOn(navigator, "sendBeacon");
+
+    renderPage(withFinal(saturdayEvening), organiser({ clearFinal: vi.fn(async () => Promise.reject(new TypeError("Load failed"))) }));
+    await userEvent.click(screen.getByRole("button", { name: "Zmień termin" }));
+
+    expect(sendBeacon).toHaveBeenCalledExactlyOnceWith(
+      "/api/failed-saves",
+      JSON.stringify({ action: "clearFinal", errorName: "TypeError" }),
+    );
+  });
+
   it("reminds with a message naming who answered", async () => {
     renderPage(threeAnswers, organiser());
 

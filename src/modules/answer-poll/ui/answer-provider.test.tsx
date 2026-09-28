@@ -237,6 +237,22 @@ describe("the Moje lead and body", () => {
     expect(saveAnswer).toHaveBeenCalledTimes(2);
   });
 
+  it("reports a save that throws to the server log", async () => {
+    vi.mocked(saveAnswer).mockRejectedValueOnce(new TypeError("Failed to fetch"));
+    const sendBeacon = vi.spyOn(navigator, "sendBeacon");
+    const { user } = renderPanel();
+
+    await user.type(nameField(), "Ola");
+    fireEvent.click(cell("pt 16, 19:00"));
+    await afterQuiet();
+    await screen.findByRole("button", { name: "Spróbuj ponownie" });
+
+    expect(sendBeacon).toHaveBeenCalledExactlyOnceWith(
+      "/api/failed-saves",
+      JSON.stringify({ action: "saveAnswer", errorName: "TypeError" }),
+    );
+  });
+
   it("asks for a name before saving hours without one", async () => {
     vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason: "invalid" });
     const { user } = renderPanel();
