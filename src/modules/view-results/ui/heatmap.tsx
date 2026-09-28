@@ -1,13 +1,11 @@
 import { DayHourGrid, type GridCell } from "@/shared/day-hour-grid/day-hour-grid";
 import { Cell } from "@/shared/ui/cell/cell";
-import type { Run } from "../domain/best-time";
 import { heatCellOf } from "../domain/heat";
 import type { Results } from "../server/results-schema";
 import { useBumpOnRise } from "./use-bump-on-rise";
 
 type HeatmapProps = {
   results: Results;
-  best?: Run;
   isSelected: (cell: GridCell) => boolean;
   onCellTap: (cell: GridCell) => void;
 };
@@ -18,17 +16,17 @@ type HeatCellProps = ReturnType<typeof heatCellOf> & {
   respondentCount: number;
 };
 
-function HeatCell({ count, heat, everyone, best, label, tabIndex, respondentCount }: HeatCellProps) {
+function HeatCell({ count, heat, label, tabIndex, respondentCount }: HeatCellProps) {
   const ref = useBumpOnRise<HTMLButtonElement>(count);
 
   return (
-    <Cell ref={ref} heat={heat} everyone={everyone} best={best} aria-label={`${label}, ${count} z ${respondentCount} może`} tabIndex={tabIndex}>
+    <Cell ref={ref} heat={heat} aria-label={`${label}, ${count} z ${respondentCount} może`} tabIndex={tabIndex}>
       {count > 0 && count}
     </Cell>
   );
 }
 
-export function Heatmap({ results, best, isSelected, onCellTap }: HeatmapProps) {
+export function Heatmap({ results, isSelected, onCellTap }: HeatmapProps) {
   return (
     <DayHourGrid
       label="Kto może"
@@ -37,7 +35,7 @@ export function Heatmap({ results, best, isSelected, onCellTap }: HeatmapProps) 
       isSelected={isSelected}
       renderCell={({ label, tabIndex, date, hour }) => (
         <HeatCell
-          {...heatCellOf(results.respondents, { date, hour }, results.final ?? best)}
+          {...heatCellOf(results.respondents, { date, hour })}
           label={label}
           tabIndex={tabIndex}
           respondentCount={results.respondents.length}

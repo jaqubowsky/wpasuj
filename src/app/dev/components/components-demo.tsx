@@ -109,12 +109,6 @@ export function ComponentsDemo() {
             {heat}
           </Cell>
         ))}
-        <Cell heat={5} everyone aria-label="wszyscy">
-          6
-        </Cell>
-        <Cell heat={5} best aria-label="najlepiej">
-          5
-        </Cell>
       </Section>
       <Section name="Card">
         <Card label="Surface">Grupuje jedną rzecz na tle strony.</Card>

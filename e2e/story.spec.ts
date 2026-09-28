@@ -131,7 +131,7 @@ test("at its step the heat scene switches to everyone and warms the grid as frie
   await expect(shown(page, "5 osób")).toHaveCount(0);
 });
 
-test("at step 6 the best time shows above the heat with its cells ringed, alone in the phone", async ({ page }, testInfo) => {
+test("at step 6 the best time shows above the heat with no ring on its cells, alone in the phone", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("desktop"), "the story pins from 1280px");
   await page.goto("/");
   await story(page).scrollIntoViewIfNeeded();
@@ -141,7 +141,7 @@ test("at step 6 the best time shows above the heat with its cells ringed, alone 
   for (const text of ["Najlepiej teraz", "Sobota 18.10, 19–22", "6 osób"]) {
     await expect(shown(page, text)).toHaveCount(1);
   }
-  await expect(story(page).locator("[data-best]").filter({ visible: true })).toHaveCount(3);
+  await expect(story(page).locator("[data-best]")).toHaveCount(0);
   await expect(story(page).getByText("Kuba pyta", { exact: true }).filter({ visible: true })).toHaveCount(1);
   await expect(caption(page, steps[5].heading)).toBeVisible();
   await settleAnimations(page);
@@ -300,7 +300,7 @@ test("on the phone the heat scene shows everyone in and the grid at its warmest"
   await stepFive.screenshot({ path: `e2e/screenshots/landing-story-5-${testInfo.project.name}.png`, style: "header { visibility: hidden; }" });
 });
 
-test("on the phone every best cell of step 6 shows inside the phone, clear of the best card", async ({ page }, testInfo) => {
+test("on the phone every hour of step 6's best time shows inside the phone, clear of the best card", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("phone"), "the sequence is the phone layout");
   await page.goto("/#jak-to-dziala");
   const stepSix = story(page).locator(":scope > div").nth(5);
@@ -309,9 +309,9 @@ test("on the phone every best cell of step 6 shows inside the phone, clear of th
 
   const screen = (await stepSix.locator("[data-screen]").boundingBox())!;
   const card = (await stepSix.locator("div", { has: page.getByText("Najlepiej teraz", { exact: true }) }).last().boundingBox())!;
-  const cells = await Promise.all((await stepSix.locator("[data-best]").all()).map((cell) => cell.boundingBox()));
+  const saturdayAt = (hour: string) => stepSix.getByText(hour, { exact: true }).locator("xpath=following-sibling::*[2]");
+  const cells = await Promise.all(["19:00", "20:00", "21:00"].map((hour) => saturdayAt(hour).boundingBox()));
 
-  expect(cells).toHaveLength(3);
   for (const cell of cells.map((box) => box!)) {
     expect(cell.y).toBeGreaterThanOrEqual(screen.y);
     expect(cell.y + cell.height).toBeLessThanOrEqual(screen.y + screen.height);

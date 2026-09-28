@@ -47,12 +47,7 @@ function heatOf(free: number, respondents: number): Heat {
   return Math.ceil((free * buckets) / respondents) as Heat;
 }
 
-export function heatCellOf(respondents: Answer[], cell: Slot, best?: Run) {
+export function heatCellOf(respondents: Answer[], cell: Slot) {
   const count = freeAt(respondents, cell).length;
-  return {
-    count,
-    heat: heatOf(count, respondents.length),
-    everyone: count > 0 && count === respondents.length,
-    best: best?.date === cell.date && cell.hour >= best.firstHour && cell.hour < best.lastHour,
-  };
+  return { count, heat: heatOf(count, respondents.length) };
 }

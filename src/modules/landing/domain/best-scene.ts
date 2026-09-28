@@ -26,7 +26,7 @@ export const bestPoll = {
   people: answers.map((answer) => answer.name),
   count: peopleCount(answers.length),
   days: dates.map((date) => `${shortWeekday(date)} ${Number(date.slice(-2))}`),
-  rows: hours.map((hour) => ({ hour, cells: dates.map((date) => heatCellOf(answers, { date, hour }, best)) })),
+  rows: hours.map((hour) => ({ hour, cells: dates.map((date) => heatCellOf(answers, { date, hour })) })),
   best: longRunLabel(best),
 };
 

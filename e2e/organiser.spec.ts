@@ -179,7 +179,7 @@ test("Zobacz wszystkie głosy shows every vote read-only to a participant", asyn
   const heatmap = votes.getByRole("grid", { name: "Kto może" });
   await expect(heatmap).toBeVisible();
   await expect(heatmap).not.toHaveAttribute("aria-multiselectable");
-  await expect(heatmap.getByRole("button", { name: "sb 26, 19:00, 4 z 5 może" })).toHaveAttribute("data-best");
+  await expect(heatmap.getByRole("button", { name: "sb 26, 19:00, 4 z 5 może" })).not.toHaveAttribute("data-best");
   await expect(participant.getByRole("textbox", { name: "Twoje imię" })).toHaveCount(0);
   await saveScreenshot(participant, testInfo, "set-votes");
 });
