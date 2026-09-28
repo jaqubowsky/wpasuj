@@ -1,6 +1,6 @@
 # 39: CI in parallel jobs
 
-Status: ready-for-agent
+Status: claimed
 Blocked by: 23-landing-seo-perf.md
 
 ## Parent

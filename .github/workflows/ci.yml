@@ -21,7 +21,17 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npx playwright install --with-deps chromium webkit
-      - run: npm run e2e
+      - run: |
+          .github/scripts/memory-monitor.sh memory.log &
+          trap 'kill $!' EXIT
+          npm run e2e
+      - if: ${{ always() }}
+        run: sudo dmesg -T | grep -iE 'oom|killed process' || echo 'no oom-kill in dmesg'
+      - uses: actions/upload-artifact@v7
+        if: ${{ always() }}
+        with:
+          name: memory
+          path: memory.log
       - uses: actions/upload-artifact@v7
         if: ${{ !cancelled() }}
         with:
