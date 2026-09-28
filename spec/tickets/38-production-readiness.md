@@ -1,6 +1,6 @@
 # 38: Production readiness
 
-Status: ready-for-agent
+Status: claimed
 Blocked by: none
 
 ## Parent
