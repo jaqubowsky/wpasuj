@@ -183,6 +183,10 @@ test("the organiser asks for 22:00 to 4:00 and a night run reads 23–1", async 
     await page.getByRole("button", { name: "Od 17:00" }).click();
     const sheet = page.getByRole("dialog", { name: "O której?" });
     await sheet.getByRole("group", { name: "Od" }).getByRole("button", { name: "22:00", exact: true }).click();
+    const [late, later] = await Promise.all(
+      ["22:00", "23:00"].map((hour) => sheet.getByRole("group", { name: "Od" }).getByRole("button", { name: hour, exact: true }).boundingBox()),
+    );
+    expect(later!.y - (late!.y + late!.height)).toBeGreaterThanOrEqual(6);
     await sheet.getByRole("group", { name: "Do" }).getByRole("button", { name: "4:00", exact: true }).click();
     await expect(sheet.getByText("22:00 → 4:00 · 6 godzin")).toBeVisible();
     await settleAnimations(page);
