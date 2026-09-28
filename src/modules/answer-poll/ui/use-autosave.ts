@@ -71,7 +71,9 @@ export function useAutosave<Value>(send: (value: Value) => Promise<boolean>, ini
     },
     retry() {
       const current = queue.current;
+      if (current.inFlight) return;
       current.pending ??= current.unsaved;
+      setState("saving");
       void flush();
     },
   };
