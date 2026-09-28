@@ -1,6 +1,6 @@
 # 32: Architecture audit
 
-Status: ready-for-agent
+Status: done
 Blocked by: 12-cleanup.md, 23-landing-seo-perf.md, 34-design-token-scale.md, 35-poll-page-v3.md, 36-finalised-poll.md, 37-overnight-hours.md, 38-production-readiness.md, 40-landing-v3-follow-up.md
 
 ## Parent
@@ -27,6 +27,6 @@ Before the MVP ships, the code is checked against the rules it claims: modules b
 
 ## Acceptance criteria
 
-- [ ] `spec/audits/architecture.md` covers every item above with evidence (command output or file and line)
-- [ ] Fixes change no behaviour: the same test counts before and after, screenshots unchanged
-- [ ] `npm run lint`, `typecheck`, `test`, `build` and `e2e` green
+- [x] `spec/audits/architecture.md` covers every item above with evidence (command output or file and line): sections 1 to 5, one per Scope line, plus section 6 on delete cascade
+- [x] Fixes change no behaviour: the same test counts before and after, screenshots unchanged: 444 tests and e2e 191 passed / 31 skipped on base and after the fixes (445 with the added cascade test); screenshots within 0.5% except the story-pin race on full-page desktop shots of `/`, 0% on rerun (audit, "Proof")
+- [x] `npm run lint`, `typecheck`, `test`, `build` and `e2e` green: exit 0 each on the rebased head (phone and desktop Chromium here; phone WebKit in CI)
