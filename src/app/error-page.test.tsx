@@ -10,6 +10,6 @@ it("says something went wrong, tries again on a tap and links to a new poll", as
   await userEvent.click(screen.getByRole("button", { name: "Spróbuj ponownie" }));
 
   expect(screen.getByRole("heading", { name: "Coś poszło nie tak" })).toBeInTheDocument();
-  expect(screen.getByRole("link", { name: "Zrób nową ankietę" })).toHaveAttribute("href", "/");
+  expect(screen.getByRole("link", { name: "Zrób własną ankietę" })).toHaveAttribute("href", "/");
   expect(retry).toHaveBeenCalledOnce();
 });
