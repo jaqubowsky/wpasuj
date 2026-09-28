@@ -6,8 +6,9 @@ A no-account availability poll for a group of friends: one link in the group cha
 
 - Next.js (current stable, App Router), TypeScript strict, server actions for mutations
 - SQLite through Drizzle ORM and `better-sqlite3`, file at `DATABASE_PATH`, migrations in `drizzle/` applied on start
-- TanStack Query for polling server state; Tailwind v4 utilities on the `@theme` in `src/app/tokens.css` (default theme reset); fonts through `next/font` (`latin-ext`)
+- TanStack Query for polling server state; Tailwind v4 utilities on the `@theme` in `src/app/tokens.css` (default theme reset); fonts through `next/font/local` from `src/shared/fonts/` (latin and `latin-ext`), so no build fetches them
 - `output: 'standalone'`, a `Dockerfile`; production is one Railway service with a volume at `/data` (not deployed in this phase)
+- `GET /api/health` answers 200 once the database opens; `railway.json` builds the `Dockerfile` and gates each deploy on that route
 
 ## Scripts
 

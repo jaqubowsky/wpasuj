@@ -1,10 +1,12 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { FinalTime } from "./final-time";
+import { Invitation } from "./invitation";
+import { SetBadge } from "./set-time";
 import { OrganiserCard } from "./organiser-card";
 import { ResultsBody } from "./results-body";
 import { ResultsProvider } from "./results-provider";
+import { UntilSet } from "./until-set";
 import { WhilePollLives } from "./while-poll-lives";
 import type { FinalTime as FinalTimeValue, Results } from "../server/results-schema";
 import type { Organiser } from "./use-is-organiser";
@@ -13,6 +15,7 @@ const saturday = "2030-10-19";
 const sunday = "2030-10-20";
 const readAt = Date.parse("2030-10-15T18:00:00Z");
 const saturdayEvening = { date: saturday, firstHour: 18, lastHour: 20 };
+const sundayEvening = { date: sunday, firstHour: 19, lastHour: 21 };
 
 function answer(name: string, cells: [string, number][]) {
   return { name, normalisedName: name.toLocaleLowerCase("pl"), savedAt: readAt, slots: cells.map(([date, hour]) => ({ date, hour })) };
@@ -44,10 +47,12 @@ function organiser(overrides: Partial<Organiser> = {}): Organiser {
 function renderPage(results: Results, asOrganiser?: Organiser) {
   return render(
     <ResultsProvider pollId="Pl4nszowki" initial={results} organiser={asOrganiser} organiserKey="kuba">
+      <UntilSet invitation={<SetBadge />}>{null}</UntilSet>
       <WhilePollLives gone={<h1>Tej ankiety już nie ma</h1>}>
-        <FinalTime />
-        <OrganiserCard />
-        <ResultsBody />
+        <UntilSet invitation={<Invitation title="Planszówki" />}>
+          <OrganiserCard />
+          <ResultsBody />
+        </UntilSet>
       </WhilePollLives>
     </ResultsProvider>,
   );
@@ -75,7 +80,6 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals();
-  delete (Element.prototype as Partial<Element>).animate;
 });
 
 describe("a participant", () => {
@@ -87,19 +91,68 @@ describe("a participant", () => {
     expect(screen.queryByRole("button", { name: "Ustal termin" })).not.toBeInTheDocument();
   });
 
-  it("sees the set time with a calendar file, and cannot change it", () => {
+  it("sees the set day and hours with a calendar file, and nothing to change or paint", () => {
     renderPage(withFinal(saturdayEvening));
 
-    const final = screen.getByRole("region", { name: "Ustalone" });
-    expect(final).toHaveTextContent("Sobota 19.10, 18:00");
-    expect(within(final).getByRole("link", { name: "Dodaj do kalendarza" })).toHaveAttribute("href", "/e/Pl4nszowki/termin.ics");
-    expect(within(final).queryByRole("button", { name: "Zmień" })).not.toBeInTheDocument();
+    const setTime = screen.getByRole("region", { name: "Termin" });
+    expect(setTime).toHaveTextContent("Widzimy się");
+    expect(setTime).toHaveTextContent("Sobota");
+    expect(setTime).toHaveTextContent("19 października");
+    expect(setTime).toHaveTextContent("18:00–20:00");
+    expect(within(setTime).getByRole("link", { name: "Dodaj do kalendarza" })).toHaveAttribute("href", "/e/Pl4nszowki/termin.ics");
+    expect(screen.queryByRole("button", { name: "Zmień termin" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("grid")).not.toBeInTheDocument();
   });
 
-  it("sees nothing set while no time is set", () => {
-    renderPage(threeAnswers);
+  it("sees who comes and who cannot", () => {
+    renderPage(withFinal(sundayEvening));
 
-    expect(screen.queryByRole("region", { name: "Ustalone" })).not.toBeInTheDocument();
+    const people = screen.getByRole("region", { name: "Kto będzie" });
+    const names = (list: string) => within(within(people).getByRole("list", { name: list })).getAllByRole("img").map((avatar) => avatar.getAttribute("aria-label"));
+    expect(names("Będzie")).toEqual(["Ola", "Michał"]);
+    expect(names("Nie może")).toEqual(["Bartek"]);
+  });
+
+  it("sends the set time to the group", async () => {
+    renderPage(withFinal(saturdayEvening));
+
+    await userEvent.click(screen.getByRole("button", { name: "Wyślij termin na grupę" }));
+
+    expect(clipboard).toBe(`Planszówki: Sobota 19 października, 18:00–20:00. ${location.origin}/e/Pl4nszowki`);
+    expect(screen.getByRole("status")).toHaveTextContent("Wiadomość skopiowana. Wklej ją na grupę.");
+  });
+
+  it("sees every vote read-only, the set hours marked", async () => {
+    renderPage(withFinal(sundayEvening));
+
+    await userEvent.click(screen.getByRole("button", { name: "Zobacz wszystkie głosy" }));
+
+    const votes = screen.getByRole("dialog", { name: "Wszystkie głosy" });
+    const heatmap = within(votes).getByRole("grid", { name: "Kto może" });
+    expect(heatmap).not.toHaveAttribute("aria-multiselectable");
+    expect(within(heatmap).getByRole("button", { name: "nd 20, 20:00, 2 z 3 może" })).toHaveAttribute("data-best");
+    expect(within(heatmap).getByRole("button", { name: "sb 19, 18:00, 3 z 3 może" })).not.toHaveAttribute("data-best");
+  });
+
+  it("finds no hour left open from the votes once the time is cleared", async () => {
+    renderPage(withFinal(sundayEvening));
+    await userEvent.click(screen.getByRole("button", { name: "Zobacz wszystkie głosy" }));
+    await userEvent.click(screen.getByRole("button", { name: "nd 20, 20:00, 2 z 3 może" }));
+    (screen.getByRole("dialog", { name: "Wszystkie głosy" }) as HTMLDialogElement).close();
+
+    window.dispatchEvent(new Event("focus"));
+
+    expect(await screen.findByRole("grid", { name: "Kto może" })).toBeVisible();
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("sees the open poll again once the time is cleared", async () => {
+    renderPage(withFinal(saturdayEvening));
+
+    window.dispatchEvent(new Event("focus"));
+
+    expect(await screen.findByRole("grid", { name: "Kto może" })).toBeVisible();
+    expect(screen.queryByRole("region", { name: "Termin" })).not.toBeInTheDocument();
   });
 });
 
@@ -120,26 +173,32 @@ describe("the organiser", () => {
     expect(screen.getByRole("button", { name: "Przypomnij" })).toBeVisible();
   });
 
-  it("changes a set time, and cannot set another until then", async () => {
+  it("changes a set time from Twoja ankieta, with no reminder while it is set", async () => {
     const asOrganiser = organiser();
     renderPage(withFinal(saturdayEvening), asOrganiser);
 
-    expect(screen.queryByRole("button", { name: "Ustal termin" })).not.toBeInTheDocument();
-    await userEvent.click(within(screen.getByRole("region", { name: "Ustalone" })).getByRole("button", { name: "Zmień" }));
+    const card = screen.getByRole("region", { name: "Twoja ankieta" });
+    expect(within(card).queryByRole("button", { name: "Ustal termin" })).not.toBeInTheDocument();
+    expect(within(card).queryByRole("button", { name: "Przypomnij" })).not.toBeInTheDocument();
+    await userEvent.click(within(card).getByRole("button", { name: "Zmień termin" }));
 
     expect(asOrganiser.clearFinal).toHaveBeenCalledOnce();
   });
 
-  it("hears why a change failed even where the results are not shown", async () => {
-    render(
-      <ResultsProvider pollId="Pl4nszowki" initial={withFinal(saturdayEvening)} organiserKey="kuba" organiser={organiser({ clearFinal: vi.fn(async () => Promise.reject(new Error("offline"))) })}>
-        <FinalTime />
-      </ResultsProvider>,
-    );
+  it("reaches the send action before the calendar, in the order it sees them", () => {
+    renderPage(withFinal(saturdayEvening), organiser());
 
-    await userEvent.click(screen.getByRole("button", { name: "Zmień" }));
+    const actions = Array.from(screen.getByRole("region", { name: "Termin" }).querySelectorAll("a, button"));
 
-    expect(within(screen.getByRole("region", { name: "Ustalone" })).getByRole("alert")).toHaveTextContent(
+    expect(actions.map((action) => action.textContent)).toEqual(["Wyślij termin na grupę", "Dodaj do kalendarza"]);
+  });
+
+  it("hears why a change failed", async () => {
+    renderPage(withFinal(saturdayEvening), organiser({ clearFinal: vi.fn(async () => Promise.reject(new Error("offline"))) }));
+
+    await userEvent.click(screen.getByRole("button", { name: "Zmień termin" }));
+
+    expect(within(screen.getByRole("region", { name: "Twoja ankieta" })).getByRole("alert")).toHaveTextContent(
       "Nie udało się. Sprawdź internet i spróbuj jeszcze raz.",
     );
   });
@@ -189,6 +248,19 @@ describe("the organiser", () => {
     expect(await screen.findByRole("heading", { name: "Tej ankiety już nie ma" })).toBeVisible();
   });
 
+  it("drops the Ustalone badge once a set poll is deleted", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => Response.json({ reason: "gone" }, { status: 404 })));
+    renderPage(withFinal(saturdayEvening), organiser());
+    expect(screen.getByText("Ustalone")).toBeVisible();
+
+    await userEvent.click(screen.getByRole("button", { name: "Więcej" }));
+    await userEvent.click(screen.getByRole("button", { name: "Usuń ankietę" }));
+    await userEvent.click(screen.getByRole("button", { name: "Tak, usuń" }));
+
+    expect(await screen.findByRole("heading", { name: "Tej ankiety już nie ma" })).toBeVisible();
+    expect(screen.queryByText("Ustalone")).not.toBeInTheDocument();
+  });
+
   it("loses the controls once the server says this device is not the organiser", async () => {
     renderPage(threeAnswers, organiser({ setFinal: vi.fn(async () => ({ ok: false as const, reason: "not-organiser" as const })) }));
 
@@ -198,35 +270,13 @@ describe("the organiser", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("To urządzenie nie jest już organizatorem tej ankiety.");
   });
 
-  it("fills the chosen hours in sequence once the time is set", async () => {
-    const filled: { cell: string | null; delay?: number }[] = [];
-    vi.stubGlobal("matchMedia", () => ({ matches: false, addEventListener() {}, removeEventListener() {} }));
-    Element.prototype.animate = vi.fn(function (this: Element, _keyframes, options) {
-      filled.push({ cell: this.getAttribute("aria-label"), delay: typeof options === "object" ? options.delay : undefined });
-      return {} as Animation;
-    });
-    vi.stubGlobal("fetch", vi.fn(async () => Response.json(withFinal({ date: sunday, firstHour: 19, lastHour: 21 }))));
+  it("leads with the invitation once the time is set", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => Response.json(withFinal(sundayEvening))));
     renderPage(threeAnswers, organiser());
 
     await userEvent.click(screen.getByRole("button", { name: "Ustal termin" }));
-    await screen.findByRole("region", { name: "Ustalone" });
 
-    expect(filled).toEqual([
-      { cell: "nd 20, 19:00, 2 z 3 może", delay: 0 },
-      { cell: "nd 20, 20:00, 2 z 3 może", delay: 90 },
-    ]);
-    expect(screen.getByRole("button", { name: "nd 20, 19:00, 2 z 3 może" })).toHaveAttribute("data-best");
-    expect(screen.getByRole("button", { name: "sb 19, 18:00, 3 z 3 może" })).not.toHaveAttribute("data-best");
-  });
-});
-
-describe("a poll opened with its time already set", () => {
-  it("marks the set hours without motion", () => {
-    vi.stubGlobal("matchMedia", () => ({ matches: false, addEventListener() {}, removeEventListener() {} }));
-    Element.prototype.animate = vi.fn();
-    renderPage(withFinal({ date: sunday, firstHour: 19, lastHour: 21 }));
-
-    expect(screen.getByRole("button", { name: "nd 20, 20:00, 2 z 3 może" })).toHaveAttribute("data-best");
-    expect(Element.prototype.animate).not.toHaveBeenCalled();
+    expect(await screen.findByRole("region", { name: "Termin" })).toHaveTextContent("19:00–21:00");
+    expect(screen.queryByRole("grid")).not.toBeInTheDocument();
   });
 });

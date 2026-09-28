@@ -6,6 +6,7 @@ function openDatabase() {
   const path = process.env.DATABASE_PATH;
   if (!path) throw new Error("DATABASE_PATH is not set");
   const sqlite = new Database(path);
+  sqlite.pragma("journal_mode = WAL");
   sqlite.pragma("foreign_keys = ON");
   return drizzle(sqlite, { schema });
 }

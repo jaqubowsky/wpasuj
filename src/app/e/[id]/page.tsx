@@ -2,7 +2,7 @@ import { findMyAnswer, nameKey } from "@/modules/answer-poll";
 import { AnswerBody, AnswerLead, AnswerProvider, AnswerStatus } from "@/modules/answer-poll/client";
 import { clearFinal, deletePoll, findPoll, organiserToken, setFinal } from "@/modules/create-poll";
 import { readResults } from "@/modules/view-results";
-import { BestNow, FinalTime, InviteCard, OrganiserCard, PeoplePanel, RespondentCount, ResultsBody, ResultsProvider, WhilePollLives } from "@/modules/view-results/client";
+import { BestNow, InviteCard, Invitation, OrganiserCard, PeoplePanel, RespondentCount, ResultsBody, ResultsProvider, SetBadge, UntilSet, WhilePollLives } from "@/modules/view-results/client";
 import { Avatar } from "@/shared/ui/avatar/avatar";
 import { Text } from "@/shared/ui/text/text";
 import { Morph, pollTitleMorph } from "@/shared/morph";
@@ -52,16 +52,28 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
     <PageFrame wide>
       <AnswerProvider pollId={id} dates={poll.dates} hours={hours} mine={mine} fixedName={token && poll.organiserName}>
         <ResultsProvider pollId={id} initial={readResults(id, poll, now, (await cookies()).get(id)?.value)} organiser={organiser} organiserKey={nameKey(poll.organiserName)}>
-          <AppHeader aside={<RespondentCount />} />
+          <AppHeader
+            aside={
+              <UntilSet invitation={<SetBadge />}>
+                <RespondentCount />
+              </UntilSet>
+            }
+          />
           <WhilePollLives gone={<PollGone />}>
             <main className="flex flex-col gap-4 pt-1 pb-8 lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-x-10 lg:gap-y-6">
               <div className="grid gap-2 lg:col-span-2">
                 <div className="flex min-h-8 items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <Avatar name={poll.organiserName} tintKey={nameKey(poll.organiserName)} />
-                    <Text variant="meta">{token ? `Pytasz jako ${poll.organiserName}` : `${poll.organiserName} pyta`}</Text>
+                    <Text variant="meta">
+                      <UntilSet invitation={token ? "Ustalone przez Ciebie" : `Ustalone przez: ${poll.organiserName}`}>{token ? `Pytasz jako ${poll.organiserName}` : `${poll.organiserName} pyta`}</UntilSet>
+                    </Text>
                   </div>
-                  {token && <AnswerStatus />}
+                  {token && (
+                    <UntilSet invitation={null}>
+                      <AnswerStatus />
+                    </UntilSet>
+                  )}
                 </div>
                 <Morph name={pollTitleMorph}>
                   <Text as="h1" variant="title">
@@ -69,17 +81,20 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
                   </Text>
                 </Morph>
                 <ZoneNote pollZone={poll.timeZone} />
-                <FinalTime />
-                <InviteCard pollId={id} title={poll.title} />
+                <UntilSet invitation={null}>
+                  <InviteCard pollId={id} title={poll.title} />
+                </UntilSet>
               </div>
-              <div className="contents lg:col-start-2 lg:row-start-2 lg:flex lg:flex-col lg:gap-4" data-poll-panel>
-                <BestNow />
-                <OrganiserCard />
-                <PeoplePanel />
-              </div>
-              <div className="lg:col-start-1 lg:row-start-2">
-                <PollTabs opening={mine ? "Wszyscy" : "Moje"} leads={{ Moje: <AnswerLead /> }} bodies={{ Moje: <AnswerBody />, Wszyscy: <ResultsBody /> }} />
-              </div>
+              <UntilSet invitation={<Invitation title={poll.title} />}>
+                <div className="contents lg:col-start-2 lg:row-start-2 lg:flex lg:flex-col lg:gap-4" data-poll-panel>
+                  <BestNow />
+                  <OrganiserCard />
+                  <PeoplePanel />
+                </div>
+                <div className="lg:col-start-1 lg:row-start-2">
+                  <PollTabs opening={mine ? "Wszyscy" : "Moje"} leads={{ Moje: <AnswerLead /> }} bodies={{ Moje: <AnswerBody />, Wszyscy: <ResultsBody /> }} />
+                </div>
+              </UntilSet>
             </main>
             <footer className="flex justify-center pb-8">
               <Link href="/" className="inline-flex min-h-11 items-center text-base font-medium text-muted underline underline-offset-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink">

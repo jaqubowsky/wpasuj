@@ -68,9 +68,15 @@ function OrganiserControls({ organiser }: { organiser: LiveOrganiser }) {
             Ustal termin
           </Button>
         )}
-        <Button size="small" block onClick={card.remind}>
-          Przypomnij
-        </Button>
+        {results.final ? (
+          <Button size="small" block onClick={organiser.clearFinal}>
+            Zmień termin
+          </Button>
+        ) : (
+          <Button size="small" block onClick={card.remind}>
+            Przypomnij
+          </Button>
+        )}
         <Button ref={more} size="small" block aria-label="Więcej" aria-haspopup="dialog" aria-expanded={card.menu !== undefined} onClick={card.openMenu}>
           <svg className="size-4.5 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
             <circle cx="5" cy="12" r="1.5" />
@@ -84,7 +90,7 @@ function OrganiserControls({ organiser }: { organiser: LiveOrganiser }) {
           {notices[card.notice]}
         </p>
       )}
-      {organiserProblem && !results.final && <OrganiserProblem problem={organiserProblem} />}
+      {organiserProblem && <OrganiserProblem problem={organiserProblem} />}
       {card.menu && (
         <Sheet label={card.menu === "delete" ? "Usunąć ankietę?" : "Więcej"} menuBelow={more} onClose={card.closeMenu}>
           {card.menu === "delete" ? (
