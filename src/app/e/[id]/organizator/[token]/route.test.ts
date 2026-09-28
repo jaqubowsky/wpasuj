@@ -50,5 +50,6 @@ it("answers 404 for an id that is no poll id", async () => {
   const response = await open("żółć", token);
 
   expect(response.status).toBe(404);
+  expect(await response.text()).toBe("Tej ankiety już nie ma. Sprawdź link albo zrób własną ankietę.");
   expect(cookieJar.getAll()).toEqual([]);
 });
