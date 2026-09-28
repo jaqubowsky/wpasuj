@@ -7,8 +7,6 @@ import { and, asc, count, eq } from "drizzle-orm";
 import { isExpired } from "../domain/answer-rules";
 import { pollIdSchema, type Slot } from "./answer-schema";
 
-export type LivePoll = typeof polls.$inferSelect;
-
 type Answer = { name: string; normalisedName: string; slots: Slot[] };
 
 export function livePoll(pollId: string) {
@@ -81,7 +79,7 @@ export function saveAnswerOf(pollId: string, participant: { id: number } | undef
   });
 }
 
-export function claimParticipant(pollId: string, normalisedName: string, heldToken: string | undefined, token: string) {
+export function claimParticipant(pollId: string, normalisedName: string, gridSlots: Slot[], heldToken: string | undefined, token: string) {
   return getDb().transaction((tx) => {
     const row = participantNamed(pollId, normalisedName);
 
@@ -90,11 +88,9 @@ export function claimParticipant(pollId: string, normalisedName: string, heldTok
     const held = heldToken === undefined ? undefined : participantByToken(pollId, heldToken);
 
     if (held && held.id !== row.id) {
-      const heldSlots = slotsOf(held.id);
-
-      if (heldSlots.length > 0)
+      if (gridSlots.length > 0)
         tx.insert(slots)
-          .values(heldSlots.map((slot) => ({ participantId: row.id, ...slot })))
+          .values(gridSlots.map((slot) => ({ participantId: row.id, ...slot })))
           .onConflictDoNothing()
           .run();
 

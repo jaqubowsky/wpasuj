@@ -263,7 +263,7 @@ describe("the Moje lead and body", () => {
     await user.click(screen.getByRole("button", { name: "Tak, to ja" }));
     await afterQuiet();
 
-    expect(claimName).toHaveBeenCalledWith(pollId, "Ola");
+    expect(claimName).toHaveBeenCalledWith(pollId, { name: "Ola", slots: [{ date: "2026-10-16", hour: 19 }] });
     expect(nameField()).toHaveValue("Ola");
 
     expect(saveAnswer).toHaveBeenLastCalledWith(pollId, {
