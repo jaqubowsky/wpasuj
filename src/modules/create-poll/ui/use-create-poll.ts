@@ -37,6 +37,8 @@ export function useCreatePoll(input: Omit<CreatePollInput, "timeZone">) {
           setStatus("refused");
 
           return;
+        default:
+          return result.reason satisfies never;
       }
     }
 

@@ -156,6 +156,23 @@ const eslintConfig = defineConfig([
     },
   },
   ...modules.flatMap(moduleBlocks),
+  {
+    files: ["src/**"],
+    ignores: ["src/**/*-store.ts", "src/**/*.test.{ts,tsx}", "src/shared/db/**", "src/shared/testing/**", "src/app/api/health/**"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["drizzle-orm", "drizzle-orm/*", "**/shared/db/client"],
+              message: "Only a module's *-store.ts talks to the database",
+            },
+          ],
+        },
+      ],
+    },
+  },
   globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", ".claude/**", "spec/**", "test-results/**", "playwright-report/**"]),
 ]);
 

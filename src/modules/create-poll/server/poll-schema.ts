@@ -11,7 +11,11 @@ function isTimeZone(zone: string) {
   }
 }
 
-export const pollIdSchema = z.string().check(z.regex(/^[A-Za-z0-9_-]{10}$/));
+const pollIdSchema = z.string().check(z.regex(/^[A-Za-z0-9_-]{10}$/));
+
+export function isPollId(id: string) {
+  return pollIdSchema.safeParse(id).success;
+}
 
 export const createPollSchema = z.object({
   title: z.string().check(z.trim(), z.minLength(1), z.maxLength(60)),

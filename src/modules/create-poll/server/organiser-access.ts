@@ -1,20 +1,11 @@
-import { getDb } from "@/shared/db/client";
-import { polls } from "@/shared/db/schema";
 import { hashToken, tokenCookieOptions } from "@/shared/token-cookie";
-import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
-import { isPollId } from "./poll-queries";
+import { organiserTokenHashOf } from "./poll-store";
 
 export const organiserCookie = (id: string) => `${id}-org`;
 
-function organiserTokenHash(id: string) {
-  if (!isPollId(id)) return undefined;
-
-  return getDb().select({ organiserTokenHash: polls.organiserTokenHash }).from(polls).where(eq(polls.id, id)).get()?.organiserTokenHash;
-}
-
 function isOrganiserToken(id: string, token: string) {
-  return organiserTokenHash(id) === hashToken(token);
+  return organiserTokenHashOf(id) === hashToken(token);
 }
 
 export async function organiserTokenOf(poll: { id: string; organiserTokenHash: string | undefined }) {
@@ -24,7 +15,7 @@ export async function organiserTokenOf(poll: { id: string; organiserTokenHash: s
 }
 
 export async function organiserToken(id: string) {
-  return organiserTokenOf({ id, organiserTokenHash: organiserTokenHash(id) });
+  return organiserTokenOf({ id, organiserTokenHash: organiserTokenHashOf(id) });
 }
 
 export async function grantOrganiser(id: string, token: string) {

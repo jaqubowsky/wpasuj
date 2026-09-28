@@ -1,7 +1,8 @@
+import type { Result } from "@/shared/result";
 import { useState } from "react";
 import type { FinalTime } from "../server/results-schema";
 
-type Outcome = { ok: true } | { ok: false; reason: "invalid" | "not-organiser" | "gone" };
+type Outcome = Result<object, "invalid" | "not-organiser" | "gone">;
 
 export type Organiser = {
   title: string;
@@ -36,6 +37,8 @@ export function useIsOrganiser(given: Organiser | undefined, refreshResults: () 
         return setProblem("not-organiser");
       case "gone":
         return refreshResults();
+      default:
+        return outcome.reason satisfies never;
     }
   }
 
