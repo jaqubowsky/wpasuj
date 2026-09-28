@@ -1,8 +1,8 @@
 # Cell
 
-One hour on one date: the only thing a participant touches. A `button` on "Moje", whose selected state the grid announces as `aria-selected` on its gridcell (decision `cell-one-component`); a button with its count on "Wszyscy".
+One hour on one date: the only thing a participant touches. A `button` on "Moje", whose selected state the grid announces as `aria-selected` on its gridcell (`docs/adr/0006-grid-selection-aria.md`); a button with its count on "Wszyscy".
 
-- The consumer provides the state (`data-state` = `mine`, `adding`, `removing`, or none for free) or the heat (`data-heat` 1–5 from the share of respondents free), and the count as text. A heat cell carries no other mark: the heat shows the result and the best-time card names the best time (decision `no-result-marks`).
+- The consumer provides the state (`data-state` = `mine`, `adding`, `removing`, or none for free) or the heat (`data-heat` 1–5 from the share of respondents free), and the count as text. A heat cell carries no other mark: the heat shows the result and the best-time card names the best time (`docs/adr/0029-no-result-marks.md`).
 - Free cells carry a 1px `edge` border so they read as controls; filled cells carry none.
 - A heat cell always shows its count: colour never carries the number alone. `ink` on heat 1–4, white on `heat-5`.
 - At least `size-cell` tall and 56px wide on the phone; the hit area is the tile, never the gap around it.
