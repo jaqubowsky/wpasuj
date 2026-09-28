@@ -1,4 +1,5 @@
-import { expect, test, type Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { expect, test } from "./fixtures";
 import { stubClipboardWithoutShareSheet } from "./clipboard";
 import { saveScreenshot, settleAnimations } from "./screenshot";
 
@@ -253,7 +254,6 @@ test("nothing below the dates moves when the page hydrates", async ({ page, brow
   await serverRendered.goto("http://localhost:3000/");
   const whenHeading = (on: Page) => on.getByText("O której?", { exact: true });
   const before = (await whenHeading(serverRendered).boundingBox())!.y;
-  await firstPaint.close();
 
   await page.goto("/");
   await expect(days(page).last()).toBeEnabled();
@@ -322,7 +322,6 @@ test.describe("a viewer in London on a Warsaw poll", () => {
     await organiser.getByRole("tab", { name: "Wszyscy" }).click();
     await expect(organiser.getByRole("tab", { name: "Wszyscy", selected: true })).toBeVisible();
     await expect(organiser.getByText(/Godziny w strefie/)).toHaveCount(0);
-    await warsaw.close();
   });
 });
 

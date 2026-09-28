@@ -22,6 +22,8 @@ Declared in `package.json` by ticket 01; a change passes all of them:
 - `npm run build`
 - `npm run e2e` (Playwright: phone 390 in Chromium and WebKit, desktop 1440 in Chromium)
 
+CI (`.github/workflows/ci.yml`, skipped when a change touches only `*.md`): `quick` runs lint, typecheck, knip and test; `build` uploads the standalone build; an `e2e` matrix runs each Playwright project in its own job on that build and uploads `screenshots-<project>` and `memory-<project>` (memory sampled every 5 s); `perf` reuses the build; `docker` builds the image.
+
 Hooks (husky, installed by `npm ci`): pre-commit runs `eslint` on staged files through `lint-staged`; pre-push runs `typecheck`, `knip` and `test`. `e2e` runs in CI only. In a fleet container npm runs with `ignore-scripts`, so run `npx husky` once after install (decision 52).
 
 ## Testing
@@ -30,7 +32,7 @@ Hooks (husky, installed by `npm ci`): pre-commit runs `eslint` on staged files t
 - Units and components sit beside the code they test as `*.test.ts(x)`; run one with `npx vitest run <path>`
 - Action tests use a real SQLite file per test with `cookies()` stubbed; only the clock, cookies and true externals are stubbed
 - End to end in `e2e/`; run one with `npx playwright test <path>`
-- Screenshots: each pull request that adds or changes a screen or state saves it at 390 and 1440 through Playwright into `e2e/screenshots/` (not committed), uploaded by CI as the `screenshots` artifact. The pull request body lists each screen and the mockup (`spec/design/v2/`) or design-system parts (`spec/design/system/`) it was compared with
+- Screenshots: each pull request that adds or changes a screen or state saves it at 390 and 1440 through Playwright into `e2e/screenshots/` (not committed), uploaded by CI as one `screenshots-<project>` artifact per Playwright project. The pull request body lists each screen and the mockup (`spec/design/v2/`) or design-system parts (`spec/design/system/`) it was compared with
 
 ## Module layout
 
