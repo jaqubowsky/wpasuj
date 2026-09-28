@@ -28,5 +28,5 @@ As ticket 14; `~/.sandboxes/wpasuj/plan.md` phase 3, "The rest".
 
 ## Comments
 
-- The perf gate scales the CPU slowdown by Lighthouse's benchmark index and its mid-tier-mobile multiplier table (4x from 1500, 2x from 1000, else 1x). A fixed 4x gave TBT 414 ms on one runner and 101 ms on another; the TBT is almost all page hydration, and full zod in the create form's client bundle (392 KB raw) is its largest part
+- The perf gate scales the CPU slowdown by Lighthouse's benchmark index and its mid-tier-mobile multiplier table (4x from 1500, 2x from 1000, else 1x). TBT is almost all page hydration and varies by runner (101 ms and 208 ms at 4x on two runs); the create form's schema moved to zod/mini (owner decision), which takes the 392 KB full zod chunk out of the landing's first load
 - At 390 the scene 6 best card covers the 19–22 rows, including the best cells; the fix is the phone frame height or the card's position, both classes
