@@ -17,6 +17,20 @@ export function dayNumber(date: string) {
   return String(asDate(date).getUTCDate());
 }
 
+export function dayAndMonth(date: string) {
+  const [, month, day] = date.split("-");
+  return `${Number(day)}.${month}`;
+}
+
+export function longWeekday(date: string) {
+  const weekday = weekdayLong.format(asDate(date));
+  return weekday.charAt(0).toLocaleUpperCase("pl") + weekday.slice(1);
+}
+
+export function dayAndMonthLong(date: string) {
+  return monthGenitive.format(asDate(date));
+}
+
 export function fullDate(date: string) {
   return `${weekdayLong.format(asDate(date))}, ${monthGenitive.format(asDate(date))}`;
 }
