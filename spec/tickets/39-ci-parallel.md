@@ -30,3 +30,4 @@ A pull request that changes only Markdown runs no CI. Any other pull request's C
 - [ ] The three e2e projects run as separate jobs on one build; screenshots of all three are downloadable
 - [ ] A pull request changing only a `.md` file starts no CI run (the run list for its branch is empty, link in the PR body)
 - [ ] `lint`, `typecheck`, `test`, `knip`, `build`, `e2e` green
+
