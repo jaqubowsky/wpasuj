@@ -1,6 +1,6 @@
 # 31: Security audit
 
-Status: ready-for-agent
+Status: done
 Blocked by: 12-cleanup.md, 23-landing-seo-perf.md, 34-design-token-scale.md, 35-poll-page-v3.md, 36-finalised-poll.md, 37-overnight-hours.md, 38-production-readiness.md, 40-landing-v3-follow-up.md
 
 ## Parent
@@ -26,6 +26,6 @@ Before the MVP ships, someone who wants to break Wpasuj without an account has b
 
 ## Acceptance criteria
 
-- [ ] `spec/audits/security.md` lists every boundary above with its verdict and the evidence (test, command output or file and line)
-- [ ] Every critical or high finding is fixed with a test that failed before the fix; medium and low are tickets or accepted with a reason
-- [ ] `npm run lint`, `typecheck`, `test`, `build` and `e2e` green
+- [x] `spec/audits/security.md` lists every boundary above with its verdict and the evidence (test, command output or file and line): sections "Server actions", "Route handlers", "Cookies and the organiser token", "Abuse without an account", "Headers", "Dependencies and the image"
+- [x] Every critical or high finding is fixed with a test that failed before the fix; medium and low are tickets or accepted with a reason: no critical or high; mediums 1–3 fixed test-first in `7c4f248`, `c17503a`, `643bb80`; 4–9 accepted with their reasons in the findings table and decision 80
+- [x] `npm run lint`, `typecheck`, `test`, `build` and `e2e` green: each exit 0 locally (450 tests; e2e phone-chromium and desktop-chromium 201 passed, 31 skipped); phone-webkit in the pull request's CI
