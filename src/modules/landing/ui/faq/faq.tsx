@@ -1,3 +1,5 @@
+import { productName } from "@/shared/brand";
+
 const questions = [
   {
     question: "Czy znajomi muszą coś instalować albo zakładać konto?",
@@ -5,7 +7,7 @@ const questions = [
   },
   {
     question: "A jak ktoś otworzy link na innym telefonie?",
-    answer: "Wpisuje to samo imię, a Wpasuj pyta „To ty?”. Po potwierdzeniu zmienia dalej swoje godziny.",
+    answer: `Wpisuje to samo imię, a ${productName} pyta „To ty?”. Po potwierdzeniu zmienia dalej swoje godziny.`,
   },
   {
     question: "Ile to kosztuje?",
