@@ -23,7 +23,7 @@ beforeEach(async () => {
     organiserName: "Kuba",
     dates: ["2030-10-19"],
     firstHour: 17,
-    lastHour: 23,
+    hourCount: 6,
     timeZone: "Europe/Warsaw",
     organiserTokenHash: "organiser",
     createdByParticipant: false,

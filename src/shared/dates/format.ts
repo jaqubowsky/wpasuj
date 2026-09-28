@@ -34,3 +34,11 @@ export function summaryOfDates(dates: string[]) {
 export function monthOnFirstDay(date: string) {
   return asDate(date).getUTCDate() === 1 ? monthShort.format(asDate(date)) : undefined;
 }
+
+export function clockHour(hour: number) {
+  return hour % 24;
+}
+
+export function clockEndHour(hour: number) {
+  return hour > 24 ? hour - 24 : hour;
+}

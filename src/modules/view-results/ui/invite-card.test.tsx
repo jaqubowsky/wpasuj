@@ -5,7 +5,7 @@ import { markFreshPoll } from "@/shared/fresh-poll";
 import { InviteCard } from "./invite-card";
 
 const pollId = "abcdefghij";
-const poll = { organiserName: "Kuba", title: "Planszówki u Michała", dates: ["2030-10-18", "2030-10-19", "2030-10-20"], firstHour: 17, lastHour: 23 };
+const poll = { organiserName: "Kuba", title: "Planszówki u Michała", dates: ["2030-10-18", "2030-10-19", "2030-10-20"], firstHour: 17, hourCount: 6 };
 const invite = `Kiedy możecie? Planszówki u Michała ${location.origin}/e/${pollId}`;
 
 function stubSharing(share?: (data: ShareData) => Promise<void>) {

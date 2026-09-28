@@ -30,6 +30,23 @@ describe("calendarFile", () => {
     expect(lines).toContain("DTEND:20261025T030000Z");
   });
 
+  it("ends a set time 23–1 on 25.10 the next day in UTC", () => {
+    const lines = linesOf(calendarFile({ ...poll, final: { date: "2026-10-25", firstHour: 23, lastHour: 25 } }, now));
+
+    expect(lines).toContain("DTSTART:20261025T220000Z");
+    expect(lines).toContain("DTEND:20261026T000000Z");
+  });
+
+  it("keeps local hours through a night the clocks go back or forward", () => {
+    const autumn = linesOf(calendarFile({ ...poll, final: { date: "2026-10-24", firstHour: 22, lastHour: 28 } }, now));
+    const spring = linesOf(calendarFile({ ...poll, final: { date: "2027-03-27", firstHour: 22, lastHour: 28 } }, now));
+
+    expect(autumn).toContain("DTSTART:20261024T200000Z");
+    expect(autumn).toContain("DTEND:20261025T030000Z");
+    expect(spring).toContain("DTSTART:20270327T210000Z");
+    expect(spring).toContain("DTEND:20270328T020000Z");
+  });
+
   it("is one event named by the poll's title", () => {
     const lines = linesOf(calendarFile({ ...poll, final: { date: "2026-10-24", firstHour: 19, lastHour: 22 } }, now));
 

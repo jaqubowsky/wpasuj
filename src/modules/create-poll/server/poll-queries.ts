@@ -13,7 +13,7 @@ export function findPoll(id: string, now: Date) {
       organiserName: polls.organiserName,
       dates: polls.dates,
       firstHour: polls.firstHour,
-      lastHour: polls.lastHour,
+      hourCount: polls.hourCount,
       timeZone: polls.timeZone,
       finalDate: polls.finalDate,
       finalFirstHour: polls.finalFirstHour,

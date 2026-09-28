@@ -9,7 +9,7 @@ const sunday = "2030-10-27";
 const organiserToken = "organiser-token-for-the-e2e-poll-0123456789";
 
 function seedAnsweredPoll() {
-  const pollId = seedPoll({ dates: [saturday, sunday], firstHour: 17, lastHour: 21, organiserToken });
+  const pollId = seedPoll({ dates: [saturday, sunday], firstHour: 17, hourCount: 4, organiserToken });
   seedAnswer(pollId, "Ola", Date.now(), [[saturday, 17], [sunday, 18], [sunday, 19]]);
   seedAnswer(pollId, "Bartek", Date.now(), [[saturday, 18], [sunday, 18], [sunday, 19]]);
   seedAnswer(pollId, "Michał", Date.now(), [[saturday, 17], [saturday, 18], [sunday, 18], [sunday, 19]]);

@@ -22,7 +22,7 @@ beforeEach(async () => {
     title: "Kino",
     dates: ["2026-10-16", "2026-10-17"],
     firstHour: 17,
-    lastHour: 23,
+    hourCount: 6,
     timeZone: "Europe/Warsaw",
     organiserName: "Kuba",
   });

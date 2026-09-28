@@ -1,21 +1,25 @@
 import { useState } from "react";
-import { endBounds, hourRanges, startBounds, withEnd, withStart, type HourRange } from "../domain/hour-range";
-
-export type RangeChoice = keyof typeof hourRanges | "custom";
+import { defaultRange, withEnd, withStart, withTiles } from "../domain/hour-range";
 
 export function useHourRange() {
-  const [choice, setChoice] = useState<RangeChoice>("evening");
-  const [custom, setCustom] = useState<HourRange>(hourRanges.evening);
+  const [range, setRange] = useState(defaultRange);
+  const [pickingEnd, setPickingEnd] = useState(false);
 
   return {
-    choice,
-    choose: setChoice,
-    range: choice === "custom" ? custom : hourRanges[choice],
-    custom,
-    startBounds,
-    endBounds: endBounds(custom),
-    setStart: (start: number) => setCustom((range) => withStart(range, start)),
-    setEnd: (end: number) => setCustom((range) => withEnd(range, end)),
+    range,
+    pickingEnd,
+    setStart: (firstHour: number) => setRange((current) => withStart(current, firstHour)),
+    setEnd: (endHour: number) => setRange((current) => withEnd(current, endHour)),
+    pickTile: (hour: number) => {
+      const tiled = withTiles(range.firstHour, hour);
+      if (pickingEnd && tiled.hourCount >= 1) {
+        setRange(tiled);
+        setPickingEnd(false);
+        return;
+      }
+      setRange({ firstHour: hour, hourCount: 1 });
+      setPickingEnd(true);
+    },
   };
 }
 

@@ -1,31 +1,56 @@
 import { describe, expect, it } from "vitest";
-import { endBounds, hourRanges, startBounds, withEnd, withStart } from "./hour-range";
+import { defaultRange, endHours, hoursOf, rangeSummary, startHours, withEnd, withStart, withTiles } from "./hour-range";
 
-describe("part of day", () => {
-  it("Wieczór is 17 to 23 and Cały dzień 10 to 23", () => {
-    expect(hourRanges.evening).toEqual({ firstHour: 17, lastHour: 23 });
-    expect(hourRanges["all-day"]).toEqual({ firstHour: 10, lastHour: 23 });
+describe("range", () => {
+  it("starts as the evening, 17:00 to 23:00", () => {
+    expect(defaultRange).toEqual({ firstHour: 17, hourCount: 6 });
+  });
+
+  it("22:00 to 4:00 is 6 hours", () => {
+    expect(withEnd(withStart(defaultRange, 22), 28)).toEqual({ firstHour: 22, hourCount: 6 });
+    expect(rangeSummary({ firstHour: 22, hourCount: 6 })).toBe("22:00 → 4:00 · 6 godzin");
+  });
+
+  it("0:00 to 24:00 is 24 hours", () => {
+    expect(withEnd(withStart(defaultRange, 0), 24)).toEqual({ firstHour: 0, hourCount: 24 });
+    expect(rangeSummary({ firstHour: 0, hourCount: 24 })).toBe("0:00 → 0:00 · 24 godziny");
+  });
+
+  it("names one hour and a few hours in Polish", () => {
+    expect(rangeSummary({ firstHour: 20, hourCount: 1 })).toBe("20:00 → 21:00 · 1 godzina");
+    expect(rangeSummary({ firstHour: 20, hourCount: 3 })).toBe("20:00 → 23:00 · 3 godziny");
+  });
+
+  it("a new start keeps the length", () => {
+    expect(withStart({ firstHour: 17, hourCount: 6 }, 22)).toEqual({ firstHour: 22, hourCount: 6 });
+  });
+
+  it("counts hours past midnight on the evening's date", () => {
+    expect(hoursOf({ firstHour: 22, hourCount: 6 })).toEqual([22, 23, 24, 25, 26, 27]);
   });
 });
 
-describe("Własne", () => {
-  it("starts from 0 to 23 and ends from start+1 to 24", () => {
-    expect(startBounds).toEqual({ min: 0, max: 23 });
-    expect(endBounds({ firstHour: 9, lastHour: 12 })).toEqual({ min: 10, max: 24 });
+describe("Od and Do", () => {
+  it("offers starts from 6:00 round to 5:00", () => {
+    expect(startHours).toEqual([6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 0, 1, 2, 3, 4, 5]);
   });
 
-  it("a start that reaches the end pushes the end one hour later", () => {
-    expect(withStart({ firstHour: 17, lastHour: 18 }, 18)).toEqual({ firstHour: 18, lastHour: 19 });
+  it("offers ends from one hour after the start round to the same hour next day", () => {
+    const ends = endHours({ firstHour: 22, hourCount: 6 });
+
+    expect(ends).toHaveLength(24);
+    expect(ends.slice(0, 4)).toEqual([23, 24, 25, 26]);
+    expect(ends.at(-1)).toBe(46);
+  });
+});
+
+describe("hour tiles", () => {
+  it("a first and a last tile make the range between them", () => {
+    expect(withTiles(22, 3)).toEqual({ firstHour: 22, hourCount: 6 });
+    expect(withTiles(16, 20)).toEqual({ firstHour: 16, hourCount: 5 });
   });
 
-  it("a start before the end keeps the end", () => {
-    expect(withStart({ firstHour: 17, lastHour: 23 }, 16)).toEqual({ firstHour: 16, lastHour: 23 });
-  });
-
-  it("the start stays within 0 to 23 and the end within start+1 to 24", () => {
-    expect(withStart({ firstHour: 0, lastHour: 5 }, -1)).toEqual({ firstHour: 0, lastHour: 5 });
-    expect(withStart({ firstHour: 23, lastHour: 24 }, 24)).toEqual({ firstHour: 23, lastHour: 24 });
-    expect(withEnd({ firstHour: 17, lastHour: 18 }, 17)).toEqual({ firstHour: 17, lastHour: 18 });
-    expect(withEnd({ firstHour: 17, lastHour: 24 }, 25)).toEqual({ firstHour: 17, lastHour: 24 });
+  it("the same tile twice is one hour", () => {
+    expect(withTiles(5, 5)).toEqual({ firstHour: 5, hourCount: 1 });
   });
 });

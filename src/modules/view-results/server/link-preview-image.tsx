@@ -11,8 +11,7 @@ const gridBox = { width: 360, height: 502 };
 
 export async function linkPreviewImage(poll: PreviewedPoll) {
   const { asker, title, when } = linkPreview(poll);
-  const hours = poll.lastHour - poll.firstHour;
-  const { tileWidth, tileHeight, gap, radius } = miniGrid(poll.dates.length, hours, gridBox);
+  const { tileWidth, tileHeight, gap, radius } = miniGrid(poll.dates.length, poll.hourCount, gridBox);
   const [display, sans500, sans600] = await Promise.all([
     ogFont("bricolage-grotesque-800.ttf"),
     ogFont("onest-500.ttf"),
@@ -72,7 +71,7 @@ export async function linkPreviewImage(poll: PreviewedPoll) {
         <div style={{ fontFamily: "Bricolage Grotesque", fontWeight: 800, fontSize: 30, letterSpacing: "-0.03em" }}>{productName}</div>
       </div>
       <div style={{ width: gridBox.width, display: "flex", flexDirection: "column", gap }}>
-        {Array.from({ length: hours }, (_, row) => (
+        {Array.from({ length: poll.hourCount }, (_, row) => (
           <div key={row} style={{ display: "flex", gap }}>
             {poll.dates.map((date) => (
               <div
