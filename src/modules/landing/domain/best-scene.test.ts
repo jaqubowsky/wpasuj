@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { bestPoll, bestTimeAt, settledAt } from "./best-scene";
+import { bestPoll, bestTimeAt, invitation } from "./best-scene";
 
 describe("bestPoll", () => {
-  it("counts who can make each hour, days 17 to 19 by hours 17 to 22", () => {
-    expect(bestPoll.days).toEqual([17, 18, 19]);
+  it("counts who can make each hour, Friday 17 to Sunday 19 by hours 17 to 22", () => {
+    expect(bestPoll.days).toEqual(["pt 17", "sb 18", "nd 19"]);
     expect(bestPoll.rows.map((row) => row.hour)).toEqual([17, 18, 19, 20, 21, 22]);
     expect(bestPoll.rows.map((row) => row.cells.map((cell) => cell.count))).toEqual([
       [2, 1, 5],
@@ -15,8 +15,13 @@ describe("bestPoll", () => {
     ]);
   });
 
+  it("has all six friends in", () => {
+    expect(bestPoll.people).toEqual(["Kuba", "Ola", "Michał", "Zuza", "Bartek", "Kasia"]);
+    expect(bestPoll.count).toBe("6 osób");
+  });
+
   it("picks Saturday 19 to 22, which five of six can make, and marks its three cells", () => {
-    expect(bestPoll.best).toEqual({ label: "Sobota 18.10, 19–22", share: "5 z 6 może", cannot: "Nie może: Ola" });
+    expect(bestPoll.best).toBe("Sobota 18.10, 19–22");
     expect(bestPoll.rows.map((row) => row.cells.map((cell) => cell.best))).toEqual([
       [false, false, false],
       [false, false, false],
@@ -29,29 +34,23 @@ describe("bestPoll", () => {
 });
 
 describe("bestTimeAt", () => {
-  it("keeps the card below the phone as the step starts", () => {
-    expect(bestTimeAt(0)).toEqual({ risen: false, settled: false });
+  it("keeps the card hidden as the step starts", () => {
+    expect(bestTimeAt(0)).toBe(false);
   });
 
-  it("has the card risen by the middle of the step, not yet settled", () => {
-    expect(bestTimeAt(0.5)).toEqual({ risen: true, settled: false });
-  });
-
-  it("ends with the card up, still offering to settle the time", () => {
-    expect(bestTimeAt(1)).toEqual({ risen: true, settled: false });
+  it("has the card up by the middle of the step and keeps it there", () => {
+    expect(bestTimeAt(0.5)).toBe(true);
+    expect(bestTimeAt(1)).toBe(true);
   });
 });
 
-describe("settledAt", () => {
-  it("starts where the best-time step ended", () => {
-    expect(settledAt(0)).toEqual(bestTimeAt(1));
-  });
-
-  it("has settled the time by the middle of the step", () => {
-    expect(settledAt(0.5)).toEqual({ risen: true, settled: true });
-  });
-
-  it("ends settled", () => {
-    expect(settledAt(1)).toEqual({ risen: true, settled: true });
+describe("invitation", () => {
+  it("sets Saturday 18 October, 19:00 to 22:00, with the five who can come", () => {
+    expect(invitation).toEqual({
+      weekday: "Sobota",
+      day: "18 października",
+      hours: "19:00–22:00",
+      coming: ["Kuba", "Michał", "Zuza", "Bartek", "Kasia"],
+    });
   });
 });

@@ -66,7 +66,7 @@ test("the organiser creates a weekend evening poll, lands on the invite card and
 
   await page.getByRole("textbox", { name: "Co robimy?" }).fill("Planszówki u Michała");
   await page.getByRole("button", { name: "Ten weekend" }).click();
-  await expect(page.getByText("17:00 → 23:00 · 6 godzin").filter({ visible: true })).toBeVisible();
+  await expect(page.getByRole("group", { name: "O której?" }).getByText("17:00 → 23:00 · 6 godzin").filter({ visible: true })).toBeVisible();
   await page.getByRole("textbox", { name: "Twoje imię" }).fill("Kuba");
   await saveScreenshot(page, testInfo, "create-filled");
   const action = await holdCreateAction(page);

@@ -1,6 +1,6 @@
 type Cell = { column: number; row: number };
 
-export const paintDays = [17, 18, 19];
+export const paintDays = ["pt 17", "sb 18", "nd 19"];
 export const paintHours = [17, 18, 19, 20, 21, 22];
 
 const path: Cell[] = [
