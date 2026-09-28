@@ -6,7 +6,7 @@ export const polls = sqliteTable("polls", {
   organiserName: text("organiser_name").notNull(),
   dates: text("dates", { mode: "json" }).$type<string[]>().notNull(),
   firstHour: integer("first_hour").notNull(),
-  lastHour: integer("last_hour").notNull(),
+  hourCount: integer("hour_count").notNull(),
   timeZone: text("time_zone").notNull(),
   organiserTokenHash: text("organiser_token_hash").notNull(),
   finalDate: text("final_date"),

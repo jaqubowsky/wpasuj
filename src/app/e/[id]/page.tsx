@@ -45,7 +45,7 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
         deletePoll: deletePoll.bind(null, id),
       }
     : undefined;
-  const hours = Array.from({ length: poll.lastHour - poll.firstHour }, (_, index) => poll.firstHour + index);
+  const hours = Array.from({ length: poll.hourCount }, (_, index) => poll.firstHour + index);
 
   return (
     <PageFrame>

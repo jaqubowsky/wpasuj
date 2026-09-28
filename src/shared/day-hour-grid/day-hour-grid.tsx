@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, type CSSProperties, type PointerEvent, type ReactNode } from "react";
+import { clockHour } from "@/shared/dates/format";
 import { Text } from "@/shared/ui/text/text";
 import { dateMorph, Morph } from "@/shared/morph";
 import { useGridKeyboard } from "./use-grid-keyboard";
@@ -108,11 +109,11 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
               <div role="rowheader" aria-colindex={header.column + 1} className="sticky left-0 z-1 touch-pan-y bg-paper shadow-[--spacing(1.5)_0_0_var(--color-paper)]" data-row={header.row} data-column={header.column}>
                 {onHourTap ? (
                   <button type="button" className="box-border min-h-11 w-full cursor-pointer rounded-cell border-0 bg-track font-sans text-ink tabular-nums transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink motion-safe:active:scale-96 h-full p-0" tabIndex={keyboard.tabIndexOf(header)} onFocus={() => keyboard.onFocus(header)} onClick={() => onHourTap(hour)}>
-                    <Text variant="meta">{hour}:00</Text>
+                    <Text variant="meta">{clockHour(hour)}:00</Text>
                   </button>
                 ) : (
                   <span className="grid h-full items-start justify-items-end pr-2">
-                    <Text variant="meta">{hour}:00</Text>
+                    <Text variant="meta">{clockHour(hour)}:00</Text>
                   </span>
                 )}
               </div>
@@ -143,7 +144,7 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
                     {renderCell({
                       ...cell,
                       selected,
-                      label: `${day.weekday} ${day.number}, ${hour}:00`,
+                      label: `${day.weekday} ${day.number}, ${clockHour(hour)}:00`,
                       tabIndex: keyboard.tabIndexOf(position),
                       preview: stroke.preview(cell),
                     })}

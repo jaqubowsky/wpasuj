@@ -6,7 +6,7 @@ const poll = {
   title: "Planszówki u Michała",
   dates: ["2030-10-18", "2030-10-19", "2030-10-20"],
   firstHour: 17,
-  lastHour: 23,
+  hourCount: 6,
 };
 
 describe("linkPreview", () => {
@@ -19,11 +19,15 @@ describe("linkPreview", () => {
   });
 
   it("names the whole day", () => {
-    expect(linkPreview({ ...poll, firstHour: 10, lastHour: 23 }).when).toBe("pt 18, sb 19, nd 20 października, cały dzień");
+    expect(linkPreview({ ...poll, firstHour: 10, hourCount: 13 }).when).toBe("pt 18, sb 19, nd 20 października, cały dzień");
   });
 
   it("names a custom range by its hours", () => {
-    expect(linkPreview({ ...poll, dates: ["2030-10-18"], firstHour: 8, lastHour: 12 }).when).toBe("pt 18 października, 8–12");
+    expect(linkPreview({ ...poll, dates: ["2030-10-18"], firstHour: 8, hourCount: 4 }).when).toBe("pt 18 października, 8–12");
+  });
+
+  it("names a night past midnight by the clock", () => {
+    expect(linkPreview({ ...poll, dates: ["2030-10-18"], firstHour: 22, hourCount: 6 }).when).toBe("pt 18 października, 22–4");
   });
 });
 

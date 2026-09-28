@@ -1,6 +1,6 @@
 # 37: Hour ranges past midnight
 
-Status: ready-for-agent
+Status: done
 Blocked by: 34-design-token-scale.md
 
 ## Parent
@@ -24,9 +24,9 @@ An organiser can ask for any whole-hour range, including one past midnight such 
 
 ## Acceptance criteria
 
-- [ ] Unit tests of the range model: 22→4 is 6 hours; 0→24 is 24; a run 23–1 is one run; DST night in Europe/Warsaw keeps local hours
-- [ ] e2e: create 22:00→4:00 on phone and desktop, paint 23 and 0 on one date, results show one run "23–1"
-- [ ] `.ics` test: a set time 23–1 on 25.10 in Europe/Warsaw has the right UTC DTSTART and DTEND
-- [ ] Migration test: existing polls read back unchanged
-- [ ] Screenshots of the pickers beside TimePhone and TimeDesktop
-- [ ] `lint`, `typecheck`, `test`, `knip`, `build`, `e2e` green
+- [x] Unit tests of the range model: 22→4 is 6 hours; 0→24 is 24; a run 23–1 is one run; DST night in Europe/Warsaw keeps local hours. Evidence: `src/modules/create-poll/domain/hour-range.test.ts` ("22:00 to 4:00 is 6 hours", "0:00 to 24:00 is 24 hours"), `src/modules/view-results/domain/best-time.test.ts` ("keeps 23:00 to 1:00 one run across midnight"), `src/modules/view-results/domain/calendar-file.test.ts` ("keeps local hours through a night the clocks go back or forward")
+- [x] e2e: create 22:00→4:00 on phone and desktop, paint 23 and 0 on one date, results show one run "23–1". Evidence: `e2e/create-poll.spec.ts` "the organiser asks for 22:00 to 4:00 and a night run reads 23–1" (phone-chromium, desktop-chromium; phone-webkit in CI)
+- [x] `.ics` test: a set time 23–1 on 25.10 in Europe/Warsaw has the right UTC DTSTART and DTEND. Evidence: `src/modules/view-results/domain/calendar-file.test.ts` "ends a set time 23–1 on 25.10 the next day in UTC" (20261025T220000Z to 20261026T000000Z)
+- [x] Migration test: existing polls read back unchanged. Evidence: `src/shared/db/migrate.test.ts` "keeps a poll created before ranges could pass midnight"
+- [x] Screenshots of the pickers beside TimePhone and TimeDesktop. Evidence: `e2e/screenshots/create-hours-phone-chromium.png` and `create-hours-desktop-chromium.png`, saved by the night e2e and uploaded by CI; compared in the pull request body
+- [x] `lint`, `typecheck`, `test`, `knip`, `build`, `e2e` green. Evidence: task directory `logs/gate-20260927T232413/summary.txt` (all exit 0; 396 unit tests, 139 e2e passed in phone-chromium and desktop-chromium); phone-webkit runs in CI
