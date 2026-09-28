@@ -88,6 +88,17 @@ test("the organiser reminds and sets the time", async ({ browser }, testInfo) =>
   await expect(setTime).toContainText("18:00–20:00");
 });
 
+test("a failed Ustal termin says to check the connection and try again", async ({ browser }, testInfo) => {
+  const pollId = seedAnsweredPoll();
+  const organiser = await openAsNewDevice(browser, `/e/${pollId}`, pollId);
+
+  await organiser.route(`/e/${pollId}`, (route) => (route.request().method() === "POST" ? route.abort() : route.continue()));
+  await organiser.getByRole("region", { name: "Twoja ankieta" }).getByRole("button", { name: "Ustal termin" }).click();
+
+  await expect(organiser.getByRole("alert").filter({ hasText: "Nie udało się. Sprawdź internet i spróbuj jeszcze raz." })).toBeVisible();
+  await saveScreenshot(organiser, testInfo, "organiser-failed");
+});
+
 test("the organiser link restores the organiser controls on a fresh device", async ({ browser }) => {
   const pollId = seedAnsweredPoll();
   const organiser = await openAsNewDevice(browser, `/e/${pollId}`, pollId);
@@ -179,6 +190,7 @@ test("after Ustal termin a participant sees the invitation with no grid, and can
   else await firstCell.click();
 
   await expect(newcomer.getByRole("alert").filter({ hasText: "Termin jest już ustalony, odpowiedzi są zamknięte." })).toBeVisible();
+  await saveScreenshot(newcomer, testInfo, "answer-closed");
 
   await refreshNow(newcomer);
   await expect(newcomer.getByRole("region", { name: "Termin" })).toContainText("Sobota");

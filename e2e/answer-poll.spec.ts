@@ -2,6 +2,7 @@ import type { Browser, Locator, Page, Request, TestInfo } from "@playwright/test
 import { expect, test } from "./fixtures";
 import { centreOf, mouseDrag, touchDrag } from "./pointer";
 import { saveScreenshot } from "./screenshot";
+import { seedAnswer, seedPoll } from "./seed";
 
 async function createPoll(browser: Browser) {
   const organiser = await browser.newPage();
@@ -307,4 +308,21 @@ test("failed saves reach the server log, one report each and at most five per pa
     expect(report.postDataJSON()).toEqual({ action: "saveAnswer", errorName: "TypeError" });
     expect((await report.response())?.status()).toBe(204);
   }
+});
+
+test("a newcomer to a poll with 30 people reads that it is full and to write on the group", async ({ browser }, testInfo) => {
+  const pollId = seedPoll({ dates: ["2030-10-26", "2030-10-27"], firstHour: 17, hourCount: 4 });
+
+  for (let index = 1; index <= 30; index++) seedAnswer(pollId, `Osoba ${index}`, Date.now(), [["2030-10-26", 18]]);
+
+  const page = await openAsNewDevice(browser, `/e/${pollId}`);
+
+  await nameField(page).fill("Zosia");
+  await tap(cellAt(page, 0, 0), testInfo);
+
+  await expect(
+    page.getByRole("alert").filter({ hasText: "W tej ankiecie jest już 30 osób, więcej się nie zmieści. Napisz na grupie, kiedy możesz." }),
+  ).toBeVisible();
+
+  await saveScreenshot(page, testInfo, "answer-full");
 });

@@ -64,7 +64,7 @@ export function CreatePollForm() {
         )}
         {status === "failed" && (
           <p className="m-0 text-sm font-medium text-accent-ink" role="alert">
-            Coś poszło nie tak. Spróbuj jeszcze raz.
+            Nie udało się utworzyć ankiety. Sprawdź internet i spróbuj jeszcze raz.
           </p>
         )}
         <Button type="submit" variant="primary" block aria-busy={status === "creating"}>

@@ -378,7 +378,10 @@ describe("the organiser", () => {
     await userEvent.click(screen.getByRole("button", { name: "Ustal termin" }));
 
     expect(screen.queryByRole("button", { name: "Przypomnij" })).not.toBeInTheDocument();
-    expect(screen.getByRole("alert")).toHaveTextContent("To urządzenie nie jest już organizatorem tej ankiety.");
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "To urządzenie nie jest już organizatorem tej ankiety. Otwórz na nim link organizatora.",
+    );
   });
 
   it("leads with the invitation once the time is set", async () => {
