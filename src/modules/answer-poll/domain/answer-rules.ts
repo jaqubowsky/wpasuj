@@ -15,7 +15,7 @@ export function fitsPoll(poll: { dates: string[]; firstHour: number; hourCount: 
   return slots.every((slot) => poll.dates.includes(slot.date) && slot.hour >= poll.firstHour && slot.hour < poll.firstHour + poll.hourCount);
 }
 
-type Standing = { takesOrganiserName?: boolean; nameHeldByOther?: { name: string; hours: number }; newcomer: boolean; participantCount: number };
+type Standing = { takesOrganiserName?: boolean; nameHeldByOther?: { name: string; hours: number; yours?: { name: string; hours: number } }; newcomer: boolean; participantCount: number };
 
 export function refusalOf({ takesOrganiserName, nameHeldByOther, newcomer, participantCount }: Standing) {
   if (takesOrganiserName) return { reason: "organiser-name" as const };

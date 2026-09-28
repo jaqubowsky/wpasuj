@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { clashLine } from "./clash-line";
+import { clashLine, mergeLine } from "./clash-line";
 
 it.each([
   [1, "Na innym telefonie, 1 godzina"],
@@ -9,4 +9,11 @@ it.each([
   [0, "Na innym telefonie, nie może w żadnym terminie"],
 ])("says where the row answered and how many hours it holds: %i", (hours, line) => {
   expect(clashLine(hours)).toBe(line);
+});
+
+it.each([
+  [2, "Twoje godziny jako Bartek dołączą do tych."],
+  [0, "Odpowiedź jako Bartek zniknie."],
+])("says what happens to this device's answer on Tak: %i hours", (hours, line) => {
+  expect(mergeLine({ name: "Bartek", hours })).toBe(line);
 });
