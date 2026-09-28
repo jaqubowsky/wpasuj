@@ -1,4 +1,4 @@
-import type { Browser, Locator, Page, TestInfo } from "@playwright/test";
+import type { Browser, Locator, Page, Request, TestInfo } from "@playwright/test";
 import { expect, test } from "./fixtures";
 import { centreOf, mouseDrag, touchDrag } from "./pointer";
 import { saveScreenshot } from "./screenshot";
@@ -265,4 +265,46 @@ test("save states: Zapisuję, Nie zapisano with Spróbuj ponownie, and nie może
   await page.reload();
   await page.getByRole("tab", { name: "Moje" }).click();
   await expect(selected(page)).toHaveCount(1);
+});
+
+test("failed saves reach the server log, one report each and at most five per page load", async ({ browser }) => {
+  const { link } = await createPoll(browser);
+  const page = await openAsNewDevice(browser, link);
+  const reports: Request[] = [];
+  let failedSaves = 0;
+
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname === "/api/failed-saves") reports.push(request);
+  });
+
+  await page.route(link, (route) => {
+    if (route.request().method() !== "POST") return route.continue();
+
+    failedSaves++;
+
+    return route.abort();
+  });
+
+  await nameField(page).fill("Zuza");
+  await cellAt(page, 0, 0).click();
+  await expect(status(page)).toHaveText("Nie zapisano");
+  await expect.poll(() => reports.length).toBe(1);
+
+  for (let attempt = 2; attempt <= 6; attempt++) {
+    await page.getByRole("button", { name: "Spróbuj ponownie" }).click();
+    await expect.poll(() => failedSaves).toBe(attempt);
+    await expect(page.getByRole("button", { name: "Spróbuj ponownie" })).toBeVisible();
+    await expect.poll(() => reports.length).toBe(Math.min(attempt, 5));
+  }
+
+  await page.unroute(link);
+  await page.getByRole("button", { name: "Spróbuj ponownie" }).click();
+  await expect(status(page)).toHaveText("Zapisane");
+
+  expect(reports).toHaveLength(5);
+
+  for (const report of reports) {
+    expect(report.postDataJSON()).toEqual({ action: "saveAnswer", errorName: "TypeError" });
+    expect((await report.response())?.status()).toBe(204);
+  }
 });

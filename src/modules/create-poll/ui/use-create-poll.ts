@@ -1,4 +1,5 @@
 import { deviceTimeZone } from "@/shared/dates/use-device-time-zone";
+import { reportFailedSave } from "@/shared/failed-save";
 import { markFreshPoll } from "@/shared/fresh-poll";
 import { rememberName } from "@/shared/last-name";
 import { useRouter } from "next/navigation";
@@ -23,7 +24,7 @@ export function useCreatePoll(input: Omit<CreatePollInput, "timeZone">) {
 
     setStatus("creating");
 
-    const result = await createPoll(fullInput).catch(() => undefined);
+    const result = await createPoll(fullInput).catch(reportFailedSave("createPoll"));
 
     if (!result) {
       setStatus("failed");

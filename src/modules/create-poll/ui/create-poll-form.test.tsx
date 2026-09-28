@@ -269,4 +269,15 @@ describe("Utwórz i wyślij na grupę", () => {
 
     expect(push).toHaveBeenCalledWith("/e/abcdefghij");
   });
+
+  it("reports a create that throws to the server log", async () => {
+    createPoll.mockRejectedValueOnce(new Error("An unexpected response was received from the server."));
+    const sendBeacon = vi.spyOn(navigator, "sendBeacon");
+
+    render(<CreatePollForm />);
+    await fillIn("Dziś");
+    await act(() => userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" })));
+
+    expect(sendBeacon).toHaveBeenCalledExactlyOnceWith("/api/failed-saves", JSON.stringify({ action: "createPoll", errorName: "Error" }));
+  });
 });
