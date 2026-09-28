@@ -1,26 +1,7 @@
 import { Avatar } from "@/shared/ui/avatar/avatar";
+import { SettledBadge } from "@/shared/ui/settled-badge/settled-badge";
 import { invitation } from "../../../domain/best-scene";
 import { PollHead } from "./poll-parts";
-
-function SetBadge() {
-  return (
-    <span className="inline-flex items-center gap-1.5 rounded-pill bg-ink px-3 py-1.5 text-sm font-semibold text-surface">
-      <svg
-        className="size-3.5"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M20 6 9 17l-5-5" />
-      </svg>
-      Ustalone
-    </span>
-  );
-}
 
 function PeopleGroup({ label, names }: { label: string; names: string[] }) {
   return (
@@ -42,7 +23,7 @@ function PeopleGroup({ label, names }: { label: string; names: string[] }) {
 export function Settled() {
   return (
     <>
-      <PollHead line="Ustalone przez: Kuba" aside={<SetBadge />} />
+      <PollHead line="Ustalone przez: Kuba" aside={<SettledBadge />} />
       <div className="grid gap-4 rounded-card bg-ink p-5 text-surface">
         <p className="m-0 grid gap-1">
           <span className="text-sm text-on-dark-muted">Widzimy się</span>
