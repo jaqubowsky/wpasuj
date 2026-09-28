@@ -314,7 +314,7 @@ describe("the Moje lead and body", () => {
   });
 
   it.each([
-    ["closed", "Termin jest już ustalony, odpowiedzi są zamknięte. Zobacz go w zakładce Wszyscy."],
+    ["closed", "Termin jest już ustalony, odpowiedzi są zamknięte."],
     ["full", "W tej ankiecie jest już 30 osób, więcej się nie zmieści. Napisz na grupie, kiedy możesz."],
     ["gone", "Tej ankiety już nie ma. Zrób własną ankietę"],
   ] as const)("says what happened and what to do when the poll is %s", async (reason, copy) => {
@@ -324,7 +324,7 @@ describe("the Moje lead and body", () => {
     fireEvent.click(cell("pt 16, 19:00"));
     await afterQuiet();
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(copy);
+    expect((await screen.findByRole("alert")).textContent).toBe(copy);
     expect(screen.getByRole("status")).toHaveTextContent("Nie zapisano");
   });
 });
