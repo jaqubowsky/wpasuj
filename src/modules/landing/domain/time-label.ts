@@ -9,6 +9,8 @@ function dayAndMonth(date: string) {
   return `${Number(day)}.${month}`;
 }
 
+const dayAndMonthLong = new Intl.DateTimeFormat("pl", { timeZone: "UTC", day: "numeric", month: "long" });
+
 function capitalised(text: string) {
   return text.charAt(0).toLocaleUpperCase("pl") + text.slice(1);
 }
@@ -19,4 +21,13 @@ export function longRunLabel({ date, firstHour, lastHour }: TimeRange) {
 
 export function shortRunLabel({ date, firstHour, lastHour }: TimeRange) {
   return `${shortWeekday(date)} ${dayAndMonth(date)}, ${firstHour}–${lastHour}`;
+}
+
+export function setTimeLabel({ date, firstHour, lastHour }: TimeRange) {
+  const day = new Date(`${date}T00:00:00Z`);
+  return {
+    weekday: capitalised(longWeekday.format(day)),
+    day: dayAndMonthLong.format(day),
+    hours: `${firstHour}:00–${lastHour}:00`,
+  };
 }

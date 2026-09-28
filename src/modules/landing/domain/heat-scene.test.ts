@@ -44,9 +44,15 @@ describe("heatScene", () => {
     expect(heats(1)).toEqual(counts(1));
   });
 
-  it("lays the cells out as the days 17 to 19 by the hours 17 to 22", () => {
+  it("counts the people in as the pill on the poll does", () => {
+    expect(heatScene(0).count).toBe("1 osoba");
+    expect(heatScene(0.5).count).toBe("4 osoby");
+    expect(heatScene(1).count).toBe("6 osób");
+  });
+
+  it("lays the cells out as Friday 17 to Sunday 19 by the hours 17 to 22", () => {
     const scene = heatScene(1);
-    expect(scene.days).toEqual([17, 18, 19]);
+    expect(scene.days).toEqual(["pt 17", "sb 18", "nd 19"]);
     expect(scene.rows.map((row) => row.hour)).toEqual([17, 18, 19, 20, 21, 22]);
   });
 });

@@ -24,10 +24,13 @@ function Caption({ step }: { step: (typeof storySteps)[number] }) {
   );
 }
 
-function Phone({ children }: { children: ReactNode }) {
+function Phone({ pinned, children }: { pinned?: boolean; children: ReactNode }) {
   return (
-    <div className="box-border h-[min(740px,82dvh)] w-full max-w-90 self-center justify-self-center rounded-[52px] bg-ink p-3">
-      <div className="relative size-full overflow-hidden rounded-[41px] bg-paper">{children}</div>
+    <div
+      data-pinned={pinned || undefined}
+      className="box-border h-185 w-full data-pinned:h-[min(740px,82dvh)] max-w-90 self-center justify-self-center rounded-[52px] bg-ink p-3"
+    >
+      <div data-screen className="relative size-full overflow-hidden rounded-[41px] bg-paper">{children}</div>
     </div>
   );
 }
@@ -84,7 +87,7 @@ function PinnedStory() {
               </div>
             ))}
           </div>
-          <Phone>
+          <Phone pinned>
             {storySteps.map(({ label, Scene }, index) => (
               <SceneSlot key={label} place={placeOf(index, moment.step)}>
                 {Scene && <Scene time={sceneTime(index, moment)} />}

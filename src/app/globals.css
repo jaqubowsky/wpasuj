@@ -2,6 +2,36 @@
 @import "tailwindcss/utilities.css" source(none);
 @source "../**/*.tsx";
 
+@font-face {
+  font-family: "Bricolage Grotesque Fallback";
+  font-weight: 700 800;
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold"), local("Arimo Bold");
+  size-adjust: 102.5%;
+  ascent-override: 90.7%;
+  descent-override: 26.3%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Onest Fallback";
+  font-weight: 400 500;
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("LiberationSans"), local("Arimo");
+  size-adjust: 106.3%;
+  ascent-override: 91.25%;
+  descent-override: 28.7%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Onest Fallback";
+  font-weight: 600;
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold"), local("Arimo Bold");
+  size-adjust: 101.85%;
+  ascent-override: 95.2%;
+  descent-override: 29.9%;
+  line-gap-override: 0%;
+}
+
 body {
   margin: 0;
   min-height: 100dvh;

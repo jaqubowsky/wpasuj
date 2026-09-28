@@ -17,7 +17,6 @@ export function Demo({ formId }: { formId: string }) {
 
   return (
     <section
-      id="demo"
       aria-label="Wypróbuj na żywo"
       className="mx-auto box-border max-w-wide px-5 py-20 lg:px-12 lg:pt-30"
     >
