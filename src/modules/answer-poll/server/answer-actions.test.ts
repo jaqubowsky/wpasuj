@@ -1,5 +1,6 @@
 import { participants, polls } from "@/shared/db/schema";
 import { fakeCookies } from "@/shared/testing/fake-cookies";
+import { loggedLines } from "@/shared/testing/logged-lines";
 import { openTestDatabase } from "@/shared/testing/test-database";
 import { hashToken } from "@/shared/token-cookie";
 import { eq } from "drizzle-orm";
@@ -60,6 +61,7 @@ beforeEach(async () => {
 });
 
 afterEach(() => {
+  vi.restoreAllMocks();
   vi.useRealTimers();
   vi.unstubAllEnvs();
 });
@@ -153,6 +155,31 @@ describe("saveAnswer", () => {
     await saveAnswer(pollId, { name: "Ola", slots: [fridayOneAm] });
 
     expect(await myAnswer()).toEqual({ name: "Ola", slots: [fridayOneAm] });
+  });
+
+  it("writes one answer_saved line per save, new or changed, without the name", async () => {
+    const { saveAnswer } = await actions();
+    const lines = loggedLines("log");
+
+    await saveAnswer(pollId, { name: "Ola", slots: [friday19] });
+    await saveAnswer(pollId, { name: "Ola Nowak", slots: [] });
+
+    expect(lines().map((line) => JSON.parse(line))).toEqual([
+      { level: "info", message: "answer_saved", pollId },
+      { level: "info", message: "answer_saved", pollId },
+    ]);
+  });
+
+  it("writes nothing for a refused save", async () => {
+    const { saveAnswer } = await actions();
+
+    await saveAnswer(pollId, { name: "Łucja", slots: [friday19] });
+    onAnotherDevice();
+    const lines = loggedLines("log");
+
+    await saveAnswer(pollId, { name: "Łucja", slots: [saturday17] });
+
+    expect(lines()).toEqual([]);
   });
 
   it("tells a newcomer that a name already in the poll is taken, ignoring case", async () => {

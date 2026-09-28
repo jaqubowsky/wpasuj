@@ -31,7 +31,7 @@ export function organiserTokenHashOf(id: string) {
 }
 
 export function insertPoll(poll: NewPoll, heldTokenHashes: string[], now: Date) {
-  getDb().transaction((tx) => {
+  return getDb().transaction((tx) => {
     const createdByParticipant =
       heldTokenHashes.length > 0 &&
       tx.select({ id: participants.id }).from(participants).where(inArray(participants.tokenHash, heldTokenHashes)).get() !== undefined;
@@ -43,6 +43,8 @@ export function insertPoll(poll: NewPoll, heldTokenHashes: string[], now: Date) 
     tx.insert(polls)
       .values({ ...poll, createdByParticipant, createdAt: now })
       .run();
+
+    return createdByParticipant;
   });
 }
 

@@ -1,5 +1,6 @@
 "use server";
 
+import { writeLogLine } from "@/shared/log-line";
 import { fail, ok, parse, type Failure, type Result } from "@/shared/result";
 import { newToken, tokenCookieOptions } from "@/shared/token-cookie";
 import { cookies } from "next/headers";
@@ -63,6 +64,7 @@ export async function saveAnswer(pollId: string, answer: AnswerInput): Promise<S
   const newcomerToken = newToken();
 
   saveAnswerOf(pollId, participant, { name, normalisedName, slots: mySlots }, newcomerToken, new Date());
+  writeLogLine({ level: "info", message: "answer_saved", pollId });
   if (!participant) cookieStore.set(pollId, newcomerToken, await tokenCookieOptions());
 
   return ok();

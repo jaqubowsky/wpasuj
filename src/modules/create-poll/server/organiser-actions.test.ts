@@ -1,5 +1,6 @@
 import { polls } from "@/shared/db/schema";
 import { fakeCookies } from "@/shared/testing/fake-cookies";
+import { loggedLines } from "@/shared/testing/logged-lines";
 import { openTestDatabase } from "@/shared/testing/test-database";
 import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -33,6 +34,7 @@ beforeEach(async () => {
 });
 
 afterEach(() => {
+  vi.restoreAllMocks();
   vi.useRealTimers();
   vi.unstubAllEnvs();
 });
@@ -58,12 +60,24 @@ describe("setFinal", () => {
     expect(await finalOf(pollId)).toEqual(saturdayEvening);
   });
 
+  it("writes one time_set line", async () => {
+    const { setFinal } = await import("./organiser-actions");
+    const lines = loggedLines("log");
+
+    await setFinal(pollId, saturdayEvening);
+
+    expect(lines().map((line) => JSON.parse(line))).toEqual([{ level: "info", message: "time_set", pollId }]);
+  });
+
   it("refuses someone without the organiser cookie", async () => {
     const { setFinal } = await import("./organiser-actions");
 
     asStranger();
 
+    const lines = loggedLines("log");
+
     expect(await setFinal(pollId, saturdayEvening)).toEqual({ ok: false, reason: "not-organiser" });
+    expect(lines()).toEqual([]);
     expect(await finalOf(pollId)).toEqual({ date: null, firstHour: null, lastHour: null });
   });
 

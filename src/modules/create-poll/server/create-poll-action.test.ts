@@ -1,5 +1,6 @@
 import { participants, polls } from "@/shared/db/schema";
 import { fakeCookies } from "@/shared/testing/fake-cookies";
+import { loggedLines } from "@/shared/testing/logged-lines";
 import { openTestDatabase } from "@/shared/testing/test-database";
 import { hashToken } from "@/shared/token-cookie";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -39,6 +40,7 @@ beforeEach(async () => {
 });
 
 afterEach(() => {
+  vi.restoreAllMocks();
   vi.useRealTimers();
   vi.unstubAllEnvs();
 });
@@ -105,8 +107,9 @@ describe("createPoll", () => {
     expect(cookieJar.get(`${result.ok ? result.id : ""}-org`)).toMatchObject({ secure: true });
   });
 
-  it("records whether the organiser already answered another poll", async () => {
+  it("records whether the organiser already answered another poll, in the poll and in its line", async () => {
     const { createPoll } = await actions();
+    const lines = loggedLines("log");
     const first = await createPoll(input);
     const firstId = first.ok ? first.id : "";
     const now = new Date();
@@ -134,6 +137,7 @@ describe("createPoll", () => {
     expect(created(firstId)).toBe(false);
     expect(created(stranger.ok ? stranger.id : "")).toBe(false);
     expect(created(participant.ok ? participant.id : "")).toBe(true);
+    expect(lines().map((line) => JSON.parse(line).createdByParticipant)).toEqual([false, false, true]);
   });
 
   it("removes polls 60 days past their last date before it inserts", async () => {
@@ -193,6 +197,27 @@ describe("createPoll", () => {
     const result = await createPoll({ ...input, dates: ["2026-10-16"] });
 
     expect(result.ok).toBe(true);
+  });
+});
+
+describe("the poll_created line", () => {
+  it("carries the poll id and whether a participant of another poll created it, and nothing personal", async () => {
+    const { createPoll } = await actions();
+    const lines = loggedLines("log");
+    const result = await createPoll(input);
+
+    expect(lines().map((line) => JSON.parse(line))).toEqual([
+      { level: "info", message: "poll_created", pollId: result.ok ? result.id : "", createdByParticipant: false },
+    ]);
+  });
+
+  it("writes nothing for a refused poll", async () => {
+    const { createPoll } = await actions();
+    const lines = loggedLines("log");
+
+    await createPoll({ ...input, title: " " });
+
+    expect(lines()).toEqual([]);
   });
 });
 
