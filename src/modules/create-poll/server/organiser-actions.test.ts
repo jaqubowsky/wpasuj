@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 let cookieJar = fakeCookies();
-vi.mock("next/headers", () => ({ cookies: async () => cookieJar }));
+vi.mock("next/headers", () => ({ cookies: async () => cookieJar, headers: async () => new Headers() }));
 
 let db: Awaited<ReturnType<typeof openTestDatabase>>;
 let pollId: string;

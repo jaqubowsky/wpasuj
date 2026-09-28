@@ -7,7 +7,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 
 let cookieJar = fakeCookies();
-vi.mock("next/headers", () => ({ cookies: async () => cookieJar }));
+vi.mock("next/headers", () => ({ cookies: async () => cookieJar, headers: async () => new Headers() }));
 
 const now = new Date("2030-10-15T10:00:00Z");
 const pollId = "Pl4nszowki";

@@ -6,7 +6,8 @@ import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 let cookieJar = fakeCookies();
-vi.mock("next/headers", () => ({ cookies: async () => cookieJar }));
+let requestHeaders = new Headers();
+vi.mock("next/headers", () => ({ cookies: async () => cookieJar, headers: async () => requestHeaders }));
 
 const thursdayNoonInWarsaw = new Date("2026-10-15T10:00:00Z");
 const pollId = "Planszowki";
@@ -35,6 +36,7 @@ function onOrganiserDevice() {
 
 beforeEach(async () => {
   cookieJar = fakeCookies();
+  requestHeaders = new Headers();
   vi.useFakeTimers({ toFake: ["Date"] });
   vi.setSystemTime(thursdayNoonInWarsaw);
   db = await openTestDatabase();
@@ -85,7 +87,26 @@ describe("saveAnswer", () => {
       sameSite: "lax",
       path: "/",
       maxAge: 31_536_000,
+      secure: false,
     });
+  });
+
+  it("marks the participant cookie Secure on a request that arrived over https", async () => {
+    requestHeaders = new Headers({ "x-forwarded-proto": "https" });
+    const { saveAnswer } = await actions();
+
+    await saveAnswer(pollId, { name: "Ola", slots: [] });
+
+    expect(cookieJar.get(pollId)).toMatchObject({ secure: true });
+  });
+
+  it("leaves Secure off a cookie set over plain http, so a browser on http://localhost keeps it", async () => {
+    requestHeaders = new Headers({ "x-forwarded-proto": "http" });
+    const { saveAnswer } = await actions();
+
+    await saveAnswer(pollId, { name: "Ola", slots: [] });
+
+    expect(cookieJar.get(pollId)).toMatchObject({ secure: false });
   });
 
   it("saves an empty set for someone who can't make any time", async () => {
