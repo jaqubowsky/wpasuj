@@ -1,4 +1,5 @@
-import { expect, test, type Browser, type Locator, type Page, type TestInfo } from "@playwright/test";
+import type { Browser, Locator, Page, TestInfo } from "@playwright/test";
+import { expect, test } from "./fixtures";
 import { centreOf, mouseDrag, touchDrag } from "./pointer";
 import { saveScreenshot } from "./screenshot";
 
