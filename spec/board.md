@@ -6,17 +6,16 @@ Every ticket whose blockers have landed runs at once, one container each, up to 
 
 ## Now
 
-- `tickets/34-design-token-scale.md`: claude-wpasuj-t34-design-tokens, PR #37
-- `tickets/23-landing-seo-perf.md`: claude-wpasuj-t23-landing-seo-perf
-- `tickets/38-production-readiness.md`
+- `tickets/23-landing-seo-perf.md`: claude-wpasuj-t23-landing-seo-perf, PR #39
+- `tickets/12-cleanup.md`: claude-wpasuj-t12-cleanup, PR #44
 
 ## Next
 
-- `tickets/35-poll-page-v3.md`, `tickets/37-overnight-hours.md` (after 34; in parallel)
-- `tickets/36-finalised-poll.md` (after 35)
-- `tickets/12-cleanup.md` (after 35, 36, 37)
-- `tickets/31-security-audit.md`, `tickets/32-architecture-audit.md` (after 12, 23, 34-37; in parallel)
-- `tickets/08-acceptance.md` (after 31, 32 and their fix tickets, and 38)
+- `tickets/39-ci-parallel.md` (after 23)
+- `tickets/40-landing-v3-follow-up.md` (after 23)
+- `tickets/41-webkit-answer-flake.md` (after 23; beside 39 and 40)
+- `tickets/31-security-audit.md`, `tickets/32-architecture-audit.md` (after 12, 23, 40; in parallel; 39 beside them)
+- `tickets/08-acceptance.md` (after 31, 32 and their fix tickets)
 - `tickets/24-readme.md` (after 08)
 
 ## Landed
@@ -48,3 +47,8 @@ Every ticket whose blockers have landed runs at once, one container each, up to 
 - `tickets/20-story-best.md`: PR #33
 - `tickets/25-create-and-cant-feedback.md`: PR #34
 - `tickets/30-tailwind-landing.md`: PR #35
+- `tickets/34-design-token-scale.md`: PR #37
+- `tickets/37-overnight-hours.md`: PR #40
+- `tickets/35-poll-page-v3.md`: PR #41
+- `tickets/38-production-readiness.md`: PR #42
+- `tickets/36-finalised-poll.md`: PR #43
