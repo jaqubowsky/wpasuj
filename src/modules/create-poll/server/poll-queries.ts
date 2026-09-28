@@ -1,44 +1,17 @@
-import { todayIn } from "@/shared/dates/iso-date";
-import { getDb } from "@/shared/db/client";
-import { participants, polls } from "@/shared/db/schema";
-import { count, eq } from "drizzle-orm";
-import { isExpired } from "../domain/poll-rules";
-import { pollIdSchema } from "./poll-schema";
-
-export function isPollId(id: string) {
-  return pollIdSchema.safeParse(id).success;
-}
+import { livePoll } from "./poll-store";
 
 export function findPoll(id: string, now: Date) {
-  if (!isPollId(id)) return undefined;
+  const found = livePoll(id, now);
 
-  const poll = getDb()
-    .select({
-      title: polls.title,
-      organiserName: polls.organiserName,
-      dates: polls.dates,
-      firstHour: polls.firstHour,
-      hourCount: polls.hourCount,
-      timeZone: polls.timeZone,
-      finalDate: polls.finalDate,
-      finalFirstHour: polls.finalFirstHour,
-      finalLastHour: polls.finalLastHour,
-      respondentCount: count(participants.id),
-    })
-    .from(polls)
-    .leftJoin(participants, eq(participants.pollId, polls.id))
-    .where(eq(polls.id, id))
-    .groupBy(polls.id)
-    .get();
+  if (!found.ok) return undefined;
 
-  if (!poll || isExpired(poll.dates, todayIn(poll.timeZone, now))) return undefined;
-
-  const { finalDate, finalFirstHour, finalLastHour, ...rest } = poll;
+  const { title, organiserName, dates, firstHour, hourCount, timeZone, respondentCount, finalDate, finalFirstHour, finalLastHour } =
+    found.poll;
 
   const final =
     finalDate !== null && finalFirstHour !== null && finalLastHour !== null
       ? { date: finalDate, firstHour: finalFirstHour, lastHour: finalLastHour }
       : null;
 
-  return { ...rest, final };
+  return { title, organiserName, dates, firstHour, hourCount, timeZone, respondentCount, final };
 }
