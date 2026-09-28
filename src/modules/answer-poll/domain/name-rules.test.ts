@@ -16,6 +16,10 @@ describe("nameKey", () => {
     expect(nameKey("ŁUKASZ Żak")).toBe(nameKey("łukasz żak"));
   });
 
+  it("treats a decomposed accent and its composed twin as one name", () => {
+    expect(nameKey("Zósia")).toBe(nameKey("Zósia"));
+  });
+
   it("keeps different names apart", () => {
     expect(nameKey("Ola")).not.toBe(nameKey("Ala"));
   });
