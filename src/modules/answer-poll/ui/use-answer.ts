@@ -8,7 +8,7 @@ import { normaliseName } from "../domain/name-rules";
 import { useAutosave } from "./use-autosave";
 
 export type Answer = { name: string; slots: Slot[] };
-type Problem = { kind: "name-taken"; heldName: string; hours?: number } | { kind: "invalid" | "organiser-name" | "closed" | "full" | "gone" };
+type Problem = { kind: "name-taken"; heldName: string; hours?: number; yours?: { name: string; hours: number } } | { kind: "invalid" | "organiser-name" | "closed" | "full" | "gone" };
 
 type AnswerOptions = { pollId: string; dates: string[]; hours: number[]; mine?: Answer; fixedName?: string };
 
@@ -70,7 +70,7 @@ export function useAnswer({ pollId, dates, hours, mine, fixedName }: AnswerOptio
     }
     switch (result.reason) {
       case "name-taken":
-        setProblem({ kind: "name-taken", heldName: result.name, hours: result.hours });
+        setProblem({ kind: "name-taken", heldName: result.name, hours: result.hours, yours: result.yours });
         return false;
       case "not-yours":
         setProblem({ kind: "name-taken", heldName: normaliseName(answer.name) });

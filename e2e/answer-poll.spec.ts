@@ -107,6 +107,32 @@ test("a second device typing the same name gets To ty, Ola? and takes the row ov
   await expect(first.getByRole("tab", { name: "Moje", selected: true })).toBeVisible();
 });
 
+test("a device that answered as Bartek hears its hours join Ola's before Tak, to ja", async ({ browser }, testInfo) => {
+  const { link } = await createPoll(browser);
+  const ola = await openAsNewDevice(browser, link);
+  await nameField(ola).fill("Ola");
+  await cellAt(ola, 0, 0).click();
+  await expect(status(ola)).toHaveText("Zapisane");
+  const bartek = await openAsNewDevice(browser, link);
+  await nameField(bartek).fill("Bartek");
+  await cellAt(bartek, 2, 2).click();
+  await expect(status(bartek)).toHaveText("Zapisane");
+
+  await nameField(bartek).fill("Ola");
+  const clash = bartek.getByRole("region", { name: "To Ty, Ola?" });
+  await expect(clash).toContainText("Twoje godziny jako Bartek dołączą do tych.");
+  await saveScreenshot(bartek, testInfo, "answer-to-ty-merge");
+  await clash.getByRole("button", { name: "Tak, to ja" }).click();
+  await expect(status(bartek)).toHaveText("Zapisane");
+
+  await bartek.reload();
+  await bartek.getByRole("tab", { name: "Moje" }).click();
+  await expect(nameField(bartek)).toHaveValue("Ola");
+  await expect(selected(bartek)).toHaveCount(2);
+  await bartek.getByRole("tab", { name: "Wszyscy" }).click();
+  await expect(bartek.getByRole("grid", { name: "Kto może" }).getByRole("button", { name: /, 1 z 1 może$/ })).toHaveCount(2);
+});
+
 test("server data never overwrites my Moje grid while another device saves", async ({ browser }) => {
   const { link } = await createPoll(browser);
   const mine = await openAsNewDevice(browser, link);

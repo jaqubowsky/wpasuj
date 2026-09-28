@@ -169,7 +169,7 @@ describe("saveAnswer", () => {
 
     const result = await saveAnswer(pollId, { name: "ola", slots: [friday19] });
 
-    expect(result).toEqual({ ok: false, reason: "name-taken", name: "Ola", hours: 0 });
+    expect(result).toEqual({ ok: false, reason: "name-taken", name: "Ola", hours: 0, yours: { name: "Bartek", hours: 1 } });
     expect(await myAnswer()).toEqual({ name: "Bartek", slots: [friday19] });
   });
 
@@ -244,6 +244,18 @@ describe("claimName", () => {
     await claimName(pollId, "Ola");
 
     expect(db.select({ name: participants.name }).from(participants).all()).toEqual([{ name: "Ola" }]);
+  });
+
+  it("folds the hours this device answered into the claimed row", async () => {
+    const { saveAnswer, claimName } = await actions();
+    await saveAnswer(pollId, { name: "Ola", slots: [friday19, saturday17] });
+    onAnotherDevice();
+    await saveAnswer(pollId, { name: "Bartek", slots: [friday19, friday20] });
+
+    const result = await claimName(pollId, "Ola");
+
+    expect(result).toEqual({ ok: true, name: "Ola", slots: [friday19, friday20, saturday17] });
+    expect(await myAnswer()).toEqual({ name: "Ola", slots: [friday19, friday20, saturday17] });
   });
 
   it("refuses the organiser's name and changes no row", async () => {
