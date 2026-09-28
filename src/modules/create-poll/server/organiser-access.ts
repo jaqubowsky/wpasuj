@@ -26,5 +26,5 @@ export async function organiserToken(id: string) {
 }
 
 export async function grantOrganiser(id: string, token: string) {
-  if (isOrganiserToken(id, token)) (await cookies()).set(organiserCookie(id), token, tokenCookieOptions);
+  if (isOrganiserToken(id, token)) (await cookies()).set(organiserCookie(id), token, await tokenCookieOptions());
 }

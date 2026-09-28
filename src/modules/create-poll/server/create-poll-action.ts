@@ -45,6 +45,6 @@ export async function createPoll(input: CreatePollInput): Promise<CreatePollResu
       .run();
   });
 
-  cookieStore.set(organiserCookie(id), organiserToken, tokenCookieOptions);
+  cookieStore.set(organiserCookie(id), organiserToken, await tokenCookieOptions());
   return { ok: true, id };
 }

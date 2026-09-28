@@ -70,7 +70,7 @@ export async function saveAnswer(pollId: string, answer: AnswerInput): Promise<S
     tx.delete(slots).where(eq(slots.participantId, id)).run();
     if (mySlots.length > 0) tx.insert(slots).values(mySlots.map((slot) => ({ participantId: id, ...slot }))).run();
   });
-  if (!participant) cookieStore.set(pollId, newcomerToken, tokenCookieOptions);
+  if (!participant) cookieStore.set(pollId, newcomerToken, await tokenCookieOptions());
   return { ok: true };
 }
 
@@ -95,6 +95,6 @@ export async function claimName(pollId: string, name: string): Promise<ClaimResu
   });
   if (!claimed) return { ok: false, reason: "invalid" };
 
-  cookieStore.set(pollId, token, tokenCookieOptions);
+  cookieStore.set(pollId, token, await tokenCookieOptions());
   return { ok: true, name: claimed.name, slots: slotsOf(claimed.id) };
 }

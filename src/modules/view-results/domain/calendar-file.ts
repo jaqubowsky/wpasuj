@@ -32,7 +32,7 @@ function utcStamp(instant: Date) {
 }
 
 function escaped(text: string) {
-  return text.replace(/[\\;,]/g, (character) => `\\${character}`).replace(/\r?\n/g, "\\n");
+  return text.replace(/[\\;,]/g, (character) => `\\${character}`).replace(/\r\n|\r|\n/g, "\\n");
 }
 
 function folded(line: string) {

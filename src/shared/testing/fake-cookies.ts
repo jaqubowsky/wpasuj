@@ -1,4 +1,4 @@
-type Cookie = { name: string; value: string; httpOnly?: boolean; sameSite?: string; path?: string; maxAge?: number };
+type Cookie = { name: string; value: string; httpOnly?: boolean; sameSite?: string; path?: string; maxAge?: number; secure?: boolean };
 
 export function fakeCookies() {
   const jar = new Map<string, Cookie>();

@@ -5,7 +5,8 @@ import { hashToken } from "@/shared/token-cookie";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 let cookieJar = fakeCookies();
-vi.mock("next/headers", () => ({ cookies: async () => cookieJar }));
+let requestHeaders = new Headers();
+vi.mock("next/headers", () => ({ cookies: async () => cookieJar, headers: async () => requestHeaders }));
 
 const thursdayNoonInWarsaw = new Date("2026-10-15T10:00:00Z");
 
@@ -30,6 +31,7 @@ async function queries() {
 
 beforeEach(async () => {
   cookieJar = fakeCookies();
+  requestHeaders = new Headers();
   vi.useFakeTimers({ toFake: ["Date"] });
   vi.setSystemTime(thursdayNoonInWarsaw);
   db = await openTestDatabase();
@@ -82,9 +84,19 @@ describe("createPoll", () => {
       sameSite: "lax",
       path: "/",
       maxAge: 31_536_000,
+      secure: false,
     });
     const [row] = await db.select().from(polls);
     expect(row.organiserTokenHash).toBe(hashToken(cookieJar.get(`${id}-org`)!.value));
+  });
+
+  it("marks the organiser cookie Secure on a request that arrived over https", async () => {
+    requestHeaders = new Headers({ "x-forwarded-proto": "https" });
+    const { createPoll } = await actions();
+
+    const result = await createPoll(input);
+
+    expect(cookieJar.get(`${result.ok ? result.id : ""}-org`)).toMatchObject({ secure: true });
   });
 
   it("records whether the organiser already answered another poll", async () => {
