@@ -1,0 +1,8 @@
+{
+  "path": ["src"],
+  "ignore": ["**/*.test.ts", "**/*.test.tsx", "src/shared/testing/**"],
+  "reporters": ["console"],
+  "noTips": true,
+  "baseline": ".jscpd-baseline.json",
+  "failOnNewClones": 0
+}

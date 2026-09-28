@@ -18,13 +18,14 @@ Declared in `package.json` by WPA-10; a change passes all of them:
 - `npm run lint`
 - `npm run typecheck`
 - `npm run knip` (unused files, exports and dependencies; config in `knip.json`)
+- `npm run duplicates` (jscpd over `src/` without tests; fails on a clone missing from `.jscpd-baseline.json`)
 - `npm test` (Vitest, units, components and actions)
 - `npm run build`
 - `npm run e2e` (Playwright: phone 390 in Chromium and WebKit, desktop 1440 in Chromium)
 
 CI (`.github/workflows/ci.yml`, skipped when a change touches only `*.md`): `quick` runs lint, typecheck, knip and test; `build` uploads the standalone build; an `e2e` matrix runs each Playwright project in its own job on that build and uploads `screenshots-<project>` and `memory-<project>` (memory sampled every 5 s); `perf` reuses the build; `docker` builds the image.
 
-Hooks (husky, installed by `npm ci`): pre-commit runs `eslint` on staged files through `lint-staged`; pre-push runs `typecheck`, `knip` and `test`. `e2e` runs in CI only.
+Hooks (husky, installed by `npm ci`): pre-commit runs `eslint --fix` (blank lines between statements come from `@stylistic/padding-line-between-statements`, which `npm run lint` also checks in CI) and `prettier --write` (Tailwind class order through its plugin; config in `.prettierrc.json`, whole repository with `npm run format`) on staged files through `lint-staged`, fixing them in place; pre-push runs `typecheck`, `knip`, `duplicates` and `test`. Prettier and jscpd run only in hooks, never in CI. A clone copied on purpose (domain code between modules) goes into the baseline with `npm run duplicates -- --update-baseline`; technical code is shared instead. `e2e` runs in CI only.
 
 ## Testing
 
