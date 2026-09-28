@@ -1,11 +1,5 @@
+import { tintOf } from "@/shared/tint";
 import "./avatar.css";
-
-const tints = ["coral", "lilac", "mint", "butter", "sky"] as const;
-
-function tintOf(key: string) {
-  const sum = Array.from(key).reduce((total, character) => total + character.codePointAt(0)!, 0);
-  return tints[sum % tints.length];
-}
 
 const badges = {
   organiser: <path d="M3 7l4.5 4L12 4l4.5 7L21 7l-2 12H5z" fill="currentColor" />,
