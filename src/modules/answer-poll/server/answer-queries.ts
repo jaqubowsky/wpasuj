@@ -14,6 +14,11 @@ export function findLivePoll(pollId: string) {
   return poll;
 }
 
+export async function isOrganiserDevice(poll: { id: string; organiserTokenHash: string }) {
+  const token = (await cookies()).get(`${poll.id}-org`)?.value;
+  return token !== undefined && hashToken(token) === poll.organiserTokenHash;
+}
+
 export function participantByToken(pollId: string, token: string) {
   return getDb()
     .select()

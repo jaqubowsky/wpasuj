@@ -34,4 +34,20 @@ describe("Avatar", () => {
 
     expect(screen.getByRole("img", { name: "Bartek" })).toHaveAttribute("data-pop");
   });
+
+  it("carries the organiser's crown, the cross of someone who cannot and the ring around you", () => {
+    render(
+      <>
+        <Avatar name="Kuba" tintKey="kuba" mark="organiser" you />
+        <Avatar name="Bartek" tintKey="bartek" mark="cannot" />
+      </>,
+    );
+
+    const kuba = screen.getByRole("img", { name: "Kuba" });
+    const bartek = screen.getByRole("img", { name: "Bartek" });
+    expect(kuba).toHaveAttribute("data-mark", "organiser");
+    expect(kuba).toHaveAttribute("data-you");
+    expect(bartek).toHaveAttribute("data-mark", "cannot");
+    expect(bartek).not.toHaveAttribute("data-tint");
+  });
 });

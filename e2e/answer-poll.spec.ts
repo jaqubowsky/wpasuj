@@ -23,7 +23,7 @@ async function openAsNewDevice(browser: Browser, link: string) {
   return page;
 }
 
-const nameField = (page: Page) => page.getByRole("textbox", { name: "Jak masz na imię?" });
+const nameField = (page: Page) => page.getByRole("textbox", { name: "Twoje imię" });
 const status = (page: Page) => page.getByRole("status");
 const selected = (page: Page) => page.getByRole("gridcell", { selected: true });
 const cantButton = (page: Page) => page.getByRole("button", { name: "Nie mogę w żadnym terminie" });
@@ -59,7 +59,6 @@ test("a fresh participant answers with a name and one drag and sees Zapisane", a
 
   await expect(status(page)).toHaveText("Zapisane");
   await expect(selected(page)).toHaveCount(9);
-  await expect(page.getByText("Gotowe. Zmieniasz zdanie? Po prostu kliknij.")).toBeVisible();
   await saveScreenshot(page, testInfo, "answer-zapisane");
 
   await page.reload();
@@ -94,7 +93,7 @@ test("a second device typing the same name gets To ty, Ola? and takes the row ov
   const second = await openAsNewDevice(browser, link);
   await nameField(second).fill("Ola");
   await cellAt(second, 1, 1).click();
-  await expect(second.getByText("To ty, Ola?")).toBeVisible();
+  await expect(second.getByRole("region", { name: "To Ty, Ola?" })).toContainText("Na innym telefonie, 1 godzina");
   await expect(status(second)).toHaveText("Nie zapisano");
   await saveScreenshot(second, testInfo, "answer-to-ty");
   await second.getByRole("button", { name: "Tak, to ja" }).click();
@@ -120,7 +119,7 @@ test("server data never overwrites my Moje grid while another device saves", asy
   await cellAt(other, 2, 1).click();
   await expect(status(other)).toHaveText("Zapisane");
   await mine.getByRole("tab", { name: "Wszyscy" }).click();
-  await expect(mine.getByRole("list", { name: "Kto odpowiedział" })).toContainText("Ola", { timeout: 10_000 });
+  await expect(mine.getByText(/^2 osoby/).filter({ visible: true })).toBeVisible({ timeout: 10_000 });
   await mine.getByRole("tab", { name: "Moje" }).click();
 
   await expect(status(mine)).toHaveText("Zapisane");
@@ -128,12 +127,18 @@ test("server data never overwrites my Moje grid while another device saves", asy
   await expect(cellAt(mine, 2, 1).locator("..")).toHaveAttribute("aria-selected", "false");
 });
 
-test("the organiser answers on Moje with the name from create prefilled", async ({ browser }) => {
+test("the organiser answers on Moje under the name from create, with no name field", async ({ browser }, testInfo) => {
   const { organiser } = await createPoll(browser);
 
   await expect(organiser.getByRole("tab", { name: "Moje", selected: true })).toBeVisible();
-  await expect(nameField(organiser)).toHaveValue("Kuba");
-  await expect(nameField(organiser)).not.toBeFocused();
+  await expect(organiser.getByText("Pytasz jako Kuba")).toBeVisible();
+  await expect(organiser.getByText("Zaznacz też swoje godziny.")).toBeVisible();
+  await expect(organiser.getByRole("textbox", { name: "Twoje imię" })).toHaveCount(0);
+
+  await tap(cellAt(organiser, 0, 0), testInfo);
+
+  await expect(status(organiser)).toHaveText("Zapisane");
+  await expect(cantButton(organiser)).toBeVisible();
 });
 
 test("a returning device finds its last name prefilled and the field left alone", async ({ browser }) => {
@@ -181,7 +186,6 @@ test("save states: Zapisuję, Nie zapisano with Spróbuj ponownie, and nie może
   await expect(page.getByRole("button", { name: "Nie mogę w żadnym terminie", pressed: true })).toBeVisible();
   await expect(selected(page)).toHaveCount(0);
   await expect(status(page)).toHaveText("Zapisane");
-  await expect(page.getByText("Organizator zobaczy Twoją odpowiedź.")).toBeVisible();
   await saveScreenshot(page, testInfo, "answer-nie-moze");
 
   await page.getByRole("button", { name: "Cofnij" }).click();

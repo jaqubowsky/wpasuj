@@ -1,6 +1,7 @@
 import { participants, polls } from "@/shared/db/schema";
 import { fakeCookies } from "@/shared/testing/fake-cookies";
 import { openTestDatabase } from "@/shared/testing/test-database";
+import { hashToken } from "@/shared/token-cookie";
 import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -25,6 +26,13 @@ function onAnotherDevice() {
   cookieJar = fakeCookies();
 }
 
+const organiserToken = "organiser-token";
+
+function onOrganiserDevice() {
+  cookieJar = fakeCookies();
+  cookieJar.set(`${pollId}-org`, organiserToken);
+}
+
 beforeEach(async () => {
   cookieJar = fakeCookies();
   vi.useFakeTimers({ toFake: ["Date"] });
@@ -39,7 +47,7 @@ beforeEach(async () => {
       firstHour: 17,
       hourCount: 6,
       timeZone: "Europe/Warsaw",
-      organiserTokenHash: "organiser",
+      organiserTokenHash: hashToken(organiserToken),
       createdByParticipant: false,
       createdAt: thursdayNoonInWarsaw,
     })
@@ -128,7 +136,7 @@ describe("saveAnswer", () => {
 
     const result = await saveAnswer(pollId, { name: "ŁUCJA", slots: [saturday17] });
 
-    expect(result).toEqual({ ok: false, reason: "name-taken", name: "Łucja" });
+    expect(result).toEqual({ ok: false, reason: "name-taken", name: "Łucja", hours: 1 });
     expect(await myAnswer()).toBeUndefined();
   });
 
@@ -140,7 +148,7 @@ describe("saveAnswer", () => {
 
     const result = await saveAnswer(pollId, { name: "ola", slots: [friday19] });
 
-    expect(result).toEqual({ ok: false, reason: "name-taken", name: "Ola" });
+    expect(result).toEqual({ ok: false, reason: "name-taken", name: "Ola", hours: 0 });
     expect(await myAnswer()).toEqual({ name: "Bartek", slots: [friday19] });
   });
 
@@ -156,6 +164,14 @@ describe("saveAnswer", () => {
 
     expect(result).toEqual({ ok: false, reason: "not-yours" });
     expect(cookieJar.get(pollId)).toBeUndefined();
+  });
+
+  it("keeps the organiser's name for the organiser's devices", async () => {
+    const { saveAnswer } = await actions();
+
+    expect(await saveAnswer(pollId, { name: "kuba", slots: [friday19] })).toEqual({ ok: false, reason: "organiser-name" });
+    onOrganiserDevice();
+    expect(await saveAnswer(pollId, { name: "Kuba", slots: [friday19] })).toEqual({ ok: true });
   });
 
   it("refuses answers once the final time is set", async () => {
@@ -207,6 +223,29 @@ describe("claimName", () => {
     await claimName(pollId, "Ola");
 
     expect(db.select({ name: participants.name }).from(participants).all()).toEqual([{ name: "Ola" }]);
+  });
+
+  it("refuses the organiser's name and changes no row", async () => {
+    const { saveAnswer, claimName } = await actions();
+    onOrganiserDevice();
+    await saveAnswer(pollId, { name: "Kuba", slots: [friday19] });
+    const rowsBefore = db.select().from(participants).all();
+    onAnotherDevice();
+
+    const result = await claimName(pollId, " kuba ");
+
+    expect(result).toEqual({ ok: false, reason: "organiser-name" });
+    expect(db.select().from(participants).all()).toEqual(rowsBefore);
+    expect(cookieJar.get(pollId)).toBeUndefined();
+  });
+
+  it("lets the organiser move their own row to a second device", async () => {
+    const { saveAnswer, claimName } = await actions();
+    onOrganiserDevice();
+    await saveAnswer(pollId, { name: "Kuba", slots: [friday19] });
+    onOrganiserDevice();
+
+    expect(await claimName(pollId, "Kuba")).toEqual({ ok: true, name: "Kuba", slots: [friday19] });
   });
 
   it("refuses a name nobody in the poll has", async () => {

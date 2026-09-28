@@ -8,9 +8,9 @@ import { normaliseName } from "../domain/name-rules";
 import { useAutosave } from "./use-autosave";
 
 export type Answer = { name: string; slots: Slot[] };
-export type Problem = { kind: "name-taken"; heldName: string } | { kind: "invalid" | "closed" | "full" | "gone" };
+export type Problem = { kind: "name-taken"; heldName: string; hours?: number } | { kind: "invalid" | "organiser-name" | "closed" | "full" | "gone" };
 
-type AnswerOptions = { pollId: string; dates: string[]; hours: number[]; mine?: Answer };
+type AnswerOptions = { pollId: string; dates: string[]; hours: number[]; mine?: Answer; fixedName?: string };
 
 const keyOf = ({ date, hour }: GridCell) => `${date} ${hour}`;
 
@@ -31,13 +31,14 @@ function afterRefusedClaim(reason: ClaimRefusal): "save-as-newcomer" | Problem {
   switch (reason) {
     case "invalid":
       return "save-as-newcomer";
+    case "organiser-name":
     case "closed":
     case "gone":
       return { kind: reason };
   }
 }
 
-export function useAnswer({ pollId, dates, hours, mine }: AnswerOptions) {
+export function useAnswer({ pollId, dates, hours, mine, fixedName }: AnswerOptions) {
   const lastName = useLastName();
   const [typedName, setTypedName] = useState(mine?.name);
   const [mySlots, setMySlots] = useState(() => new Set(mine?.slots.map(keyOf)));
@@ -48,12 +49,12 @@ export function useAnswer({ pollId, dates, hours, mine }: AnswerOptions) {
   const clearing = useRef<ReturnType<typeof setTimeout>[]>([]);
   const [problem, setProblem] = useState<Problem>();
   const nameRef = useRef<HTMLInputElement>(null);
-  const name = typedName ?? lastName;
+  const name = fixedName ?? typedName ?? lastName;
   const newHere = mine === undefined;
 
   useEffect(() => {
-    if (newHere && readLastName() === "") nameRef.current?.focus();
-  }, [newHere]);
+    if (newHere && readLastName() === "" && fixedName === undefined) nameRef.current?.focus();
+  }, [newHere, fixedName]);
 
   async function send(answer: Answer) {
     let result = await saveAnswer(pollId, answer);
@@ -69,12 +70,13 @@ export function useAnswer({ pollId, dates, hours, mine }: AnswerOptions) {
     }
     switch (result.reason) {
       case "name-taken":
-        setProblem({ kind: "name-taken", heldName: result.name });
+        setProblem({ kind: "name-taken", heldName: result.name, hours: result.hours });
         return false;
       case "not-yours":
         setProblem({ kind: "name-taken", heldName: normaliseName(answer.name) });
         return false;
       case "invalid":
+      case "organiser-name":
       case "closed":
       case "full":
       case "gone":
@@ -135,8 +137,8 @@ export function useAnswer({ pollId, dates, hours, mine }: AnswerOptions) {
     },
     saveState: autosave.state,
     problem,
-    holdsRow,
-    canMakeIt: mySlots.size > 0,
+    asksName: fixedName === undefined,
+    asksToMark: fixedName !== undefined && !holdsRow,
     saidCant: beforeCant !== undefined || (holdsRow && mySlots.size === 0 && !cantTurnedOff),
     justSaidCant: beforeCant !== undefined,
     isMine: (cell: GridCell) => mySlots.has(keyOf(cell)),

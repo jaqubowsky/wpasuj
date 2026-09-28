@@ -1,9 +1,7 @@
 import { DayHourGrid, type GridCell } from "@/shared/day-hour-grid/day-hour-grid";
 import { Cell } from "@/shared/ui/cell/cell";
-import { Text } from "@/shared/ui/text/text";
 import type { Run } from "../domain/best-time";
 import { heatCellOf } from "../domain/heat";
-import "./heatmap.css";
 import type { FinalTime, Results } from "../server/results-schema";
 import { useBumpOnRise } from "./use-bump-on-rise";
 import { useFillIn } from "./use-fill-in";
@@ -22,8 +20,6 @@ type HeatCellProps = ReturnType<typeof heatCellOf> & {
   chosen?: string;
   fillOrder?: number;
 };
-
-const ramp = [1, 2, 3, 4, 5];
 
 function HeatCell({ count, heat, everyone, best, label, tabIndex, respondentCount, chosen, fillOrder }: HeatCellProps) {
   const ref = useBumpOnRise<HTMLButtonElement>(count);
@@ -47,32 +43,22 @@ function fillOrderOf(final: FinalTime | null, { date, hour }: GridCell) {
 
 export function Heatmap({ results, best, isSelected, onCellTap }: HeatmapProps) {
   return (
-    <section className="lg:rounded-card lg:bg-surface lg:pt-5 lg:pr-6 lg:pb-6 lg:pl-3" data-heatmap>
-      <div className="mb-2.5 flex items-center justify-between gap-3">
-        <Text variant="meta">Kliknij godzinę, żeby zobaczyć, kto może</Text>
-        <span className="flex flex-none gap-1" aria-hidden>
-          {ramp.map((heat) => (
-            <span key={heat} className="h-2.5 w-4.5 rounded-[3px] data-[heat=1]:bg-heat-1 data-[heat=2]:bg-heat-2 data-[heat=3]:bg-heat-3 data-[heat=4]:bg-heat-4 data-[heat=5]:bg-heat-5" data-heat={heat} />
-          ))}
-        </span>
-      </div>
-      <DayHourGrid
-        label="Kto może"
-        dates={results.dates}
-        hours={results.hours}
-        isSelected={isSelected}
-        renderCell={({ label, tabIndex, date, hour }) => (
-          <HeatCell
-            {...heatCellOf(results.respondents, { date, hour }, results.final ?? best)}
-            chosen={chosenKey(results.final)}
-            fillOrder={fillOrderOf(results.final, { date, hour })}
-            label={label}
-            tabIndex={tabIndex}
-            respondentCount={results.respondents.length}
-          />
-        )}
-        onCellTap={onCellTap}
-      />
-    </section>
+    <DayHourGrid
+      label="Kto może"
+      dates={results.dates}
+      hours={results.hours}
+      isSelected={isSelected}
+      renderCell={({ label, tabIndex, date, hour }) => (
+        <HeatCell
+          {...heatCellOf(results.respondents, { date, hour }, results.final ?? best)}
+          chosen={chosenKey(results.final)}
+          fillOrder={fillOrderOf(results.final, { date, hour })}
+          label={label}
+          tabIndex={tabIndex}
+          respondentCount={results.respondents.length}
+        />
+      )}
+      onCellTap={onCellTap}
+    />
   );
 }

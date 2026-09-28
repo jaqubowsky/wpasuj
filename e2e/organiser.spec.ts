@@ -47,14 +47,13 @@ test("the organiser reminds and sets the time; a participant downloads it and ca
   );
 
   await organiser.getByRole("button", { name: "Więcej" }).click();
-  await expect(organiser.getByText(/Nie wysyłaj go na grupę/)).toBeVisible();
+  await expect(organiser.getByRole("dialog", { name: "Więcej" })).toBeVisible();
   await saveScreenshot(organiser, testInfo, "organiser-menu");
   await organiser.getByRole("button", { name: "Usuń ankietę" }).click();
   await saveScreenshot(organiser, testInfo, "organiser-delete-confirm");
   await organiser.getByRole("button", { name: "Nie, zostaw" }).click();
-  await organiser.getByRole("button", { name: "Więcej" }).click();
 
-  await organiser.getByRole("region", { name: "Najlepiej" }).getByRole("button", { name: "Ustal ten termin" }).click();
+  await organiser.getByRole("region", { name: "Twoja ankieta" }).getByRole("button", { name: "Ustal termin" }).click();
 
   await expect(organiser.getByRole("region", { name: "Ustalone" })).toContainText("Niedziela 27.10, 18:00");
   await saveScreenshot(organiser, testInfo, "final-time");
@@ -71,7 +70,7 @@ test("the organiser reminds and sets the time; a participant downloads it and ca
 
   expect(calendar.split("\r\n")).toEqual(expect.arrayContaining(["DTSTART:20301027T170000Z", "DTEND:20301027T190000Z"]));
 
-  await participant.getByRole("textbox", { name: "Jak masz na imię?" }).fill("Zosia");
+  await participant.getByRole("textbox", { name: "Twoje imię" }).fill("Zosia");
   const firstCell = participant.getByRole("grid", { name: "Kiedy możesz?" }).getByRole("row").nth(1).getByRole("button").nth(1);
   if (testInfo.project.use.hasTouch) await firstCell.tap();
   else await firstCell.click();
@@ -81,7 +80,7 @@ test("the organiser reminds and sets the time; a participant downloads it and ca
   await organiser.getByRole("region", { name: "Ustalone" }).getByRole("button", { name: "Zmień" }).click();
 
   await expect(organiser.getByRole("region", { name: "Ustalone" })).toHaveCount(0);
-  await expect(organiser.getByRole("region", { name: "Najlepiej" }).getByRole("button", { name: "Ustal ten termin" })).toBeVisible();
+  await expect(organiser.getByRole("button", { name: "Ustal termin" })).toBeVisible();
 });
 
 test("the organiser link restores the organiser controls on a fresh device", async ({ browser }) => {
@@ -89,13 +88,14 @@ test("the organiser link restores the organiser controls on a fresh device", asy
   const organiser = await openAsNewDevice(browser, `/e/${pollId}`, pollId);
   await openResults(organiser);
   await organiser.getByRole("button", { name: "Więcej" }).click();
-  await organiser.getByRole("button", { name: "Link organizatora" }).click();
+  await organiser.getByRole("button", { name: "Link organizatora na inny telefon" }).click();
+  await expect(organiser.getByText(/Nie wysyłaj go na grupę/)).toBeVisible();
   const organiserLink = await copied(organiser);
   expect(organiserLink).toBe(`http://localhost:3000/e/${pollId}/organizator/${organiserToken}`);
 
   const stranger = await openAsNewDevice(browser, `/e/${pollId}`);
   await openResults(stranger);
-  await expect(stranger.getByRole("region", { name: "Najlepiej" })).toBeVisible();
+  await expect(stranger.getByRole("region", { name: "Najlepiej teraz" })).toBeVisible();
   await expect(stranger.getByRole("button", { name: "Przypomnij" })).toHaveCount(0);
 
   const secondDevice = await openAsNewDevice(browser, organiserLink!);
@@ -103,7 +103,7 @@ test("the organiser link restores the organiser controls on a fresh device", asy
   await openResults(secondDevice);
 
   await expect(secondDevice.getByRole("button", { name: "Przypomnij" })).toBeVisible();
-  await expect(secondDevice.getByRole("region", { name: "Najlepiej" }).getByRole("button", { name: "Ustal ten termin" })).toBeVisible();
+  await expect(secondDevice.getByRole("button", { name: "Ustal termin" })).toBeVisible();
 });
 
 test("the organiser deletes the poll after confirming", async ({ browser }) => {

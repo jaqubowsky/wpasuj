@@ -32,14 +32,15 @@ export function seedPoll({
   return id;
 }
 
-export function seedAnswer(pollId: string, name: string, savedAt: number, cells: [string, number][]) {
+export function seedAnswer(pollId: string, name: string, savedAt: number, cells: [string, number][], token = randomBytes(32).toString("base64url")) {
   write((database) => {
     const { lastInsertRowid } = database
       .prepare(
         `insert into participants (poll_id, name, normalised_name, token_hash, created_at, updated_at) values (?, ?, ?, ?, ?, ?)`,
       )
-      .run(pollId, name, name.toLocaleLowerCase("pl"), randomBytes(32).toString("hex"), savedAt, savedAt);
+      .run(pollId, name, name.toLocaleLowerCase("pl"), createHash("sha256").update(token).digest("hex"), savedAt, savedAt);
     const slot = database.prepare("insert into slots (participant_id, date, hour) values (?, ?, ?)");
     for (const [date, hour] of cells) slot.run(lastInsertRowid, date, hour);
   });
+  return token;
 }

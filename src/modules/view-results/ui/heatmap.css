@@ -1,7 +1,0 @@
-@media (min-width: 1024px) {
-  [data-heatmap] [role="rowheader"],
-  [data-heatmap] [role="row"] > [aria-hidden] {
-    background: var(--color-surface);
-    box-shadow: calc(var(--spacing) * 1.5) 0 0 var(--color-surface);
-  }
-}
