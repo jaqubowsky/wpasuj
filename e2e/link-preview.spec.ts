@@ -23,7 +23,9 @@ test("the poll page asks the question and points og:image at its card on SITE_UR
   await expect(page).toHaveTitle("Kiedy możesz? Wędrówka: żubry i łąka");
   await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", "Kiedy możesz? Wędrówka: żubry i łąka");
   const image = await page.locator('meta[property="og:image"]').getAttribute("content");
-  expect(image).toMatch(new RegExp(`^${siteUrl}/e/${pollId}/opengraph-image(\\?|$)`));
+  const card = `${siteUrl}/e/${pollId}/opengraph-image`;
+  expect(image?.slice(0, card.length)).toBe(card);
+  expect(image?.slice(card.length)).toMatch(/^(\?|$)/);
 });
 
 test("the card is a 1200×630 PNG under 1 MB", async ({ page, request }) => {
