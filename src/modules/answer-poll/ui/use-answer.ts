@@ -8,7 +8,7 @@ import { normaliseName } from "../domain/name-rules";
 import { useAutosave } from "./use-autosave";
 
 export type Answer = { name: string; slots: Slot[] };
-export type Problem = { kind: "name-taken"; heldName: string; hours?: number } | { kind: "invalid" | "organiser-name" | "closed" | "full" | "gone" };
+type Problem = { kind: "name-taken"; heldName: string; hours?: number } | { kind: "invalid" | "organiser-name" | "closed" | "full" | "gone" };
 
 type AnswerOptions = { pollId: string; dates: string[]; hours: number[]; mine?: Answer; fixedName?: string };
 
