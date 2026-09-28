@@ -202,7 +202,7 @@ Counts on heat cells are `ink`, white only on `heat-5`. Avatars take their tint 
 
 ### Link preview
 
-A 1200×630 PNG under 1 MB, rendered by `next/og` with flexbox layout only: "{imię} pyta, kiedy możesz", the title in Bricolage 800 at display size, the dates and part of day, and a miniature of the offered grid (flex rows of tiles, empty tiles in `surface` on `paper`). No answer count, because chat apps cache the preview when the link is pasted. `og:image` is absolute, from `metadataBase` built on `SITE_URL`. Title and description state the question itself: "Kiedy możesz? {title}".
+A 1200×630 PNG under 1 MB, rendered by `next/og` with flexbox layout only, in one column: "{imię} pyta, kiedy możesz", the title in Bricolage 800 at display size, the dates and the hours in words, and a bottom row with the respondents beside the wordmark. With no respondents the row invites "Zaznacz, kiedy możesz"; from one on it shows up to six initials in their avatar tints, "+N" for the rest and "N osób już odpowiedziało". Chat apps render the preview when the link is sent, so the first paste nearly always shows the invitation and a later reminder the real count. `og:image` is absolute, from `metadataBase` built on `SITE_URL`. Title and description state the question itself: "Kiedy możesz? {title}".
 
 ## Out of scope
 
