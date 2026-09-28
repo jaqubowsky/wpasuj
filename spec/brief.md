@@ -142,7 +142,7 @@ Every failure has Polish copy that says what happened and what to do. A deleted 
 - `v2/`: static screen mockups (`create-phone.html`, `answer-phone.html`, `results-phone.html`, `results-desktop.html`, `og.html`) with screenshots under `v2/shots/`. They fix layout only; sizes, gaps, borders and colours come from this document and `tokens.json`, and their data is invented. The PNGs under `shots/` predate the 6px gap, 44px chips and `edge` borders in the HTML; the HTML wins.
 - `landing-canvas/Main.dc.html`: the marketing home page, designed in Claude Design at https://claude.ai/artifact/R1i1BZPFRXe91JjJBup4yb; built in phase 3 of `~/.sandboxes/wpasuj/plan.md`, not in this MVP.
 
-Where a mockup and this document differ, this document wins; screens without a mockup (desktop create and answer, the bottom sheet, "Ustalone", "Własne", "To ty?", errors, the empty state) are composed from the design system's parts.
+Where a mockup and this document differ, this document wins; screens without a mockup (desktop create and answer, the bottom sheet, "Ustalone", "To ty?", errors, the empty state) are composed from the design system's parts.
 
 **Type**: Bricolage Grotesque for display (titles, the best time, day numbers, the wordmark), weights 700 and 800, tight tracking (−0.01 to −0.03em); Onest for everything else, weights 400, 500 and 600, tabular figures wherever a number can change.
 
