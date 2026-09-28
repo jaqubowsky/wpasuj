@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 type Shift = { startTime: number; value: number };
 
@@ -56,9 +56,13 @@ function cumulativeLayoutShift(shifts: Shift[]) {
   return worst;
 }
 
-test("the landing holds LCP, TBT and CLS on a throttled phone, story included", async ({ page }) => {
-  const index = await page.evaluate(benchmarkIndex);
-  const slowdown = midTierMobileSlowdown(index);
+const runs = 5;
+
+function median(values: number[]) {
+  return values.toSorted((a, b) => a - b)[Math.floor(values.length / 2)];
+}
+
+async function measure(page: Page, slowdown: number) {
   const cdp = await page.context().newCDPSession(page);
   await cdp.send("Network.enable");
   await cdp.send("Network.emulateNetworkConditions", slow4g);
@@ -95,9 +99,27 @@ test("the landing holds LCP, TBT and CLS on a throttled phone, story included", 
   const tbt = longTasks
     .filter((task) => task.startTime >= firstContentfulPaint)
     .reduce((sum, task) => sum + Math.max(0, task.duration - 50), 0);
-  const cls = cumulativeLayoutShift(shifts);
-  console.log(`LCP ${Math.round(lcp.startTime)} ms on ${lcp.element}, TBT ${Math.round(tbt)} ms, CLS ${cls.toFixed(3)} with the story scrolled through (benchmark index ${Math.round(index)}, CPU ${slowdown}x)`);
-  expect.soft(lcp.startTime).toBeLessThanOrEqual(2500);
+  return { lcp: lcp.startTime, element: lcp.element, tbt, cls: cumulativeLayoutShift(shifts) };
+}
+
+test("the landing holds LCP, TBT and CLS on a throttled phone, story included", async ({ browser, page }, testInfo) => {
+  test.setTimeout(runs * 60_000);
+  const index = await page.evaluate(benchmarkIndex);
+  const slowdown = midTierMobileSlowdown(index);
+  const results = [];
+  for (let run = 1; run <= runs; run++) {
+    const context = await browser.newContext(testInfo.project.use);
+    const result = await measure(await context.newPage(), slowdown);
+    await context.close();
+    results.push(result);
+    console.log(`run ${run}: LCP ${Math.round(result.lcp)} ms on ${result.element}, TBT ${Math.round(result.tbt)} ms, CLS ${result.cls.toFixed(3)}`);
+  }
+
+  const lcp = median(results.map((result) => result.lcp));
+  const tbt = median(results.map((result) => result.tbt));
+  const cls = median(results.map((result) => result.cls));
+  console.log(`LCP ${Math.round(lcp)} ms, TBT ${Math.round(tbt)} ms, CLS ${cls.toFixed(3)}, medians of ${runs} runs with the story scrolled through (benchmark index ${Math.round(index)}, CPU ${slowdown}x)`);
+  expect.soft(lcp).toBeLessThanOrEqual(2500);
   expect.soft(tbt).toBeLessThanOrEqual(200);
   expect.soft(cls).toBeLessThanOrEqual(0.1);
 });
