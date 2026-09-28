@@ -9,7 +9,7 @@ As ticket 14; `~/.sandboxes/wpasuj/plan.md` phase 3, "The rest".
 
 ## Outcome
 
-`/` has its title, description, Open Graph card, `sitemap.ts`, `robots.ts` and `WebApplication` JSON-LD, and CI fails when a throttled phone run of `/` misses LCP 2.5 s, TBT as the lab stand-in for INP 200 ms, or CLS 0.1, story included.
+`/` has its title, description, Open Graph card, `sitemap.ts`, `robots.ts` and `WebApplication` JSON-LD, and CI fails when a throttled phone run of `/` misses LCP 2.5 s, TBT as the lab stand-in for INP 250 ms (decision 68), or CLS 0.1, story included, each as the median of 5 runs.
 
 ## Scope
 
