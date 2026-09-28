@@ -20,16 +20,9 @@ describe("bestPoll", () => {
     expect(bestPoll.count).toBe("6 osób");
   });
 
-  it("picks Saturday 19 to 22, which five of six can make, and marks its three cells", () => {
+  it("picks Saturday 19 to 22, which five of six can make, and gives its cells only their count and heat", () => {
     expect(bestPoll.best).toBe("Sobota 18.10, 19–22");
-    expect(bestPoll.rows.map((row) => row.cells.map((cell) => cell.best))).toEqual([
-      [false, false, false],
-      [false, false, false],
-      [false, true, false],
-      [false, true, false],
-      [false, true, false],
-      [false, false, false],
-    ]);
+    expect(bestPoll.rows[2].cells[1]).toEqual({ count: 5, heat: 5 });
   });
 });
 

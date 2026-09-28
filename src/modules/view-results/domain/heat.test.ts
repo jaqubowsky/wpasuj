@@ -30,17 +30,16 @@ describe("heatCellOf", () => {
     { name: "Bartek", slots: [{ date: "2030-10-19", hour: 18 }] },
     { name: "Kasia", slots: [{ date: "2030-10-19", hour: 18 }] },
   ];
-  const best = { date: "2030-10-19", firstHour: 18, lastHour: 19, free: ["Ola", "Bartek", "Kasia"] };
 
-  it("counts who is free, marks everyone and the best time", () => {
-    expect(heatCellOf(respondents, { date: "2030-10-19", hour: 18 }, best)).toEqual({ count: 3, heat: 5, everyone: true, best: true });
+  it("gives an hour everyone can make the top heat and nothing more", () => {
+    expect(heatCellOf(respondents, { date: "2030-10-19", hour: 18 })).toEqual({ count: 3, heat: 5 });
   });
 
-  it("gives an hour some can make its heat without the marks", () => {
-    expect(heatCellOf(respondents, { date: "2030-10-19", hour: 19 }, best)).toEqual({ count: 1, heat: 2, everyone: false, best: false });
+  it("gives an hour some can make its heat", () => {
+    expect(heatCellOf(respondents, { date: "2030-10-19", hour: 19 })).toEqual({ count: 1, heat: 2 });
   });
 
   it("leaves an hour nobody can make empty", () => {
-    expect(heatCellOf(respondents, { date: "2030-10-20", hour: 18 })).toEqual({ count: 0, heat: 0, everyone: false, best: false });
+    expect(heatCellOf(respondents, { date: "2030-10-20", hour: 18 })).toEqual({ count: 0, heat: 0 });
   });
 });

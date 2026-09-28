@@ -122,7 +122,7 @@ describe("a participant", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Wiadomość skopiowana. Wklej ją na grupę.");
   });
 
-  it("sees every vote read-only, the set hours marked", async () => {
+  it("sees every vote read-only, the set hours unmarked", async () => {
     renderPage(withFinal(sundayEvening));
 
     await userEvent.click(screen.getByRole("button", { name: "Zobacz wszystkie głosy" }));
@@ -130,8 +130,7 @@ describe("a participant", () => {
     const votes = screen.getByRole("dialog", { name: "Wszystkie głosy" });
     const heatmap = within(votes).getByRole("grid", { name: "Kto może" });
     expect(heatmap).not.toHaveAttribute("aria-multiselectable");
-    expect(within(heatmap).getByRole("button", { name: "nd 20, 20:00, 2 z 3 może" })).toHaveAttribute("data-best");
-    expect(within(heatmap).getByRole("button", { name: "sb 19, 18:00, 3 z 3 może" })).not.toHaveAttribute("data-best");
+    expect(within(heatmap).getByRole("button", { name: "nd 20, 20:00, 2 z 3 może" })).not.toHaveAttribute("data-best");
   });
 
   it("finds no hour left open from the votes once the time is cleared", async () => {

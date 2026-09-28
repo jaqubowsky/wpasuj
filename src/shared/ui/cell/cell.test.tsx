@@ -60,21 +60,4 @@ describe("Cell", () => {
     expect(screen.getByRole("button", { name: "sb 19:00" })).not.toHaveAttribute("data-heat");
   });
 
-  it("marks a heat cell where everyone is free and the best time", () => {
-    render(
-      <>
-        <Cell heat={5} everyone>
-          6
-        </Cell>
-        <Cell heat={5} best>
-          5
-        </Cell>
-      </>,
-    );
-
-    expect(screen.getByText("6")).toHaveAttribute("data-everyone");
-    expect(screen.getByText("6")).not.toHaveAttribute("data-best");
-    expect(screen.getByText("5")).toHaveAttribute("data-best");
-  });
-
 });

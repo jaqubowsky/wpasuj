@@ -15,9 +15,9 @@ describe("demoPoll", () => {
   it("counts four friends and the visitor in each cell", () => {
     const poll = demoPoll([{ date: "2025-10-18", hour: 19 }]);
 
-    expect(poll.cellAt({ date: "2025-10-17", hour: 20 })).toEqual({ count: 4, heat: 4, everyone: false, best: false });
-    expect(poll.cellAt({ date: "2025-10-18", hour: 19 })).toEqual({ count: 5, heat: 5, everyone: true, best: true });
-    expect(poll.cellAt({ date: "2025-10-19", hour: 21 })).toEqual({ count: 0, heat: 0, everyone: false, best: false });
+    expect(poll.cellAt({ date: "2025-10-17", hour: 20 })).toEqual({ count: 4, heat: 4 });
+    expect(poll.cellAt({ date: "2025-10-18", hour: 19 })).toEqual({ count: 5, heat: 5 });
+    expect(poll.cellAt({ date: "2025-10-19", hour: 21 })).toEqual({ count: 0, heat: 0 });
   });
 
   it("moves the best time to the hour the visitor adds", () => {
