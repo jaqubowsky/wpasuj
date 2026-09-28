@@ -6,6 +6,7 @@ import { BestNow, InviteCard, Invitation, OrganiserCard, PeoplePanel, Respondent
 import { Avatar } from "@/shared/ui/avatar/avatar";
 import { Text } from "@/shared/ui/text/text";
 import { Morph, pollTitleMorph } from "@/shared/morph";
+import { siteUrl } from "@/shared/site-url";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import Link from "next/link";
@@ -22,7 +23,7 @@ export async function generateMetadata({ params }: PageProps<"/e/[id]">): Promis
   if (!poll) return {};
   const question = `Kiedy możesz? ${poll.title}`;
   return {
-    metadataBase: new URL(process.env.SITE_URL!),
+    metadataBase: siteUrl(),
     title: question,
     description: question,
     openGraph: { title: question, description: question },
