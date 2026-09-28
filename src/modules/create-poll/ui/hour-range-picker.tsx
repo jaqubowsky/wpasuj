@@ -79,7 +79,7 @@ function HourSheet({ hours, sheet }: { hours: HourRangeState; sheet: HourSheetSt
 }
 
 function HourTiles({ hours }: { hours: HourRangeState }) {
-  const picked = hours.pickingEnd ? [] : hoursOf(hours.range).map(clockHour);
+  const picked = hoursOf(hours.range).map(clockHour);
   const edges = [picked[0], picked.at(-1)];
 
   return (

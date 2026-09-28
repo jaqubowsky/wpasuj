@@ -206,6 +206,24 @@ test("the organiser asks for 22:00 to 4:00 and a night run reads 23–1", async 
   await expect(page.getByRole("region", { name: "Najlepiej" }).getByText(/, 23–1$/)).toBeVisible();
 });
 
+test("on desktop the first tile shows as the start, and 2 then 8 runs to 9:00 the next morning", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("desktop"), "the hour tiles are the desktop picker");
+  await page.goto("/");
+  const tiles = page.getByRole("group", { name: "Godziny" });
+
+  await tiles.getByRole("button", { name: "2:00", exact: true }).click();
+
+  await expect(tiles.getByRole("button", { pressed: true })).toHaveText(["2"]);
+  await expect(tiles.getByRole("button", { name: "2:00", exact: true })).toHaveCSS("background-color", "rgb(30, 27, 24)");
+  await expect(page.getByText("Od 2:00, teraz kliknij koniec").filter({ visible: true })).toBeVisible();
+  await saveScreenshot(page, testInfo, "create-hours-start");
+
+  await tiles.getByRole("button", { name: "8:00", exact: true }).click();
+
+  await expect(tiles.getByRole("button", { pressed: true })).toHaveText(["6", "7", "8", "2", "3", "4", "5"]);
+  await expect(page.getByText("2:00 → 9:00 · 7 godzin").filter({ visible: true })).toBeVisible();
+});
+
 test("the month and the 10-day limit", async ({ page }, testInfo) => {
   await page.goto("/");
 

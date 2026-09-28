@@ -31,7 +31,7 @@ export function withEnd(range: HourRange, endHour: number): HourRange {
 }
 
 export function withTiles(firstHour: number, lastHour: number): HourRange {
-  return { firstHour, hourCount: startHours.indexOf(lastHour) - startHours.indexOf(firstHour) + 1 };
+  return { firstHour, hourCount: ((lastHour - firstHour + hoursInDay) % hoursInDay) + 1 };
 }
 
 export function rangeSummary({ firstHour, hourCount }: HourRange) {
