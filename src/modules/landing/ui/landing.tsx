@@ -1,10 +1,12 @@
 import { productName } from "@/shared/brand";
 import { Text } from "@/shared/ui/text/text";
 import type { ReactNode } from "react";
+import { headline, pitch } from "../domain/pitch";
 import { Faq } from "./faq/faq";
 import { Footer } from "./footer/footer";
 import { GoToFormButton } from "./go-to-form-button";
 import { LazyDemo, LazyStory } from "./lazy-sections";
+import { WebApplicationJsonLd } from "./web-application-json-ld";
 
 const formId = "utworz";
 
@@ -26,9 +28,10 @@ const reasons = [
   },
 ];
 
-export function Landing({ hero }: { hero: ReactNode }) {
+export function Landing({ hero, home }: { hero: ReactNode; home: URL }) {
   return (
     <>
+      <WebApplicationJsonLd home={home} />
       <header className="sticky top-0 z-1 box-border flex h-18 items-center justify-between bg-paper px-5 lg:px-12">
         <div className="flex items-center gap-2.5">
           <span aria-hidden className="grid grid-cols-[repeat(2,--spacing(2))] gap-0.5">
@@ -49,10 +52,10 @@ export function Landing({ hero }: { hero: ReactNode }) {
           <div className="flex flex-col gap-3">
             <span className="text-sm font-semibold text-accent-ink">{productName}</span>
             <h1 id="hero-heading" className="m-0 font-display font-extrabold tracking-tightest text-balance text-4xl lg:text-7xl">
-              Kiedy się widzimy? Ustalcie to w minutę.
+              {headline}
             </h1>
             <p className="m-0 max-w-150 text-lg text-muted lg:text-xl">
-              Wrzucasz jeden link na grupę, każdy klika godziny, kiedy może. Najlepszy termin wyskakuje sam.
+              {pitch}
             </p>
           </div>
           <div id={formId} className="scroll-mt-18">

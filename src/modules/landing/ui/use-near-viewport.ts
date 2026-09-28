@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-export function useNearViewport() {
+export function useNearViewport(rootMargin: string) {
   const ref = useRef<HTMLDivElement>(null);
   const [near, setNear] = useState(false);
 
@@ -11,11 +11,11 @@ export function useNearViewport() {
         setNear(true);
         observer.disconnect();
       },
-      { rootMargin: "50% 0px" },
+      { rootMargin },
     );
     observer.observe(ref.current!);
     return () => observer.disconnect();
-  }, []);
+  }, [rootMargin]);
 
   return { ref, near };
 }

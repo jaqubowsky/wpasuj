@@ -17,16 +17,19 @@ import { PollGone } from "./poll-gone";
 import { PollTabs } from "./poll-tabs";
 import { ZoneNote } from "./zone-note";
 
+const unlisted = { index: false, follow: false };
+
 export async function generateMetadata({ params }: PageProps<"/e/[id]">): Promise<Metadata> {
   const { id } = await params;
   const poll = findPoll(id, new Date());
-  if (!poll) return {};
+  if (!poll) return { robots: unlisted };
   const question = `Kiedy możesz? ${poll.title}`;
   return {
     metadataBase: siteUrl(),
     title: question,
     description: question,
     openGraph: { title: question, description: question },
+    robots: unlisted,
   };
 }
 

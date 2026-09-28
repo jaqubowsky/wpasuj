@@ -12,7 +12,8 @@
     "knip": "KNIP_DISABLE_RAW_TRANSFER=1 knip",
     "e2e": "playwright test",
     "db:generate": "drizzle-kit generate",
-    "prepare": "husky"
+    "prepare": "husky",
+    "perf": "playwright test -c playwright.perf.config.ts"
   },
   "dependencies": {
     "@tanstack/react-query": "5.103.1",

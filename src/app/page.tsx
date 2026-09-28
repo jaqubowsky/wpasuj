@@ -1,6 +1,15 @@
 import { CreatePollForm } from "@/modules/create-poll/client";
-import { Landing } from "@/modules/landing";
+import { Landing, landingMetadata } from "@/modules/landing";
+import { siteUrl } from "@/shared/site-url";
+import type { Metadata } from "next";
+import { connection } from "next/server";
 
-export default function HomePage() {
-  return <Landing hero={<CreatePollForm />} />;
+export async function generateMetadata(): Promise<Metadata> {
+  await connection();
+  return landingMetadata(siteUrl());
+}
+
+export default async function HomePage() {
+  await connection();
+  return <Landing hero={<CreatePollForm />} home={new URL("/", siteUrl())} />;
 }

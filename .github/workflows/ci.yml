@@ -28,6 +28,24 @@ jobs:
           name: screenshots
           path: e2e/screenshots/
           if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: ${{ failure() }}
+        with:
+          name: test-results
+          path: test-results/
+
+  perf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run perf
 
   docker:
     runs-on: ubuntu-latest

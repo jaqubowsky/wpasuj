@@ -91,3 +91,12 @@ test("a 60-character title with ten dates leaves the wordmark untouched", async 
   expect(new Set(wordmark.match(/\d+,\d+,\d+,\d+/g)).size).toBeGreaterThan(1);
   expect(await pixelsIn(page, longCard)).toBe(wordmark);
 });
+
+test("the poll page asks search engines not to index or follow it, while robots.txt lets them read that", async ({ page, request }) => {
+  const pollId = seedPoll({ dates: ["2030-10-18"], firstHour: 17, hourCount: 6, title: "Kino u Oli" });
+
+  await page.goto(`/e/${pollId}`);
+
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, nofollow");
+  expect(await (await request.get("/robots.txt")).text()).not.toContain("Disallow: /e/");
+});

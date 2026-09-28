@@ -1,33 +1,21 @@
 import { productName } from "@/shared/brand";
+import { accent, edge, ink, muted, ogCardSize, ogFont, paper, surface } from "@/shared/og-card";
 import { ImageResponse } from "next/og";
-import { readFile } from "node:fs/promises";
-import { join } from "node:path";
 import { linkPreview, miniGrid } from "../domain/link-preview";
 
 type PreviewedPoll = Parameters<typeof linkPreview>[0];
 
-export const linkPreviewSize = { width: 1200, height: 630 };
-
-const paper = "#FBF7F1";
-const surface = "#FFFFFF";
-const ink = "#1E1B18";
-const muted = "#72695F";
-const edge = "#958A7E";
-const accent = "#F0603F";
+export const linkPreviewSize = ogCardSize;
 
 const gridBox = { width: 360, height: 502 };
-
-function font(file: string) {
-  return readFile(join(process.cwd(), "src/shared/fonts", file));
-}
 
 export async function linkPreviewImage(poll: PreviewedPoll) {
   const { asker, title, when } = linkPreview(poll);
   const { tileWidth, tileHeight, gap, radius } = miniGrid(poll.dates.length, poll.hourCount, gridBox);
   const [display, sans500, sans600] = await Promise.all([
-    font("bricolage-grotesque-800.ttf"),
-    font("onest-500.ttf"),
-    font("onest-600.ttf"),
+    ogFont("bricolage-grotesque-800.ttf"),
+    ogFont("onest-500.ttf"),
+    ogFont("onest-600.ttf"),
   ]);
 
   return new ImageResponse(

@@ -91,7 +91,7 @@ const eslintConfig = defineConfig([
     },
   },
   {
-    files: ["src/modules/view-results/server/link-preview-image.tsx"],
+    files: ["src/modules/view-results/server/link-preview-image.tsx", "src/modules/landing/server/landing-card-image.tsx", "src/app/apple-icon.tsx"],
     rules: { "shadcn/no-inline-styles": "off" },
   },
   {
