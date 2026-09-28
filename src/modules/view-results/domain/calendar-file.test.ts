@@ -79,4 +79,11 @@ describe("calendarFile", () => {
     expect(lines).toContain("SUMMARY:Kino\\\\sala\\nDTSTART:20000101T000000Z");
     expect(lines.filter((line) => line.startsWith("DTSTART"))).toHaveLength(1);
   });
+
+  it("keeps a lone carriage return in the title inside the summary", () => {
+    const title = "Kino\rURL:https://evil.example";
+    const file = calendarFile({ ...poll, title, final: { date: "2026-10-24", firstHour: 19, lastHour: 22 } }, now);
+
+    expect(file.split(/\r\n|\r|\n/)).toContain("SUMMARY:Kino\\nURL:https://evil.example");
+  });
 });
