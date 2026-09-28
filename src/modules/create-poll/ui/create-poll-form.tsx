@@ -70,7 +70,11 @@ export function CreatePollForm() {
         <Button type="submit" variant="primary" block aria-busy={status === "creating"}>
           {status === "creating" ? (
             <span className="inline-flex items-center gap-2" data-create-pending>
-              <span className="box-border size-4 rounded-pill border-2 border-solid border-surface/35 border-t-surface" aria-hidden="true" data-create-spinner />
+              <span
+                className="box-border size-4 rounded-pill border-2 border-solid border-surface/35 border-t-surface"
+                aria-hidden="true"
+                data-create-spinner
+              />
               Tworzę ankietę…
             </span>
           ) : (

@@ -12,6 +12,7 @@ const gridBox = { width: 360, height: 502 };
 export async function linkPreviewImage(poll: PreviewedPoll) {
   const { asker, title, when } = linkPreview(poll);
   const { tileWidth, tileHeight, gap, radius } = miniGrid(poll.dates.length, poll.hourCount, gridBox);
+
   const [display, sans500, sans600] = await Promise.all([
     ogFont("bricolage-grotesque-800.ttf"),
     ogFont("onest-500.ttf"),

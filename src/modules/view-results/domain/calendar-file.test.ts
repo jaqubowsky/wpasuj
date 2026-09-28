@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { calendarFile } from "./calendar-file";
 
-const poll = { id: "abcdefghij", site: "wpasuj.example", link: "https://wpasuj.example/e/abcdefghij", title: "Planszówki, u Michała", timeZone: "Europe/Warsaw" };
+const poll = {
+  id: "abcdefghij",
+  site: "wpasuj.example",
+  link: "https://wpasuj.example/e/abcdefghij",
+  title: "Planszówki, u Michała",
+  timeZone: "Europe/Warsaw",
+};
+
 const now = new Date("2026-10-20T12:00:00Z");
 
 function linesOf(file: string) {

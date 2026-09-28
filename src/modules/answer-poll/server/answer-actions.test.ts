@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 let cookieJar = fakeCookies();
 let requestHeaders = new Headers();
+
 vi.mock("next/headers", () => ({ cookies: async () => cookieJar, headers: async () => requestHeaders }));
 
 const thursdayNoonInWarsaw = new Date("2026-10-15T10:00:00Z");
@@ -20,6 +21,7 @@ async function actions() {
 
 async function myAnswer() {
   const { findMyAnswer } = await import("./answer-queries");
+
   return findMyAnswer(pollId);
 }
 
@@ -40,6 +42,7 @@ beforeEach(async () => {
   vi.useFakeTimers({ toFake: ["Date"] });
   vi.setSystemTime(thursdayNoonInWarsaw);
   db = await openTestDatabase();
+
   db.insert(polls)
     .values({
       id: pollId,
@@ -111,6 +114,7 @@ describe("saveAnswer", () => {
 
   it("saves an empty set for someone who can't make any time", async () => {
     const { saveAnswer } = await actions();
+
     await saveAnswer(pollId, { name: "Ola", slots: [friday19] });
 
     const result = await saveAnswer(pollId, { name: "Ola", slots: [] });
@@ -121,6 +125,7 @@ describe("saveAnswer", () => {
 
   it("replaces the slots and renames the row on later saves", async () => {
     const { saveAnswer } = await actions();
+
     await saveAnswer(pollId, { name: "Ola", slots: [friday19, friday20] });
 
     await saveAnswer(pollId, { name: "Ola Nowak", slots: [saturday17] });
@@ -152,6 +157,7 @@ describe("saveAnswer", () => {
 
   it("tells a newcomer that a name already in the poll is taken, ignoring case", async () => {
     const { saveAnswer } = await actions();
+
     await saveAnswer(pollId, { name: "Łucja", slots: [friday19] });
     onAnotherDevice();
 
@@ -163,6 +169,7 @@ describe("saveAnswer", () => {
 
   it("refuses a rename onto someone else's name", async () => {
     const { saveAnswer } = await actions();
+
     await saveAnswer(pollId, { name: "Ola", slots: [] });
     onAnotherDevice();
     await saveAnswer(pollId, { name: "Bartek", slots: [friday19] });
@@ -175,8 +182,10 @@ describe("saveAnswer", () => {
 
   it("says not-yours and forgets the device once another device took its row over", async () => {
     const { saveAnswer, claimName } = await actions();
+
     await saveAnswer(pollId, { name: "Ola", slots: [friday19] });
     const firstDevice = cookieJar;
+
     onAnotherDevice();
     await claimName(pollId, "Ola");
     cookieJar = firstDevice;
@@ -197,6 +206,7 @@ describe("saveAnswer", () => {
 
   it("refuses answers once the final time is set", async () => {
     const { saveAnswer } = await actions();
+
     db.update(polls).set({ finalDate: "2026-10-16", finalFirstHour: 19, finalLastHour: 22 }).where(eq(polls.id, pollId)).run();
 
     expect(await saveAnswer(pollId, { name: "Ola", slots: [friday19] })).toEqual({ ok: false, reason: "closed" });
@@ -204,10 +214,12 @@ describe("saveAnswer", () => {
 
   it("refuses a 31st participant", async () => {
     const { saveAnswer } = await actions();
+
     for (let friend = 1; friend <= 30; friend++) {
       onAnotherDevice();
       await saveAnswer(pollId, { name: `Osoba ${friend}`, slots: [] });
     }
+
     onAnotherDevice();
 
     expect(await saveAnswer(pollId, { name: "Ola", slots: [friday19] })).toEqual({ ok: false, reason: "full" });
@@ -226,6 +238,7 @@ describe("saveAnswer", () => {
 describe("claimName", () => {
   it("moves the row to this device and hands back its slots", async () => {
     const { saveAnswer, claimName } = await actions();
+
     await saveAnswer(pollId, { name: "Ola", slots: [friday19] });
     onAnotherDevice();
 
@@ -237,6 +250,7 @@ describe("claimName", () => {
 
   it("retires the row this device held, so one person never counts twice", async () => {
     const { saveAnswer, claimName } = await actions();
+
     await saveAnswer(pollId, { name: "Ola", slots: [friday19] });
     onAnotherDevice();
     await saveAnswer(pollId, { name: "O", slots: [saturday17] });
@@ -248,6 +262,7 @@ describe("claimName", () => {
 
   it("folds the hours this device answered into the claimed row", async () => {
     const { saveAnswer, claimName } = await actions();
+
     await saveAnswer(pollId, { name: "Ola", slots: [friday19, saturday17] });
     onAnotherDevice();
     await saveAnswer(pollId, { name: "Bartek", slots: [friday19, friday20] });
@@ -260,9 +275,11 @@ describe("claimName", () => {
 
   it("refuses the organiser's name and changes no row", async () => {
     const { saveAnswer, claimName } = await actions();
+
     onOrganiserDevice();
     await saveAnswer(pollId, { name: "Kuba", slots: [friday19] });
     const rowsBefore = db.select().from(participants).all();
+
     onAnotherDevice();
 
     const result = await claimName(pollId, " kuba ");
@@ -274,6 +291,7 @@ describe("claimName", () => {
 
   it("lets the organiser move their own row to a second device", async () => {
     const { saveAnswer, claimName } = await actions();
+
     onOrganiserDevice();
     await saveAnswer(pollId, { name: "Kuba", slots: [friday19] });
     onOrganiserDevice();
@@ -289,6 +307,7 @@ describe("claimName", () => {
 
   it("refuses once the final time is set, and for a gone poll", async () => {
     const { saveAnswer, claimName } = await actions();
+
     await saveAnswer(pollId, { name: "Ola", slots: [] });
     onAnotherDevice();
     db.update(polls).set({ finalDate: "2026-10-16", finalFirstHour: 19, finalLastHour: 22 }).where(eq(polls.id, pollId)).run();

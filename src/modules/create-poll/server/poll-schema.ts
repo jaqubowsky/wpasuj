@@ -4,6 +4,7 @@ import { maxDates } from "../domain/date-presets";
 function isTimeZone(zone: string) {
   try {
     new Intl.DateTimeFormat("en", { timeZone: zone });
+
     return true;
   } catch {
     return false;

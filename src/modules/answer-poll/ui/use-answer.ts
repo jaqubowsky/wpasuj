@@ -8,7 +8,9 @@ import { normaliseName } from "../domain/name-rules";
 import { useAutosave } from "./use-autosave";
 
 export type Answer = { name: string; slots: Slot[] };
-type Problem = { kind: "name-taken"; heldName: string; hours?: number; yours?: { name: string; hours: number } } | { kind: "invalid" | "organiser-name" | "closed" | "full" | "gone" };
+type Problem =
+  | { kind: "name-taken"; heldName: string; hours?: number; yours?: { name: string; hours: number } }
+  | { kind: "invalid" | "organiser-name" | "closed" | "full" | "gone" };
 
 type AnswerOptions = { pollId: string; dates: string[]; hours: number[]; mine?: Answer; fixedName?: string };
 
@@ -22,6 +24,7 @@ function slotsOf(keys: Set<string>): Slot[] {
   return [...keys]
     .map((key) => {
       const [date, hour] = key.split(" ");
+
       return { date, hour: Number(hour) };
     })
     .sort((a, b) => a.date.localeCompare(b.date) || a.hour - b.hour);
@@ -58,22 +61,28 @@ export function useAnswer({ pollId, dates, hours, mine, fixedName }: AnswerOptio
 
   async function send(answer: Answer) {
     let result = await saveAnswer(pollId, answer);
+
     if (!result.ok && result.reason === "not-yours") {
       setHoldsRow(false);
       result = await saveAnswer(pollId, answer);
     }
+
     if (result.ok) {
       setHoldsRow(true);
       setProblem(undefined);
       rememberName(normaliseName(answer.name));
+
       return true;
     }
+
     switch (result.reason) {
       case "name-taken":
         setProblem({ kind: "name-taken", heldName: result.name, hours: result.hours, yours: result.yours });
+
         return false;
       case "not-yours":
         setProblem({ kind: "name-taken", heldName: normaliseName(answer.name) });
+
         return false;
       case "invalid":
       case "organiser-name":
@@ -81,6 +90,7 @@ export function useAnswer({ pollId, dates, hours, mine, fixedName }: AnswerOptio
       case "full":
       case "gone":
         setProblem({ kind: result.reason });
+
         return false;
     }
   }
@@ -104,22 +114,27 @@ export function useAnswer({ pollId, dates, hours, mine, fixedName }: AnswerOptio
 
   function paint(cells: GridCell[], add: boolean) {
     const next = new Set(slotsRef.current);
+
     for (const cell of cells) {
       if (add) next.add(keyOf(cell));
       else next.delete(keyOf(cell));
     }
+
     replaceSlots(next);
   }
 
   function cantMakeAny() {
     const before = slotsRef.current;
+
     replaceSlots(new Set());
     setBeforeCant(before);
     setCantTurnedOff(false);
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
     const order = [...before].sort(inReadingOrder);
     const showFrom = (index: number) => setMySlots(new Set(order.slice(index)));
     const step = clearingStepMs(order.length);
+
     showFrom(1);
     clearing.current = order.slice(1).map((_, index) => setTimeout(() => showFrom(index + 2), (index + 1) * step));
   }
@@ -159,13 +174,17 @@ export function useAnswer({ pollId, dates, hours, mine, fixedName }: AnswerOptio
     retry: autosave.retry,
     async claim(heldName: string) {
       const result = await claimName(pollId, heldName);
+
       if (result.ok) {
         setProblem(undefined);
         setTypedName(result.name);
         replaceSlots(new Set([...slotsRef.current, ...result.slots.map(keyOf)]), result.name);
+
         return;
       }
+
       const next = afterRefusedClaim(result.reason);
+
       setProblem(next === "save-as-newcomer" ? undefined : next);
       if (next === "save-as-newcomer") autosave.retry();
     },

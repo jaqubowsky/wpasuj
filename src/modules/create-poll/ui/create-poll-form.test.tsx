@@ -5,9 +5,11 @@ import { isFreshPoll } from "@/shared/fresh-poll";
 import { CreatePollForm } from "./create-poll-form";
 
 const push = vi.fn();
+
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
 
 const createPoll = vi.fn();
+
 vi.mock("../server/create-poll-action", () => ({ createPoll: (input: unknown) => createPoll(input) }));
 
 const thursdayMorning = new Date(2026, 9, 15, 9);
@@ -103,6 +105,7 @@ describe("O której?", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Od 17:00" }));
     const sheet = screen.getByRole("dialog", { name: "O której?" });
+
     await userEvent.click(within(within(sheet).getByRole("group", { name: "Od" })).getByRole("button", { name: "22:00" }));
     await userEvent.click(within(within(sheet).getByRole("group", { name: "Do" })).getByRole("button", { name: "4:00" }));
 
@@ -142,10 +145,21 @@ describe("O której?", () => {
 
     await userEvent.click(within(tiles).getByRole("button", { name: "22:00" }));
     expect(screen.getByText("Od 22:00, teraz kliknij koniec")).toBeInTheDocument();
-    expect(within(tiles).getAllByRole("button", { pressed: true }).map((tile) => tile.textContent)).toEqual(["22"]);
+
+    expect(
+      within(tiles)
+        .getAllByRole("button", { pressed: true })
+        .map((tile) => tile.textContent),
+    ).toEqual(["22"]);
+
     await userEvent.click(within(tiles).getByRole("button", { name: "3:00" }));
 
-    expect(within(tiles).getAllByRole("button", { pressed: true }).map((tile) => tile.textContent)).toEqual(["22", "23", "0", "1", "2", "3"]);
+    expect(
+      within(tiles)
+        .getAllByRole("button", { pressed: true })
+        .map((tile) => tile.textContent),
+    ).toEqual(["22", "23", "0", "1", "2", "3"]);
+
     expect(screen.getAllByText("22:00 → 4:00 · 6 godzin")).not.toHaveLength(0);
   });
 
@@ -156,7 +170,12 @@ describe("O której?", () => {
     await userEvent.click(within(tiles).getByRole("button", { name: "2:00" }));
     await userEvent.click(within(tiles).getByRole("button", { name: "8:00" }));
 
-    expect(within(tiles).getAllByRole("button", { pressed: true }).map((tile) => tile.textContent)).toEqual(["6", "7", "8", "2", "3", "4", "5"]);
+    expect(
+      within(tiles)
+        .getAllByRole("button", { pressed: true })
+        .map((tile) => tile.textContent),
+    ).toEqual(["6", "7", "8", "2", "3", "4", "5"]);
+
     expect(screen.getAllByText("2:00 → 9:00 · 7 godzin")).not.toHaveLength(0);
   });
 });
@@ -175,6 +194,7 @@ describe("Utwórz i wyślij na grupę", () => {
 
   it("creates the poll and lands on it marked as fresh, without opening the share sheet", async () => {
     const share = vi.fn(async () => {});
+
     stubShareSheet(share);
     createPoll.mockResolvedValue({ ok: true, id: "abcdefghij" });
     render(<CreatePollForm />);
@@ -194,6 +214,7 @@ describe("Utwórz i wyślij na grupę", () => {
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       organiserName: "Kuba",
     });
+
     expect(push).toHaveBeenCalledWith("/e/abcdefghij");
     expect(share).not.toHaveBeenCalled();
     expect(isFreshPoll("abcdefghij")).toBe(true);
@@ -207,6 +228,7 @@ describe("Utwórz i wyślij na grupę", () => {
     fireEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
 
     const pending = screen.getByRole("button", { name: "Tworzę ankietę…" });
+
     expect(pending).toHaveAttribute("aria-busy", "true");
     fireEvent.click(pending);
     expect(createPoll).toHaveBeenCalledTimes(1);
@@ -215,6 +237,7 @@ describe("Utwórz i wyślij na grupę", () => {
   it("prefills the name used last on this device", async () => {
     createPoll.mockResolvedValue({ ok: true, id: "abcdefghij" });
     const { unmount } = render(<CreatePollForm />);
+
     await fillIn("Jutro");
     await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
     unmount();

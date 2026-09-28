@@ -21,6 +21,7 @@ export function PollTabs({ opening, leads, bodies }: PollTabsProps) {
 
   function show(next: View) {
     if (next === "Moje") forgetTappedHour();
+
     setView(next);
   }
 

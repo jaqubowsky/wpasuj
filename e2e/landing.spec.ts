@@ -12,6 +12,7 @@ test("the create form is in the first viewport and creates a poll", async ({ pag
   await page.addInitScript(() => {
     Object.defineProperty(navigator, "share", { configurable: true, value: async () => {} });
   });
+
   await page.goto("/");
 
   await expect(page.getByRole("heading", { level: 1, name: "Kiedy się widzimy? Ustalcie to w minutę." })).toBeInViewport();
@@ -32,13 +33,17 @@ test("the hero opens with the product name above the headline", async ({ page })
   const hero = page.getByRole("region", { name: "Kiedy się widzimy? Ustalcie to w minutę." });
   const kicker = await hero.getByText("Wpasuj", { exact: true }).boundingBox();
   const headline = await hero.getByRole("heading", { level: 1 }).boundingBox();
+
   expect(kicker!.y + kicker!.height).toBeLessThanOrEqual(headline!.y);
 });
 
 test("the questions sit between the reasons and the final call", async ({ page }) => {
   await page.goto("/");
 
-  const order = await page.locator("main > section").evaluateAll((sections) => sections.map((section) => section.getAttribute("aria-labelledby")));
+  const order = await page
+    .locator("main > section")
+    .evaluateAll((sections) => sections.map((section) => section.getAttribute("aria-labelledby")));
+
   expect(order).toEqual(["hero-heading", "reasons-heading", "faq-heading", "end-heading"]);
 });
 
@@ -71,12 +76,15 @@ test("the story and the demo load after the form is interactive", async ({ page,
   const lateChunks: string[] = [];
   let releaseLateChunks!: () => void;
   const lateChunksReleased = new Promise<void>((resolve) => (releaseLateChunks = resolve));
+
   await page.route("**/_next/static/chunks/**/*.js", async (route) => {
     const path = new URL(route.request().url()).pathname;
+
     if (!initialChunks.has(path)) {
       lateChunks.push(path);
       await lateChunksReleased;
     }
+
     await route.continue();
   });
 
@@ -90,10 +98,13 @@ test("the story and the demo load after the form is interactive", async ({ page,
   await demoSlot(page).scrollIntoViewIfNeeded();
 
   await expect(page.getByRole("region", { name: "Wypróbuj na żywo" })).toBeAttached();
+
   const chunksHolding = async (chunks: Iterable<string>, marker: string) => {
     const bodies = await Promise.all([...chunks].map(async (chunk) => [chunk, await (await request.get(chunk)).text()] as const));
+
     return bodies.filter(([, body]) => body.includes(marker)).map(([chunk]) => chunk);
   };
+
   for (const marker of [storyChunkMarker, demoChunkMarker]) {
     expect(await chunksHolding(initialChunks, marker)).toEqual([]);
     expect(await chunksHolding(lateChunks, marker)).toHaveLength(1);
@@ -103,6 +114,7 @@ test("the story and the demo load after the form is interactive", async ({ page,
 test("the demo loads only once the reader nears it", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("desktop"), "on the phone the hero keeps both far below");
   const demo = page.getByRole("region", { name: "Wypróbuj na żywo" });
+
   await page.goto("/");
   await expect(page.getByRole("region", { name: "Jak to działa" })).toBeAttached();
   await page.waitForLoadState("networkidle");
@@ -116,6 +128,7 @@ test("the demo loads only once the reader nears it", async ({ page }, testInfo) 
 test("on the phone the create bar stays whole as it leaves with the form", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("phone"), "the bar sticks only on the phone");
   const createButton = page.getByRole("button", { name: "Utwórz i wyślij na grupę" });
+
   await page.goto("/");
 
   await page.locator("form").evaluate((form) => window.scrollBy(0, form.getBoundingClientRect().bottom - (window.innerHeight - 30)));
@@ -124,6 +137,7 @@ test("on the phone the create bar stays whole as it leaves with the form", async
   await page.goto("/#jak-to-dziala");
   const story = (await page.getByRole("region", { name: "Jak to działa" }).boundingBox())!;
   const button = (await createButton.boundingBox())!;
+
   expect(button.y + button.height).toBeLessThanOrEqual(story.y);
 });
 
@@ -132,11 +146,13 @@ test("the demo's best time follows a tap and a drag", async ({ page, browserName
   await demoSlot(page).scrollIntoViewIfNeeded();
   await demo(page).scrollIntoViewIfNeeded();
   const bestTime = demo(page).getByRole("status", { name: "Najlepiej" });
+
   await expect(bestTime).toContainText("Sobota 18.10, 19–21");
   await expect(bestTime).toContainText("4 z 5 może");
   await expect(bestTime).toContainText("Nie może: Ty");
 
   const saturday19 = demoCell(page, "sb 18, 19:00");
+
   if (isMobile) await saturday19.tap();
   else await saturday19.click();
 
@@ -147,6 +163,7 @@ test("the demo's best time follows a tap and a drag", async ({ page, browserName
   await demo(page).getByRole("button", { name: "Wyczyść moje godziny" }).click();
   await expect(bestTime).toContainText("Nie może: Ty");
   const drag = browserName === "chromium" && isMobile ? touchDrag : mouseDrag;
+
   await demoCell(page, "pt 17, 19:00").scrollIntoViewIfNeeded();
   await drag(page, await centreOf(demoCell(page, "pt 17, 19:00")), await centreOf(demoCell(page, "pt 17, 20:00")));
 
@@ -174,6 +191,7 @@ const questions = [
   "Ile to kosztuje?",
   "Co się dzieje z danymi?",
 ];
+
 const faq = (page: Page) => page.getByRole("region", { name: "Pytania" });
 const answerOf = (page: Page, question: string) => faq(page).locator("details", { hasText: question }).locator("p");
 
@@ -226,12 +244,15 @@ test.describe("with reduced motion", () => {
       await page.evaluate((share) => window.scrollTo(0, document.documentElement.scrollHeight * share), y);
       expect(await page.evaluate(() => document.getAnimations().length)).toBe(0);
     }
-    const moved = await page.evaluate(() =>
-      [...document.querySelectorAll("body *")].filter((element) => getComputedStyle(element).transform !== "none").length,
+
+    const moved = await page.evaluate(
+      () => [...document.querySelectorAll("body *")].filter((element) => getComputedStyle(element).transform !== "none").length,
     );
+
     expect(moved).toBe(0);
 
     await saveScreenshot(page, testInfo, "landing");
+
     for (const [name, section] of [
       ["hero", page.getByRole("region", { name: "Kiedy się widzimy? Ustalcie to w minutę." })],
       ["demo", demo(page)],
@@ -260,5 +281,9 @@ test("the questions reveal with the scroll where motion is allowed", async ({ pa
 
   await faq(page).scrollIntoViewIfNeeded();
 
-  expect(await faq(page).getByRole("heading", { name: "Pytania" }).evaluate((heading) => heading.getAnimations().length)).toBeGreaterThan(0);
+  expect(
+    await faq(page)
+      .getByRole("heading", { name: "Pytania" })
+      .evaluate((heading) => heading.getAnimations().length),
+  ).toBeGreaterThan(0);
 });

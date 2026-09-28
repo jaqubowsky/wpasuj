@@ -4,12 +4,14 @@ import { useAutosave } from "./use-autosave";
 
 function deferredSends() {
   const pending: { value: string; settle: (saved: boolean) => void }[] = [];
+
   const send = vi.fn(
     (value: string) =>
       new Promise<boolean>((resolve) => {
         pending.push({ value, settle: resolve });
       }),
   );
+
   return { send, pending };
 }
 
@@ -61,6 +63,7 @@ describe("useAutosave", () => {
   it("keeps one save in flight and sends the newest pending set after it", async () => {
     const sends = deferredSends();
     const { result } = renderHook(() => useAutosave(sends.send));
+
     act(() => result.current.schedule("a"));
     await wait(500);
 
@@ -81,6 +84,7 @@ describe("useAutosave", () => {
   it("still says saving when a save lands while a newer stroke waits", async () => {
     const sends = deferredSends();
     const { result } = renderHook(() => useAutosave(sends.send));
+
     act(() => result.current.schedule("a"));
     await wait(500);
     act(() => result.current.schedule("b"));
@@ -93,6 +97,7 @@ describe("useAutosave", () => {
   it("stays failed until a retry succeeds", async () => {
     const sends = deferredSends();
     const { result } = renderHook(() => useAutosave(sends.send));
+
     act(() => result.current.schedule("a"));
     await wait(500);
 
@@ -110,6 +115,7 @@ describe("useAutosave", () => {
   it("says saving at once on a retry, and a second tap while it runs sends nothing more", async () => {
     const sends = deferredSends();
     const { result } = renderHook(() => useAutosave(sends.send));
+
     act(() => result.current.schedule("a"));
     await wait(500);
     await settle(sends, 0, false);
@@ -127,6 +133,7 @@ describe("useAutosave", () => {
   it("says saving on a retry tapped while a newer set is already on its way", async () => {
     const sends = deferredSends();
     const { result } = renderHook(() => useAutosave(sends.send));
+
     act(() => result.current.schedule("a"));
     await wait(500);
     await settle(sends, 0, false);
@@ -144,6 +151,7 @@ describe("useAutosave", () => {
   it("keeps saying failed through new strokes until a save succeeds", async () => {
     const sends = deferredSends();
     const { result } = renderHook(() => useAutosave(sends.send));
+
     act(() => result.current.schedule("a"));
     await wait(500);
     await settle(sends, 0, false);
@@ -161,6 +169,7 @@ describe("useAutosave", () => {
   it("sends a pending set at once when the page is hidden", async () => {
     const sends = deferredSends();
     const { result } = renderHook(() => useAutosave(sends.send));
+
     act(() => result.current.schedule("a"));
     vi.spyOn(document, "visibilityState", "get").mockReturnValue("hidden");
 
@@ -174,6 +183,7 @@ describe("useAutosave", () => {
   it("leaves a visible page's pending set to its quiet time", async () => {
     const sends = deferredSends();
     const { result } = renderHook(() => useAutosave(sends.send));
+
     act(() => result.current.schedule("a"));
 
     act(() => {
@@ -186,6 +196,7 @@ describe("useAutosave", () => {
   it("sends a pending set at once when the page is left", async () => {
     const sends = deferredSends();
     const { result } = renderHook(() => useAutosave(sends.send));
+
     act(() => result.current.schedule("a"));
 
     act(() => {
@@ -198,6 +209,7 @@ describe("useAutosave", () => {
   it("sends a pending set at once when it unmounts", async () => {
     const sends = deferredSends();
     const { result, unmount } = renderHook(() => useAutosave(sends.send));
+
     act(() => result.current.schedule("a"));
 
     unmount();
@@ -209,6 +221,7 @@ describe("useAutosave", () => {
     const send = vi.fn(async () => {
       throw new TypeError("Failed to fetch");
     });
+
     const { result } = renderHook(() => useAutosave(send));
 
     act(() => result.current.schedule("a"));

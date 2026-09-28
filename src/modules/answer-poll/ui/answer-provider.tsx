@@ -13,6 +13,8 @@ export function AnswerProvider({ children, ...options }: AnswerProviderProps) {
 
 export function useAnswerContext() {
   const answer = use(AnswerContext);
+
   if (!answer) throw new Error("AnswerLead, AnswerStatus and AnswerBody render inside AnswerProvider");
+
   return answer;
 }

@@ -8,7 +8,9 @@ export function useBumpOnRise<Element extends HTMLElement>(count: number) {
 
   useEffect(() => {
     const rose = count > shown.current;
+
     shown.current = count;
+
     if (rose && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
       ref.current?.animate(bump, { duration: 180, easing: "cubic-bezier(0.2, 0.8, 0.2, 1)" });
     }

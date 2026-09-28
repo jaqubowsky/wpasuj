@@ -8,15 +8,25 @@ const ink = "rgb(30, 27, 24)";
 const styleOf = (locator: Locator) =>
   locator.evaluate((element) => {
     const style = getComputedStyle(element);
-    return { fontFamily: style.fontFamily, fontSize: style.fontSize, fontWeight: style.fontWeight, boxShadow: style.boxShadow, transform: style.transform };
+
+    return {
+      fontFamily: style.fontFamily,
+      fontSize: style.fontSize,
+      fontWeight: style.fontWeight,
+      boxShadow: style.boxShadow,
+      transform: style.transform,
+    };
   });
 
 async function expectTargetsAtLeast44(page: Page) {
   const targets = page.locator("button:visible, [role=tab]:visible");
+
   await expect(targets.first()).toBeVisible();
+
   for (const target of await targets.all()) {
     const box = await target.boundingBox();
     const html = await target.evaluate((element) => element.outerHTML);
+
     expect(box?.height, html).toBeGreaterThanOrEqual(44);
     expect(box?.width, html).toBeGreaterThanOrEqual(44);
   }
@@ -39,6 +49,7 @@ test("every button, chip and tab is at least 44px tall and wide", async ({ page 
 
   await page.goto("/");
   await expectTargetsAtLeast44(page);
+
   if (testInfo.project.name.startsWith("phone")) {
     await page.getByRole("button", { name: "Od 17:00" }).click();
     await expectTargetsAtLeast44(page);
@@ -48,14 +59,22 @@ test("every button, chip and tab is at least 44px tall and wide", async ({ page 
 test("every target on the poll page is at least 44px tall and wide", async ({ browser }, testInfo) => {
   const organiserToken = "organiser-token-for-the-44px-sweep-0123456";
   const pollId = seedPoll({ dates: ["2031-10-17", "2031-10-18", "2031-10-19"], firstHour: 18, hourCount: 4, organiserToken });
-  const kuba = seedAnswer(pollId, "Kuba", Date.now() - 60_000, [["2031-10-17", 19], ["2031-10-18", 19]]);
+
+  const kuba = seedAnswer(pollId, "Kuba", Date.now() - 60_000, [
+    ["2031-10-17", 19],
+    ["2031-10-18", 19],
+  ]);
+
   seedAnswer(pollId, "Ola", Date.now() - 30_000, [["2031-10-18", 19]]);
   const context = await browser.newContext(testInfo.project.use);
+
   await context.addCookies([
     { name: pollId, value: kuba, url: "http://localhost:3000" },
     { name: `${pollId}-org`, value: organiserToken, url: "http://localhost:3000" },
   ]);
+
   const page = await context.newPage();
+
   await page.goto(`/e/${pollId}`);
 
   await expectTargetsAtLeast44(page);
@@ -66,6 +85,7 @@ test("every target on the poll page is at least 44px tall and wide", async ({ br
   await expectTargetsAtLeast44(page);
 
   const newcomer = await browser.newPage(testInfo.project.use);
+
   await newcomer.goto(`/e/${pollId}`);
   await newcomer.getByRole("textbox", { name: "Twoje imię" }).fill("Ola");
   await newcomer.getByRole("grid", { name: "Kiedy możesz?" }).getByRole("row").nth(1).getByRole("button").nth(1).click();
@@ -87,7 +107,11 @@ test("Button, Chip and Segment show the ink focus ring from the keyboard", async
     await expect(target).toHaveCSS("outline-width", "2px");
     await expect(target).toHaveCSS("outline-color", ink);
     const box = (await target.boundingBox())!;
-    await page.screenshot({ path: `e2e/screenshots/components-focus-${part}-${testInfo.project.name}.png`, clip: { x: box.x - 8, y: box.y - 8, width: box.width + 16, height: box.height + 16 } });
+
+    await page.screenshot({
+      path: `e2e/screenshots/components-focus-${part}-${testInfo.project.name}.png`,
+      clip: { x: box.x - 8, y: box.y - 8, width: box.width + 16, height: box.height + 16 },
+    });
   }
 });
 
@@ -97,6 +121,7 @@ test("the create form's questions are section headings", async ({ page }, testIn
   for (const question of ["Co robimy?", "Twoje imię"]) await expectSectionHeading(page.locator("label", { hasText: question }));
   for (const question of ["Kiedy?", "O której?"]) await expectSectionHeading(page.locator("legend", { hasText: question }));
   const titleSize = testInfo.project.name.startsWith("desktop") ? "40px" : "30px";
+
   expect(await styleOf(page.getByRole("textbox", { name: "Co robimy?" }))).toMatchObject({ fontSize: titleSize });
 });
 
@@ -105,6 +130,7 @@ test("day numbers are tracked tight", async ({ page }) => {
 
   const dayNumber = page.getByRole("region", { name: "Text" }).getByText("17", { exact: true });
   const stepperValue = page.getByRole("group", { name: "od" }).first().getByRole("status");
+
   for (const number of [dayNumber, stepperValue]) {
     expect(await number.evaluate((element) => getComputedStyle(element).letterSpacing)).toBe("-0.4px");
   }
@@ -114,6 +140,7 @@ test("a cell reached by keyboard shows its focus ring", async ({ page }, testInf
   await page.goto("/dev/components");
 
   const cell = page.getByRole("button", { name: "wolne" });
+
   await cell.focus();
   await page.keyboard.press("Shift+Tab");
   await page.keyboard.press("Tab");
@@ -129,6 +156,7 @@ test("the answer's name label is small, with the save state beside it", async ({
   await page.goto(`/e/${pollId}`);
 
   const label = page.locator("label", { hasText: "Twoje imię" });
+
   await expect(label).toHaveCSS("font-size", "14px");
   await expect(label).toHaveCSS("font-weight", "600");
 });
@@ -138,9 +166,11 @@ test("an invalid input shows the focus ring while focused", async ({ page }, tes
 
   for (const name of ["Imię z błędem", "Tytuł z błędem"]) {
     const input = page.getByRole("textbox", { name });
+
     await input.focus();
     expect((await styleOf(input)).boxShadow).toContain(ink);
   }
+
   await page.getByRole("textbox", { name: "Imię z błędem" }).focus();
   await saveScreenshot(page, testInfo, "components-invalid-focus");
 });

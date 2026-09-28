@@ -16,10 +16,7 @@ export function Demo({ formId }: { formId: string }) {
   const poll = demoPoll(slots.mine);
 
   return (
-    <section
-      aria-label="Wypróbuj na żywo"
-      className="mx-auto box-border max-w-wide px-5 py-20 lg:px-12 lg:pt-30"
-    >
+    <section aria-label="Wypróbuj na żywo" className="mx-auto box-border max-w-wide px-5 py-20 lg:px-12 lg:pt-30">
       <div className="mb-8 max-w-170 lg:mb-10">
         <p className="m-0 text-sm font-semibold text-accent-ink">Wypróbuj na żywo</p>
         <h2 className="m-0 mt-2 font-display text-3xl font-extrabold tracking-tightest text-balance lg:text-5xl">
@@ -49,6 +46,7 @@ export function Demo({ formId }: { formId: string }) {
             renderCell={({ date, hour, selected, label, tabIndex, preview }) => {
               const { count, heat } = poll.cellAt({ date, hour });
               const marked = preview ? preview === "adding" : selected;
+
               return (
                 <Cell heat={heat} aria-label={`${label}, ${count} z ${poll.respondentCount} może`} tabIndex={tabIndex}>
                   <span className="col-start-1 row-start-1">{count || ""}</span>

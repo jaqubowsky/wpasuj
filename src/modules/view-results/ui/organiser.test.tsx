@@ -26,9 +26,28 @@ const threeAnswers: Results = {
   hours: [17, 18, 19, 20],
   readAt,
   respondents: [
-    answer("Bartek", [[saturday, 18], [saturday, 19], [saturday, 20], [sunday, 18]]),
-    answer("Ola", [[saturday, 17], [saturday, 18], [saturday, 19], [sunday, 19], [sunday, 20]]),
-    answer("Michał", [[saturday, 18], [saturday, 19], [saturday, 20], [sunday, 17], [sunday, 18], [sunday, 19], [sunday, 20]]),
+    answer("Bartek", [
+      [saturday, 18],
+      [saturday, 19],
+      [saturday, 20],
+      [sunday, 18],
+    ]),
+    answer("Ola", [
+      [saturday, 17],
+      [saturday, 18],
+      [saturday, 19],
+      [sunday, 19],
+      [sunday, 20],
+    ]),
+    answer("Michał", [
+      [saturday, 18],
+      [saturday, 19],
+      [saturday, 20],
+      [sunday, 17],
+      [sunday, 18],
+      [sunday, 19],
+      [sunday, 20],
+    ]),
   ],
   final: null,
 };
@@ -66,8 +85,14 @@ let clipboard: string | undefined;
 
 beforeEach(() => {
   clipboard = undefined;
-  vi.stubGlobal("fetch", vi.fn(async () => Response.json(threeAnswers)));
+
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async () => Response.json(threeAnswers)),
+  );
+
   Object.defineProperty(navigator, "share", { configurable: true, value: undefined });
+
   Object.defineProperty(navigator, "clipboard", {
     configurable: true,
     value: {
@@ -95,6 +120,7 @@ describe("a participant", () => {
     renderPage(withFinal(saturdayEvening));
 
     const setTime = screen.getByRole("region", { name: "Termin" });
+
     expect(setTime).toHaveTextContent("Widzimy się");
     expect(setTime).toHaveTextContent("Sobota");
     expect(setTime).toHaveTextContent("19 października");
@@ -111,14 +137,17 @@ describe("a participant", () => {
 
     const menu = screen.getByRole("dialog", { name: "Dodaj do kalendarza" });
     const google = new URL(within(menu).getByRole("link", { name: "Kalendarz Google" }).getAttribute("href")!);
+
     expect(google.hostname).toBe("calendar.google.com");
     expect(google.searchParams.get("text")).toBe("Planszówki");
     expect(google.searchParams.get("dates")).toBe("20301019T160000Z/20301019T180000Z");
     expect(google.searchParams.get("details")).toBe(`${location.origin}/e/Pl4nszowki`);
     const apple = within(menu).getByRole("link", { name: "Kalendarz Apple" });
+
     expect(apple).toHaveAttribute("href", "/e/Pl4nszowki/termin.ics");
     expect(apple).not.toHaveAttribute("download");
     const outlook = new URL(within(menu).getByRole("link", { name: "Outlook" }).getAttribute("href")!);
+
     expect(outlook.hostname).toBe("outlook.live.com");
     expect(outlook.searchParams.get("startdt")).toBe("2030-10-19T16:00:00Z");
     expect(within(menu).getByRole("link", { name: "Kalendarz Google" })).toHaveAttribute("target", "_blank");
@@ -129,7 +158,12 @@ describe("a participant", () => {
     renderPage(withFinal(sundayEvening));
 
     const people = screen.getByRole("region", { name: "Kto będzie" });
-    const names = (list: string) => within(within(people).getByRole("list", { name: list })).getAllByRole("img").map((avatar) => avatar.getAttribute("aria-label"));
+
+    const names = (list: string) =>
+      within(within(people).getByRole("list", { name: list }))
+        .getAllByRole("img")
+        .map((avatar) => avatar.getAttribute("aria-label"));
+
     expect(names("Będzie")).toEqual(["Ola", "Michał"]);
     expect(names("Nie może")).toEqual(["Bartek"]);
   });
@@ -150,6 +184,7 @@ describe("a participant", () => {
 
     const votes = screen.getByRole("dialog", { name: "Wszystkie głosy" });
     const heatmap = within(votes).getByRole("grid", { name: "Kto może" });
+
     expect(heatmap).not.toHaveAttribute("aria-multiselectable");
     expect(within(heatmap).getByRole("button", { name: "nd 20, 20:00, 2 z 3 może" })).not.toHaveAttribute("data-best");
   });
@@ -179,6 +214,7 @@ describe("a participant", () => {
 describe("the organiser", () => {
   it("sets the best time from Twoja ankieta", async () => {
     const asOrganiser = organiser();
+
     renderPage(threeAnswers, asOrganiser);
 
     await userEvent.click(within(screen.getByRole("region", { name: "Twoja ankieta" })).getByRole("button", { name: "Ustal termin" }));
@@ -188,6 +224,7 @@ describe("the organiser", () => {
 
   it("waits on a slow set with the button held, so a second tap sends nothing", async () => {
     const asOrganiser = organiser({ setFinal: vi.fn(() => new Promise<never>(() => {})) });
+
     renderPage(threeAnswers, asOrganiser);
     const set = within(screen.getByRole("region", { name: "Twoja ankieta" })).getByRole("button", { name: "Ustal termin" });
 
@@ -200,6 +237,7 @@ describe("the organiser", () => {
 
   it("waits on a slow delete with Tak, usuń held", async () => {
     const asOrganiser = organiser({ deletePoll: vi.fn(() => new Promise<never>(() => {})) });
+
     renderPage(threeAnswers, asOrganiser);
     await userEvent.click(screen.getByRole("button", { name: "Więcej" }));
     await userEvent.click(screen.getByRole("button", { name: "Usuń ankietę" }));
@@ -221,9 +259,11 @@ describe("the organiser", () => {
 
   it("changes a set time from Twoja ankieta, with no reminder while it is set", async () => {
     const asOrganiser = organiser();
+
     renderPage(withFinal(saturdayEvening), asOrganiser);
 
     const card = screen.getByRole("region", { name: "Twoja ankieta" });
+
     expect(within(card).queryByRole("button", { name: "Ustal termin" })).not.toBeInTheDocument();
     expect(within(card).queryByRole("button", { name: "Przypomnij" })).not.toBeInTheDocument();
     await userEvent.click(within(card).getByRole("button", { name: "Zmień termin" }));
@@ -276,12 +316,21 @@ describe("the organiser", () => {
 
   it("deletes the poll only after confirming, and then shows it gone", async () => {
     const asOrganiser = organiser();
-    vi.stubGlobal("fetch", vi.fn(async () => Response.json({ reason: "gone" }, { status: 404 })));
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => Response.json({ reason: "gone" }, { status: 404 })),
+    );
+
     renderPage(threeAnswers, asOrganiser);
     await userEvent.click(screen.getByRole("button", { name: "Więcej" }));
 
     await userEvent.click(screen.getByRole("button", { name: "Usuń ankietę" }));
-    expect(screen.getByRole("dialog", { name: "Usunąć ankietę?" })).toHaveTextContent("Znikną też odpowiedzi 3 osób. Tego nie da się cofnąć.");
+
+    expect(screen.getByRole("dialog", { name: "Usunąć ankietę?" })).toHaveTextContent(
+      "Znikną też odpowiedzi 3 osób. Tego nie da się cofnąć.",
+    );
+
     await userEvent.click(screen.getByRole("button", { name: "Nie, zostaw" }));
 
     expect(asOrganiser.deletePoll).not.toHaveBeenCalled();
@@ -295,7 +344,11 @@ describe("the organiser", () => {
   });
 
   it("drops the Ustalone badge once a set poll is deleted", async () => {
-    vi.stubGlobal("fetch", vi.fn(async () => Response.json({ reason: "gone" }, { status: 404 })));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => Response.json({ reason: "gone" }, { status: 404 })),
+    );
+
     renderPage(withFinal(saturdayEvening), organiser());
     expect(screen.getByText("Ustalone")).toBeVisible();
 
@@ -317,7 +370,11 @@ describe("the organiser", () => {
   });
 
   it("leads with the invitation once the time is set", async () => {
-    vi.stubGlobal("fetch", vi.fn(async () => Response.json(withFinal(sundayEvening))));
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => Response.json(withFinal(sundayEvening))),
+    );
+
     renderPage(threeAnswers, organiser());
 
     await userEvent.click(screen.getByRole("button", { name: "Ustal termin" }));

@@ -4,7 +4,9 @@ type Point = { x: number; y: number };
 
 export async function centreOf(locator: Locator) {
   const box = await locator.boundingBox();
+
   if (!box) throw new Error("not visible");
+
   return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
 }
 
@@ -17,6 +19,7 @@ function stepsBetween(from: Point, to: Point) {
 
 export async function touchDrag(page: Page, from: Point, to: Point, beforeRelease?: () => Promise<void>) {
   const session = await page.context().newCDPSession(page);
+
   await session.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [from] });
   for (const point of stepsBetween(from, to)) await session.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [point] });
   await beforeRelease?.();

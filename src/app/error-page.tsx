@@ -14,7 +14,10 @@ export function ErrorPage({ retry }: { retry: () => void }) {
           <Button variant="primary" block onClick={retry}>
             Spróbuj ponownie
           </Button>
-          <Link href="/" className="flex min-h-11 items-center justify-center text-base font-medium text-muted underline underline-offset-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink">
+          <Link
+            href="/"
+            className="flex min-h-11 items-center justify-center text-base font-medium text-muted underline underline-offset-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+          >
             Zrób nową ankietę
           </Link>
         </div>

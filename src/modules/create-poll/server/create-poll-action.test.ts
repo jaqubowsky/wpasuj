@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 let cookieJar = fakeCookies();
 let requestHeaders = new Headers();
+
 vi.mock("next/headers", () => ({ cookies: async () => cookieJar, headers: async () => requestHeaders }));
 
 const thursdayNoonInWarsaw = new Date("2026-10-15T10:00:00Z");
@@ -50,6 +51,7 @@ describe("createPoll", () => {
 
     expect(result).toEqual({ ok: true, id: expect.stringMatching(/^[A-Za-z0-9_-]{10}$/) });
     const { findPoll } = await queries();
+
     expect(findPoll(result.ok ? result.id : "", new Date())).toEqual({
       title: "Planszówki u Michała",
       organiserName: "Kuba Nowak",
@@ -68,6 +70,7 @@ describe("createPoll", () => {
     const result = await createPoll({ ...input, firstHour: 22, hourCount: 6 });
 
     const { findPoll } = await queries();
+
     expect(findPoll(result.ok ? result.id : "", new Date())).toMatchObject({ firstHour: 22, hourCount: 6 });
   });
 
@@ -77,6 +80,7 @@ describe("createPoll", () => {
     const result = await createPoll(input);
 
     const id = result.ok ? result.id : "";
+
     expect(cookieJar.get(`${id}-org`)).toEqual({
       name: `${id}-org`,
       value: expect.stringMatching(/^[A-Za-z0-9_-]{43}$/),
@@ -86,7 +90,9 @@ describe("createPoll", () => {
       maxAge: 31_536_000,
       secure: false,
     });
+
     const [row] = await db.select().from(polls);
+
     expect(row.organiserTokenHash).toBe(hashToken(cookieJar.get(`${id}-org`)!.value));
   });
 
@@ -104,6 +110,7 @@ describe("createPoll", () => {
     const first = await createPoll(input);
     const firstId = first.ok ? first.id : "";
     const now = new Date();
+
     await db.insert(participants).values({
       pollId: firstId,
       name: "Ola",
@@ -112,15 +119,18 @@ describe("createPoll", () => {
       createdAt: now,
       updatedAt: now,
     });
+
     cookieJar = fakeCookies();
     cookieJar.set("someone-else", "not-a-token");
 
     const stranger = await createPoll(input);
+
     cookieJar.set(firstId, "participant-token");
     const participant = await createPoll(input);
 
     const rows = await db.select().from(polls);
     const created = (id: string) => rows.find((row) => row.id === id)?.createdByParticipant;
+
     expect(created(firstId)).toBe(false);
     expect(created(stranger.ok ? stranger.id : "")).toBe(false);
     expect(created(participant.ok ? participant.id : "")).toBe(true);
@@ -135,6 +145,7 @@ describe("createPoll", () => {
     await createPoll({ ...input, dates: ["2026-12-16"] });
 
     const ids = (await db.select({ id: polls.id }).from(polls)).map((row) => row.id);
+
     expect(ids).not.toContain(old.ok ? old.id : "");
     expect(ids).toContain(recent.ok ? recent.id : "");
     expect(ids).toHaveLength(2);
@@ -214,6 +225,7 @@ describe("findPoll", () => {
     const result = await createPoll(input);
     const id = result.ok ? result.id : "";
     const now = new Date();
+
     await db.insert(participants).values(
       ["Ola", "Bartek"].map((name) => ({
         pollId: id,

@@ -15,7 +15,19 @@ export async function landingCardImage() {
   const [display, sans500] = await Promise.all([ogFont("bricolage-grotesque-800.ttf"), ogFont("onest-500.ttf")]);
 
   return new ImageResponse(
-    <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", gap: 64, padding: "56px 72px", background: paper, color: ink, fontFamily: "Onest" }}>
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        gap: 64,
+        padding: "56px 72px",
+        background: paper,
+        color: ink,
+        fontFamily: "Onest",
+      }}
+    >
       <div style={{ flex: 1, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           <div style={{ display: "flex", flexWrap: "wrap", width: 34, gap: 4 }}>
@@ -25,14 +37,25 @@ export async function landingCardImage() {
           </div>
           <div style={{ fontFamily: "Bricolage Grotesque", fontWeight: 800, fontSize: 34, letterSpacing: "-0.03em" }}>{productName}</div>
         </div>
-        <div style={{ fontFamily: "Bricolage Grotesque", fontWeight: 800, fontSize: 76, lineHeight: "80px", letterSpacing: "-0.03em" }}>{headline}</div>
+        <div style={{ fontFamily: "Bricolage Grotesque", fontWeight: 800, fontSize: 76, lineHeight: "80px", letterSpacing: "-0.03em" }}>
+          {headline}
+        </div>
         <div style={{ fontSize: 28, lineHeight: "38px", fontWeight: 500, color: muted }}>{pitch}</div>
       </div>
       <div style={{ width: 300, display: "flex", flexDirection: "column", gap: 10 }}>
         {heatRows.map((row, rowIndex) => (
           <div key={rowIndex} style={{ display: "flex", gap: 10 }}>
             {row.map((level, index) => (
-              <div key={index} style={{ width: 67, height: 67, borderRadius: 14, background: level ? heat[level - 1] : surface, border: level ? "none" : `2px solid ${edge}` }} />
+              <div
+                key={index}
+                style={{
+                  width: 67,
+                  height: 67,
+                  borderRadius: 14,
+                  background: level ? heat[level - 1] : surface,
+                  border: level ? "none" : `2px solid ${edge}`,
+                }}
+              />
             ))}
           </div>
         ))}

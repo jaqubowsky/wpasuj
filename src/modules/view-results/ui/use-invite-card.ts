@@ -25,6 +25,7 @@ export function useInviteCard(pollId: string, title: string) {
   async function send() {
     const invite = reminderText([], { title, link: link() });
     const outcome = await shareOrCopy({ text: invite, link: invite });
+
     switch (outcome) {
       case "shared":
         return setStage("sent");
@@ -45,5 +46,12 @@ export function useInviteCard(pollId: string, title: string) {
     }
   }
 
-  return { stage, copiedBy: (from: Copied["from"]) => copied?.from === from && copied.outcome === "copied", notCopiedBy: copied?.outcome === "not-copied" ? copied.from : undefined, shownLink: () => `${location.host}/e/${pollId}`, send, copyLink };
+  return {
+    stage,
+    copiedBy: (from: Copied["from"]) => copied?.from === from && copied.outcome === "copied",
+    notCopiedBy: copied?.outcome === "not-copied" ? copied.from : undefined,
+    shownLink: () => `${location.host}/e/${pollId}`,
+    send,
+    copyLink,
+  };
 }

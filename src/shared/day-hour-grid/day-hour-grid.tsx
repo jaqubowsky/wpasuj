@@ -28,16 +28,30 @@ const weekdays = ["nd", "pn", "wt", "śr", "cz", "pt", "sb"];
 
 function dayOf(date: string) {
   const day = new Date(`${date}T00:00:00Z`);
+
   return { weekday: weekdays[day.getUTCDay()], number: day.getUTCDate() };
 }
 
 function cellUnder(event: PointerEvent): GridCell | undefined {
   const slot = document.elementFromPoint(event.clientX, event.clientY)?.closest<HTMLElement>("[data-date]");
+
   if (!slot?.dataset.date) return undefined;
+
   return { date: slot.dataset.date, hour: Number(slot.dataset.hour) };
 }
 
-export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCellTap, onDateTap, onHourTap, onStroke, morphDates }: DayHourGridProps) {
+export function DayHourGrid({
+  label,
+  dates,
+  hours,
+  isSelected,
+  renderCell,
+  onCellTap,
+  onDateTap,
+  onHourTap,
+  onStroke,
+  morphDates,
+}: DayHourGridProps) {
   const gridRef = useRef<HTMLDivElement>(null);
   const stroke = usePaintStroke({ dates, hours, onStroke, onTap: onCellTap });
   const keyboard = useGridKeyboard({ gridRef, dates, hours, onStroke, firstRow: onDateTap ? 0 : 1, firstColumn: onHourTap ? 0 : 1 });
@@ -49,7 +63,7 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
         role="grid"
         aria-label={label}
         aria-multiselectable={onStroke && true}
-        className="grid [scrollbar-width:none] grid-cols-[var(--hour-column)_repeat(var(--date-count),minmax(56px,1fr))] grid-rows-[auto] auto-rows-12 gap-1.5 overflow-x-auto overscroll-x-contain scroll-pl-[calc(var(--hour-column)+--spacing(1.5))] [--hour-column:--spacing(12)] snap-x snap-mandatory @max-grid-fit:data-scrolls:grid-cols-[var(--hour-column)_repeat(var(--date-count),max(56px,calc((100cqi_-_var(--hour-column)_-_5_*_--spacing(1.5))_/_4.4)))] [&::-webkit-scrollbar]:hidden"
+        className="grid snap-x snap-mandatory scroll-pl-[calc(var(--hour-column)+--spacing(1.5))] [scrollbar-width:none] auto-rows-12 grid-cols-[var(--hour-column)_repeat(var(--date-count),minmax(56px,1fr))] grid-rows-[auto] gap-1.5 overflow-x-auto overscroll-x-contain [--hour-column:--spacing(12)] @max-grid-fit:data-scrolls:grid-cols-[var(--hour-column)_repeat(var(--date-count),max(56px,calc((100cqi_-_var(--hour-column)_-_5_*_--spacing(1.5))_/_4.4)))] [&::-webkit-scrollbar]:hidden"
         style={{ "--date-count": dates.length } as CSSProperties}
         data-scrolls={dates.length > 4 || undefined}
         data-paints={onStroke && true}
@@ -60,17 +74,18 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
         onLostPointerCapture={stroke.cancel}
       >
         <div role="row" className="contents">
-          <div className="sticky left-0 z-1 touch-pan-y -mr-1.5 box-border bg-surface pr-1.5" aria-hidden />
+          <div className="sticky left-0 z-1 -mr-1.5 box-border touch-pan-y bg-surface pr-1.5" aria-hidden />
           {dates.map((date, index) => {
             const day = dayOf(date);
             const position = { row: 0, column: index + 1 };
             const label = `${day.weekday} ${day.number}`;
+
             return (
               <div
                 key={date}
                 role="columnheader"
                 aria-colindex={position.column + 1}
-                className="snap-start touch-pan-x"
+                className="touch-pan-x snap-start"
                 data-row={position.row}
                 data-column={position.column}
               >
@@ -95,11 +110,24 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
         </div>
         {hours.map((hour, rowIndex) => {
           const header = { row: rowIndex + 1, column: 0 };
+
           return (
             <div key={hour} role="row" className="contents">
-              <div role="rowheader" aria-colindex={header.column + 1} className="sticky left-0 z-1 touch-pan-y -mr-1.5 box-border bg-surface pr-1.5" data-row={header.row} data-column={header.column}>
+              <div
+                role="rowheader"
+                aria-colindex={header.column + 1}
+                className="sticky left-0 z-1 -mr-1.5 box-border touch-pan-y bg-surface pr-1.5"
+                data-row={header.row}
+                data-column={header.column}
+              >
                 {onHourTap ? (
-                  <button type="button" className="box-border h-full min-h-11 w-full cursor-pointer rounded-cell border-0 bg-transparent p-0 text-left font-sans tabular-nums transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink motion-safe:active:scale-96" tabIndex={keyboard.tabIndexOf(header)} onFocus={() => keyboard.onFocus(header)} onClick={() => onHourTap(hour)}>
+                  <button
+                    type="button"
+                    className="box-border h-full min-h-11 w-full cursor-pointer rounded-cell border-0 bg-transparent p-0 text-left font-sans tabular-nums transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink motion-safe:active:scale-96"
+                    tabIndex={keyboard.tabIndexOf(header)}
+                    onFocus={() => keyboard.onFocus(header)}
+                    onClick={() => onHourTap(hour)}
+                  >
                     <Text variant="meta">{clockHour(hour)}:00</Text>
                   </button>
                 ) : (
@@ -113,6 +141,7 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
                 const selected = isSelected(cell);
                 const position = { row: rowIndex + 1, column: columnIndex + 1 };
                 const day = dayOf(date);
+
                 return (
                   <div
                     key={date}
@@ -127,6 +156,7 @@ export function DayHourGrid({ label, dates, hours, isSelected, renderCell, onCel
                     onFocus={() => keyboard.onFocus(position)}
                     onPointerDown={(event) => {
                       if (!onStroke || event.button !== 0) return;
+
                       event.currentTarget.setPointerCapture(event.pointerId);
                       stroke.start(cell, selected, event);
                     }}

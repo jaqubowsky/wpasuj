@@ -9,6 +9,7 @@ const hours = [17, 18, 19];
 
 function renderGrid(selected: string[] = []) {
   const handlers = { onCellTap: vi.fn(), onDateTap: vi.fn(), onHourTap: vi.fn(), onStroke: vi.fn() };
+
   render(
     <DayHourGrid
       label="Kiedy możesz?"
@@ -19,16 +20,19 @@ function renderGrid(selected: string[] = []) {
       {...handlers}
     />,
   );
+
   return handlers;
 }
 
 function dragFrom(fromLabel: string, toLabel: string) {
   const from = screen.getByRole("button", { name: fromLabel });
   const to = screen.getByRole("button", { name: toLabel });
+
   document.elementFromPoint = () => to;
   Element.prototype.setPointerCapture ??= () => {};
   fireEvent.pointerDown(from, { button: 0, buttons: 1, pointerId: 1, isPrimary: true });
   fireEvent.pointerMove(from, { buttons: 1, pointerId: 1, isPrimary: true });
+
   return screen.getByRole("grid");
 }
 
@@ -37,6 +41,7 @@ describe("DayHourGrid", () => {
     const { onStroke } = renderGrid();
 
     const grid = dragFrom("pt 16, 17:00", "sb 17, 18:00");
+
     fireEvent.pointerUp(grid, { pointerId: 1 });
 
     expect(onStroke).toHaveBeenCalledExactlyOnceWith({ dates: ["2026-10-16", "2026-10-17"], hours: [17, 18], mode: "add" });
@@ -46,6 +51,7 @@ describe("DayHourGrid", () => {
     const { onStroke } = renderGrid();
 
     const grid = dragFrom("pt 16, 17:00", "sb 17, 18:00");
+
     fireEvent.pointerCancel(grid, { pointerId: 1 });
     fireEvent.pointerUp(grid, { pointerId: 1 });
 
@@ -56,6 +62,7 @@ describe("DayHourGrid", () => {
     const { onStroke } = renderGrid();
 
     const grid = dragFrom("pt 16, 17:00", "sb 17, 18:00");
+
     fireEvent.pointerMove(grid, { buttons: 0, pointerId: 1 });
     fireEvent.pointerUp(grid, { pointerId: 1 });
 
@@ -66,14 +73,27 @@ describe("DayHourGrid", () => {
     renderGrid(["2026-10-17 18"]);
 
     const grid = screen.getByRole("grid", { name: "Kiedy możesz?" });
+
     expect(grid).toHaveAttribute("aria-multiselectable", "true");
     expect(screen.getAllByRole("columnheader").map((header) => header.textContent)).toEqual(["pt 16", "sb 17", "nd 18"]);
     expect(screen.getAllByRole("rowheader").map((header) => header.textContent)).toEqual(["17:00", "18:00", "19:00"]);
-    expect(screen.getAllByRole("gridcell", { selected: true })).toEqual([screen.getByRole("button", { name: "sb 17, 18:00" }).parentElement]);
+
+    expect(screen.getAllByRole("gridcell", { selected: true })).toEqual([
+      screen.getByRole("button", { name: "sb 17, 18:00" }).parentElement,
+    ]);
   });
 
   it("reads hours past midnight by the clock, after the evening's", () => {
-    render(<DayHourGrid label="Kiedy możesz?" dates={dates} hours={[23, 24, 25]} isSelected={() => false} renderCell={({ label }) => <Cell aria-label={label} />} onCellTap={vi.fn()} />);
+    render(
+      <DayHourGrid
+        label="Kiedy możesz?"
+        dates={dates}
+        hours={[23, 24, 25]}
+        isSelected={() => false}
+        renderCell={({ label }) => <Cell aria-label={label} />}
+        onCellTap={vi.fn()}
+      />,
+    );
 
     expect(screen.getAllByRole("rowheader").map((header) => header.textContent)).toEqual(["23:00", "0:00", "1:00"]);
     expect(screen.getByRole("button", { name: "pt 16, 1:00" })).toBeInTheDocument();
@@ -82,7 +102,16 @@ describe("DayHourGrid", () => {
   it("tells each rendered cell whether it is selected", () => {
     const renderCell = vi.fn<(cell: { date: string; selected: boolean }) => null>(() => null);
 
-    render(<DayHourGrid label="Kiedy możesz?" dates={dates} hours={[17]} isSelected={({ date }) => date === "2026-10-17"} renderCell={renderCell} onCellTap={vi.fn()} />);
+    render(
+      <DayHourGrid
+        label="Kiedy możesz?"
+        dates={dates}
+        hours={[17]}
+        isSelected={({ date }) => date === "2026-10-17"}
+        renderCell={renderCell}
+        onCellTap={vi.fn()}
+      />,
+    );
 
     expect(renderCell.mock.calls.map(([cell]) => [cell.date, cell.selected])).toEqual([
       ["2026-10-16", false],
@@ -99,6 +128,7 @@ describe("DayHourGrid", () => {
     const [, ...dataRows] = screen.getAllByRole("row");
 
     expect(headerColumns).toEqual(["2", "3", "4"]);
+
     for (const row of dataRows) {
       expect(within(row).getByRole("rowheader")).toHaveAttribute("aria-colindex", "1");
       expect(within(row).getAllByRole("gridcell").map(columnOf)).toEqual(headerColumns);
@@ -135,6 +165,7 @@ describe("DayHourGrid", () => {
 
   it("moves with arrows and toggles with Space", async () => {
     const { onCellTap, onDateTap } = renderGrid();
+
     await userEvent.tab();
 
     await userEvent.keyboard("{ArrowRight}{ArrowDown}{ArrowDown}{ArrowDown}");
@@ -152,6 +183,7 @@ describe("DayHourGrid", () => {
 
   it("extends the selection with Shift and arrows from where it started", async () => {
     const { onStroke } = renderGrid();
+
     await userEvent.tab();
 
     await userEvent.keyboard("{Shift>}{ArrowRight}{ArrowDown}{/Shift}");
@@ -162,6 +194,7 @@ describe("DayHourGrid", () => {
 
   it("starts a new Shift selection from a cell focused some other way", async () => {
     const { onStroke } = renderGrid();
+
     await userEvent.tab();
     await userEvent.keyboard("{Shift>}{ArrowRight}{/Shift}");
 
@@ -174,16 +207,22 @@ describe("DayHourGrid", () => {
   describe("to look at, without painting", () => {
     function renderViewOnlyGrid() {
       const onCellTap = vi.fn();
+
       render(
         <DayHourGrid
           label="Ile osób może"
           dates={dates}
           hours={hours}
           isSelected={({ date, hour }) => date === "2026-10-17" && hour === 18}
-          renderCell={({ label, tabIndex }) => <Cell heat={1} aria-label={label} tabIndex={tabIndex}>1</Cell>}
+          renderCell={({ label, tabIndex }) => (
+            <Cell heat={1} aria-label={label} tabIndex={tabIndex}>
+              1
+            </Cell>
+          )}
           onCellTap={onCellTap}
         />,
       );
+
       return { onCellTap };
     }
 
@@ -198,6 +237,7 @@ describe("DayHourGrid", () => {
 
     it("keeps the arrows on the cells and reports Space as a tap", async () => {
       const { onCellTap } = renderViewOnlyGrid();
+
       await userEvent.tab();
 
       await userEvent.keyboard("{ArrowUp}{ArrowLeft}{Shift>}{ArrowRight}{/Shift} ");
@@ -205,6 +245,5 @@ describe("DayHourGrid", () => {
       expect(screen.getByRole("button", { name: "sb 17, 17:00" })).toHaveFocus();
       expect(onCellTap).toHaveBeenCalledExactlyOnceWith({ date: "2026-10-17", hour: 17 });
     });
-
   });
 });

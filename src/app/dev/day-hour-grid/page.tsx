@@ -7,6 +7,7 @@ const hours = Array.from({ length: 13 }, (_, index) => 10 + index);
 
 export default async function DayHourGridDemo({ searchParams }: PageProps<"/dev/day-hour-grid">) {
   const { dates } = await searchParams;
+
   if (process.env.DEMO_ROUTES !== "1") notFound();
 
   return (

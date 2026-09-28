@@ -20,7 +20,16 @@ export function SetBadge() {
 
   return (
     <span className="inline-flex items-center gap-1.5 rounded-pill bg-ink px-3 py-1.5 text-sm font-semibold text-surface">
-      <svg className="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <svg
+        className="size-3.5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
         <path d="M20 6 9 17l-5-5" />
       </svg>
       Ustalone
@@ -32,14 +41,28 @@ function CardAction({ primary, ...props }: { primary?: boolean } & ComponentProp
   return (
     <button
       type="button"
-      className="box-border inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-control border-0 bg-transparent px-6 font-sans text-base font-semibold text-surface shadow-[inset_0_0_0_1px_var(--color-muted)] transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface motion-safe:active:scale-97 data-[emphasis=primary]:h-13 data-[emphasis=primary]:bg-surface data-[emphasis=primary]:text-ink data-[emphasis=primary]:shadow-none lg:h-13"
+      className="box-border inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-control border-0 bg-transparent px-6 font-sans text-base font-semibold text-surface shadow-[inset_0_0_0_1px_var(--color-muted)] transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-surface data-[emphasis=primary]:h-13 data-[emphasis=primary]:bg-surface data-[emphasis=primary]:text-ink data-[emphasis=primary]:shadow-none motion-safe:active:scale-97 lg:h-13"
       data-emphasis={primary ? "primary" : undefined}
       {...props}
     />
   );
 }
 
-function CalendarMenu({ pollId, title, timeZone, final, opener, onClose }: { pollId: string; title: string; timeZone: string; final: FinalTime; opener: RefObject<HTMLButtonElement | null>; onClose: () => void }) {
+function CalendarMenu({
+  pollId,
+  title,
+  timeZone,
+  final,
+  opener,
+  onClose,
+}: {
+  pollId: string;
+  title: string;
+  timeZone: string;
+  final: FinalTime;
+  opener: RefObject<HTMLButtonElement | null>;
+  onClose: () => void;
+}) {
   const event = { title, link: `${location.origin}/e/${pollId}`, timeZone, final };
 
   return (
@@ -68,10 +91,26 @@ export function SetTime({ final, title, timeZone }: { final: FinalTime; title: s
   const [calendarOpen, setCalendarOpen] = useState(false);
   const calendarOpener = useRef<HTMLButtonElement>(null);
   const { weekday, day, hours } = setTimeShown(final);
+
   const calendarAction = (
-    <CardAction ref={calendarOpener} primary={!organiser} aria-haspopup="dialog" aria-expanded={calendarOpen} onClick={() => setCalendarOpen(true)}>
+    <CardAction
+      ref={calendarOpener}
+      primary={!organiser}
+      aria-haspopup="dialog"
+      aria-expanded={calendarOpen}
+      onClick={() => setCalendarOpen(true)}
+    >
       {!organiser && (
-        <svg className="size-4.5 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <svg
+          className="size-4.5 flex-none"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
           <rect x="3" y="4" width="18" height="18" rx="2" />
           <path d="M16 2v4M8 2v4M3 10h18M12 14v4M10 16h4" />
         </svg>
@@ -79,6 +118,7 @@ export function SetTime({ final, title, timeZone }: { final: FinalTime; title: s
       Dodaj do kalendarza
     </CardAction>
   );
+
   const sendAction = (
     <CardAction primary={!!organiser} onClick={send}>
       Wyślij termin na grupę
@@ -101,7 +141,16 @@ export function SetTime({ final, title, timeZone }: { final: FinalTime; title: s
         {calendarAction}
         {!organiser && sendAction}
       </div>
-      {calendarOpen && <CalendarMenu pollId={pollId} title={title} timeZone={timeZone} final={final} opener={calendarOpener} onClose={() => setCalendarOpen(false)} />}
+      {calendarOpen && (
+        <CalendarMenu
+          pollId={pollId}
+          title={title}
+          timeZone={timeZone}
+          final={final}
+          opener={calendarOpener}
+          onClose={() => setCalendarOpen(false)}
+        />
+      )}
       {notice && (
         <p className="m-0 text-sm text-on-dark-muted" role="status">
           {notices[notice]}

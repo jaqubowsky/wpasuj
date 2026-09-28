@@ -18,6 +18,7 @@ describe("Chip", () => {
 
   it("asks to toggle on a tap", async () => {
     const onClick = vi.fn();
+
     render(
       <Chip pressed={false} onClick={onClick}>
         Przyszły tydzień

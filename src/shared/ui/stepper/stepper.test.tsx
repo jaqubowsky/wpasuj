@@ -12,6 +12,7 @@ describe("Stepper", () => {
 
   it("steps one down and one up", async () => {
     const onChange = vi.fn();
+
     render(<Stepper label="od" value={17} min={0} max={23} onChange={onChange} />);
 
     await userEvent.click(screen.getByRole("button", { name: "Wcześniej" }));

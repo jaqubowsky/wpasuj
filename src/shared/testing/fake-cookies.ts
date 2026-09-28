@@ -2,6 +2,7 @@ type Cookie = { name: string; value: string; httpOnly?: boolean; sameSite?: stri
 
 export function fakeCookies() {
   const jar = new Map<string, Cookie>();
+
   return {
     get: (name: string) => jar.get(name),
     getAll: () => [...jar.values()],

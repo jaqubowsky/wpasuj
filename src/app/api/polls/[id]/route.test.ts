@@ -7,6 +7,7 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 
 let cookieJar = fakeCookies();
+
 vi.mock("next/headers", () => ({ cookies: async () => cookieJar, headers: async () => new Headers() }));
 
 const now = new Date("2030-10-15T10:00:00Z");
@@ -16,6 +17,7 @@ let db: Awaited<ReturnType<typeof openTestDatabase>>;
 
 async function get(id: string) {
   const { GET } = await import("./route");
+
   return GET(new Request(`http://localhost/api/polls/${id}`), { params: Promise.resolve({ id }) });
 }
 
@@ -37,8 +39,16 @@ async function seedPoll(dates: string[]) {
 async function seedAnswer(name: string, savedAt: Date, cells: [string, number][]) {
   const [{ id }] = await db
     .insert(participants)
-    .values({ pollId, name, normalisedName: name.toLowerCase(), tokenHash: hashToken(`${name}-token`), createdAt: savedAt, updatedAt: savedAt })
+    .values({
+      pollId,
+      name,
+      normalisedName: name.toLowerCase(),
+      tokenHash: hashToken(`${name}-token`),
+      createdAt: savedAt,
+      updatedAt: savedAt,
+    })
     .returning({ id: participants.id });
+
   if (cells.length > 0) await db.insert(slots).values(cells.map(([date, hour]) => ({ participantId: id, date, hour })));
 }
 
@@ -56,16 +66,19 @@ afterEach(() => {
 
 it("answers with the poll's grid and every respondent's free hours", async () => {
   await seedPoll(["2030-10-19", "2030-10-20"]);
+
   await seedAnswer("Ola", new Date("2030-10-15T08:00:00Z"), [
     ["2030-10-19", 18],
     ["2030-10-20", 17],
   ]);
+
   await seedAnswer("Bartek", new Date("2030-10-15T09:40:00Z"), []);
 
   const response = await get(pollId);
 
   expect(response.status).toBe(200);
   const { resultsSchema } = await import("@/modules/view-results/server/results-schema");
+
   expect(resultsSchema.parse(await response.json())).toEqual({
     dates: ["2030-10-19", "2030-10-20"],
     hours: [17, 18, 19],
@@ -95,6 +108,7 @@ it("names the viewer's own row from the participant cookie", async () => {
   const response = await get(pollId);
 
   const { resultsSchema } = await import("@/modules/view-results/server/results-schema");
+
   expect(resultsSchema.parse(await response.json()).you).toBe("bartek");
 });
 
@@ -107,6 +121,7 @@ it("lists the hours of a night after the evening's own", async () => {
 
   const { resultsSchema } = await import("@/modules/view-results/server/results-schema");
   const results = resultsSchema.parse(await response.json());
+
   expect(results.hours).toEqual([22, 23, 24, 25]);
   expect(results.respondents[0].slots).toEqual([{ date: "2030-10-19", hour: 24 }]);
   expect(results.final).toEqual({ date: "2030-10-19", firstHour: 23, lastHour: 25 });
@@ -119,6 +134,7 @@ it("carries the time the organiser set", async () => {
   const response = await get(pollId);
 
   const { resultsSchema } = await import("@/modules/view-results/server/results-schema");
+
   expect(resultsSchema.parse(await response.json()).final).toEqual({ date: "2030-10-20", firstHour: 18, lastHour: 20 });
 });
 

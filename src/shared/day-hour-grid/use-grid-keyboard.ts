@@ -38,6 +38,7 @@ export function useGridKeyboard({ gridRef, dates, hours, onStroke, firstRow, fir
   function focus(position: GridPosition) {
     setActive(position);
     const slot = gridRef.current?.querySelector(`[data-row="${position.row}"][data-column="${position.column}"]`);
+
     (slot?.firstElementChild as HTMLElement | null)?.focus();
   }
 
@@ -46,24 +47,31 @@ export function useGridKeyboard({ gridRef, dates, hours, onStroke, firstRow, fir
     onFocus: setActive,
     onKeyDown(event: KeyboardEvent) {
       const step = steps[event.key];
+
       if (!step) return;
+
       event.preventDefault();
 
       const next = { row: active.row + step.row, column: active.column + step.column };
       const inside = next.row >= firstRow && next.row <= hours.length && next.column >= firstColumn && next.column <= dates.length;
+
       if (!inside || (next.row === 0 && next.column === 0)) return;
 
       if (!event.shiftKey) {
         extensionRef.current = null;
         focus(next);
+
         return;
       }
 
       if (!isCell(active) || !isCell(next)) return;
+
       const extension = extensionRef.current;
       const anchor = extension && isSamePosition(extension.reached, active) ? extension.anchor : active;
+
       extensionRef.current = { anchor, reached: next };
       focus(next);
+
       onStroke?.({
         dates: dates.slice(...span(anchor.column - 1, next.column - 1)),
         hours: hours.slice(...span(anchor.row - 1, next.row - 1)),

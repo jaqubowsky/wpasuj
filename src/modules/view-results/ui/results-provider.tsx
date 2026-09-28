@@ -11,7 +11,12 @@ import { useSelectedCell } from "./use-selected-cell";
 type ResultsProviderProps = { pollId: string; initial: Results; organiser?: Organiser; organiserKey: string; children: ReactNode };
 
 type LiveResults = ReturnType<typeof useResults> &
-  ReturnType<typeof useIsOrganiser> & { pollId: string; organiserKey: string; previous?: Results; selection: ReturnType<typeof useSelectedCell> };
+  ReturnType<typeof useIsOrganiser> & {
+    pollId: string;
+    organiserKey: string;
+    previous?: Results;
+    selection: ReturnType<typeof useSelectedCell>;
+  };
 
 const ResultsContext = createContext<LiveResults | null>(null);
 
@@ -20,6 +25,7 @@ function LiveResultsProvider({ pollId, initial, organiser, organiserKey, childre
   const previous = usePrevious(live.results);
   const organiserControls = useIsOrganiser(organiser, live.refresh);
   const selection = useSelectedCell();
+
   return <ResultsContext value={{ ...live, ...organiserControls, pollId, organiserKey, previous, selection }}>{children}</ResultsContext>;
 }
 
@@ -39,6 +45,8 @@ export function useForgetTappedHour() {
 
 export function useResultsContext() {
   const results = use(ResultsContext);
+
   if (!results) throw new Error("The poll's results parts render inside ResultsProvider");
+
   return results;
 }

@@ -26,7 +26,13 @@ it("has no heat while nobody answered", () => {
 
 describe("heatCellOf", () => {
   const respondents = [
-    { name: "Ola", slots: [{ date: "2030-10-19", hour: 18 }, { date: "2030-10-19", hour: 19 }] },
+    {
+      name: "Ola",
+      slots: [
+        { date: "2030-10-19", hour: 18 },
+        { date: "2030-10-19", hour: 19 },
+      ],
+    },
     { name: "Bartek", slots: [{ date: "2030-10-19", hour: 18 }] },
     { name: "Kasia", slots: [{ date: "2030-10-19", hour: 18 }] },
   ];

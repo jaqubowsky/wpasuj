@@ -12,23 +12,46 @@ function answer(name: string, slots: [string, number][]) {
 describe("runsOf", () => {
   it("joins consecutive hours where the same people are free", () => {
     const runs = runsOf([saturday], hours, [
-      answer("Ola", [[saturday, 18], [saturday, 19], [saturday, 20]]),
-      answer("Bartek", [[saturday, 18], [saturday, 19], [saturday, 20]]),
+      answer("Ola", [
+        [saturday, 18],
+        [saturday, 19],
+        [saturday, 20],
+      ]),
+      answer("Bartek", [
+        [saturday, 18],
+        [saturday, 19],
+        [saturday, 20],
+      ]),
     ]);
 
     expect(runs).toEqual([{ date: saturday, firstHour: 18, lastHour: 21, free: ["Ola", "Bartek"] }]);
   });
 
   it("keeps 23:00 to 1:00 one run across midnight", () => {
-    const runs = runsOf([saturday], [22, 23, 24, 25], [answer("Ola", [[saturday, 23], [saturday, 24]])]);
+    const runs = runsOf(
+      [saturday],
+      [22, 23, 24, 25],
+      [
+        answer("Ola", [
+          [saturday, 23],
+          [saturday, 24],
+        ]),
+      ],
+    );
 
     expect(runs).toEqual([{ date: saturday, firstHour: 23, lastHour: 25, free: ["Ola"] }]);
   });
 
   it("splits a run where the free set changes while the count stays the same", () => {
     const runs = runsOf([saturday], hours, [
-      answer("Ola", [[saturday, 18], [saturday, 19]]),
-      answer("Bartek", [[saturday, 17], [saturday, 18]]),
+      answer("Ola", [
+        [saturday, 18],
+        [saturday, 19],
+      ]),
+      answer("Bartek", [
+        [saturday, 17],
+        [saturday, 18],
+      ]),
       answer("Kasia", [[saturday, 19]]),
     ]);
 
@@ -41,7 +64,12 @@ describe("runsOf", () => {
 
   it("never runs across two dates or through an hour nobody can make", () => {
     const runs = runsOf([saturday, sunday], hours, [
-      answer("Ola", [[saturday, 17], [saturday, 19], [saturday, 20], [sunday, 17]]),
+      answer("Ola", [
+        [saturday, 17],
+        [saturday, 19],
+        [saturday, 20],
+        [sunday, 17],
+      ]),
     ]);
 
     expect(runs).toEqual([
@@ -55,9 +83,28 @@ describe("runsOf", () => {
 describe("bestTimes", () => {
   it("ranks by how many can, then by length, then by the earliest start", () => {
     const times = bestTimes([saturday, sunday], hours, [
-      answer("Ola", [[saturday, 17], [saturday, 18], [saturday, 19], [sunday, 19], [sunday, 20]]),
-      answer("Bartek", [[saturday, 18], [saturday, 19], [saturday, 20], [sunday, 18]]),
-      answer("Kasia", [[saturday, 18], [saturday, 19], [saturday, 20], [sunday, 17], [sunday, 18], [sunday, 19], [sunday, 20]]),
+      answer("Ola", [
+        [saturday, 17],
+        [saturday, 18],
+        [saturday, 19],
+        [sunday, 19],
+        [sunday, 20],
+      ]),
+      answer("Bartek", [
+        [saturday, 18],
+        [saturday, 19],
+        [saturday, 20],
+        [sunday, 18],
+      ]),
+      answer("Kasia", [
+        [saturday, 18],
+        [saturday, 19],
+        [saturday, 20],
+        [sunday, 17],
+        [sunday, 18],
+        [sunday, 19],
+        [sunday, 20],
+      ]),
     ]);
 
     expect(times).toEqual([
@@ -69,9 +116,21 @@ describe("bestTimes", () => {
 
   it("offers the best time and at most two others that do not overlap it", () => {
     const times = bestTimes([saturday], hours, [
-      answer("Ola", [[saturday, 17], [saturday, 18], [saturday, 19], [saturday, 20]]),
-      answer("Bartek", [[saturday, 18], [saturday, 19], [saturday, 20]]),
-      answer("Kasia", [[saturday, 19], [saturday, 20]]),
+      answer("Ola", [
+        [saturday, 17],
+        [saturday, 18],
+        [saturday, 19],
+        [saturday, 20],
+      ]),
+      answer("Bartek", [
+        [saturday, 18],
+        [saturday, 19],
+        [saturday, 20],
+      ]),
+      answer("Kasia", [
+        [saturday, 19],
+        [saturday, 20],
+      ]),
     ]);
 
     expect(times).toEqual([

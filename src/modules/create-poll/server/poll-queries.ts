@@ -11,6 +11,7 @@ export function isPollId(id: string) {
 
 export function findPoll(id: string, now: Date) {
   if (!isPollId(id)) return undefined;
+
   const poll = getDb()
     .select({
       title: polls.title,
@@ -29,11 +30,15 @@ export function findPoll(id: string, now: Date) {
     .where(eq(polls.id, id))
     .groupBy(polls.id)
     .get();
+
   if (!poll || isExpired(poll.dates, todayIn(poll.timeZone, now))) return undefined;
+
   const { finalDate, finalFirstHour, finalLastHour, ...rest } = poll;
+
   const final =
     finalDate !== null && finalFirstHour !== null && finalLastHour !== null
       ? { date: finalDate, firstHour: finalFirstHour, lastHour: finalLastHour }
       : null;
+
   return { ...rest, final };
 }

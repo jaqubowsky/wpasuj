@@ -28,6 +28,7 @@ it("recomputes the best time when the visitor taps an hour and resets it", async
 
 it("brings the hero form into view from its call to action", async () => {
   Element.prototype.scrollIntoView = vi.fn();
+
   render(
     <>
       <div id="utworz">

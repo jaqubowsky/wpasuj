@@ -16,24 +16,35 @@ afterEach(() => {
 
 function firstMigrationOnly() {
   const folder = join(directory, "first");
+
   cpSync(migrations, folder, { recursive: true });
   const journal = JSON.parse(readFileSync(join(folder, "meta/_journal.json"), "utf8"));
+
   journal.entries = journal.entries.slice(0, 1);
   writeFileSync(join(folder, "meta/_journal.json"), JSON.stringify(journal));
+
   return folder;
 }
 
 it("keeps a poll created before ranges could pass midnight", () => {
   const sqlite = new Database(join(directory, "old.db"));
   const db = drizzle(sqlite, { schema });
+
   migrate(db, { migrationsFolder: firstMigrationOnly() });
+
   sqlite
     .prepare(
       `insert into polls (id, title, organiser_name, dates, first_hour, last_hour, time_zone, organiser_token_hash, final_date, final_first_hour, final_last_hour, created_by_participant, created_at)
        values ('abcdefghij', 'Kino', 'Kuba', '["2030-10-18","2030-10-19"]', 17, 23, 'Europe/Warsaw', 'hash', '2030-10-19', 19, 22, 0, 1)`,
     )
     .run();
-  sqlite.prepare(`insert into participants (poll_id, name, normalised_name, token_hash, created_at, updated_at) values ('abcdefghij', 'Ola', 'ola', 't', 1, 1)`).run();
+
+  sqlite
+    .prepare(
+      `insert into participants (poll_id, name, normalised_name, token_hash, created_at, updated_at) values ('abcdefghij', 'Ola', 'ola', 't', 1, 1)`,
+    )
+    .run();
+
   sqlite.prepare(`insert into slots (participant_id, date, hour) values (1, '2030-10-19', 19), (1, '2030-10-19', 22)`).run();
 
   migrate(db, { migrationsFolder: migrations });
@@ -48,9 +59,11 @@ it("keeps a poll created before ranges could pass midnight", () => {
       finalLastHour: 22,
     }),
   ]);
+
   expect(db.select().from(schema.slots).all()).toEqual([
     { participantId: 1, date: "2030-10-19", hour: 19 },
     { participantId: 1, date: "2030-10-19", hour: 22 },
   ]);
+
   sqlite.close();
 });

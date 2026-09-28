@@ -11,7 +11,10 @@ function BestTime({ run, changed }: { run: Parameters<typeof runParts>[0]; chang
   const { day, hours } = runParts(run);
 
   return (
-    <p className="m-0 mt-1 data-changed:animate-[best-now-cross-fade_var(--duration-sheet)_var(--ease-out)]" data-changed={changed || undefined}>
+    <p
+      className="m-0 mt-1 data-changed:animate-[best-now-cross-fade_var(--duration-sheet)_var(--ease-out)]"
+      data-changed={changed || undefined}
+    >
       <Text variant="best-time">
         {day}, <span className="whitespace-nowrap">{hours}</span>
       </Text>

@@ -25,6 +25,7 @@ it("merges an adding stroke over a tapped hour and cuts a removing stroke out of
 
 it("clears every hour", () => {
   const { result } = renderHook(() => useDemoSlots());
+
   act(() => result.current.stroke({ dates: [friday], hours: [18, 19], mode: "add" }));
 
   act(() => result.current.clear());

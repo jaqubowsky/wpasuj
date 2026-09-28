@@ -3,6 +3,7 @@ import { openTestDatabase } from "@/shared/testing/test-database";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 let cookieJar = fakeCookies();
+
 vi.mock("next/headers", () => ({ cookies: async () => cookieJar, headers: async () => new Headers() }));
 
 let pollId: string;
@@ -12,6 +13,7 @@ beforeEach(async () => {
   cookieJar = fakeCookies();
   await openTestDatabase();
   const { createPoll } = await import("./create-poll-action");
+
   const result = await createPoll({
     title: "Kino",
     dates: ["2030-10-16"],
@@ -20,6 +22,7 @@ beforeEach(async () => {
     timeZone: "Europe/Warsaw",
     organiserName: "Kuba",
   });
+
   pollId = result.ok ? result.id : "";
   organiserCookie = cookieJar.get(`${pollId}-org`)?.value ?? "";
 });
@@ -37,6 +40,7 @@ describe("organiserToken", () => {
 
   it("is missing on another device", async () => {
     const { organiserToken } = await import("./organiser-access");
+
     onAnotherDevice();
 
     expect(await organiserToken(pollId)).toBeUndefined();
@@ -44,6 +48,7 @@ describe("organiserToken", () => {
 
   it("is missing for a cookie that does not match the poll", async () => {
     const { organiserToken } = await import("./organiser-access");
+
     onAnotherDevice();
     cookieJar.set(`${pollId}-org`, "not-the-token");
 
@@ -54,6 +59,7 @@ describe("organiserToken", () => {
 describe("grantOrganiser", () => {
   it("makes another device the organiser with the organiser's token", async () => {
     const { grantOrganiser, organiserToken } = await import("./organiser-access");
+
     onAnotherDevice();
 
     await grantOrganiser(pollId, organiserCookie);
@@ -64,6 +70,7 @@ describe("grantOrganiser", () => {
 
   it("gives nothing for a wrong token", async () => {
     const { grantOrganiser } = await import("./organiser-access");
+
     onAnotherDevice();
 
     await grantOrganiser(pollId, "not-the-token");
@@ -73,6 +80,7 @@ describe("grantOrganiser", () => {
 
   it("gives nothing for a poll that does not exist", async () => {
     const { grantOrganiser } = await import("./organiser-access");
+
     onAnotherDevice();
 
     await grantOrganiser("abcdefghij", organiserCookie);

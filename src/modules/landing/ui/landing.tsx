@@ -51,12 +51,10 @@ export function Landing({ hero, home }: { hero: ReactNode; home: URL }) {
         >
           <div className="flex flex-col gap-3">
             <span className="text-sm font-semibold text-accent-ink">{productName}</span>
-            <h1 id="hero-heading" className="m-0 font-display font-extrabold tracking-tightest text-balance text-4xl lg:text-7xl">
+            <h1 id="hero-heading" className="m-0 font-display text-4xl font-extrabold tracking-tightest text-balance lg:text-7xl">
               {headline}
             </h1>
-            <p className="m-0 max-w-150 text-lg text-muted lg:text-xl">
-              {pitch}
-            </p>
+            <p className="m-0 max-w-150 text-lg text-muted lg:text-xl">{pitch}</p>
           </div>
           <div id={formId} className="scroll-mt-18">
             {hero}
@@ -68,14 +66,22 @@ export function Landing({ hero, home }: { hero: ReactNode; home: URL }) {
           className="mx-auto box-border max-w-wide px-5 py-20 [contain-intrinsic-size:auto_640px] [content-visibility:auto] lg:px-12"
           aria-labelledby="reasons-heading"
         >
-          <h2 id="reasons-heading" className="m-0 mb-8 max-w-narrow font-display font-extrabold tracking-tightest text-balance text-3xl animate-rise [animation-range:entry_0%_cover_30%] [animation-timeline:view()] lg:mb-9 lg:text-5xl">
+          <h2
+            id="reasons-heading"
+            className="m-0 mb-8 max-w-narrow animate-rise font-display text-3xl font-extrabold tracking-tightest text-balance [animation-range:entry_0%_cover_30%] [animation-timeline:view()] lg:mb-9 lg:text-5xl"
+          >
             Zrobione pod paczkę znajomych, nie pod firmę.
           </h2>
           <ul className="m-0 grid list-none gap-4 p-0 lg:grid-cols-3">
             {reasons.map((reason) => (
-              <li key={reason.figure} className="rounded-card bg-surface p-6 animate-rise [animation-range:entry_0%_cover_30%] [animation-timeline:view()] lg:p-8">
-                <b className="m-0 mb-4 block font-display font-extrabold tracking-tightest text-balance text-accent-ink text-6xl">{reason.figure}</b>
-                <h3 className="m-0 mb-2 font-display font-bold tracking-tighter text-balance text-2xl">{reason.heading}</h3>
+              <li
+                key={reason.figure}
+                className="animate-rise rounded-card bg-surface p-6 [animation-range:entry_0%_cover_30%] [animation-timeline:view()] lg:p-8"
+              >
+                <b className="m-0 mb-4 block font-display text-6xl font-extrabold tracking-tightest text-balance text-accent-ink">
+                  {reason.figure}
+                </b>
+                <h3 className="m-0 mb-2 font-display text-2xl font-bold tracking-tighter text-balance">{reason.heading}</h3>
                 <p className="m-0 text-muted">{reason.body}</p>
               </li>
             ))}
@@ -86,10 +92,13 @@ export function Landing({ hero, home }: { hero: ReactNode; home: URL }) {
           className="mx-auto box-border flex max-w-wide flex-col gap-8 px-5 py-20 [contain-intrinsic-size:auto_640px] [content-visibility:auto] lg:grid lg:grid-cols-[minmax(0,1fr)_480px] lg:items-center lg:gap-16 lg:px-12 lg:py-30"
           aria-labelledby="end-heading"
         >
-          <h2 id="end-heading" className="m-0 font-display font-extrabold tracking-tightest text-balance text-4xl animate-rise [animation-range:entry_0%_cover_30%] [animation-timeline:view()] lg:text-7xl">
+          <h2
+            id="end-heading"
+            className="m-0 animate-rise font-display text-4xl font-extrabold tracking-tightest text-balance [animation-range:entry_0%_cover_30%] [animation-timeline:view()] lg:text-7xl"
+          >
             To kiedy się widzicie?
           </h2>
-          <div className="flex flex-col gap-3 text-center animate-rise [animation-range:entry_0%_cover_30%] [animation-timeline:view()]">
+          <div className="flex animate-rise flex-col gap-3 text-center [animation-range:entry_0%_cover_30%] [animation-timeline:view()]">
             <GoToFormButton formId={formId}>Utwórz ankietę</GoToFormButton>
             <Text variant="meta">Za darmo. Znajomi nie zakładają kont.</Text>
           </div>

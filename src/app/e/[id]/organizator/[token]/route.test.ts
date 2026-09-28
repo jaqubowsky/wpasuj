@@ -3,6 +3,7 @@ import { openTestDatabase } from "@/shared/testing/test-database";
 import { beforeEach, expect, it, vi } from "vitest";
 
 let cookieJar = fakeCookies();
+
 vi.mock("next/headers", () => ({ cookies: async () => cookieJar, headers: async () => new Headers() }));
 vi.mock("server-only", () => ({}));
 
@@ -11,6 +12,7 @@ let token: string;
 
 async function open(id: string, withToken: string) {
   const { GET } = await import("./route");
+
   return GET(new Request(`http://localhost/e/${id}/organizator/${withToken}`), { params: Promise.resolve({ id, token: withToken }) });
 }
 
@@ -18,6 +20,7 @@ beforeEach(async () => {
   cookieJar = fakeCookies();
   await openTestDatabase();
   const { createPoll } = await import("@/modules/create-poll/server/create-poll-action");
+
   const result = await createPoll({
     title: "Kino",
     dates: ["2030-10-16"],
@@ -26,6 +29,7 @@ beforeEach(async () => {
     timeZone: "Europe/Warsaw",
     organiserName: "Kuba",
   });
+
   pollId = result.ok ? result.id : "";
   token = cookieJar.get(`${pollId}-org`)?.value ?? "";
   cookieJar = fakeCookies();

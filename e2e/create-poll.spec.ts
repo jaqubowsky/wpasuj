@@ -24,31 +24,42 @@ async function holdCreateAction(page: Page) {
   let release = () => {};
   let onHeld = () => {};
   const held = new Promise<void>((resolve) => (onHeld = resolve));
+
   await page.route("/", async (route) => {
     if (route.request().method() !== "POST") return route.continue();
+
     onHeld();
     await new Promise<void>((resolve) => (release = resolve));
     await route.continue();
   });
+
   return { held, release: () => release() };
 }
 
 async function countViewTransitions(page: Page) {
   await page.addInitScript(() => {
     const started: string[] = [];
+
     Object.defineProperty(window, "viewTransitions", { value: started });
     const start = document.startViewTransition?.bind(document);
+
     if (start) document.startViewTransition = (update) => (started.push(location.pathname), start(update));
   });
+
   return () => page.evaluate(() => (window as unknown as { viewTransitions: string[] }).viewTransitions.length);
 }
 
 const namedForTransition = (page: Page) =>
-  page.evaluate(() => [...document.querySelectorAll("*")].map((element) => getComputedStyle(element).viewTransitionName).filter((name) => name !== "none" && name !== "root"));
+  page.evaluate(() =>
+    [...document.querySelectorAll("*")]
+      .map((element) => getComputedStyle(element).viewTransitionName)
+      .filter((name) => name !== "none" && name !== "root"),
+  );
 
 const inviteCard = (page: Page) => page.getByRole("region", { name: "Ankieta gotowa" });
 
 const createButton = (page: Page) => page.getByRole("button", { name: "Utwórz i wyślij na grupę" });
+
 async function createPoll(page: Page, { title, day, name }: { title: string; day: string; name: string }) {
   await page.getByRole("textbox", { name: "Co robimy?" }).fill(title);
   await page.getByRole("button", { name: day }).click();
@@ -67,10 +78,15 @@ test("the organiser creates a weekend evening poll, lands on the invite card and
 
   await page.getByRole("textbox", { name: "Co robimy?" }).fill("Planszówki u Michała");
   await page.getByRole("button", { name: "Ten weekend" }).click();
-  await expect(page.getByRole("group", { name: "O której?" }).getByText("17:00 → 23:00 · 6 godzin").filter({ visible: true })).toBeVisible();
+
+  await expect(
+    page.getByRole("group", { name: "O której?" }).getByText("17:00 → 23:00 · 6 godzin").filter({ visible: true }),
+  ).toBeVisible();
+
   await page.getByRole("textbox", { name: "Twoje imię" }).fill("Kuba");
   await saveScreenshot(page, testInfo, "create-filled");
   const action = await holdCreateAction(page);
+
   await createButton(page).click();
 
   await action.held;
@@ -89,7 +105,11 @@ test("the organiser creates a weekend evening poll, lands on the invite card and
   await inviteCard(page).getByRole("button", { name: "Wyślij na grupę" }).click();
 
   await expect(page.getByText("Wysłane. Odpowiedzi pojawią się tutaj.")).toBeVisible();
-  expect(await page.evaluate(() => window.shared)).toEqual([{ data: { text: `Kiedy możecie? Planszówki u Michała ${page.url()}` }, fromTap: true }]);
+
+  expect(await page.evaluate(() => window.shared)).toEqual([
+    { data: { text: `Kiedy możecie? Planszówki u Michała ${page.url()}` }, fromTap: true },
+  ]);
+
   await expect(inviteCard(page)).toHaveCount(0);
   await saveScreenshot(page, testInfo, "invite-sent");
 
@@ -114,13 +134,16 @@ test("on a slow network the spinner keeps moving and the form morphs only once t
   let onHeld = () => {};
   const held = new Promise<void>((resolve) => (onHeld = resolve));
   let holding = true;
+
   await page.route(/\/e\/[A-Za-z0-9_-]{10}(\?.*)?$/, async (route) => {
     if (!holding) return route.continue();
+
     holding = false;
     onHeld();
     await new Promise<void>((resolve) => (release = resolve));
     await route.continue();
   });
+
   await page.goto("/");
 
   await createPoll(page, { title: "Kino", day: "Jutro", name: "Ola" });
@@ -129,6 +152,7 @@ test("on a slow network the spinner keeps moving and the form morphs only once t
   const spinner = page.getByRole("button", { name: "Tworzę ankietę…" }).locator("[data-create-spinner]");
   const turned = () => spinner.evaluate((element) => element.getAnimations()[0].currentTime);
   const before = await turned();
+
   await expect.poll(turned).not.toBe(before);
   expect(await viewTransitions()).toBe(0);
   release();
@@ -174,6 +198,7 @@ test("the organiser asks for 22:00 to 4:00 and a night run reads 23–1", async 
 
   if (testInfo.project.name.startsWith("desktop")) {
     const tiles = page.getByRole("group", { name: "Godziny" });
+
     await tiles.getByRole("button", { name: "22:00", exact: true }).click();
     await expect(page.getByText("Od 22:00, teraz kliknij koniec").filter({ visible: true })).toBeVisible();
     await tiles.getByRole("button", { name: "3:00", exact: true }).click();
@@ -183,10 +208,15 @@ test("the organiser asks for 22:00 to 4:00 and a night run reads 23–1", async 
   } else {
     await page.getByRole("button", { name: "Od 17:00" }).click();
     const sheet = page.getByRole("dialog", { name: "O której?" });
+
     await sheet.getByRole("group", { name: "Od" }).getByRole("button", { name: "22:00", exact: true }).click();
+
     const [late, later] = await Promise.all(
-      ["22:00", "23:00"].map((hour) => sheet.getByRole("group", { name: "Od" }).getByRole("button", { name: hour, exact: true }).boundingBox()),
+      ["22:00", "23:00"].map((hour) =>
+        sheet.getByRole("group", { name: "Od" }).getByRole("button", { name: hour, exact: true }).boundingBox(),
+      ),
     );
+
     expect(later!.y - (late!.y + late!.height)).toBeGreaterThanOrEqual(6);
     await sheet.getByRole("group", { name: "Do" }).getByRole("button", { name: "4:00", exact: true }).click();
     await expect(sheet.getByText("22:00 → 4:00 · 6 godzin")).toBeVisible();
@@ -197,10 +227,12 @@ test("the organiser asks for 22:00 to 4:00 and a night run reads 23–1", async 
     await expect(page.getByRole("button", { name: "Od 22:00" })).toBeFocused();
     await expect(page.getByRole("button", { name: "Do 4:00" })).toBeVisible();
   }
+
   await createPoll(page, { title: "Nocne granie", day: "Jutro", name: "Kuba" });
   await expect(page).toHaveURL(/\/e\/[A-Za-z0-9_-]{10}$/);
 
   const grid = page.getByRole("grid", { name: "Kiedy możesz?" });
+
   await expect(grid.getByRole("rowheader")).toHaveText(["22:00", "23:00", "0:00", "1:00", "2:00", "3:00"]);
   await grid.getByRole("button", { name: /, 23:00$/ }).click();
   await grid.getByRole("button", { name: /, 0:00$/ }).click();
@@ -238,11 +270,13 @@ test("the month and the 10-day limit", async ({ page }, testInfo) => {
 
   await page.getByRole("button", { name: "Przyszły tydzień" }).click();
   const free = page.getByRole("group", { name: "Dni" }).locator('button[aria-pressed="false"]:enabled');
+
   for (let picked = 7; picked < 10; picked++) await free.last().click();
   await free.last().click();
 
   await expect(page.getByText("Maksymalnie 10 dni")).toBeVisible();
   const selected = page.getByRole("group", { name: "Dni" }).locator('button[aria-pressed="true"]');
+
   await expect(selected).toHaveCount(10);
   await expect(selected.first()).toHaveCSS("color", "rgb(30, 27, 24)");
   await saveScreenshot(page, testInfo, "create-limit");
@@ -251,6 +285,7 @@ test("the month and the 10-day limit", async ({ page }, testInfo) => {
 test("nothing below the dates moves when the page hydrates", async ({ page, browser }) => {
   const firstPaint = await browser.newContext({ viewport: page.viewportSize(), javaScriptEnabled: false });
   const serverRendered = await firstPaint.newPage();
+
   await serverRendered.goto("http://localhost:3000/");
   const whenHeading = (on: Page) => on.getByText("O której?", { exact: true });
   const before = (await whenHeading(serverRendered).boundingBox())!.y;
@@ -264,10 +299,12 @@ test("nothing below the dates moves when the page hydrates", async ({ page, brow
 test("what the organiser types before the page hydrates still creates the poll", async ({ page }) => {
   let hydrate = () => {};
   const scriptsHeld = new Promise<void>((resolve) => (hydrate = resolve));
+
   await page.route(/\/_next\/static\/chunks\/.+\.js$/, async (route) => {
     await scriptsHeld;
     await route.continue();
   });
+
   await stubShareSheet(page);
   await page.goto("/", { waitUntil: "domcontentloaded" });
 
@@ -287,6 +324,7 @@ test("inputs render at 16px or more", async ({ page }) => {
 
   for (const input of await page.locator("input, output").all()) {
     const size = await input.evaluate((element) => parseFloat(getComputedStyle(element).fontSize));
+
     expect(size).toBeGreaterThanOrEqual(16);
   }
 });
@@ -296,10 +334,12 @@ test("the create button sits above the safe area", async ({ page }, testInfo) =>
   await page.goto("/");
 
   const bar = createButton(page).locator("..");
+
   await expect(bar).toHaveCSS("position", "sticky");
   await expect(bar).toHaveCSS("bottom", "0px");
   const viewport = page.viewportSize()!;
   const button = (await createButton(page).boundingBox())!;
+
   expect(button.y + button.height).toBeLessThanOrEqual(viewport.height - 12);
 });
 
@@ -309,6 +349,7 @@ test.describe("a viewer in London on a Warsaw poll", () => {
   test("reads which zone the hours are in; a viewer in Warsaw does not", async ({ page, browser }, testInfo) => {
     const warsaw = await browser.newContext({ timezoneId: "Europe/Warsaw", baseURL: testInfo.project.use.baseURL });
     const organiser = await warsaw.newPage();
+
     await stubShareSheet(organiser);
     await organiser.goto("/");
     await createPoll(organiser, { title: "Kino", day: "Jutro", name: "Ola" });
@@ -340,12 +381,16 @@ test.describe("with reduced motion", () => {
 
   test("creating, sending and Nie mogę work with no transition or animation", async ({ page }) => {
     await stubShareSheet(page);
+
     await page.addInitScript(() => {
       const moved: string[] = [];
+
       Object.defineProperty(window, "moved", { value: moved });
       for (const event of ["animationstart", "transitionrun"]) document.addEventListener(event, () => moved.push(event), true);
     });
+
     const moved = () => page.evaluate(() => (window as unknown as { moved: string[] }).moved);
+
     await page.goto("/");
 
     await createPoll(page, { title: "Kino", day: "Jutro", name: "Ola" });
@@ -354,7 +399,14 @@ test.describe("with reduced motion", () => {
     await expect(page.getByText("Wysłane. Odpowiedzi pojawią się tutaj.")).toBeVisible();
 
     const grid = page.getByRole("grid", { name: "Kiedy możesz?" });
-    const cell = (hourIndex: number) => grid.getByRole("row").nth(hourIndex + 1).getByRole("button").nth(1);
+
+    const cell = (hourIndex: number) =>
+      grid
+        .getByRole("row")
+        .nth(hourIndex + 1)
+        .getByRole("button")
+        .nth(1);
+
     await cell(0).click();
     await cell(1).click();
     await expect(page.getByRole("status").filter({ hasText: "Zapisane" })).toBeVisible();

@@ -15,12 +15,27 @@ const notices: Record<"closed" | "full" | "gone", ReactNode> = {
   full: "W tej ankiecie jest już 30 osób, więcej się nie zmieści. Napisz na grupie, kiedy możesz.",
   gone: (
     <>
-      Tej ankiety już nie ma. <Link href="/" className="text-inherit underline-offset-3">Zrób własną ankietę</Link>
+      Tej ankiety już nie ma.{" "}
+      <Link href="/" className="text-inherit underline-offset-3">
+        Zrób własną ankietę
+      </Link>
     </>
   ),
 };
 
-function NameClash({ heldName, hours, yours, onClaim, onDecline }: { heldName: string; hours?: number; yours?: { name: string; hours: number }; onClaim: () => void; onDecline?: () => void }) {
+function NameClash({
+  heldName,
+  hours,
+  yours,
+  onClaim,
+  onDecline,
+}: {
+  heldName: string;
+  hours?: number;
+  yours?: { name: string; hours: number };
+  onClaim: () => void;
+  onDecline?: () => void;
+}) {
   const headingId = useId();
 
   return (
@@ -87,7 +102,13 @@ export function AnswerLead() {
         </p>
       )}
       {problem?.kind === "name-taken" && (
-        <NameClash heldName={problem.heldName} hours={problem.hours} yours={problem.yours} onClaim={() => answer.claim(problem.heldName)} onDecline={answer.asksName ? answer.declineClaim : undefined} />
+        <NameClash
+          heldName={problem.heldName}
+          hours={problem.hours}
+          yours={problem.yours}
+          onClaim={() => answer.claim(problem.heldName)}
+          onDecline={answer.asksName ? answer.declineClaim : undefined}
+        />
       )}
       {(problem?.kind === "closed" || problem?.kind === "full" || problem?.kind === "gone") && (
         <p className="m-0 text-sm font-medium text-accent-ink" role="alert">

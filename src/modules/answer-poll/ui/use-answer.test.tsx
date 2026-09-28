@@ -7,6 +7,7 @@ vi.mock("../server/answer-actions", () => ({ saveAnswer: vi.fn(), claimName: vi.
 
 function NameField({ mine }: { mine?: Answer }) {
   const { attachNameField, declineClaim } = useAnswer({ pollId: "Planszowki", dates: ["2026-10-16"], hours: [19], mine });
+
   return (
     <>
       <button type="button" onClick={declineClaim}>

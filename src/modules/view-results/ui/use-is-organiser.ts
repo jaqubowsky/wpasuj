@@ -22,14 +22,17 @@ export function useIsOrganiser(given: Organiser | undefined, refreshResults: () 
     setProblem(undefined);
     setPending(true);
     const outcome = await request().catch(() => undefined);
+
     setPending(false);
     if (!outcome) return setProblem("failed");
     if (outcome.ok) return onDone();
+
     switch (outcome.reason) {
       case "invalid":
         return setProblem("invalid");
       case "not-organiser":
         setRevoked(true);
+
         return setProblem("not-organiser");
       case "gone":
         return refreshResults();

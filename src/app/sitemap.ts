@@ -4,5 +4,6 @@ import { connection } from "next/server";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   await connection();
+
   return [{ url: new URL("/", siteUrl()).href }];
 }

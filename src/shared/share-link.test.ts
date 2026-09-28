@@ -5,7 +5,9 @@ const message = { text: "Kiedy możecie? Kino https://wpasuj.pl/e/abcdefghij", l
 
 function stubBrowser({ share }: { share?: (data: ShareData) => Promise<void> }) {
   const writeText = vi.fn(async () => {});
+
   vi.stubGlobal("navigator", { share, clipboard: { writeText } });
+
   return writeText;
 }
 

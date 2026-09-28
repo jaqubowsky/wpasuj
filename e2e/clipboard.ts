@@ -9,6 +9,7 @@ declare global {
 export async function stubClipboardWithoutShareSheet(page: Page) {
   await page.addInitScript(() => {
     Object.defineProperty(navigator, "share", { configurable: true, value: undefined });
+
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
       value: {

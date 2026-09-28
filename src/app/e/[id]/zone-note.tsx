@@ -5,6 +5,7 @@ import { Text } from "@/shared/ui/text/text";
 
 export function ZoneNote({ pollZone }: { pollZone: string }) {
   const viewerZone = useDeviceTimeZone();
+
   if (!viewerZone || viewerZone === pollZone) return null;
 
   return (

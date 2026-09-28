@@ -8,12 +8,20 @@ type PollGrid = Pick<Results, "dates" | "final"> & { firstHour: number; hourCoun
 
 export function readResults(id: string, poll: PollGrid, now: Date, participantToken?: string): Results {
   const db = getDb();
+
   const respondents = db
-    .select({ id: participants.id, name: participants.name, normalisedName: participants.normalisedName, savedAt: participants.updatedAt, tokenHash: participants.tokenHash })
+    .select({
+      id: participants.id,
+      name: participants.name,
+      normalisedName: participants.normalisedName,
+      savedAt: participants.updatedAt,
+      tokenHash: participants.tokenHash,
+    })
     .from(participants)
     .where(eq(participants.pollId, id))
     .orderBy(asc(participants.id))
     .all();
+
   const freeSlots = db
     .select({ participantId: slots.participantId, date: slots.date, hour: slots.hour })
     .from(slots)

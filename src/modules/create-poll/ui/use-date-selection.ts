@@ -14,17 +14,20 @@ export function useDateSelection() {
     setLimitReached(selection.limitReached ?? false);
   }
 
-  const picker = today === undefined ? undefined : {
-    today,
-    strip: stripDates(today, monthOpen ? 6 : 2),
-    monthOpen,
-    limitReached,
-    toggleMonth: () => setMonthOpen((open) => !open),
-    isPast: (date: string) => isPastDate(date, today),
-    isLit: (preset: Preset) => isLit(dates, preset, today),
-    tapPreset: (preset: Preset) => apply(togglePreset(dates, preset, today)),
-    tapDate: (date: string) => apply(toggleDate(dates, date)),
-  };
+  const picker =
+    today === undefined
+      ? undefined
+      : {
+          today,
+          strip: stripDates(today, monthOpen ? 6 : 2),
+          monthOpen,
+          limitReached,
+          toggleMonth: () => setMonthOpen((open) => !open),
+          isPast: (date: string) => isPastDate(date, today),
+          isLit: (preset: Preset) => isLit(dates, preset, today),
+          tapPreset: (preset: Preset) => apply(togglePreset(dates, preset, today)),
+          tapDate: (date: string) => apply(toggleDate(dates, date)),
+        };
 
   return { dates, picker };
 }

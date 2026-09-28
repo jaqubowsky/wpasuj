@@ -12,12 +12,18 @@ const results = {
   dates: ["2030-10-19"],
   hours: [18, 19],
   readAt: Date.parse("2030-10-15T18:00:00Z"),
-  respondents: [{ name: "Ola", normalisedName: "ola", savedAt: Date.parse("2030-10-15T18:00:00Z"), slots: [{ date: "2030-10-19", hour: 18 }] }],
+  respondents: [
+    { name: "Ola", normalisedName: "ola", savedAt: Date.parse("2030-10-15T18:00:00Z"), slots: [{ date: "2030-10-19", hour: 18 }] },
+  ],
   final: null,
 };
 
 function renderTabs(tabs: ReactNode) {
-  vi.stubGlobal("fetch", vi.fn(async () => Response.json(results)));
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async () => Response.json(results)),
+  );
+
   render(
     <ResultsProvider pollId="Pl4nszowki" initial={results} organiserKey="kuba">
       <PeoplePanel />
@@ -32,6 +38,7 @@ describe("PollTabs", () => {
 
     const lead = screen.getByText("imię i status");
     const tabs = screen.getByRole("tablist");
+
     expect(lead.compareDocumentPosition(tabs) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.getByRole("tabpanel", { name: "Moje" })).toHaveTextContent("siatka");
     expect(screen.queryByText("najlepszy termin")).not.toBeInTheDocument();

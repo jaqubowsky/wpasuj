@@ -5,6 +5,7 @@ import { Button } from "@/shared/ui/button/button";
 
 function goToForm(formId: string) {
   const form = document.getElementById(formId)!;
+
   form.scrollIntoView({ block: "start" });
   form.querySelector("input")!.focus({ preventScroll: true });
 }

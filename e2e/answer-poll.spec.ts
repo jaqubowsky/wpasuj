@@ -5,22 +5,27 @@ import { saveScreenshot } from "./screenshot";
 
 async function createPoll(browser: Browser) {
   const organiser = await browser.newPage();
+
   await organiser.addInitScript(() => {
     Object.defineProperty(navigator, "share", { configurable: true, value: async () => {} });
   });
+
   await organiser.goto("/");
   await organiser.getByRole("textbox", { name: "Co robimy?" }).fill("Planszówki u Michała");
   await organiser.getByRole("button", { name: "Przyszły tydzień" }).click();
   await organiser.getByRole("textbox", { name: "Twoje imię" }).fill("Kuba");
   await organiser.getByRole("button", { name: "Utwórz i wyślij na grupę" }).click();
   await expect(organiser).toHaveURL(/\/e\/[A-Za-z0-9_-]{10}$/);
+
   return { organiser, link: organiser.url() };
 }
 
 async function openAsNewDevice(browser: Browser, link: string) {
   const context = await browser.newContext(test.info().project.use);
   const page = await context.newPage();
+
   await page.goto(link);
+
   return page;
 }
 
@@ -30,11 +35,17 @@ const selected = (page: Page) => page.getByRole("gridcell", { selected: true });
 const cantButton = (page: Page) => page.getByRole("button", { name: "Nie mogę w żadnym terminie" });
 
 function cellAt(page: Page, hourIndex: number, dateIndex: number) {
-  return page.getByRole("grid", { name: "Kiedy możesz?" }).getByRole("row").nth(hourIndex + 1).getByRole("button").nth(dateIndex + 1);
+  return page
+    .getByRole("grid", { name: "Kiedy możesz?" })
+    .getByRole("row")
+    .nth(hourIndex + 1)
+    .getByRole("button")
+    .nth(dateIndex + 1);
 }
 
 async function drag(page: Page, testInfo: TestInfo, from: Locator, to: Locator, beforeRelease?: () => Promise<void>) {
   const dragWith = testInfo.project.name === "phone-chromium" ? touchDrag : mouseDrag;
+
   await dragWith(page, await centreOf(from), await centreOf(to), beforeRelease);
 }
 
@@ -46,13 +57,18 @@ async function tap(cell: Locator, testInfo: TestInfo) {
 test("a fresh participant answers with a name and one drag and sees Zapisane", async ({ browser }, testInfo) => {
   const { link } = await createPoll(browser);
   const page = await openAsNewDevice(browser, link);
+
   await expect(page.getByRole("tab", { name: "Moje", selected: true })).toBeVisible();
   await expect(nameField(page)).toBeFocused();
   await saveScreenshot(page, testInfo, "answer-empty");
 
   await nameField(page).fill("Zuza");
+
   await drag(page, testInfo, cellAt(page, 1, 0), cellAt(page, 3, 2), async () => {
-    const shades = await page.locator('[data-state="adding"]').evaluateAll((cells) => cells.map((cell) => getComputedStyle(cell).backgroundColor));
+    const shades = await page
+      .locator('[data-state="adding"]')
+      .evaluateAll((cells) => cells.map((cell) => getComputedStyle(cell).backgroundColor));
+
     expect(shades).toHaveLength(9);
     expect(new Set(shades).size).toBe(1);
     await saveScreenshot(page, testInfo, "answer-painting");
@@ -87,11 +103,13 @@ test("a fresh participant answers with taps only", async ({ browser }, testInfo)
 test("a second device typing the same name gets To ty, Ola? and takes the row over", async ({ browser }, testInfo) => {
   const { link } = await createPoll(browser);
   const first = await openAsNewDevice(browser, link);
+
   await nameField(first).fill("Ola");
   await cellAt(first, 0, 0).click();
   await expect(status(first)).toHaveText("Zapisane");
 
   const second = await openAsNewDevice(browser, link);
+
   await nameField(second).fill("Ola");
   await cellAt(second, 1, 1).click();
   await expect(second.getByRole("region", { name: "To Ty, Ola?" })).toContainText("Na innym telefonie, 1 godzina");
@@ -110,16 +128,19 @@ test("a second device typing the same name gets To ty, Ola? and takes the row ov
 test("a device that answered as Bartek hears its hours join Ola's before Tak, to ja", async ({ browser }, testInfo) => {
   const { link } = await createPoll(browser);
   const ola = await openAsNewDevice(browser, link);
+
   await nameField(ola).fill("Ola");
   await cellAt(ola, 0, 0).click();
   await expect(status(ola)).toHaveText("Zapisane");
   const bartek = await openAsNewDevice(browser, link);
+
   await nameField(bartek).fill("Bartek");
   await cellAt(bartek, 2, 2).click();
   await expect(status(bartek)).toHaveText("Zapisane");
 
   await nameField(bartek).fill("Ola");
   const clash = bartek.getByRole("region", { name: "To Ty, Ola?" });
+
   await expect(clash).toContainText("Twoje godziny jako Bartek dołączą do tych.");
   await saveScreenshot(bartek, testInfo, "answer-to-ty-merge");
   await clash.getByRole("button", { name: "Tak, to ja" }).click();
@@ -136,12 +157,14 @@ test("a device that answered as Bartek hears its hours join Ola's before Tak, to
 test("server data never overwrites my Moje grid while another device saves", async ({ browser }) => {
   const { link } = await createPoll(browser);
   const mine = await openAsNewDevice(browser, link);
+
   await nameField(mine).fill("Michał");
   await cellAt(mine, 0, 0).click();
   await expect(status(mine)).toHaveText("Zapisane");
   await cellAt(mine, 5, 2).click();
 
   const other = await openAsNewDevice(browser, link);
+
   await nameField(other).fill("Ola");
   await cellAt(other, 2, 1).click();
   await expect(status(other)).toHaveText("Zapisane");
@@ -171,6 +194,7 @@ test("the organiser answers on Moje under the name from create, with no name fie
 test("a returning device finds its last name prefilled and the field left alone", async ({ browser }) => {
   const { link } = await createPoll(browser);
   const context = await browser.newContext(test.info().project.use);
+
   await context.addInitScript(() => localStorage.setItem("last-name", "Ola"));
   const page = await context.newPage();
 
@@ -186,12 +210,15 @@ test("save states: Zapisuję, Nie zapisano with Spróbuj ponownie, and nie może
   let release = () => {};
   let onHeld = () => {};
   const held = new Promise<void>((resolve) => (onHeld = resolve));
+
   await page.route(link, async (route) => {
     if (route.request().method() !== "POST") return route.continue();
+
     onHeld();
     await new Promise<void>((resolve) => (release = resolve));
     await route.continue();
   });
+
   await nameField(page).fill("Zuza");
   await cellAt(page, 0, 0).click();
   await held;

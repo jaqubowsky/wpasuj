@@ -16,6 +16,7 @@ type CreatePollResult = { ok: true; id: string } | { ok: false; reason: "invalid
 export async function createPoll(input: CreatePollInput): Promise<CreatePollResult> {
   const parsed = createPollSchema.safeParse(input);
   const now = new Date();
+
   if (!parsed.success || hasPastDate(parsed.data.dates, todayIn(parsed.data.timeZone, now))) {
     return { ok: false, reason: "invalid" };
   }
@@ -29,11 +30,12 @@ export async function createPoll(input: CreatePollInput): Promise<CreatePollResu
   db.transaction((tx) => {
     const createdByParticipant =
       heldTokenHashes.length > 0 &&
-      tx.select({ id: participants.id }).from(participants).where(inArray(participants.tokenHash, heldTokenHashes)).get() !==
-        undefined;
+      tx.select({ id: participants.id }).from(participants).where(inArray(participants.tokenHash, heldTokenHashes)).get() !== undefined;
+
     tx.delete(polls)
       .where(lt(sql`(select max(value) from json_each(${polls.dates}))`, cleanupCutoff(now)))
       .run();
+
     tx.insert(polls)
       .values({
         id,
@@ -46,5 +48,6 @@ export async function createPoll(input: CreatePollInput): Promise<CreatePollResu
   });
 
   cookieStore.set(organiserCookie(id), organiserToken, await tokenCookieOptions());
+
   return { ok: true, id };
 }

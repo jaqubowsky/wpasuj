@@ -19,8 +19,13 @@ describe("linkPreview", () => {
   });
 
   it("names three or more days in a row as a range, across a month too", () => {
-    expect(linkPreview({ ...poll, dates: ["2030-10-30", "2030-10-31", "2030-11-01"] }).when).toBe("śr 30 października – pt 1 listopada, wieczorem");
-    expect(linkPreview({ ...poll, dates: ["2030-10-14", "2030-10-16", "2030-10-17", "2030-10-18"] }).when).toBe("pn 14, śr 16 – pt 18 października, wieczorem");
+    expect(linkPreview({ ...poll, dates: ["2030-10-30", "2030-10-31", "2030-11-01"] }).when).toBe(
+      "śr 30 października – pt 1 listopada, wieczorem",
+    );
+
+    expect(linkPreview({ ...poll, dates: ["2030-10-14", "2030-10-16", "2030-10-17", "2030-10-18"] }).when).toBe(
+      "pn 14, śr 16 – pt 18 października, wieczorem",
+    );
   });
 
   it("lists two days in a row one by one", () => {

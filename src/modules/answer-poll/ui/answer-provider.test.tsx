@@ -26,6 +26,7 @@ function panel(mine?: Mine) {
 function renderPanel(mine?: Mine) {
   const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
   const view = render(panel(mine));
+
   return { user, ...view };
 }
 
@@ -58,6 +59,7 @@ afterEach(() => {
 describe("the Moje lead and body", () => {
   it("saves the name and the tapped hours without a button and says so", async () => {
     const { user } = renderPanel();
+
     await user.type(nameField(), "Ola");
 
     fireEvent.click(cell("pt 16, 19:00"));
@@ -71,6 +73,7 @@ describe("the Moje lead and body", () => {
         { date: "2026-10-17", hour: 20 },
       ],
     });
+
     expect(await screen.findByRole("status")).toHaveTextContent("Zapisane");
     expect(localStorage.getItem("last-name")).toBe("Ola");
   });
@@ -101,6 +104,7 @@ describe("the Moje lead and body", () => {
 
   it("resumes the saved answer and keeps it when newer server data arrives", async () => {
     const { rerender } = renderPanel({ name: "Ola", slots: [{ date: "2026-10-16", hour: 19 }] });
+
     expect(screen.getByRole("status")).toHaveTextContent("Zapisane");
     fireEvent.click(cell("sb 17, 21:00"));
 
@@ -122,7 +126,14 @@ describe("the Moje lead and body", () => {
   });
 
   it("Nie mogę w żadnym terminie selects the toggle, clears the hours one by one and saves an empty set", async () => {
-    const { user } = renderPanel({ name: "Ola", slots: [{ date: "2026-10-16", hour: 19 }, { date: "2026-10-17", hour: 19 }, { date: "2026-10-16", hour: 21 }] });
+    const { user } = renderPanel({
+      name: "Ola",
+      slots: [
+        { date: "2026-10-16", hour: 19 },
+        { date: "2026-10-17", hour: 19 },
+        { date: "2026-10-16", hour: 21 },
+      ],
+    });
 
     await user.click(cantButton());
 
@@ -141,7 +152,14 @@ describe("the Moje lead and body", () => {
 
   it("clears the hours at once under reduced motion", async () => {
     stubReducedMotion(true);
-    const { user } = renderPanel({ name: "Ola", slots: [{ date: "2026-10-16", hour: 19 }, { date: "2026-10-17", hour: 19 }] });
+
+    const { user } = renderPanel({
+      name: "Ola",
+      slots: [
+        { date: "2026-10-16", hour: 19 },
+        { date: "2026-10-17", hour: 19 },
+      ],
+    });
 
     await user.click(cantButton());
 
@@ -149,8 +167,13 @@ describe("the Moje lead and body", () => {
   });
 
   it("Cofnij restores and saves the hours from before", async () => {
-    const before = [{ date: "2026-10-16", hour: 19 }, { date: "2026-10-17", hour: 20 }];
+    const before = [
+      { date: "2026-10-16", hour: 19 },
+      { date: "2026-10-17", hour: 20 },
+    ];
+
     const { user } = renderPanel({ name: "Ola", slots: before });
+
     await user.click(cantButton());
     await afterQuiet();
 
@@ -166,6 +189,7 @@ describe("the Moje lead and body", () => {
 
   it("painting an hour leaves Nie mogę and its Cofnij", async () => {
     const { user } = renderPanel({ name: "Ola", slots: [{ date: "2026-10-16", hour: 19 }] });
+
     await user.click(cantButton());
     await afterQuiet();
 
@@ -201,6 +225,7 @@ describe("the Moje lead and body", () => {
   it("shows Nie zapisano until Spróbuj ponownie succeeds", async () => {
     vi.mocked(saveAnswer).mockRejectedValueOnce(new TypeError("Failed to fetch"));
     const { user } = renderPanel();
+
     await user.type(nameField(), "Ola");
     fireEvent.click(cell("pt 16, 19:00"));
     await afterQuiet();
@@ -229,6 +254,7 @@ describe("the Moje lead and body", () => {
     vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola", hours: 1 });
     vi.mocked(claimName).mockResolvedValue({ ok: true, name: "Ola", slots: [{ date: "2026-10-17", hour: 21 }] });
     const { user } = renderPanel();
+
     await user.type(nameField(), "ola ");
     fireEvent.click(cell("pt 16, 19:00"));
     await afterQuiet();
@@ -239,6 +265,7 @@ describe("the Moje lead and body", () => {
 
     expect(claimName).toHaveBeenCalledWith(pollId, "Ola");
     expect(nameField()).toHaveValue("Ola");
+
     expect(saveAnswer).toHaveBeenLastCalledWith(pollId, {
       name: "Ola",
       slots: [
@@ -246,13 +273,22 @@ describe("the Moje lead and body", () => {
         { date: "2026-10-17", hour: 21 },
       ],
     });
+
     expect(await screen.findByRole("status")).toHaveTextContent("Zapisane");
     expect(screen.queryByText("To Ty, Ola?")).not.toBeInTheDocument();
   });
 
   it("tells a device that answered as Bartek that Tak, to ja folds its hours into Ola", async () => {
-    vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola", hours: 1, yours: { name: "Bartek", hours: 2 } });
+    vi.mocked(saveAnswer).mockResolvedValueOnce({
+      ok: false,
+      reason: "name-taken",
+      name: "Ola",
+      hours: 1,
+      yours: { name: "Bartek", hours: 2 },
+    });
+
     const { user } = renderPanel();
+
     await user.type(nameField(), "Ola");
     fireEvent.click(cell("pt 16, 19:00"));
     await afterQuiet();
@@ -265,8 +301,10 @@ describe("the Moje lead and body", () => {
   it("keeps hours painted while Tak, to ja is on its way", async () => {
     vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola", hours: 1 });
     let finishClaim: (result: Awaited<ReturnType<typeof claimName>>) => void = () => {};
+
     vi.mocked(claimName).mockReturnValue(new Promise((resolve) => (finishClaim = resolve)));
     const { user } = renderPanel();
+
     await user.type(nameField(), "Ola");
     fireEvent.click(cell("pt 16, 19:00"));
     await afterQuiet();
@@ -277,6 +315,7 @@ describe("the Moje lead and body", () => {
     await afterQuiet();
 
     expect(slot("pt 16, 20:00")).toHaveAttribute("aria-selected", "true");
+
     expect(saveAnswer).toHaveBeenLastCalledWith(pollId, {
       name: "Ola",
       slots: [
@@ -289,6 +328,7 @@ describe("the Moje lead and body", () => {
   it("keeps Nie zapisano and Spróbuj ponownie through a new stroke that fails again", async () => {
     vi.mocked(saveAnswer).mockRejectedValue(new TypeError("Failed to fetch"));
     const { user } = renderPanel();
+
     await user.type(nameField(), "Ola");
     fireEvent.click(cell("pt 16, 19:00"));
     await afterQuiet();
@@ -302,6 +342,7 @@ describe("the Moje lead and body", () => {
   it("lets the participant pick another name on To nie ja", async () => {
     vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola", hours: 1 });
     const { user } = renderPanel();
+
     await user.type(nameField(), "Ola");
     fireEvent.click(cell("pt 16, 19:00"));
     await afterQuiet();
@@ -316,6 +357,7 @@ describe("the Moje lead and body", () => {
     vi.mocked(saveAnswer)
       .mockResolvedValueOnce({ ok: false, reason: "not-yours" })
       .mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola", hours: 1 });
+
     renderPanel({ name: "Ola", slots: [] });
 
     fireEvent.click(cell("pt 16, 19:00"));

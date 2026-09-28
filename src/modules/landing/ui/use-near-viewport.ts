@@ -8,12 +8,15 @@ export function useNearViewport(rootMargin: string) {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
+
         setNear(true);
         observer.disconnect();
       },
       { rootMargin },
     );
+
     observer.observe(ref.current!);
+
     return () => observer.disconnect();
   }, [rootMargin]);
 

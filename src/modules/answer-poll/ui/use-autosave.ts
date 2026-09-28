@@ -24,10 +24,13 @@ export function useAutosave<Value>(send: (value: Value) => Promise<boolean>, ini
 
   async function flush() {
     const current = queue.current;
+
     clearTimeout(current.timer);
     current.timer = undefined;
     if (current.inFlight || !current.pending) return;
+
     const { value } = current.pending;
+
     current.pending = undefined;
     current.inFlight = true;
     setState(unlessFailed);
@@ -47,8 +50,10 @@ export function useAutosave<Value>(send: (value: Value) => Promise<boolean>, ini
     const flushWhenHidden = () => {
       if (document.visibilityState === "hidden") flushNow();
     };
+
     document.addEventListener("visibilitychange", flushWhenHidden);
     window.addEventListener("pagehide", flushNow);
+
     return () => {
       document.removeEventListener("visibilitychange", flushWhenHidden);
       window.removeEventListener("pagehide", flushNow);
@@ -60,6 +65,7 @@ export function useAutosave<Value>(send: (value: Value) => Promise<boolean>, ini
     state,
     schedule(value: Value) {
       const current = queue.current;
+
       current.pending = { value };
       setState(unlessFailed);
       clearTimeout(current.timer);
@@ -67,8 +73,10 @@ export function useAutosave<Value>(send: (value: Value) => Promise<boolean>, ini
     },
     retry() {
       const current = queue.current;
+
       setState("saving");
       if (current.inFlight) return;
+
       current.pending ??= current.unsaved;
       void flush();
     },

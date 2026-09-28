@@ -20,17 +20,22 @@ export function useCreatePoll(input: Omit<CreatePollInput, "timeZone">) {
   async function submit() {
     setAttempted(true);
     if (!parsed.success || status === "creating") return;
+
     setStatus("creating");
 
     const result = await createPoll(fullInput).catch(() => undefined);
+
     if (!result) {
       setStatus("failed");
+
       return;
     }
+
     if (!result.ok) {
       switch (result.reason) {
         case "invalid":
           setStatus("refused");
+
           return;
       }
     }

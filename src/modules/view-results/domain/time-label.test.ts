@@ -27,14 +27,26 @@ it("names an hour or a run that starts after midnight by its calendar date", () 
 
 describe("setTimeShown", () => {
   it("names the day and the hours", () => {
-    expect(setTimeShown({ date: "2030-10-19", firstHour: 19, lastHour: 21 })).toEqual({ weekday: "Sobota", day: "19 października", hours: "19:00–21:00" });
+    expect(setTimeShown({ date: "2030-10-19", firstHour: 19, lastHour: 21 })).toEqual({
+      weekday: "Sobota",
+      day: "19 października",
+      hours: "19:00–21:00",
+    });
   });
 
   it("names the calendar date of a time that starts after midnight", () => {
-    expect(setTimeShown({ date: "2030-10-18", firstHour: 25, lastHour: 27 })).toEqual({ weekday: "Sobota", day: "19 października", hours: "1:00–3:00" });
+    expect(setTimeShown({ date: "2030-10-18", firstHour: 25, lastHour: 27 })).toEqual({
+      weekday: "Sobota",
+      day: "19 października",
+      hours: "1:00–3:00",
+    });
   });
 
   it("keeps the evening's date for a time that crosses midnight", () => {
-    expect(setTimeShown({ date: "2030-10-18", firstHour: 23, lastHour: 25 })).toEqual({ weekday: "Piątek", day: "18 października", hours: "23:00–1:00" });
+    expect(setTimeShown({ date: "2030-10-18", firstHour: 23, lastHour: 25 })).toEqual({
+      weekday: "Piątek",
+      day: "18 października",
+      hours: "23:00–1:00",
+    });
   });
 });
