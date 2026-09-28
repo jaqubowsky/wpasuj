@@ -24,6 +24,7 @@ test("the poll page asks the question and points og:image at its card on SITE_UR
   await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", "Kiedy możesz? Wędrówka: żubry i łąka");
   const image = await page.locator('meta[property="og:image"]').getAttribute("content");
   const card = `${siteUrl}/e/${pollId}/opengraph-image`;
+
   expect(image?.slice(0, card.length)).toBe(card);
   expect(image?.slice(card.length)).toMatch(/^(\?|$)/);
 });
@@ -35,6 +36,7 @@ test("the card is a 1200×630 PNG under 1 MB", async ({ page, request }) => {
     hourCount: 6,
     title: "Wędrówka: żubry i łąka",
   });
+
   await page.goto(`/e/${pollId}`);
   const image = new URL((await page.locator('meta[property="og:image"]').getAttribute("content"))!);
 
@@ -43,6 +45,7 @@ test("the card is a 1200×630 PNG under 1 MB", async ({ page, request }) => {
   expect(response.status()).toBe(200);
   expect(response.headers()["content-type"]).toBe("image/png");
   const png = await response.body();
+
   expect(pngSize(png)).toEqual({ width: 1200, height: 630 });
   expect(png.byteLength).toBeLessThan(1024 * 1024);
   await mkdir("e2e/screenshots", { recursive: true });
@@ -52,6 +55,7 @@ test("the card is a 1200×630 PNG under 1 MB", async ({ page, request }) => {
 async function cardOf(page: Page, request: APIRequestContext, pollId: string) {
   await page.goto(`/e/${pollId}`);
   const image = new URL((await page.locator('meta[property="og:image"]').getAttribute("content"))!);
+
   return (await request.get(image.pathname + image.search)).body();
 }
 
@@ -67,13 +71,19 @@ const bands = {
 };
 
 async function pixelsIn(page: Page, png: Buffer, band: Band) {
-  const pixels = await page.evaluate(async ({ source, band }) => {
-    const bitmap = await createImageBitmap(await (await fetch(source)).blob());
-    const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
-    const context = canvas.getContext("2d")!;
-    context.drawImage(bitmap, 0, 0);
-    return Array.from(context.getImageData(band.x, band.y, band.width, band.height).data).join(",");
-  }, { source: `data:image/png;base64,${png.toString("base64")}`, band });
+  const pixels = await page.evaluate(
+    async ({ source, band }) => {
+      const bitmap = await createImageBitmap(await (await fetch(source)).blob());
+      const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+      const context = canvas.getContext("2d")!;
+
+      context.drawImage(bitmap, 0, 0);
+
+      return Array.from(context.getImageData(band.x, band.y, band.width, band.height).data).join(",");
+    },
+    { source: `data:image/png;base64,${png.toString("base64")}`, band },
+  );
+
   return { digest: createHash("sha256").update(pixels).digest("hex"), colours: new Set(pixels.match(/\d+,\d+,\d+,\d+/g)).size };
 }
 
@@ -82,7 +92,9 @@ const kino = { dates: ["2030-10-18", "2030-10-19", "2030-10-20"], firstHour: 17,
 test("each fact on the card draws in its own band: organiser, title, dates, hours, respondents", async ({ page, request }) => {
   const base = await cardOf(page, request, seedPoll(kino));
   const answered = seedPoll(kino);
+
   ["Ola", "Michał", "Zośka"].forEach((name, index) => seedAnswer(answered, name, Date.now() + index, []));
+
   const variants = {
     organiser: await cardOf(page, request, seedPoll({ ...kino, organiserName: "Zośka" })),
     title: await cardOf(page, request, seedPoll({ ...kino, title: "Mecz u Oli" })),
@@ -97,6 +109,7 @@ test("each fact on the card draws in its own band: organiser, title, dates, hour
   for (const [fact, card] of Object.entries(variants)) {
     for (const [name, band] of Object.entries(bands)) {
       const [before, after] = [await pixelsIn(page, base, band), await pixelsIn(page, card, band)];
+
       expect(before.colours, `${name} draws something`).toBeGreaterThan(1);
       if (name === fact) expect(after.digest, `${fact} changes its band`).not.toBe(before.digest);
       else expect(after.digest, `${fact} leaves ${name} alone`).toBe(before.digest);
@@ -105,9 +118,55 @@ test("each fact on the card draws in its own band: organiser, title, dates, hour
 });
 
 const sixtyCharacters = "Rowerem dookoła Mazur, nocleg pod namiotem, ognisko nad wodą";
-const tenDates = ["2030-10-01", "2030-10-03", "2030-10-05", "2030-10-07", "2030-10-09", "2030-10-11", "2030-10-13", "2030-10-15", "2030-10-17", "2030-10-19"];
-const thirtyNames = ["Ola", "Michał", "Zośka", "Bartłomiej", "Łucja", "Ślęzak Grzegorz", "Kasia", "Piotrek", "Żaneta", "Jędrzej", "Małgorzata Wiśniewska", "Tomek", "Agnieszka", "Wojtek", "Ewa", "Szymon", "Natalia", "Kuba", "Iga", "Paweł", "Ania", "Krzysiek", "Dominika", "Maciek", "Julia", "Filip", "Hania", "Staś", "Weronika", "Adam"];
+
+const tenDates = [
+  "2030-10-01",
+  "2030-10-03",
+  "2030-10-05",
+  "2030-10-07",
+  "2030-10-09",
+  "2030-10-11",
+  "2030-10-13",
+  "2030-10-15",
+  "2030-10-17",
+  "2030-10-19",
+];
+
+const thirtyNames = [
+  "Ola",
+  "Michał",
+  "Zośka",
+  "Bartłomiej",
+  "Łucja",
+  "Ślęzak Grzegorz",
+  "Kasia",
+  "Piotrek",
+  "Żaneta",
+  "Jędrzej",
+  "Małgorzata Wiśniewska",
+  "Tomek",
+  "Agnieszka",
+  "Wojtek",
+  "Ewa",
+  "Szymon",
+  "Natalia",
+  "Kuba",
+  "Iga",
+  "Paweł",
+  "Ania",
+  "Krzysiek",
+  "Dominika",
+  "Maciek",
+  "Julia",
+  "Filip",
+  "Hania",
+  "Staś",
+  "Weronika",
+  "Adam",
+];
+
 const margin = 40;
+
 const frame = [
   { x: 0, y: 0, width: 1200, height: margin },
   { x: 0, y: 630 - margin, width: 1200, height: margin },
@@ -117,10 +176,19 @@ const frame = [
 
 test("a 60-character title with ten dates and 30 respondents stays inside the card", async ({ page, request }) => {
   expect(sixtyCharacters).toHaveLength(60);
-  const long = seedPoll({ dates: tenDates, firstHour: 8, hourCount: 5, title: sixtyCharacters, organiserName: "Małgorzata Żółkiewska-Ślęczkowska" });
+
+  const long = seedPoll({
+    dates: tenDates,
+    firstHour: 8,
+    hourCount: 5,
+    title: sixtyCharacters,
+    organiserName: "Małgorzata Żółkiewska-Ślęczkowska",
+  });
+
   thirtyNames.forEach((name, index) => seedAnswer(long, name, Date.now() + index, []));
 
   const [shortCard, longCard] = [await cardOf(page, request, seedPoll(kino)), await cardOf(page, request, long)];
+
   await mkdir("e2e/screenshots", { recursive: true });
   await writeFile("e2e/screenshots/link-preview-long.png", longCard);
 
