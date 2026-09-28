@@ -112,6 +112,7 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  { files: ["src/**"], rules: { "max-lines": ["error", 1] } },
   ...modules.flatMap(moduleBlocks),
   globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", ".claude/**", "spec/**", "test-results/**", "playwright-report/**"]),
 ]);
