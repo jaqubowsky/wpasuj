@@ -1,8 +1,6 @@
 import { openTestDatabase } from "@/shared/testing/test-database";
 import { afterEach, expect, it, vi } from "vitest";
 
-vi.mock("server-only", () => ({}));
-
 afterEach(() => {
   vi.unstubAllEnvs();
 });
