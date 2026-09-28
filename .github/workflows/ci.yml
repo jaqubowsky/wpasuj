@@ -2,11 +2,13 @@ name: CI
 
 on:
   pull_request:
+    paths-ignore: ['**/*.md']
   push:
     branches: [main]
+    paths-ignore: ['**/*.md']
 
 jobs:
-  check:
+  quick:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -19,32 +21,8 @@ jobs:
       - run: npm run typecheck
       - run: npm run knip
       - run: npm test
-      - run: npm run build
-      - run: npx playwright install --with-deps chromium webkit
-      - run: |
-          .github/scripts/memory-monitor.sh memory.log &
-          trap 'kill $!' EXIT
-          npm run e2e
-      - if: ${{ always() }}
-        run: sudo dmesg -T | grep -iE 'oom|killed process' || echo 'no oom-kill in dmesg'
-      - uses: actions/upload-artifact@v7
-        if: ${{ always() }}
-        with:
-          name: memory
-          path: memory.log
-      - uses: actions/upload-artifact@v7
-        if: ${{ !cancelled() }}
-        with:
-          name: screenshots
-          path: e2e/screenshots/
-          if-no-files-found: error
-      - uses: actions/upload-artifact@v7
-        if: ${{ failure() }}
-        with:
-          name: test-results
-          path: test-results/
 
-  perf:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -54,7 +32,88 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      - run: tar -cf build.tar .next/standalone
+      - uses: actions/upload-artifact@v7
+        with:
+          name: build
+          path: build.tar
+          retention-days: 1
+
+  e2e:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project: phone-chromium
+            browser: chromium
+          - project: phone-webkit
+            browser: webkit
+          - project: desktop-chromium
+            browser: chromium
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - id: playwright
+        run: echo "version=$(node -p 'require("@playwright/test/package.json").version')" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-${{ matrix.browser }}
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - uses: actions/download-artifact@v8
+        with:
+          name: build
+      - run: tar -xf build.tar
+      - run: |
+          .github/scripts/memory-monitor.sh memory.log &
+          trap 'kill $!' EXIT
+          npm run e2e -- --project=${{ matrix.project }}
+      - if: ${{ always() }}
+        run: sudo dmesg -T | grep -iE 'oom|killed process' || echo 'no oom-kill in dmesg'
+      - uses: actions/upload-artifact@v7
+        if: ${{ always() }}
+        with:
+          name: memory-${{ matrix.project }}
+          path: memory.log
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: screenshots-${{ matrix.project }}
+          path: e2e/screenshots/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v7
+        if: ${{ failure() }}
+        with:
+          name: test-results-${{ matrix.project }}
+          path: test-results/
+
+  perf:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - id: playwright
+        run: echo "version=$(node -p 'require("@playwright/test/package.json").version')" >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium
       - run: npx playwright install --with-deps chromium
+      - uses: actions/download-artifact@v8
+        with:
+          name: build
+      - run: tar -xf build.tar
       - run: npm run perf
 
   docker:
