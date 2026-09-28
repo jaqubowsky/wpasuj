@@ -11,6 +11,10 @@ export function AnswerProvider({ children, ...options }: AnswerProviderProps) {
   return <AnswerContext value={useAnswer(options)}>{children}</AnswerContext>;
 }
 
+export function useSaveState() {
+  return useAnswerContext().saveState;
+}
+
 export function useAnswerContext() {
   const answer = use(AnswerContext);
 

@@ -43,6 +43,10 @@ export function useForgetTappedHour() {
   return useResultsContext().selection.close;
 }
 
+export function useRefreshResults() {
+  return useResultsContext().refresh;
+}
+
 export function useResultsContext() {
   const results = use(ResultsContext);
 
