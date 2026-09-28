@@ -1,4 +1,4 @@
-import { clockEndHour, clockHour, shortWeekday } from "@/shared/dates/format";
+import { clockEndHour, clockHour } from "@/shared/dates/format";
 
 type TimeRange = { date: string; firstHour: number; lastHour: number };
 
@@ -19,10 +19,6 @@ function longDay(date: string) {
 
 export function longRunLabel({ date, firstHour, lastHour }: TimeRange) {
   return `${longDay(date)}, ${clockHour(firstHour)}–${clockEndHour(lastHour)}`;
-}
-
-export function shortRunLabel({ date, firstHour, lastHour }: TimeRange) {
-  return `${shortWeekday(date)} ${dayAndMonth(date)}, ${clockHour(firstHour)}–${clockEndHour(lastHour)}`;
 }
 
 export function hourLabel({ date, hour }: { date: string; hour: number }) {

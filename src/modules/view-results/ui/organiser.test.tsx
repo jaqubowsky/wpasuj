@@ -2,9 +2,10 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { FinalTime } from "./final-time";
+import { OrganiserCard } from "./organiser-card";
 import { ResultsBody } from "./results-body";
-import { ResultsLead } from "./results-lead";
 import { ResultsProvider } from "./results-provider";
+import { WhilePollLives } from "./while-poll-lives";
 import type { FinalTime as FinalTimeValue, Results } from "../server/results-schema";
 import type { Organiser } from "./use-is-organiser";
 
@@ -42,10 +43,12 @@ function organiser(overrides: Partial<Organiser> = {}): Organiser {
 
 function renderPage(results: Results, asOrganiser?: Organiser) {
   return render(
-    <ResultsProvider pollId="Pl4nszowki" initial={results} organiser={asOrganiser}>
-      <FinalTime />
-      <ResultsLead />
-      <ResultsBody />
+    <ResultsProvider pollId="Pl4nszowki" initial={results} organiser={asOrganiser} organiserKey="kuba">
+      <WhilePollLives gone={<h1>Tej ankiety już nie ma</h1>}>
+        <FinalTime />
+        <OrganiserCard />
+        <ResultsBody />
+      </WhilePollLives>
     </ResultsProvider>,
   );
 }
@@ -81,7 +84,7 @@ describe("a participant", () => {
 
     expect(screen.queryByRole("button", { name: "Przypomnij" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Więcej" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /Ustal ten termin/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Ustal termin" })).not.toBeInTheDocument();
   });
 
   it("sees the set time with a calendar file, and cannot change it", () => {
@@ -101,22 +104,27 @@ describe("a participant", () => {
 });
 
 describe("the organiser", () => {
-  it("sets the best time or one of the other good ones", async () => {
+  it("sets the best time from Twoja ankieta", async () => {
     const asOrganiser = organiser();
     renderPage(threeAnswers, asOrganiser);
 
-    await userEvent.click(within(screen.getByRole("region", { name: "Najlepiej" })).getByRole("button", { name: "Ustal ten termin" }));
-    await userEvent.click(within(screen.getByRole("list", { name: "Też dobre" })).getAllByRole("button", { name: /Ustal ten termin/ })[0]);
+    await userEvent.click(within(screen.getByRole("region", { name: "Twoja ankieta" })).getByRole("button", { name: "Ustal termin" }));
 
-    expect(asOrganiser.setFinal).toHaveBeenNthCalledWith(1, { date: saturday, firstHour: 18, lastHour: 20 });
-    expect(asOrganiser.setFinal).toHaveBeenNthCalledWith(2, { date: sunday, firstHour: 19, lastHour: 21 });
+    expect(asOrganiser.setFinal).toHaveBeenCalledExactlyOnceWith({ date: saturday, firstHour: 18, lastHour: 20 });
+  });
+
+  it("has no time to set while nobody answered, and still reminds", () => {
+    renderPage({ ...threeAnswers, respondents: [] }, organiser());
+
+    expect(screen.queryByRole("button", { name: "Ustal termin" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Przypomnij" })).toBeVisible();
   });
 
   it("changes a set time, and cannot set another until then", async () => {
     const asOrganiser = organiser();
     renderPage(withFinal(saturdayEvening), asOrganiser);
 
-    expect(screen.queryByRole("button", { name: /Ustal ten termin/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Ustal termin" })).not.toBeInTheDocument();
     await userEvent.click(within(screen.getByRole("region", { name: "Ustalone" })).getByRole("button", { name: "Zmień" }));
 
     expect(asOrganiser.clearFinal).toHaveBeenCalledOnce();
@@ -124,7 +132,7 @@ describe("the organiser", () => {
 
   it("hears why a change failed even where the results are not shown", async () => {
     render(
-      <ResultsProvider pollId="Pl4nszowki" initial={withFinal(saturdayEvening)} organiser={organiser({ clearFinal: vi.fn(async () => Promise.reject(new Error("offline"))) })}>
+      <ResultsProvider pollId="Pl4nszowki" initial={withFinal(saturdayEvening)} organiserKey="kuba" organiser={organiser({ clearFinal: vi.fn(async () => Promise.reject(new Error("offline"))) })}>
         <FinalTime />
       </ResultsProvider>,
     );
@@ -149,11 +157,13 @@ describe("the organiser", () => {
     renderPage(threeAnswers, organiser());
 
     await userEvent.click(screen.getByRole("button", { name: "Więcej" }));
-    await userEvent.click(screen.getByRole("button", { name: "Kopiuj link" }));
+    await userEvent.click(within(screen.getByRole("dialog", { name: "Więcej" })).getByRole("button", { name: "Kopiuj link do ankiety" }));
 
     expect(clipboard).toBe(`${location.origin}/e/Pl4nszowki`);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole("button", { name: "Link organizatora" }));
+    await userEvent.click(screen.getByRole("button", { name: "Więcej" }));
+    await userEvent.click(screen.getByRole("button", { name: "Link organizatora na inny telefon" }));
 
     expect(clipboard).toBe(`${location.origin}/e/Pl4nszowki/organizator/organiser-token`);
     expect(screen.getByText(/Nie wysyłaj go na grupę/)).toBeVisible();
@@ -166,10 +176,12 @@ describe("the organiser", () => {
     await userEvent.click(screen.getByRole("button", { name: "Więcej" }));
 
     await userEvent.click(screen.getByRole("button", { name: "Usuń ankietę" }));
+    expect(screen.getByRole("dialog", { name: "Usunąć ankietę?" })).toHaveTextContent("Znikną też odpowiedzi 3 osób. Tego nie da się cofnąć.");
     await userEvent.click(screen.getByRole("button", { name: "Nie, zostaw" }));
 
     expect(asOrganiser.deletePoll).not.toHaveBeenCalled();
 
+    await userEvent.click(screen.getByRole("button", { name: "Więcej" }));
     await userEvent.click(screen.getByRole("button", { name: "Usuń ankietę" }));
     await userEvent.click(screen.getByRole("button", { name: "Tak, usuń" }));
 
@@ -180,7 +192,7 @@ describe("the organiser", () => {
   it("loses the controls once the server says this device is not the organiser", async () => {
     renderPage(threeAnswers, organiser({ setFinal: vi.fn(async () => ({ ok: false as const, reason: "not-organiser" as const })) }));
 
-    await userEvent.click(within(screen.getByRole("region", { name: "Najlepiej" })).getByRole("button", { name: "Ustal ten termin" }));
+    await userEvent.click(screen.getByRole("button", { name: "Ustal termin" }));
 
     expect(screen.queryByRole("button", { name: "Przypomnij" })).not.toBeInTheDocument();
     expect(screen.getByRole("alert")).toHaveTextContent("To urządzenie nie jest już organizatorem tej ankiety.");
@@ -188,7 +200,7 @@ describe("the organiser", () => {
 
   it("fills the chosen hours in sequence once the time is set", async () => {
     const filled: { cell: string | null; delay?: number }[] = [];
-    vi.stubGlobal("matchMedia", () => ({ matches: false }));
+    vi.stubGlobal("matchMedia", () => ({ matches: false, addEventListener() {}, removeEventListener() {} }));
     Element.prototype.animate = vi.fn(function (this: Element, _keyframes, options) {
       filled.push({ cell: this.getAttribute("aria-label"), delay: typeof options === "object" ? options.delay : undefined });
       return {} as Animation;
@@ -196,7 +208,7 @@ describe("the organiser", () => {
     vi.stubGlobal("fetch", vi.fn(async () => Response.json(withFinal({ date: sunday, firstHour: 19, lastHour: 21 }))));
     renderPage(threeAnswers, organiser());
 
-    await userEvent.click(within(screen.getByRole("list", { name: "Też dobre" })).getAllByRole("button", { name: /Ustal ten termin/ })[0]);
+    await userEvent.click(screen.getByRole("button", { name: "Ustal termin" }));
     await screen.findByRole("region", { name: "Ustalone" });
 
     expect(filled).toEqual([
@@ -210,7 +222,7 @@ describe("the organiser", () => {
 
 describe("a poll opened with its time already set", () => {
   it("marks the set hours without motion", () => {
-    vi.stubGlobal("matchMedia", () => ({ matches: false }));
+    vi.stubGlobal("matchMedia", () => ({ matches: false, addEventListener() {}, removeEventListener() {} }));
     Element.prototype.animate = vi.fn();
     renderPage(withFinal({ date: sunday, firstHour: 19, lastHour: 21 }));
 

@@ -1,9 +1,12 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { BestNow } from "./best-now";
+import { PeoplePanel } from "./people-panel";
+import { RespondentCount } from "./respondent-count";
 import { ResultsBody } from "./results-body";
-import { ResultsLead } from "./results-lead";
 import { ResultsProvider } from "./results-provider";
+import { WhilePollLives } from "./while-poll-lives";
 import type { Results } from "../server/results-schema";
 
 const saturday = "2030-10-19";
@@ -27,13 +30,15 @@ const threeAnswers: Results = {
   final: null,
 };
 
-function Tabs({ results, lead = true }: { results: Results; lead?: boolean }) {
+function Tabs({ results, panel = true }: { results: Results; panel?: boolean }) {
   return (
-    <ResultsProvider pollId="Pl4nszowki" initial={results}>
-      <div data-testid="lead">{lead && <ResultsLead />}</div>
-      <div data-testid="body">
+    <ResultsProvider pollId="Pl4nszowki" initial={results} organiserKey="ola">
+      <RespondentCount />
+      <WhilePollLives gone={<h1>Tej ankiety już nie ma</h1>}>
+        {panel && <BestNow />}
+        {panel && <PeoplePanel />}
         <ResultsBody />
-      </div>
+      </WhilePollLives>
     </ResultsProvider>
   );
 }
@@ -42,33 +47,13 @@ function renderResults(results: Results) {
   return render(<Tabs results={results} />);
 }
 
+const answered = () => within(screen.getByRole("list", { name: "Odpowiedzieli" })).getAllByRole("listitem").map((row) => row.textContent);
+
 describe("Results", () => {
-  it("puts the best time in the lead and the heatmap with who answered in the body", () => {
-    renderResults(threeAnswers);
-
-    expect(within(screen.getByTestId("lead")).getByRole("region", { name: "Najlepiej" })).toBeVisible();
-    expect(within(screen.getByTestId("lead")).getByRole("list", { name: "Też dobre" })).toBeVisible();
-    expect(within(screen.getByTestId("body")).getByRole("grid")).toBeVisible();
-    expect(within(screen.getByTestId("body")).getByRole("list", { name: "Kto odpowiedział" })).toBeVisible();
-  });
-
-  it("leads with the best time and offers two other good ones", () => {
-    renderResults(threeAnswers);
-
-    const best = screen.getByRole("region", { name: "Najlepiej" });
-    expect(best).toHaveTextContent("Sobota 19.10, 18–20");
-    expect(best).toHaveTextContent("3 z 3 może");
-    expect(best).not.toHaveTextContent("Nie może");
-    const others = within(screen.getByRole("list", { name: "Też dobre" })).getAllByRole("listitem");
-    expect(others.map((item) => item.textContent)).toEqual(["nd 20.10, 19–212 z 3", "sb 19.10, 20–212 z 3"]);
-  });
-
-  it("names who can't make the best time", () => {
+  it("shows only the best time, never who cannot make it", () => {
     renderResults({ ...threeAnswers, respondents: [...threeAnswers.respondents, answer("Zosia", minutesBefore(5), [])] });
 
-    const best = screen.getByRole("region", { name: "Najlepiej" });
-    expect(best).toHaveTextContent("3 z 4 może");
-    expect(best).toHaveTextContent("Nie może: Zosia");
+    expect(screen.getByRole("region", { name: "Najlepiej teraz" })).toHaveTextContent(/^Najlepiej terazSobota 19\.10, 18–20$/);
   });
 
   it("counts who can in every hour and marks where everyone can", () => {
@@ -82,41 +67,40 @@ describe("Results", () => {
     expect(screen.getByRole("button", { name: "sb 19, 17:00, 1 z 3 może" })).not.toHaveAttribute("data-everyone");
   });
 
-  it("shows who can and who can't for a tapped hour, and closes again", async () => {
+  it("shows who can and who can't for a tapped hour in a sheet, and closes again", async () => {
     renderResults(threeAnswers);
 
     await userEvent.click(screen.getByRole("button", { name: "nd 20, 18:00, 2 z 3 może" }));
 
-    const details = screen.getByRole("region", { name: "Niedziela 20.10, 18:00" });
-    expect(within(within(details).getByRole("list", { name: "Mogą" })).getAllByRole("listitem").map((item) => item.textContent)).toEqual([
-      "BBartek",
-      "KKasia",
-    ]);
-    expect(within(within(details).getByRole("list", { name: "Nie mogą" })).getAllByRole("listitem").map((item) => item.textContent)).toEqual([
-      "OOla",
-    ]);
-    await userEvent.click(within(details).getByRole("button", { name: "Zamknij" }));
-    expect(screen.queryByRole("region", { name: "Niedziela 20.10, 18:00" })).not.toBeInTheDocument();
+    const details = screen.getByRole("dialog", { name: "Niedziela 20.10, 18:00" });
+    expect(within(within(details).getByRole("list", { name: "Może" })).getAllByRole("listitem").map((item) => item.textContent)).toEqual(["KKasia", "BBartek"]);
+    expect(within(within(details).getByRole("list", { name: "Nie może" })).getAllByRole("listitem").map((item) => item.textContent)).toEqual(["OOla, organizator, nie może"]);
+    fireEvent.click(details);
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("lists who answered, newest first, and who can't make any hour", () => {
+  it("lists who answered, newest first, marking who can't make any hour, the organiser and you", () => {
+    renderResults({ ...threeAnswers, you: "bartek", respondents: [...threeAnswers.respondents, answer("Zosia", minutesBefore(5), [])] });
+
+    expect(answered()).toEqual(["KKasia", "ZZosia, nie może", "BBartek, to Ty", "OOla, organizator"]);
+  });
+
+  it("opens who answered from the counter, grouped by who marked hours", async () => {
     renderResults({ ...threeAnswers, respondents: [...threeAnswers.respondents, answer("Zosia", minutesBefore(5), [])] });
 
-    const rows = within(screen.getByRole("list", { name: "Kto odpowiedział" })).getAllByRole("listitem");
-    expect(rows.map((row) => row.textContent)).toEqual([
-      "KKasiaprzed chwilą",
-      "ZZosianie może",
-      "BBartek20 min temu",
-      "OOla2 godz. temu",
-    ]);
+    await userEvent.click(screen.getByRole("button", { name: "4 osoby" }));
+
+    const sheet = screen.getByRole("dialog", { name: "Odpowiedzieli" });
+    expect(within(within(sheet).getByRole("list", { name: "Zaznaczyli godziny" })).getAllByRole("listitem")).toHaveLength(3);
+    expect(within(within(sheet).getByRole("list", { name: "Nie może w żadnym" })).getAllByRole("listitem").map((item) => item.textContent)).toEqual(["ZZosia, nie może"]);
   });
 
   it("keeps a respondent's tint through a case-only rename", async () => {
     const tintsOf = async (name: string) => {
       const { unmount } = renderResults({ ...threeAnswers, respondents: [{ ...threeAnswers.respondents[0], name }] });
-      const listed = within(screen.getByRole("list", { name: "Kto odpowiedział" })).getByRole("img", { name });
+      const listed = within(screen.getByRole("list", { name: "Odpowiedzieli" })).getByRole("img", { name });
       await userEvent.click(screen.getByRole("button", { name: "sb 19, 17:00, 1 z 1 może" }));
-      const free = within(screen.getByRole("list", { name: "Mogą" })).getByRole("img", { name });
+      const free = within(within(screen.getByRole("dialog")).getByRole("list", { name: "Może" })).getByRole("img", { name });
       const tints = [listed.dataset.tint, free.dataset.tint];
       unmount();
       return tints;
@@ -129,7 +113,9 @@ describe("Results", () => {
     renderResults({ ...threeAnswers, respondents: [] });
 
     expect(screen.getByText("Nikt jeszcze nie odpowiedział. Wyślij link na grupę.")).toBeVisible();
+    expect(screen.getByText("Bądź pierwszy")).toBeVisible();
     expect(screen.queryByRole("grid")).not.toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "Najlepiej teraz" })).not.toBeInTheDocument();
   });
 });
 
@@ -158,19 +144,19 @@ describe("Results refreshing", () => {
 
     await wait(9_000);
 
-    expect(screen.getByRole("region", { name: "Najlepiej" })).toHaveTextContent("3 z 4 może");
+    expect(answered()).toHaveLength(4);
   });
 
-  it("keeps refreshed answers when the lead mounts again", async () => {
+  it("keeps refreshed answers when the panel mounts again", async () => {
     vi.useFakeTimers();
     const fetch = answerWith(Response.json(withZosia));
     const { rerender } = renderResults(threeAnswers);
     await wait(9_000);
 
-    rerender(<Tabs results={threeAnswers} lead={false} />);
+    rerender(<Tabs results={threeAnswers} panel={false} />);
     rerender(<Tabs results={threeAnswers} />);
 
-    expect(screen.getByRole("region", { name: "Najlepiej" })).toHaveTextContent("3 z 4 może");
+    expect(answered()).toHaveLength(4);
     expect(fetch).toHaveBeenCalledOnce();
   });
 
@@ -183,7 +169,7 @@ describe("Results refreshing", () => {
     await wait(0);
 
     expect(fetch).toHaveBeenCalledOnce();
-    expect(screen.getByRole("region", { name: "Najlepiej" })).toHaveTextContent("3 z 4 może");
+    expect(answered()).toHaveLength(4);
   });
 
   it("says the poll is gone once the read answers 404, and stops asking", async () => {
@@ -194,7 +180,6 @@ describe("Results refreshing", () => {
     await wait(60_000);
 
     expect(screen.getByRole("heading", { name: "Tej ankiety już nie ma" })).toBeVisible();
-    expect(screen.getByRole("link", { name: "Zrób nową ankietę" })).toHaveAttribute("href", "/");
     expect(fetch).toHaveBeenCalledOnce();
   });
 
@@ -206,11 +191,11 @@ describe("Results refreshing", () => {
     await wait(9_000);
 
     expect(screen.getByText("Nie udało się odświeżyć. Spróbujemy za chwilę.")).toBeVisible();
-    expect(screen.getByRole("region", { name: "Najlepiej" })).toHaveTextContent("3 z 3 może");
+    expect(answered()).toHaveLength(3);
 
     await wait(9_000);
 
     expect(screen.queryByText("Nie udało się odświeżyć. Spróbujemy za chwilę.")).not.toBeInTheDocument();
-    expect(screen.getByRole("region", { name: "Najlepiej" })).toHaveTextContent("3 z 4 może");
+    expect(answered()).toHaveLength(4);
   });
 });

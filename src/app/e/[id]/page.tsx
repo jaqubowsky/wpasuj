@@ -1,19 +1,19 @@
 import { findMyAnswer, nameKey } from "@/modules/answer-poll";
-import { AnswerBody, AnswerLead, AnswerProvider } from "@/modules/answer-poll/client";
+import { AnswerBody, AnswerLead, AnswerProvider, AnswerStatus } from "@/modules/answer-poll/client";
 import { clearFinal, deletePoll, findPoll, organiserToken, setFinal } from "@/modules/create-poll";
 import { readResults } from "@/modules/view-results";
-import { FinalTime, InviteCard, ResultsBody, ResultsLead, ResultsProvider } from "@/modules/view-results/client";
+import { BestNow, FinalTime, InviteCard, OrganiserCard, PeoplePanel, RespondentCount, ResultsBody, ResultsProvider, WhilePollLives } from "@/modules/view-results/client";
 import { Avatar } from "@/shared/ui/avatar/avatar";
 import { Text } from "@/shared/ui/text/text";
 import { Morph, pollTitleMorph } from "@/shared/morph";
 import { siteUrl } from "@/shared/site-url";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AppHeader } from "../../app-header";
 import { PageFrame } from "../../page-frame";
-import { answeredCount } from "./answered-count";
-import "./poll-page.css";
+import { PollGone } from "./poll-gone";
 import { PollTabs } from "./poll-tabs";
 import { ZoneNote } from "./zone-note";
 
@@ -49,40 +49,46 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
   const hours = Array.from({ length: poll.hourCount }, (_, index) => poll.firstHour + index);
 
   return (
-    <PageFrame>
-      <AppHeader aside={<Text variant="meta">{answeredCount(poll.respondentCount)}</Text>} />
-      <main data-poll-main className="pt-1 pb-8">
-        <AnswerProvider pollId={id} dates={poll.dates} hours={hours} mine={mine}>
-          <ResultsProvider pollId={id} initial={readResults(id, poll, now)} organiser={organiser}>
-            <div data-poll-head>
-              <div className="mb-2 flex items-center gap-2">
-                <Avatar name={poll.organiserName} tintKey={nameKey(poll.organiserName)} />
-                <Text variant="meta">{poll.organiserName} pyta</Text>
+    <PageFrame wide>
+      <AnswerProvider pollId={id} dates={poll.dates} hours={hours} mine={mine} fixedName={token && poll.organiserName}>
+        <ResultsProvider pollId={id} initial={readResults(id, poll, now, (await cookies()).get(id)?.value)} organiser={organiser} organiserKey={nameKey(poll.organiserName)}>
+          <AppHeader aside={<RespondentCount />} />
+          <WhilePollLives gone={<PollGone />}>
+            <main className="flex flex-col gap-4 pt-1 pb-8 lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-x-10 lg:gap-y-6">
+              <div className="grid gap-2 lg:col-span-2">
+                <div className="flex min-h-8 items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <Avatar name={poll.organiserName} tintKey={nameKey(poll.organiserName)} />
+                    <Text variant="meta">{token ? `Pytasz jako ${poll.organiserName}` : `${poll.organiserName} pyta`}</Text>
+                  </div>
+                  {token && <AnswerStatus />}
+                </div>
+                <Morph name={pollTitleMorph}>
+                  <Text as="h1" variant="title">
+                    {poll.title}
+                  </Text>
+                </Morph>
+                <ZoneNote pollZone={poll.timeZone} />
+                <FinalTime />
+                <InviteCard pollId={id} title={poll.title} />
               </div>
-              <Morph name={pollTitleMorph}>
-                <Text as="h1" variant="title">
-                  {poll.title}
-                </Text>
-              </Morph>
-              <ZoneNote pollZone={poll.timeZone} />
-              <FinalTime />
-              <InviteCard pollId={id} poll={poll} />
-            </div>
-            <div data-poll-tabs className="mt-5">
-              <PollTabs
-                opening={mine ? "Wszyscy" : "Moje"}
-                leads={{ Moje: <AnswerLead />, Wszyscy: <ResultsLead /> }}
-                bodies={{ Moje: <AnswerBody />, Wszyscy: <ResultsBody /> }}
-              />
-            </div>
-          </ResultsProvider>
-        </AnswerProvider>
-      </main>
-      <footer className="flex justify-center pb-8">
-        <Link href="/" className="inline-flex min-h-11 items-center text-base font-medium text-muted underline underline-offset-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink">
-          Zrób własną ankietę
-        </Link>
-      </footer>
+              <div className="contents lg:col-start-2 lg:row-start-2 lg:flex lg:flex-col lg:gap-4" data-poll-panel>
+                <BestNow />
+                <OrganiserCard />
+                <PeoplePanel />
+              </div>
+              <div className="lg:col-start-1 lg:row-start-2">
+                <PollTabs opening={mine ? "Wszyscy" : "Moje"} leads={{ Moje: <AnswerLead /> }} bodies={{ Moje: <AnswerBody />, Wszyscy: <ResultsBody /> }} />
+              </div>
+            </main>
+            <footer className="flex justify-center pb-8">
+              <Link href="/" className="inline-flex min-h-11 items-center text-base font-medium text-muted underline underline-offset-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink">
+                Zrób własną ankietę
+              </Link>
+            </footer>
+          </WhilePollLives>
+        </ResultsProvider>
+      </AnswerProvider>
     </PageFrame>
   );
 }

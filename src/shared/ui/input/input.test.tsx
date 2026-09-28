@@ -36,4 +36,11 @@ describe("Input", () => {
     expect(name).toBeValid();
     expect(name).not.toHaveAccessibleDescription();
   });
+
+  it("sets a note beside a small label", () => {
+    render(<Input label="Twoje imię" variant="compact" labelAside={<span>Zapisane</span>} defaultValue="Zuza" />);
+
+    expect(screen.getByRole("textbox", { name: "Twoje imię" })).toHaveAttribute("data-variant", "compact");
+    expect(screen.getByText("Zapisane")).toBeVisible();
+  });
 });

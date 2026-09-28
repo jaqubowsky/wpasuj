@@ -1,19 +1,22 @@
 "use client";
 
 import { Button } from "@/shared/ui/button/button";
-import { useId, type CSSProperties, type ReactNode } from "react";
-import { linkPreview } from "../domain/link-preview";
+import { useId, type ReactNode } from "react";
 import "./invite-card.css";
 import { useInviteCard } from "./use-invite-card";
 
-type InviteCardProps = { pollId: string; poll: Parameters<typeof linkPreview>[0] };
-
-const miniRows = 4;
-
 const notCopied = {
-  send: "Nie udało się wysłać. Skopiuj link przyciskiem „Kopiuj link”.",
+  send: "Nie udało się wysłać. Skopiuj link przyciskiem „Kopiuj”.",
   link: "Nie udało się skopiować. Skopiuj link z paska adresu.",
 };
+
+function Icon({ children }: { children: ReactNode }) {
+  return (
+    <svg className="size-4.5 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {children}
+    </svg>
+  );
+}
 
 function Check() {
   return (
@@ -35,55 +38,64 @@ function Copied({ when, children }: { when: boolean; children: ReactNode }) {
   );
 }
 
-export function InviteCard({ pollId, poll }: InviteCardProps) {
-  const card = useInviteCard(pollId, poll.title);
+export function InviteCard({ pollId, title }: { pollId: string; title: string }) {
+  const card = useInviteCard(pollId, title);
   const headingId = useId();
 
   if (card.stage === "closed") return null;
 
   if (card.stage === "sent") {
     return (
-      <p className="m-0 mt-4 flex items-center gap-2.5 rounded-control bg-surface px-4 py-3 text-sm font-medium" role="status" data-invite-sent>
+      <p className="m-0 mt-2 flex items-center gap-2.5 rounded-control bg-surface px-4 py-3 text-sm font-medium" role="status" data-invite-sent>
         <Check />
         Wysłane. Odpowiedzi pojawią się tutaj.
       </p>
     );
   }
 
-  const { asker, title, when } = linkPreview(poll);
-
   return (
-    <section className="mt-4 flex flex-col gap-3 rounded-card bg-surface p-4" aria-labelledby={headingId} data-invite-card>
-      <div className="flex items-start justify-between gap-3">
-        <h2 id={headingId} className="m-0 pt-3 font-display text-lg font-bold tracking-tighter">
-          Ankieta gotowa. Wyślij ją na grupę.
-        </h2>
-        <Button variant="text" onClick={card.close}>
-          Gotowe
-        </Button>
-      </div>
-      <figure className="m-0 overflow-hidden rounded-control shadow-[inset_0_0_0_1px_var(--color-line)]" aria-label="Podgląd linku w czacie">
-        <div className="grid grid-cols-[minmax(0,1fr)_64px] items-center gap-2.5 bg-paper p-3">
-          <div className="min-w-0">
-            <span className="mb-1 block text-xs font-medium text-muted">{asker}</span>
-            <span className="block font-display text-lg font-extrabold tracking-tighter wrap-anywhere">{title}</span>
-          </div>
-          <div className="grid grid-cols-[repeat(var(--date-count),minmax(0,1fr))] gap-1" style={{ "--date-count": poll.dates.length } as CSSProperties} aria-hidden="true">
-            {Array.from({ length: poll.dates.length * miniRows }, (_, index) => (
-              <i key={index} className="block h-2 rounded-[3px] bg-surface shadow-[inset_0_0_0_1px_var(--color-edge)]" />
-            ))}
-          </div>
+    <section className="mt-2 grid gap-4 rounded-card bg-surface p-5 shadow-lift" aria-labelledby={headingId} data-invite-card>
+      <div className="flex items-center gap-3">
+        <span className="grid size-10 flex-none place-items-center rounded-pill bg-accent text-surface" aria-hidden="true">
+          <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+        </span>
+        <div className="grid">
+          <h2 id={headingId} className="m-0 font-display text-xl font-bold tracking-tight">
+            Ankieta gotowa
+          </h2>
+          <span className="text-sm text-muted">Wyślij link znajomym na grupę</span>
         </div>
-        <figcaption className="bg-surface px-3 py-2 text-xs font-medium text-muted">
-          {card.host()} · {when}
-        </figcaption>
-      </figure>
-      <div className="grid grid-cols-[1.4fr_1fr] gap-2">
+      </div>
+      <p className="m-0 flex h-11 min-w-0 items-center gap-2.5 rounded-cell bg-track px-3.5 text-sm">
+        <span className="flex text-muted">
+          <Icon>
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+          </Icon>
+        </span>
+        <span className="truncate">{card.shownLink()}</span>
+      </p>
+      <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2">
         <Button variant="primary" block onClick={card.send}>
-          <Copied when={card.copiedBy("send")}>Wyślij na grupę</Copied>
+          <Copied when={card.copiedBy("send")}>
+            <Icon>
+              <path d="M12 3v12" />
+              <path d="m7 8 5-5 5 5" />
+              <path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" />
+            </Icon>
+            Wyślij na grupę
+          </Copied>
         </Button>
         <Button block onClick={card.copyLink}>
-          <Copied when={card.copiedBy("link")}>Kopiuj link</Copied>
+          <Copied when={card.copiedBy("link")}>
+            <Icon>
+              <rect x="9" y="9" width="12" height="12" rx="2" />
+              <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+            </Icon>
+            Kopiuj
+          </Copied>
         </Button>
       </div>
       {card.notCopiedBy && (

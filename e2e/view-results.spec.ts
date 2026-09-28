@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page, type TestInfo } from "@playwright/test";
 import { saveScreenshot } from "./screenshot";
 import { seedAnswer, seedPoll } from "./seed";
 
@@ -26,17 +26,15 @@ async function openResults(page: Page, pollId: string) {
 }
 
 const itemsOf = (page: Page, list: string) => page.getByRole("list", { name: list }).getByRole("listitem");
+const counted = (page: Page, people: string) => page.getByText(new RegExp(`^${people}`)).filter({ visible: true });
+const isPhone = (testInfo: TestInfo) => testInfo.project.name.startsWith("phone");
 
 test("three answers agree with a hand count", async ({ page }, testInfo) => {
   const pollId = seedThreeAnswers();
 
   await openResults(page, pollId);
 
-  const best = page.getByRole("region", { name: "Najlepiej" });
-  await expect(best).toContainText("Sobota 19.10, 18–20");
-  await expect(best).toContainText("3 z 3 może");
-  await expect(best).not.toContainText("Nie może");
-  await expect(itemsOf(page, "Też dobre")).toHaveText(["nd 20.10, 19–212 z 3", "sb 19.10, 20–212 z 3"]);
+  await expect(page.getByRole("region", { name: "Najlepiej teraz" })).toHaveText("Najlepiej terazSobota 19.10, 18–20");
   const handCount: [string, number][] = [
     ["sb 19, 17:00", 1],
     ["sb 19, 18:00", 3],
@@ -50,30 +48,31 @@ test("three answers agree with a hand count", async ({ page }, testInfo) => {
   for (const [hour, count] of handCount) {
     await expect(page.getByRole("button", { name: `${hour}, ${count} z 3 może` })).toHaveText(String(count));
   }
-  await expect(itemsOf(page, "Kto odpowiedział")).toHaveText(["KKasiaprzed chwilą", "BBartek20 min temu", "OOla2 godz. temu"]);
+  if (isPhone(testInfo)) await page.getByRole("button", { name: "3 osoby" }).click();
+  await expect(itemsOf(page, isPhone(testInfo) ? "Zaznaczyli godziny" : "Odpowiedzieli")).toHaveText(["KKasia", "BBartek", "OOla"]);
   await saveScreenshot(page, testInfo, "results-three-answers");
+  if (isPhone(testInfo)) await page.keyboard.press("Escape");
 
   await page.getByRole("button", { name: "nd 20, 18:00, 2 z 3 może" }).click();
 
-  const details = page.getByRole("region", { name: "Niedziela 20.10, 18:00" });
-  await expect(details.getByRole("list", { name: "Mogą", exact: true }).getByRole("listitem")).toHaveText(["BBartek", "KKasia"]);
-  await expect(details.getByRole("list", { name: "Nie mogą" }).getByRole("listitem")).toHaveText(["OOla"]);
-  await saveScreenshot(page, testInfo, testInfo.project.name.startsWith("desktop") ? "results-side-panel" : "results-sheet");
-  await details.getByRole("button", { name: "Zamknij" }).click();
+  const details = page.getByRole(isPhone(testInfo) ? "dialog" : "region", { name: "Niedziela 20.10, 18:00" });
+  await expect(details.getByRole("list", { name: "Może", exact: true }).getByRole("listitem")).toHaveText(["KKasia", "BBartek"]);
+  await expect(details.getByRole("list", { name: "Nie może" }).getByRole("listitem")).toHaveText(["OOla, nie może"]);
+  await saveScreenshot(page, testInfo, isPhone(testInfo) ? "results-sheet" : "results-side-panel");
+  if (isPhone(testInfo)) await page.keyboard.press("Escape");
+  else await details.getByRole("button", { name: "Zamknij" }).click();
   await expect(details).toBeHidden();
 });
 
 test("an answer written elsewhere shows within 10 seconds", async ({ page }) => {
   const pollId = seedThreeAnswers();
   await openResults(page, pollId);
-  await expect(page.getByRole("region", { name: "Najlepiej" })).toContainText("3 z 3 może");
+  await expect(counted(page, "3 osoby")).toBeVisible();
 
   seedAnswer(pollId, "Zosia", Date.now(), []);
 
-  const best = page.getByRole("region", { name: "Najlepiej" });
-  await expect(best).toContainText("3 z 4 może", { timeout: 10_000 });
-  await expect(best).toContainText("Nie może: Zosia");
-  await expect(itemsOf(page, "Kto odpowiedział").first()).toHaveText("ZZosianie może");
+  await expect(counted(page, "4 osoby")).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByRole("region", { name: "Najlepiej teraz" })).toHaveText("Najlepiej terazSobota 19.10, 18–20");
 });
 
 test("the heatmap lets the page scroll under a finger", async ({ page }) => {
@@ -95,14 +94,13 @@ test("a fresh answer stays across tab switches", async ({ page }) => {
   const pollId = seedThreeAnswers();
   await openResults(page, pollId);
   seedAnswer(pollId, "Zosia", Date.now(), []);
-  const best = page.getByRole("region", { name: "Najlepiej" });
-  await expect(best).toContainText("3 z 4 może", { timeout: 10_000 });
+  await expect(counted(page, "4 osoby")).toBeVisible({ timeout: 10_000 });
 
   await page.getByRole("tab", { name: "Moje" }).click();
   await page.getByRole("tab", { name: "Wszyscy" }).click();
 
-  await expect(best).toContainText("3 z 4 może");
-  await expect(itemsOf(page, "Kto odpowiedział").first()).toHaveText("ZZosianie może");
+  await expect(counted(page, "4 osoby")).toBeVisible();
+  await expect(page.getByRole("button", { name: "sb 19, 18:00, 3 z 4 może" })).toBeVisible();
 });
 
 test("a count that rises twice bumps twice", async ({ page }) => {
@@ -130,7 +128,7 @@ test("a count that rises twice bumps twice", async ({ page }) => {
 
 test("the best time leads the page on a phone and sits beside the heatmap on a desktop", async ({ page }, testInfo) => {
   await openResults(page, seedThreeAnswers());
-  const best = (await page.getByRole("region", { name: "Najlepiej" }).boundingBox())!;
+  const best = (await page.getByRole("region", { name: "Najlepiej teraz" }).boundingBox())!;
   const tabs = (await page.getByRole("tablist", { name: "Widok" }).boundingBox())!;
   const grid = (await page.getByRole("grid", { name: "Kto może" }).boundingBox())!;
 
@@ -139,13 +137,10 @@ test("the best time leads the page on a phone and sits beside the heatmap on a d
     return;
   }
   expect(best.x).toBeGreaterThanOrEqual(grid.x + grid.width);
-  expect(best.y).toBeLessThan(tabs.y);
-  expect(grid.y - (tabs.y + tabs.height)).toBeLessThan(80);
+  expect(best.y).toBe(tabs.y);
+  expect(grid.y - (tabs.y + tabs.height)).toBeLessThan(120);
   await page.getByRole("button", { name: "nd 20, 18:00, 2 z 3 może" }).click();
   const details = (await page.getByRole("region", { name: "Niedziela 20.10, 18:00" }).boundingBox())!;
-  expect(details.x).toBe(best.x);
-  expect(details.width).toBe(best.width);
+  expect(details.x).toBeGreaterThanOrEqual(best.x);
   expect(details.y).toBeGreaterThan(best.y + best.height);
-  const weekday = page.getByRole("columnheader").first().locator("[data-long]");
-  expect(await weekday.evaluate((element) => getComputedStyle(element, "::after").content)).toBe('"sobota"');
 });

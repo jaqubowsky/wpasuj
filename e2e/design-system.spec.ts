@@ -74,12 +74,14 @@ test("a cell reached by keyboard shows its focus ring", async ({ page }, testInf
   await saveScreenshot(page, testInfo, "components-cell-focus");
 });
 
-test("the answer's name question is a section heading", async ({ page }) => {
+test("the answer's name label is small, with the save state beside it", async ({ page }) => {
   const pollId = seedPoll({ dates: ["2030-10-19"], firstHour: 17, hourCount: 4 });
 
   await page.goto(`/e/${pollId}`);
 
-  await expectSectionHeading(page.locator("label", { hasText: "Jak masz na imię?" }));
+  const label = page.locator("label", { hasText: "Twoje imię" });
+  await expect(label).toHaveCSS("font-size", "14px");
+  await expect(label).toHaveCSS("font-weight", "600");
 });
 
 test("an invalid input shows the focus ring while focused", async ({ page }, testInfo) => {
