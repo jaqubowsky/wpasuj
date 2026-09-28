@@ -24,8 +24,13 @@ function longDay(date: string) {
   return `${capitalised(longWeekday.format(new Date(`${date}T00:00:00Z`)))} ${dayAndMonth(date)}`;
 }
 
-export function longRunLabel({ date, firstHour, lastHour }: TimeRange) {
-  return `${longDay(calendarDate(date, firstHour))}, ${clockHour(firstHour)}–${clockEndHour(lastHour)}`;
+export function runParts({ date, firstHour, lastHour }: TimeRange) {
+  return { day: longDay(calendarDate(date, firstHour)), hours: `${clockHour(firstHour)}–${clockEndHour(lastHour)}` };
+}
+
+export function longRunLabel(run: TimeRange) {
+  const { day, hours } = runParts(run);
+  return `${day}, ${hours}`;
 }
 
 export function hourLabel({ date, hour }: { date: string; hour: number }) {

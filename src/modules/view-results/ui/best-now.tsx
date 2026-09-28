@@ -3,7 +3,7 @@
 import { Card } from "@/shared/ui/card/card";
 import { Text } from "@/shared/ui/text/text";
 import { bestTimes } from "../domain/best-time";
-import { longRunLabel } from "../domain/time-label";
+import { longRunLabel, runParts } from "../domain/time-label";
 import "./best-now.css";
 import { useResultsContext } from "./results-provider";
 
@@ -15,13 +15,16 @@ export function BestNow() {
   const [best] = bestTimes(results.dates, results.hours, results.respondents);
   const [previousBest] = previous ? bestTimes(previous.dates, previous.hours, previous.respondents) : [];
   const label = best && longRunLabel(best);
+  const parts = best && runParts(best);
 
   return (
     <section aria-label="Najlepiej teraz">
       <Card tone="ink" label="Najlepiej teraz">
-        {label ? (
+        {label && parts ? (
           <p key={label} className="m-0 mt-1 data-changed:animate-[best-now-cross-fade_var(--duration-sheet)_var(--ease-out)]" data-changed={(previousBest && longRunLabel(previousBest) !== label) || undefined}>
-            <Text variant="best-time">{label}</Text>
+            <Text variant="best-time">
+              {parts.day}, <span className="whitespace-nowrap">{parts.hours}</span>
+            </Text>
           </p>
         ) : (
           <p className="m-0 mt-1">

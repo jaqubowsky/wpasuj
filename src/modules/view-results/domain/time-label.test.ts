@@ -1,10 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { hourLabel, longRunLabel, setTimeShown } from "./time-label";
+import { hourLabel, longRunLabel, runParts, setTimeShown } from "./time-label";
 
 const run = { date: "2030-10-19", firstHour: 19, lastHour: 22 };
 
 it("names the best time in full", () => {
   expect(longRunLabel(run)).toBe("Sobota 19.10, 19–22");
+});
+
+it("splits the best time into its day and its hours, so the hours stay on one line", () => {
+  expect(runParts(run)).toEqual({ day: "Sobota 19.10", hours: "19–22" });
 });
 
 it("names one hour of one date", () => {
