@@ -14,7 +14,11 @@ it("names one hour of one date", () => {
 it("names a run past midnight by the clock under the evening's date", () => {
   expect(longRunLabel({ date: "2030-10-18", firstHour: 23, lastHour: 26 })).toBe("Piątek 18.10, 23–2");
   expect(longRunLabel({ date: "2030-10-18", firstHour: 22, lastHour: 24 })).toBe("Piątek 18.10, 22–24");
-  expect(hourLabel({ date: "2030-10-18", hour: 25 })).toBe("Piątek 18.10, 1:00");
+});
+
+it("names an hour or a run that starts after midnight by its calendar date", () => {
+  expect(hourLabel({ date: "2030-10-18", hour: 25 })).toBe("Sobota 19.10, 1:00");
+  expect(longRunLabel({ date: "2030-10-18", firstHour: 25, lastHour: 27 })).toBe("Sobota 19.10, 1–3");
 });
 
 describe("setTimeShown", () => {
