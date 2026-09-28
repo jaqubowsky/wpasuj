@@ -72,6 +72,24 @@ test("every target on the poll page is at least 44px tall and wide", async ({ br
   await expectTargetsAtLeast44(newcomer);
 });
 
+test("Button, Chip and Segment show the ink focus ring from the keyboard", async ({ page }, testInfo) => {
+  await page.goto("/dev/components");
+
+  for (const [part, target] of [
+    ["button", page.getByRole("region", { name: "Button" }).getByRole("button", { name: "Przypomnij" })],
+    ["chip", page.getByRole("region", { name: "Chip" }).getByRole("button", { name: "Dziś" })],
+    ["segment", page.getByRole("region", { name: "Segment" }).getByRole("tab", { selected: true })],
+  ] as const) {
+    await target.focus();
+
+    await expect(target).toHaveCSS("outline-style", "solid");
+    await expect(target).toHaveCSS("outline-width", "2px");
+    await expect(target).toHaveCSS("outline-color", ink);
+    const box = (await target.boundingBox())!;
+    await page.screenshot({ path: `e2e/screenshots/components-focus-${part}-${testInfo.project.name}.png`, clip: { x: box.x - 8, y: box.y - 8, width: box.width + 16, height: box.height + 16 } });
+  }
+});
+
 test("the create form's questions are section headings", async ({ page }, testInfo) => {
   await page.goto("/");
 
