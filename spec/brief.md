@@ -22,7 +22,7 @@ The phone at 390px is the primary device; the desktop at 1440px must look delibe
 ## Terms
 
 - **Slot**: one whole hour on one date, named by its start ("19" is 19:00 to 20:00).
-- **Range**: a first hour and an exclusive last hour. "Wieczór 17–23" gives slots 17 to 22. A run of slots 19, 20 and 21 is written "19–22".
+- **Range**: a first hour (0 to 23) and a number of hours (1 to 24), so a range may run past midnight: 22:00 to 4:00 is 6 hours, and its slots 0 to 3 belong to the evening's date. A run of slots 19, 20 and 21 is written "19–22"; one past midnight "23–2".
 - **Respondent**: a participant who has saved at least once, including one who can't make any slot. Shares and counts ("5 z 6 może") use respondents as the denominator.
 - **Run**: one or more consecutive slots on one date where the same set of respondents is free.
 
@@ -37,7 +37,7 @@ The home page is the create form; there is no separate landing page on the app's
    - "Dziś" and "Jutro" are those dates. "Ten weekend" is this week's Friday to Sunday, without past days. "Przyszły tydzień" is next Monday to Sunday.
    - A chip adds its dates; tapping a lit chip removes them. A chip is lit while all its dates are selected. A tap that would go past 10 dates changes nothing and says "Maksymalnie 10 dni".
    - "Today" and "past" use the organiser's device date.
-3. **O której?** Chips "Wieczór 17–23" (default), "Cały dzień" (10–23) and "Własne". "Własne" reveals two steppers, "od" and "do" (− 17 +): start 0 to 23, end start+1 to 24. No dropdowns.
+3. **O której?** "Od" and "Do", always visible, 17:00 to 23:00 by default, any whole-hour range of 1 to 24 hours (decision 59). On the phone each field opens a bottom sheet with two hour columns; on desktop 24 hour tiles in rows of eight, ordered 6 to 5, the hour number only. A first click marks its tile in `ink` as the start and the summary reads "Od 2:00, teraz kliknij koniec"; a second click makes the clicked tile the last hour, counting on past 5 into the next morning when it comes earlier in that order, so 2 then 8 is 2:00 → 9:00 · 7 godzin. The ends are `ink`, the hours between `heat-2`. A summary under both reads "22:00 → 4:00 · 6 godzin". No presets, no "rano" or "następnego dnia" labels: the order carries it.
 4. **Twoje imię**, prefilled with the last name used on this device. It becomes the organiser's answer name and is shown as "{imię} pyta".
 
 A sticky bottom button "Utwórz i wyślij na grupę". On the phone it opens the native share sheet (`navigator.share`) with "Kiedy możecie? {title} {link}"; where sharing is unavailable it copies the link and says "Link skopiowany". The organiser then lands on the poll page on "Moje".
@@ -63,7 +63,7 @@ The page opens on "Moje" when this device has not answered and on "Wszyscy" when
 
 ### Results ("Wszyscy" tab)
 
-- **The best time**, as the page's headline block: "Najlepiej: sobota 18.10, 19–22", "5 z 6 może" and "Nie może: Ola". Runs are ranked by the size of their free set, then length, then earliest start. The best time is the top run; "Też dobre" lists the next two runs that don't overlap a run already picked. A run with nobody free is never shown. With no respondents the block reads "Nikt jeszcze nie odpowiedział. Wyślij link na grupę."
+- **The best time**, as the page's headline block: "Najlepiej: sobota 18.10, 19–22", "5 z 6 może" and "Nie może: Ola". Runs are ranked by the size of their free set, then length, then earliest start. The best time is the top run; no other runs are listed (the owner removed "Też dobre", as the approved boards draw it). A run with nobody free is never shown. With no respondents the block reads "Nikt jeszcze nie odpowiedział. Wyślij link na grupę."
 - The heatmap: each cell coloured by the share of respondents free, five buckets, with the count in the cell; a cell where every respondent is free carries an ink border.
 - A tap on a cell shows who can and who can't, in a sheet from the bottom on the phone and a side panel on desktop.
 - **Kto odpowiedział**: each respondent with when they last saved ("20 min temu"), or "nie może"; newest first.
@@ -71,10 +71,10 @@ The page opens on "Moje" when this device has not answered and on "Wszyscy" when
 
 ### Organiser's extras
 
-The organiser is whoever holds the organiser cookie, set on create. The results tab shows, nothing else: "Przypomnij" and the "Więcej" menu in one row under the title, and "Ustal ten termin" inside the best-time card and each "Też dobre" row:
+The organiser is whoever holds the organiser cookie, set on create. The results tab shows, nothing else: "Przypomnij" and the "Więcej" menu in one row under the title, and "Ustal ten termin" inside the best-time card:
 
 - **Przypomnij**: a message that names who already answered, because a request addressed to named people gets more replies than one to everyone: "Już są: Bartek, Ola i Michał. Reszta, kiedy możecie? {title} {link}" ("Już jest: Ola." for one). With nobody answered: "Kiedy możecie? {title} {link}". Share sheet on the phone, copy elsewhere.
-- **Ustal termin**: on the best time and on each "Też dobre" run. The page then leads with "Ustalone: sobota 18.10, 19:00" for everyone, with "Dodaj do kalendarza" (an `.ics` with DTSTART and DTEND in UTC); answering closes. "Zmień" clears the final time and reopens answering.
+- **Ustal termin**: on the best time. The page then leads with "Ustalone: sobota 18.10, 19:00" for everyone, with "Dodaj do kalendarza" (an `.ics` with DTSTART and DTEND in UTC); answering closes. "Zmień" clears the final time and reopens answering.
 - **Zrób własną ankietę**: a quiet link at the bottom of every poll page, for everyone, because every participant who sees a poll is the next organiser.
 - **Więcej** menu: "Kopiuj link", "Link organizatora" (a URL that sets the organiser cookie on another device, with one line saying to keep it private), and "Usuń ankietę", confirmed inline.
 
@@ -86,10 +86,10 @@ Every failure has Polish copy that says what happened and what to do. A deleted 
 
 ## Stack (decided)
 
-- Next.js, current stable, App Router, TypeScript strict. Mutations through server actions. Route handlers only for the Open Graph image, the `.ics` file, the organiser link (sets the organiser cookie, then redirects to the poll) and the poll's read endpoint that live refresh polls.
+- Next.js, current stable, App Router, TypeScript strict. Mutations through server actions. Route handlers only for the Open Graph image, the `.ics` file, the organiser link (sets the organiser cookie, then redirects to the poll), the poll's read endpoint that live refresh polls, and `GET /api/health`, which answers 200 once the database opens and gates each deploy.
 - SQLite through Drizzle ORM with `better-sqlite3`, one database file on a mounted volume, migrations in `drizzle/` applied on start. `output: 'standalone'` and a `Dockerfile` that runs it; production is one Railway service with a volume at `/data` (`~/.sandboxes/wpasuj/plan.md`), so nothing may assume a serverless or edge runtime, and the database path comes from `DATABASE_PATH`.
 - Server state (the poll, its answers, who answered) is read by server components on first load and kept fresh on the client through TanStack Query polling the read endpoint; client state (the stroke being painted, my slots, the name being typed) stays in component state and hooks, never in the query cache.
-- Styling: Tailwind v4 utilities on the tokens below, declared once in `tokens.css` as the `@theme` with the default theme reset, so no class outside our tokens exists. No UI kit and no default look (no Tailwind default palette or spacing, no shadcn defaults, no Material). Fonts through `next/font` with the `latin-ext` subset; the Open Graph image loads the same fonts from committed TTF files.
+- Styling: Tailwind v4 utilities on the tokens below, declared once in `tokens.css` as the `@theme` with the default theme reset, so no class outside our tokens exists. No UI kit and no default look (no Tailwind default palette or spacing, no shadcn defaults, no Material). Fonts self-hosted through `next/font/local` from `src/shared/fonts/` (latin and `latin-ext`), so no build fetches them; the Open Graph image loads the same fonts from the committed TTF files there.
 - zod at every boundary (form data, action input, URL params, the read endpoint's response); TypeScript types derive from the schemas and the Drizzle tables, never written twice.
 - Vitest with Testing Library for units and components; Playwright for end to end, with the phone flows in both Chromium and WebKit.
 - GitHub Actions on every pull request: lint, typecheck, unit, build, end to end.
@@ -116,11 +116,11 @@ Every failure has Polish copy that says what happened and what to do. A deleted 
 
 ## Data
 
-- `polls`: id (10-character URL-safe random), title, organiser name, dates (JSON array of ISO dates), first hour, last hour (exclusive), time zone, organiser token hash, final date, final first hour and final last hour (nullable), created at.
+- `polls`: id (10-character URL-safe random), title, organiser name, dates (JSON array of ISO dates), first hour, hour count, time zone, organiser token hash, final date, final first hour and final last hour (nullable), created at.
 - `participants`: id, poll id, name, normalised name (unique per poll), token hash, created at, updated at.
 - `slots`: participant id, date, hour; the triple is the key.
 - Tokens are 32 random bytes, base64url, stored as SHA-256 hashes and looked up by hash.
-- Limits: 10 dates, 30 participants (`full` beyond), hours 0 to 24. The create action deletes polls 60 days past their last date before it inserts.
+- Limits: 10 dates, 30 participants (`full` beyond), a first hour 0 to 23 and 1 to 24 hours. The create action deletes polls 60 days past their last date before it inserts.
 - `polls.created_by_participant`: true when the creating device already held a participant cookie from another poll, so the share of participants who become organisers can be counted without analytics.
 
 ## Ergonomics (from UX research)
@@ -144,7 +144,7 @@ Every failure has Polish copy that says what happened and what to do. A deleted 
 
 Where a mockup and this document differ, this document wins; screens without a mockup (desktop create and answer, the bottom sheet, "Ustalone", "Własne", "To ty?", errors, the empty state) are composed from the design system's parts.
 
-**Type**: Bricolage Grotesque for display (titles, the best time, day numbers, the wordmark), weights 700 and 800, tight tracking (−0.02 to −0.035em); Onest for everything else, weights 400, 500 and 600, tabular figures wherever a number can change.
+**Type**: Bricolage Grotesque for display (titles, the best time, day numbers, the wordmark), weights 700 and 800, tight tracking (−0.01 to −0.03em); Onest for everything else, weights 400, 500 and 600, tabular figures wherever a number can change.
 
 Sizes come from one scale in `tokens.css`, Tailwind's names with a paired line height: `xs` 12/16, `sm` 14/20, `base` 16/24, `lg` 18/28, `xl` 20/28, `2xl` 24/32, `3xl` 30/36, `4xl` 40/44, `5xl` 48/52, `6xl` 60/62, `7xl` 72/72. A role picks a step, and a desktop size is a responsive variant (`text-3xl lg:text-4xl`), never its own token.
 
@@ -194,7 +194,6 @@ Counts on heat cells are `ink`, white only on `heat-5`. Avatars take their tint 
 - The best-time card cross-fades its text when the best time changes.
 - The "Moje" and "Wszyscy" switch uses a View Transition where the browser has one.
 - The bottom sheet slides up in 200 ms ease-out.
-- Setting the final time fills the chosen cells in sequence, the one celebratory moment.
 - Only `transform` and `opacity` animate; no confetti; `prefers-reduced-motion` removes all of it.
 
 **Copy**: Polish, informal second person, the way a friend writes in a chat: short, no exclamation marks, no corporate words ("użytkownik", "zarządzaj", "konfiguruj").
@@ -212,7 +211,7 @@ Accounts and sign-in, notifications of any kind, calendar integrations beyond th
 ## Acceptance
 
 - A first-time participant on a 390px phone (Chromium and WebKit) answers a fresh poll with a name and one drag, sees "Zapisane" without pressing any button, and the same with taps only.
-- Three participants in separate browser contexts answer; the best time, "Też dobre", the heatmap counts, the per-cell names and "Kto odpowiedział" agree with a hand count, including a poll where the free set changes while the count stays the same.
+- Three participants in separate browser contexts answer; the best time, the heatmap counts, the per-cell names and "Kto odpowiedział" agree with a hand count, including a poll where the free set changes while the count stays the same.
 - The organiser creates a poll with "Ten weekend", the default range and a title, reminds (the message names who answered), sets the time, and a participant downloads an `.ics` with the right UTC times.
 - A second browser context typing an existing name gets "To ty, Ola?" and takes the row over; the organiser link restores organiser controls in a fresh context.
 - `GET` of the Open Graph image returns a 1200×630 PNG under 1 MB, and the page's `og:image` is an absolute URL to it.
