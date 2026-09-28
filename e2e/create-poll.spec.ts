@@ -261,6 +261,27 @@ test("nothing below the dates moves when the page hydrates", async ({ page, brow
   expect((await whenHeading(page).boundingBox())!.y).toBe(before);
 });
 
+test("what the organiser types before the page hydrates still creates the poll", async ({ page }) => {
+  let hydrate = () => {};
+  const scriptsHeld = new Promise<void>((resolve) => (hydrate = resolve));
+  await page.route(/\/_next\/static\/chunks\/.+\.js$/, async (route) => {
+    await scriptsHeld;
+    await route.continue();
+  });
+  await stubShareSheet(page);
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+
+  await page.getByRole("textbox", { name: "Co robimy?" }).fill("Kino");
+  await page.getByRole("textbox", { name: "Twoje imię" }).fill("Ola");
+  hydrate();
+  await expect(days(page).last()).toBeEnabled();
+  await page.getByRole("button", { name: "Jutro" }).click();
+  await createButton(page).click();
+
+  await expect(page).toHaveURL(/\/e\/[A-Za-z0-9_-]{10}$/);
+  await expect(page.getByText("Pytasz jako Ola", { exact: true })).toBeVisible();
+});
+
 test("inputs render at 16px or more", async ({ page }) => {
   await page.goto("/");
 
