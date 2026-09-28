@@ -49,7 +49,7 @@ jobs:
           curl --fail --silent --output /dev/null --write-out '%{content_type}' "$URL$stylesheet" | grep '^text/css'
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npx playwright test e2e/answer-poll.spec.ts -g "answers with a name and one drag" --project=desktop-chromium
+      - run: npx playwright test e2e/answer-poll.spec.ts -g "answers with a name and one drag" --project=desktop-chromium --retries=0
         env:
           E2E_BASE_URL: ${{ env.URL }}
       - run: docker restart wpasuj
