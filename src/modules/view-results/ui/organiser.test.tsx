@@ -166,6 +166,32 @@ describe("the organiser", () => {
     expect(asOrganiser.setFinal).toHaveBeenCalledExactlyOnceWith({ date: saturday, firstHour: 18, lastHour: 20 });
   });
 
+  it("waits on a slow set with the button held, so a second tap sends nothing", async () => {
+    const asOrganiser = organiser({ setFinal: vi.fn(() => new Promise<never>(() => {})) });
+    renderPage(threeAnswers, asOrganiser);
+    const set = within(screen.getByRole("region", { name: "Twoja ankieta" })).getByRole("button", { name: "Ustal termin" });
+
+    await userEvent.click(set);
+    await userEvent.click(set);
+
+    expect(set).toBeDisabled();
+    expect(asOrganiser.setFinal).toHaveBeenCalledOnce();
+  });
+
+  it("waits on a slow delete with Tak, usuń held", async () => {
+    const asOrganiser = organiser({ deletePoll: vi.fn(() => new Promise<never>(() => {})) });
+    renderPage(threeAnswers, asOrganiser);
+    await userEvent.click(screen.getByRole("button", { name: "Więcej" }));
+    await userEvent.click(screen.getByRole("button", { name: "Usuń ankietę" }));
+    const confirm = screen.getByRole("button", { name: "Tak, usuń" });
+
+    await userEvent.click(confirm);
+    await userEvent.click(confirm);
+
+    expect(confirm).toBeDisabled();
+    expect(asOrganiser.deletePoll).toHaveBeenCalledOnce();
+  });
+
   it("has no time to set while nobody answered, and still reminds", () => {
     renderPage({ ...threeAnswers, respondents: [] }, organiser());
 
