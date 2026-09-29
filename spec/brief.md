@@ -191,7 +191,7 @@ Counts on heat cells are `ink`, white only on `heat-5`. Avatars take their tint 
 - A tapped cell fills in 120 ms with a 0.96 press scale.
 - A heat cell whose count rises bumps to 1.08 scale for 180 ms.
 - A new respondent's avatar pops in with a slight overshoot (320 ms, `cubic-bezier(.3,1.5,.5,1)`).
-- The best-time card cross-fades its text when the best time changes.
+- The best-time card pulses once and throws a tile burst when the best time changes (ADR 0035).
 - The "Moje" and "Wszyscy" switch uses a View Transition where the browser has one.
 - The bottom sheet slides up in 200 ms ease-out.
 - Only `transform` and `opacity` animate; no confetti; `prefers-reduced-motion` removes all of it.
