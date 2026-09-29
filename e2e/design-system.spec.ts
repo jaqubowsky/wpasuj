@@ -15,6 +15,7 @@ const styleOf = (locator: Locator) =>
       fontWeight: style.fontWeight,
       boxShadow: style.boxShadow,
       transform: style.transform,
+      translate: style.translate,
     };
   });
 
@@ -93,6 +94,92 @@ test("every target on the poll page is at least 44px tall and wide", async ({ br
   await expectTargetsAtLeast44(newcomer);
 });
 
+const ledgeOf = (locator: Locator) =>
+  locator.evaluate((element) => {
+    const ledge = getComputedStyle(element)
+      .boxShadow.split(/,(?![^(]*\))/)
+      .map((shadow) => shadow.trim())
+      .find((shadow) => !shadow.endsWith("inset") && !shadow.endsWith(" 0px 0px 0px 0px"));
+
+    if (!ledge) return "none";
+
+    const [, color, geometry] = /^(.*\)) (.*)$/.exec(ledge)!;
+    const canvas = document.createElement("canvas").getContext("2d", { willReadFrequently: true })!;
+
+    canvas.fillStyle = color;
+    canvas.fillRect(0, 0, 1, 1);
+    const [red, green, blue] = canvas.getImageData(0, 0, 1, 1).data;
+
+    return `rgb(${red}, ${green}, ${blue}) ${geometry}`;
+  });
+
+test("every button and chip stands on a ledge, and a press drops it onto the ledge", async ({ page }, testInfo) => {
+  const heat5 = "rgb(204, 68, 32)";
+  const accent = "rgb(240, 96, 63)";
+  const edge = "rgb(149, 138, 126)";
+
+  await page.goto("/dev/components");
+
+  const buttons = page.getByRole("region", { name: "Button" });
+  const chips = page.getByRole("region", { name: "Chip" });
+
+  for (const [target, ledge] of [
+    [buttons.getByRole("button", { name: "Utwórz i wyślij na grupę" }), `${heat5} 0px 8px 0px -1px`],
+    [buttons.getByRole("button", { name: "Przypomnij" }), `${ink} 0px 8px 0px -1px`],
+    [buttons.getByRole("button", { name: "Więcej" }), `${ink} 0px 5px 0px -1px`],
+    [buttons.getByRole("button", { name: "Utwórz ankietę" }).first(), `${heat5} 0px 8px 0px -1px`],
+    [buttons.getByRole("button", { name: "Utwórz ankietę" }).last(), `${accent} 0px 8px 0px -1px`],
+    [buttons.getByRole("button", { name: "Ustal ten termin" }), `${accent} 0px 8px 0px -1px`],
+    [buttons.getByRole("button", { name: "Nie mogę w żadnym terminie" }), "none"],
+    [chips.getByRole("button", { name: "Dziś" }), `${edge} 0px 5px 0px -1px`],
+    [chips.getByRole("button", { name: "Ten weekend" }), `${heat5} 0px 5px 0px -1px`],
+  ] as const) {
+    expect(await ledgeOf(target)).toBe(ledge);
+  }
+
+  const pressed = buttons.getByRole("button", { name: "Przypomnij" });
+
+  await pressed.hover();
+  await page.mouse.down();
+  await expect(pressed).toHaveCSS("translate", "0px 6px");
+  await expect.poll(() => ledgeOf(pressed)).toBe(`${ink} 0px 2px 0px -1px`);
+  await saveScreenshot(page, testInfo, "components-button-pressed");
+  await page.mouse.up();
+
+  const small = buttons.getByRole("button", { name: "Więcej" });
+
+  await small.hover();
+  if (testInfo.project.name.startsWith("desktop")) await expect.poll(() => ledgeOf(small)).toBe(`${ink} 0px 7px 0px -1px`);
+
+  await page.mouse.down();
+  await expect(small).toHaveCSS("translate", "0px 4px");
+  await expect.poll(() => ledgeOf(small)).toBe(`${ink} 0px 1px 0px -1px`);
+  await page.mouse.up();
+});
+
+const backdropOf = (tab: Locator) =>
+  tab.evaluate((element) => {
+    const { x, y, width, height } = element.getBoundingClientRect();
+    const beneath = document.elementsFromPoint(x + width / 2, y + height / 2);
+
+    return beneath.map((layer) => getComputedStyle(layer).backgroundColor).find((color) => color !== "rgba(0, 0, 0, 0)");
+  });
+
+test("the ink pill slides under the selected Segment tab", async ({ page }) => {
+  await page.goto("/dev/components");
+  const segment = page.getByRole("region", { name: "Segment" });
+
+  for (const [picked, other] of [
+    ["Wszyscy", "Moje"],
+    ["Moje", "Wszyscy"],
+  ] as const) {
+    await segment.getByRole("tab", { name: picked }).click();
+
+    await expect.poll(() => backdropOf(segment.getByRole("tab", { name: picked }))).toBe(ink);
+    await expect.poll(() => backdropOf(segment.getByRole("tab", { name: other }))).not.toBe(ink);
+  }
+});
+
 test("Button, Chip and Segment show the ink focus ring from the keyboard", async ({ page }, testInfo) => {
   await page.goto("/dev/components");
 
@@ -115,14 +202,26 @@ test("Button, Chip and Segment show the ink focus ring from the keyboard", async
   }
 });
 
-test("the create form's questions are section headings", async ({ page }, testInfo) => {
+test("the create form's title is its headline and its questions are section headings", async ({ page }, testInfo) => {
   await page.goto("/");
 
-  for (const question of ["Co robimy?", "Twoje imię"]) await expectSectionHeading(page.locator("label", { hasText: question }));
+  await expectSectionHeading(page.locator("label", { hasText: "Twoje imię" }));
   for (const question of ["Kiedy?", "O której?"]) await expectSectionHeading(page.locator("legend", { hasText: question }));
-  const titleSize = testInfo.project.name.startsWith("desktop") ? "40px" : "30px";
+  const titleSize = testInfo.project.name.startsWith("desktop") ? "96px" : "48px";
 
-  expect(await styleOf(page.getByRole("textbox", { name: "Co robimy?" }))).toMatchObject({ fontSize: titleSize });
+  expect(await styleOf(page.getByRole("textbox", { name: "Co robimy?" }))).toMatchObject({ fontSize: titleSize, fontWeight: "800" });
+});
+
+test("a long title wraps onto more lines instead of scrolling", async ({ page }) => {
+  await page.goto("/");
+  const title = page.getByRole("textbox", { name: "Co robimy?" });
+
+  await title.fill("Grill");
+  const oneLine = (await title.boundingBox())!.height;
+
+  await title.fill("Grill na działce u Oli i Marka w sobotę");
+
+  expect((await title.boundingBox())!.height).toBeGreaterThan(oneLine * 1.5);
 });
 
 test("day numbers are tracked tight", async ({ page }) => {
@@ -178,7 +277,7 @@ test("an invalid input shows the focus ring while focused", async ({ page }, tes
 test.describe("with reduced motion", () => {
   test.use({ reducedMotion: "reduce" });
 
-  test("a pressed button, chip or cell does not scale", async ({ page }) => {
+  test("a pressed button, chip or cell does not move", async ({ page }) => {
     await page.goto("/dev/components");
 
     for (const target of [
@@ -188,7 +287,7 @@ test.describe("with reduced motion", () => {
     ]) {
       await target.hover();
       await page.mouse.down();
-      expect((await styleOf(target)).transform).toBe("none");
+      expect(await styleOf(target)).toMatchObject({ transform: "none", translate: "none" });
       await page.mouse.up();
     }
   });

@@ -38,8 +38,12 @@
   --shadow-sheet: 0 -8px 32px rgba(30, 27, 24, 0.12);
   --shadow-menu: 0 8px 32px rgba(30, 27, 24, 0.12);
   --shadow-poster: 0 26px 50px -24px rgba(30, 27, 24, 0.45), 0 0 0 1px rgba(30, 27, 24, 0.06);
-  --shadow-ledge: 0 10px 0 -2px var(--color-heat-5);
-  --shadow-ledge-ink: 0 10px 0 -2px var(--color-ink);
+  --shadow-ledge: 0 8px 0 -1px var(--color-ink);
+  --shadow-ledge-up: 0 10px 0 -1px var(--color-ink);
+  --shadow-ledge-down: 0 2px 0 -1px var(--color-ink);
+  --shadow-ledge-sm: 0 5px 0 -1px var(--color-ink);
+  --shadow-ledge-sm-up: 0 7px 0 -1px var(--color-ink);
+  --shadow-ledge-sm-down: 0 1px 0 -1px var(--color-ink);
 
   --font-sans: var(--font-onest);
   --font-display: var(--font-bricolage);

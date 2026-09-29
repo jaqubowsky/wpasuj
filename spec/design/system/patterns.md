@@ -24,7 +24,7 @@ Screens are built from the components; these are the compositions that repeat, w
 
 ## Create form
 
-- Parts: Input (`title` variant), Chip groups for dates and ranges, Stepper pair for a custom range, Input (name), primary Button in a sticky bottom bar.
+- Parts: TitleInput, Chip groups for dates and ranges, Stepper pair for a custom range, Input (name), primary Button in a sticky bottom bar.
 - Four questions, one screen: "Co robimy?", "Kiedy?", "O której?", "Twoje imię".
 
 ## Bottom sheet

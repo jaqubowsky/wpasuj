@@ -5,7 +5,7 @@ import { useTypingBeforeHydration } from "./use-typing-before-hydration";
 type InputProps = Omit<ComponentProps<"input">, "aria-invalid" | "aria-describedby" | "className" | "id"> & {
   label: string;
   labelAside?: ReactNode;
-  variant?: "title" | "compact";
+  variant?: "compact";
   error?: string;
   morph?: string;
 };
@@ -31,7 +31,7 @@ export function Input({ label, labelAside, variant, error, morph, ref, ...props 
         <input
           ref={input}
           id={inputId}
-          className="box-border h-14 w-full rounded-control border-0 bg-surface px-4 py-0 font-sans text-base font-medium text-ink shadow-[inset_0_0_0_1px_var(--color-edge)] placeholder:text-muted focus:shadow-[inset_0_0_0_2px_var(--color-ink)] focus:outline-none aria-invalid:not-focus:shadow-[inset_0_0_0_2px_var(--color-accent-ink)] data-[variant=compact]:h-13 data-[variant=title]:h-auto data-[variant=title]:rounded-none data-[variant=title]:bg-transparent data-[variant=title]:px-0 data-[variant=title]:py-3 data-[variant=title]:font-display data-[variant=title]:text-3xl data-[variant=title]:font-bold data-[variant=title]:tracking-tightest data-[variant=title]:shadow-[inset_0_-2px_0_var(--color-ink)] data-[variant=title]:focus:shadow-[inset_0_-3px_0_var(--color-ink)] data-[variant=title]:aria-invalid:not-focus:shadow-[inset_0_-2px_0_var(--color-accent-ink)] lg:data-[variant=title]:text-4xl"
+          className="box-border h-14 w-full rounded-control border-0 bg-surface px-4 py-0 font-sans text-base font-medium text-ink shadow-[inset_0_0_0_1px_var(--color-edge)] placeholder:text-muted focus:shadow-[inset_0_0_0_2px_var(--color-ink)] focus:outline-none aria-invalid:not-focus:shadow-[inset_0_0_0_2px_var(--color-accent-ink)] data-[variant=compact]:h-13"
           data-variant={variant}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}

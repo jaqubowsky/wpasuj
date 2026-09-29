@@ -7,6 +7,7 @@ import { Card } from "@/shared/ui/card/card";
 import { Cell } from "@/shared/ui/cell/cell";
 import { Chip } from "@/shared/ui/chip/chip";
 import { Input } from "@/shared/ui/input/input";
+import { TitleInput } from "@/shared/ui/title-input/title-input";
 import { LinkCard } from "@/shared/ui/link-card/link-card";
 import { MotionToggle } from "@/shared/ui/motion-toggle/motion-toggle";
 import { PosterCard } from "@/shared/ui/poster-card/poster-card";
@@ -92,8 +93,8 @@ export function ComponentsDemo() {
       </Section>
       <Section name="Input">
         <div className="grid w-full gap-3">
-          <Input label="Co robimy?" variant="title" placeholder="Piwo, planszówki, kino…" />
-          <Input label="Tytuł z błędem" variant="title" defaultValue="" error="Wpisz, co robicie" />
+          <TitleInput label="Co robimy?" placeholder="Co robimy?" />
+          <TitleInput label="Tytuł z błędem" defaultValue="" error="Wpisz, co robicie" />
           <Input label="Jak masz na imię?" placeholder="Twoje imię" />
           <Input label="Imię wpisane" defaultValue="Ola" />
           <Input label="Imię z błędem" defaultValue="Ola" error="To imię już jest w tej ankiecie." />
@@ -139,14 +140,7 @@ export function ComponentsDemo() {
         <PosterCard title="Kino" when="czw 9, 19:30" people="4 osoby" tone="paper" heat={[0, 2, 3, 5, 1, 4, 0, 2, 3, 1]} size="small" />
       </Section>
       <Section name="LinkCard">
-        <LinkCard
-          asker="Kuba pyta, kiedy możesz"
-          title="Grill na działce u Oli"
-          tone="coral"
-          host="wpasuj.pl"
-          note="jeden link zamiast wszystkiego"
-        />
-        <LinkCard asker="Ty pytasz, kiedy możesz" title="Wasz plan" tone="ink" host="wpasuj.pl" />
+        <LinkCard asker="Kuba pyta, kiedy możesz" title="Grill na działce u Oli" host="wpasuj.pl" note="jeden link zamiast wszystkiego" />
       </Section>
       <Section name="WaveEdge">
         <div className="w-full">

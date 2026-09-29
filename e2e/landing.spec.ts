@@ -77,7 +77,7 @@ test("the logo takes the reader back to the top", async ({ page }) => {
   await page.goto("/");
   await faq(page).scrollIntoViewIfNeeded();
 
-  await page.getByRole("link", { name: "Wpasuj, na górę strony" }).click();
+  await page.getByRole("button", { name: "Wpasuj, na górę strony" }).click();
 
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
 });
@@ -193,16 +193,6 @@ test("the wall of posters runs and pauses under the pointer", async ({ page }, t
   await wall(page).getByRole("button", { name: "Kino, czw 9, 19:30" }).first().hover({ force: true });
 
   expect(await wallPlayStates(page)).toEqual(["paused", "paused"]);
-});
-
-test("the link preview beside the form follows what the organiser types", async ({ page }) => {
-  await page.goto("/");
-  await expect(make(page).getByRole("figure", { name: "Wasz plan" })).toContainText("Ty pytasz, kiedy możesz");
-
-  await titleField(page).fill("Grill u Oli");
-  await page.getByRole("textbox", { name: "Twoje imię" }).fill("Kuba");
-
-  await expect(make(page).getByRole("figure", { name: "Grill u Oli" })).toContainText("Kuba pyta, kiedy możesz");
 });
 
 test("stopping the motion holds every idle loop and is remembered", async ({ page }) => {

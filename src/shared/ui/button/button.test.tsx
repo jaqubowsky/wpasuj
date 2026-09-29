@@ -36,7 +36,7 @@ describe("Button", () => {
     expect(onSubmit).toHaveBeenCalledOnce();
   });
 
-  it("shows the primary, secondary, on-dark, text and small looks of the preview", () => {
+  it("shows the primary, secondary, loud, on-dark, danger, text and small looks of the preview", () => {
     render(
       <>
         <Button variant="primary" block>
@@ -48,6 +48,9 @@ describe("Button", () => {
           Ustal ten termin
         </Button>
         <Button variant="text">Nie mogę w żadnym terminie</Button>
+        <Button variant="loud">Utwórz ankietę</Button>
+        <Button variant="loud-light">Zrób ankietę</Button>
+        <Button variant="danger">Tak, usuń</Button>
       </>,
     );
 
@@ -59,6 +62,9 @@ describe("Button", () => {
     expect(screen.getByRole("button", { name: "Więcej" })).toHaveAttribute("data-size", "small");
     expect(screen.getByRole("button", { name: "Ustal ten termin" })).toHaveAttribute("data-variant", "on-dark");
     expect(screen.getByRole("button", { name: "Nie mogę w żadnym terminie" })).toHaveAttribute("data-variant", "text");
+    expect(screen.getByRole("button", { name: "Utwórz ankietę" })).toHaveAttribute("data-variant", "loud");
+    expect(screen.getByRole("button", { name: "Zrób ankietę" })).toHaveAttribute("data-variant", "loud-light");
+    expect(screen.getByRole("button", { name: "Tak, usuń" })).toHaveAttribute("data-variant", "danger");
   });
 
   it("ignores taps while disabled", async () => {
