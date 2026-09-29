@@ -13,7 +13,10 @@ export function AnswerBody() {
     <Board>
       <div className="grid text-base text-muted">
         {answer.asksToMark && <p className="m-0">Zaznacz też swoje godziny.</p>}
-        <p className="m-0">Kliknij godziny, kiedy możesz. Możesz przeciągnąć.</p>
+        <p className="m-0">
+          Kliknij godziny, kiedy możesz. <span className="pointer-coarse:hidden">Możesz przeciągnąć.</span>
+          <span className="hidden pointer-coarse:inline">Przytrzymaj, żeby przeciągnąć.</span>
+        </p>
       </div>
       <div
         className="transition-opacity duration-(--duration-fill) ease-out data-faded:opacity-45"

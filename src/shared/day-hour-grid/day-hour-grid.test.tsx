@@ -109,6 +109,30 @@ describe("DayHourGrid", () => {
     expect(rippled(grid)).toEqual([]);
   });
 
+  it("keeps the page from scrolling under a finger only once its hold starts painting", () => {
+    vi.useFakeTimers();
+    renderGrid();
+    Element.prototype.setPointerCapture ??= () => {};
+    const grid = screen.getByRole("grid");
+
+    fireEvent.pointerDown(screen.getByRole("button", { name: "pt 16, 17:00" }), {
+      button: 0,
+      buttons: 1,
+      pointerId: 1,
+      isPrimary: true,
+      pointerType: "touch",
+    });
+
+    const beforeHold = fireEvent.touchMove(grid);
+
+    act(() => vi.advanceTimersByTime(300));
+    const afterHold = fireEvent.touchMove(grid);
+
+    vi.useRealTimers();
+    expect(beforeHold).toBe(true);
+    expect(afterHold).toBe(false);
+  });
+
   it("drops a drag the browser cancels", () => {
     const { onStroke } = renderGrid();
 

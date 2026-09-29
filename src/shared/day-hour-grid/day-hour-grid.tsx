@@ -57,6 +57,7 @@ export function DayHourGrid({
   const ripple = useStrokeRipple(gridRef);
 
   const stroke = usePaintStroke({
+    gridRef,
     dates,
     hours,
     onStroke:
@@ -162,7 +163,7 @@ export function DayHourGrid({
                     role="gridcell"
                     aria-colindex={position.column + 1}
                     aria-selected={selected}
-                    className="grid in-data-paints:touch-none data-ripple:animate-pop data-ripple:[animation-delay:calc(var(--ripple-step)*var(--duration-ripple))] [&>:first-child]:w-full"
+                    className="grid in-data-paints:touch-manipulation data-ripple:animate-pop data-ripple:[animation-delay:calc(var(--ripple-step)*var(--duration-ripple))] [&>:first-child]:w-full"
                     data-row={position.row}
                     data-column={position.column}
                     data-date={date}

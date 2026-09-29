@@ -90,9 +90,7 @@ describe("the Moje lead and body", () => {
 
     const grid = screen.getByRole("grid", { name: "Kiedy możesz?" });
 
-    expect(screen.getByText("Kliknij godziny, kiedy możesz. Możesz przeciągnąć.").compareDocumentPosition(grid)).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING,
-    );
+    expect(screen.getByText(/^Kliknij godziny, kiedy możesz\./).compareDocumentPosition(grid)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
 
     expect(grid.compareDocumentPosition(cantButton())).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
