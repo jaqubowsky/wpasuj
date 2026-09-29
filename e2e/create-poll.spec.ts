@@ -261,6 +261,19 @@ test("on desktop the first tile shows as the start, and 2 then 8 runs to 9:00 th
   await expect(page.getByText("2:00 → 9:00 · 7 godzin").filter({ visible: true })).toBeVisible();
 });
 
+test("a create that fails says the poll was not created and to check the connection", async ({ page }, testInfo) => {
+  await page.goto("/");
+  await page.route("/", (route) => (route.request().method() === "POST" ? route.abort() : route.continue()));
+  await createPoll(page, { title: "Planszówki u Michała", day: "Ten weekend", name: "Kuba" });
+
+  await expect(
+    page.getByRole("alert").filter({ hasText: "Nie udało się utworzyć ankiety. Sprawdź internet i spróbuj jeszcze raz." }),
+  ).toBeVisible();
+
+  await expect(page).toHaveURL("/");
+  await saveScreenshot(page, testInfo, "create-failed");
+});
+
 test("the month and the 10-day limit", async ({ page }, testInfo) => {
   await page.goto("/");
 

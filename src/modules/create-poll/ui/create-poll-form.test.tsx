@@ -258,13 +258,13 @@ describe("Utwórz i wyślij na grupę", () => {
     expect(push).not.toHaveBeenCalled();
   });
 
-  it("says something went wrong when creating throws and lets the organiser try again", async () => {
+  it("says the poll was not created and to check the connection when creating throws, and lets the organiser try again", async () => {
     createPoll.mockRejectedValueOnce(new Error("database is locked")).mockResolvedValueOnce({ ok: true, id: "abcdefghij" });
     render(<CreatePollForm />);
     await fillIn("Dziś");
 
     await act(() => userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" })));
-    expect(screen.getByText("Coś poszło nie tak. Spróbuj jeszcze raz.")).toBeInTheDocument();
+    expect(screen.getByText("Nie udało się utworzyć ankiety. Sprawdź internet i spróbuj jeszcze raz.")).toBeInTheDocument();
     await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
 
     expect(push).toHaveBeenCalledWith("/e/abcdefghij");

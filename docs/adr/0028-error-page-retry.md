@@ -11,7 +11,7 @@ Any unhandled error, a root layout one included, needs a Polish page; Next offer
 
 ## Decision
 
-The error page shows "Coś poszło nie tak" / "Spróbuj jeszcze raz. Jeśli dalej nie działa, zrób nową ankietę." in `PageFrame` under the app header, with "Spróbuj ponownie" and a "Zrób nową ankietę" link to `/`, and no error message or digest. "Spróbuj ponownie" calls Next's `retry()`, not `reset()`, because `reset()` re-renders without fetching again and a server error stays on screen (WPA-55).
+The error page shows "Coś poszło nie tak" / "Spróbuj jeszcze raz. Jeśli dalej nie działa, zrób własną ankietę." in `PageFrame` under the app header, with "Spróbuj ponownie" and a "Zrób własną ankietę" link to `/`, and no error message or digest. "Spróbuj ponownie" calls Next's `retry()`, not `reset()`, because `reset()` re-renders without fetching again and a server error stays on screen (WPA-55).
 
 ## Consequences
 

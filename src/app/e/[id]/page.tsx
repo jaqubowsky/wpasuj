@@ -27,6 +27,7 @@ import { AppHeader } from "../../app-header";
 import { PageFrame } from "../../page-frame";
 import { PollGone } from "./poll-gone";
 import { PollTabs } from "./poll-tabs";
+import { RefreshAfterSave } from "./refresh-after-save";
 import { ZoneNote } from "./zone-note";
 
 const unlisted = { index: false, follow: false };
@@ -79,6 +80,7 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
           organiser={organiser}
           organiserKey={nameKey(poll.organiserName)}
         >
+          <RefreshAfterSave />
           <AppHeader
             aside={
               <UntilSet invitation={<SetBadge />}>
