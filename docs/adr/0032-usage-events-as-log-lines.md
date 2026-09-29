@@ -15,12 +15,14 @@ The owner could learn whether anyone uses Wpasuj only by opening the SQLite file
 - An action writes its event after its store call returns, so a refused or failed action writes none
 - No title, name, token or cookie value goes into a line; the poll id is enough to count and to join lines
 - A save whose promise rejects in the browser (WPA-75), whether the request failed or the server answered with an error, is reported by `reportFailedSave` (`src/shared/failed-save.ts`) with `navigator.sendBeacon` to `POST /api/failed-saves`, at most 5 reports per page load. The route writes `{"level":"error","message":"client_save_failed","action","errorName"}` and answers 204. `action` is one of `saveAnswer`, `createPoll`, `setFinal`, `clearFinal`, `deletePoll`; `errorName` is one of `TypeError`, `Error`, `AbortError`, `SyntaxError`, or `other` for any other thrown value. Any other body is refused with 400 and writes nothing, so the public route never puts client text in the log. It carries no `pollId`
+- A render error that reaches `src/app/error.tsx` or `global-error.tsx` (WPA-95) is reported by `reportRenderError` (`src/app/render-error.ts`) with `navigator.sendBeacon` to `POST /api/render-errors`, once per error the boundary shows. The route writes `{"level":"error","message":"client_render_failed","errorName","hasDigest","route"}` and answers 204. `errorName` is one of `Error`, `TypeError`, `RangeError`, `ReferenceError`, `SyntaxError`, or `other`; `hasDigest` is true when the error came from the server with a digest; `route` is `/`, `/e/[id]` or `other`, so no path, id or organiser token leaves the page. Any other body is refused with 400 and writes nothing
 
 ## Consequences
 
 - Counting happens in Railway's Log Explorer, over its log retention; nothing in the app stores or shows the counts
 - Failed saves show under `@level:error` beside server errors, and the phrase search `"client_save_failed"` counts them. The count is a floor: a page stops reporting after 5, and a report sent while the network is down is lost. A save that throws on the server also writes its `onRequestError` line, so `@level:error` counts that failure twice
-- Anyone can post to `/api/failed-saves`, so its count can be inflated, never filled with text
+- Anyone can post to `/api/failed-saves` or `/api/render-errors`, so their counts can be inflated, never filled with text
+- A server render error writes its `onRequestError` line and, once the error page shows it, a `client_render_failed` line with `hasDigest: true`; `@hasDigest:false` counts the errors thrown in the browser alone
 - A new event is one `writeLogLine` call after the store call, and a new key in a line is a new attribute to filter on
 - Adding a personal field to a line puts it in Railway's logs, outside the 60-day cleanup of the database
 - Renaming an event or moving it before the store call breaks counts the owner already filters on

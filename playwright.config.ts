@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 export const databasePath = join(tmpdir(), "wpasuj-e2e.db");
+export const serverLogPath = join(tmpdir(), "wpasuj-e2e-server.log");
 export const siteUrl = "https://wpasuj.example";
 const containerUrl = process.env.E2E_BASE_URL;
 
@@ -25,7 +26,7 @@ export default defineConfig({
   webServer: containerUrl
     ? undefined
     : {
-        command: `rm -f ${databasePath} ${databasePath}-wal ${databasePath}-shm && npm run start`,
+        command: `rm -f ${databasePath} ${databasePath}-wal ${databasePath}-shm && (npm run start 2>&1 1>&3 | tee ${serverLogPath} 1>&2) 3>&1`,
         url: "http://localhost:3000",
         env: { DATABASE_PATH: databasePath, DEMO_ROUTES: "1", SITE_URL: siteUrl },
         reuseExistingServer: false,
