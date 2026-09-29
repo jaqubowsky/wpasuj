@@ -9,6 +9,7 @@ Screens are built from the components; these are the compositions that repeat, w
 - The date header toggles the whole date, the hour label toggles that hour on every date; both are buttons.
 - Up to four dates fill a 390px phone; more scroll sideways with snap per date and a sticky hour column.
 - Touch: cells `touch-action: none` (a drag paints), the hour column `pan-y`, the header `pan-x`. Keyboard: an ARIA grid with `aria-multiselectable`.
+- It sits on a Board: the hint above, on "Moje" a Button toggle "Nie mogę w żadnym terminie" under it (ADR 0035). A drag paints the rectangle from its first cell and ripples out from that cell when it lifts.
 
 ## Best time
 

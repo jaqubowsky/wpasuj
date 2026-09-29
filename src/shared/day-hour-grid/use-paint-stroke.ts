@@ -10,7 +10,7 @@ type Stroke = { pointerId: number; anchor: GridCell; current: GridCell; mode: Pa
 type PaintStrokeOptions = {
   dates: string[];
   hours: number[];
-  onStroke?: (rectangle: PaintedRectangle) => void;
+  onStroke?: (rectangle: PaintedRectangle, from: GridCell) => void;
   onTap: (cell: GridCell) => void;
 };
 
@@ -67,7 +67,7 @@ export function usePaintStroke({ dates, hours, onStroke, onTap }: PaintStrokeOpt
 
       update(null);
       paintedRef.current = current.spread;
-      if (current.spread) onStroke?.(rectangleOf(current));
+      if (current.spread) onStroke?.(rectangleOf(current), current.anchor);
     },
     cancel(pointer: Pick<Pointer, "pointerId">) {
       if (strokeOf(pointer)) update(null);

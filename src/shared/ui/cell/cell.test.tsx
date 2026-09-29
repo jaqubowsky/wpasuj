@@ -62,4 +62,20 @@ describe("Cell", () => {
 
     expect(screen.getByRole("button", { name: "sb 19:00" })).not.toHaveAttribute("data-heat");
   });
+
+  it("rings the heat cell someone tapped to see who can", () => {
+    render(
+      <>
+        <Cell heat={3} selected aria-label="sb 19:00">
+          3
+        </Cell>
+        <Cell heat={3} aria-label="sb 20:00">
+          3
+        </Cell>
+      </>,
+    );
+
+    expect(screen.getByRole("button", { name: "sb 19:00" })).toHaveAttribute("data-selected");
+    expect(screen.getByRole("button", { name: "sb 20:00" })).not.toHaveAttribute("data-selected");
+  });
 });

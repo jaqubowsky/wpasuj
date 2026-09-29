@@ -23,7 +23,7 @@ function drag(result: ReturnType<typeof renderStroke>["result"]) {
 }
 
 describe("usePaintStroke", () => {
-  it("reports an add rectangle for a drag that starts on an empty cell", () => {
+  it("reports an add rectangle and its first cell for a drag that starts on an empty cell", () => {
     const { result, onStroke } = renderStroke();
 
     act(() => result.current.start({ date: "2026-10-18", hour: 19 }, false, finger));
@@ -31,7 +31,7 @@ describe("usePaintStroke", () => {
     act(() => result.current.move({ date: "2026-10-16", hour: 18 }, finger));
     act(() => result.current.end(finger));
 
-    expect(onStroke).toHaveBeenCalledExactlyOnceWith({ dates, hours: [18, 19], mode: "add" });
+    expect(onStroke).toHaveBeenCalledExactlyOnceWith({ dates, hours: [18, 19], mode: "add" }, { date: "2026-10-18", hour: 19 });
   });
 
   it("reports a remove rectangle for a drag that starts on a filled cell", () => {
@@ -41,7 +41,10 @@ describe("usePaintStroke", () => {
     act(() => result.current.move({ date: "2026-10-17", hour: 17 }, finger));
     act(() => result.current.end(finger));
 
-    expect(onStroke).toHaveBeenCalledExactlyOnceWith({ dates: ["2026-10-16", "2026-10-17"], hours: [17], mode: "remove" });
+    expect(onStroke).toHaveBeenCalledExactlyOnceWith(
+      { dates: ["2026-10-16", "2026-10-17"], hours: [17], mode: "remove" },
+      { date: "2026-10-16", hour: 17 },
+    );
   });
 
   it("leaves a press that never leaves its cell to the tap", () => {
@@ -107,7 +110,10 @@ describe("usePaintStroke", () => {
     act(() => result.current.end(secondFinger));
     act(() => result.current.end(finger));
 
-    expect(onStroke).toHaveBeenCalledExactlyOnceWith({ dates: ["2026-10-16", "2026-10-17"], hours: [17, 18], mode: "add" });
+    expect(onStroke).toHaveBeenCalledExactlyOnceWith(
+      { dates: ["2026-10-16", "2026-10-17"], hours: [17, 18], mode: "add" },
+      { date: "2026-10-16", hour: 17 },
+    );
   });
 
   it("lets a new press replace a stroke whose pointer went away unseen", () => {
@@ -118,7 +124,10 @@ describe("usePaintStroke", () => {
     act(() => result.current.move({ date: "2026-10-18", hour: 19 }, finger));
     act(() => result.current.end(finger));
 
-    expect(onStroke).toHaveBeenCalledExactlyOnceWith({ dates: ["2026-10-18"], hours: [19, 20], mode: "remove" });
+    expect(onStroke).toHaveBeenCalledExactlyOnceWith(
+      { dates: ["2026-10-18"], hours: [19, 20], mode: "remove" },
+      { date: "2026-10-18", hour: 20 },
+    );
   });
 
   it("drops a stroke the browser cancels", () => {
