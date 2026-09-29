@@ -139,28 +139,36 @@ describe("O której?", () => {
     expect(screen.getByRole("button", { name: "Od 17:00" })).toHaveFocus();
   });
 
-  it("picks 22:00 to 4:00 on the hour tiles, start then end", async () => {
+  it("picks 22:00 to 4:00 on the hour tiles, the first and then the last hour", async () => {
     render(<CreatePollForm />);
     const tiles = screen.getByRole("group", { name: "Godziny" });
 
     await userEvent.click(within(tiles).getByRole("button", { name: "22:00" }));
-    expect(screen.getByText("Od 22:00, teraz kliknij koniec")).toBeInTheDocument();
 
-    expect(
-      within(tiles)
-        .getAllByRole("button", { pressed: true })
-        .map((tile) => tile.textContent),
-    ).toEqual(["22"]);
+    expect(screen.getByText("kliknij ostatnią godzinę", { exact: false }).closest("p")).toHaveTextContent(
+      "Od 22:00 kliknij ostatnią godzinę",
+    );
+
+    expect(pressed(tiles)).toEqual(["22"]);
 
     await userEvent.click(within(tiles).getByRole("button", { name: "3:00" }));
 
-    expect(
-      within(tiles)
-        .getAllByRole("button", { pressed: true })
-        .map((tile) => tile.textContent),
-    ).toEqual(["22", "23", "0", "1", "2", "3"]);
-
+    expect(pressed(tiles)).toEqual(["22", "23", "0", "1", "2", "3"]);
     expect(screen.getAllByText("22:00 → 4:00 · 6 godzin")).not.toHaveLength(0);
+  });
+
+  it("previews the range up to the hovered end hour", async () => {
+    render(<CreatePollForm />);
+    const tiles = screen.getByRole("group", { name: "Godziny" });
+
+    await userEvent.click(within(tiles).getByRole("button", { name: "22:00" }));
+    await userEvent.hover(within(tiles).getByRole("button", { name: "1:00" }));
+
+    expect(previewed(tiles)).toEqual(["23", "0", "1"]);
+
+    await userEvent.unhover(within(tiles).getByRole("button", { name: "1:00" }));
+
+    expect(previewed(tiles)).toEqual([]);
   });
 
   it("ends on a tile before the start in the next morning", async () => {
@@ -170,15 +178,17 @@ describe("O której?", () => {
     await userEvent.click(within(tiles).getByRole("button", { name: "2:00" }));
     await userEvent.click(within(tiles).getByRole("button", { name: "8:00" }));
 
-    expect(
-      within(tiles)
-        .getAllByRole("button", { pressed: true })
-        .map((tile) => tile.textContent),
-    ).toEqual(["6", "7", "8", "2", "3", "4", "5"]);
-
+    expect(pressed(tiles)).toEqual(["6", "7", "8", "2", "3", "4", "5"]);
     expect(screen.getAllByText("2:00 → 9:00 · 7 godzin")).not.toHaveLength(0);
   });
 });
+
+const pressed = (tiles: HTMLElement) =>
+  within(tiles)
+    .getAllByRole("button", { pressed: true })
+    .map((tile) => tile.textContent);
+
+const previewed = (tiles: HTMLElement) => [...tiles.querySelectorAll("[data-preview]")].map((tile) => tile.textContent);
 
 describe("Utwórz i wyślij na grupę", () => {
   it("says what is missing instead of creating", async () => {

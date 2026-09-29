@@ -28,3 +28,23 @@
     transform: translateY(100%);
   }
 }
+
+[data-create-hour-start] {
+  animation: create-hour-pop var(--duration-turn) var(--ease-spring);
+}
+
+@keyframes create-hour-pop {
+  50% {
+    transform: scale(1.12) rotate(-3deg);
+  }
+}
+
+[data-create-hour-nudge] {
+  animation: create-hour-nudge 1s var(--ease-sway) infinite;
+}
+
+@keyframes create-hour-nudge {
+  50% {
+    transform: translateX(calc(var(--spacing) * 1));
+  }
+}
