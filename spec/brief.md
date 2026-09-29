@@ -54,8 +54,8 @@ The organiser's time zone (from `Intl.DateTimeFormat().resolvedOptions().timeZon
    - A tap on a date header toggles that whole date; a tap on an hour label toggles that slot on every date. Both look like buttons.
    - Cells use `touch-action: none`, so a drag on them never scrolls. The sticky hour column scrolls the page vertically (`touch-action: pan-y`); the date header scrolls the dates sideways (`pan-x`) with snap per date. Up to four dates fill the width; more scroll sideways.
 4. Changes show at once. The "Moje" grid is local state, seeded once from the server, and polling never writes into it. 500 ms after a stroke ends the client sends the full set of my slots, which the server replaces; one save is in flight at a time and the newest pending set goes next.
-5. A status beside the name, icon plus word: "Zapisuję", "Zapisane", or "Nie zapisano" with "Spróbuj ponownie", which stays until a save succeeds. No toasts, no save button. After the first save a line under the grid says "Gotowe. Zmieniasz zdanie? Po prostu kliknij."
-6. "Nie mogę w żadnym terminie" is a plain link under the grid; it saves an empty set. A respondent with zero slots is shown as "nie może".
+5. A status beside the name, icon plus word: "Zapisuję", "Zapisane", or "Nie zapisano" with "Spróbuj ponownie", which stays until a save succeeds; "Zapisane" fades out after each save (ADR 0035). No toasts, no save button. After the first save a line under the grid says "Gotowe. Zmieniasz zdanie? Po prostu kliknij."
+6. "Nie mogę w żadnym terminie" is a light ledge button under the grid (ADR 0035); it saves an empty set. A respondent with zero slots is shown as "nie może".
 7. The participant row is created on the first save. Editing the name renames the row.
 8. **Identity**: the server sets an httpOnly, SameSite=Lax cookie per poll, named by the poll id with path `/`, holding the participant token, so reopening the link resumes editing. A name that already exists in the poll, typed without its token, asks "To ty, Ola?" with "Tak, to ja" and "Nie, zmienię imię". "Tak" moves the row to this device (issues a new token and cookie). Friends are trusted; there is no password.
 
@@ -150,7 +150,7 @@ Sizes come from one scale in `tokens.css`, Tailwind's names with a paired line h
 
 | Role | Font | Step | Weight |
 |---|---|---|---|
-| Title | Bricolage | `3xl` phone, `4xl` desktop | 700 |
+| Title | Bricolage | `3xl` phone, `4xl` desktop | 700; the poll poster's `4xl` phone, `8xl` desktop, 800 (ADR 0035) |
 | Best time | Bricolage | `3xl` | 700 |
 | Day number | Bricolage | `xl` | 700 |
 | Section heading | Bricolage | `lg` | 700 |
@@ -185,9 +185,9 @@ Counts on heat cells are `ink`, white only on `heat-5`. Avatars take their tint 
 
 **Grid**: separate rounded tiles (10px radius) with a 6px gap, at least 48px tall and 56px wide on the phone. Free is `surface` with an `edge` border; mine is `accent`; add preview is `accent` at 35%; remove preview is `line`; heat 1 to 5 carry the count and no other mark; focus is a 2px `ink` ring. The date header is the weekday small and muted over the day number large ("pt" over "17").
 
-**Shape and space**: one 4px grid (`--spacing: 4px`), so `p-7` is 28px and 44, 48 and 52 are `11`, `12` and `13`. Radius 10 on cells, 14 on buttons and inputs, 20 on cards, full pill on chips. No borders on cards and no shadows, except the selected segment's 1px lift and the bottom sheet's one soft shadow. Buttons 52px tall on the phone, the main action full width; the primary is `ink` with white text. The best time sits in an `ink` card with the count in `heat-3`.
+**Shape and space**: one 4px grid (`--spacing: 4px`), so `p-7` is 28px and 44, 48 and 52 are `11`, `12` and `13`. Radius 10 on cells, 14 on buttons and inputs, 20 on cards, full pill on chips. No borders on cards and no shadows, except the selected segment's 1px lift and the bottom sheet's one soft shadow; the landing (ADR 0034) and the app pages (ADR 0035) add posters, a board shadow and ledges under buttons. Buttons 52px tall on the phone, the main action full width; the primary is `ink` with white text. The best time sits in an `ink` card with the count in `heat-3`.
 
-**Motion**: the app has some play in it, used where it carries meaning and never on load:
+**Motion**: the app has some play in it, used where it carries meaning and never on load (the poll pages' one-shot motions are in ADR 0035):
 - A tapped cell fills in 120 ms with a 0.96 press scale.
 - A heat cell whose count rises bumps to 1.08 scale for 180 ms.
 - A new respondent's avatar pops in with a slight overshoot (320 ms, `cubic-bezier(.3,1.5,.5,1)`).
@@ -198,7 +198,7 @@ Counts on heat cells are `ink`, white only on `heat-5`. Avatars take their tint 
 
 **Copy**: Polish, informal second person, the way a friend writes in a chat: short, no exclamation marks, no corporate words ("użytkownik", "zarządzaj", "konfiguruj").
 
-**Out, by name**: gradients, glassmorphism, purple or indigo, emoji as icons or decoration, illustrations, a hero on the app's own pages, cards with drop shadows, onboarding tours, tooltips explaining the grid, toasts, confetti, skeleton shimmer, icon-only buttons, and Inter, Poppins, Montserrat, DM Sans, Plus Jakarta Sans, Satoshi or General Sans. Icons, where a label alone is not enough, are Lucide at 18px with a 1.5 stroke, beside text.
+**Out, by name**: gradients, glassmorphism, purple or indigo, emoji as icons or decoration, illustrations, a hero on the app's own pages (the poll poster header is not one, ADR 0035), cards with drop shadows (except ADR 0034 and 0035), onboarding tours, tooltips explaining the grid, toasts, confetti, skeleton shimmer, icon-only buttons, and Inter, Poppins, Montserrat, DM Sans, Plus Jakarta Sans, Satoshi or General Sans. Icons, where a label alone is not enough, are Lucide at 18px with a 1.5 stroke, beside text.
 
 ### Link preview
 
