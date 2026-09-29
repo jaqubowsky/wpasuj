@@ -5,6 +5,7 @@ import { Input } from "@/shared/ui/input/input";
 import { pollTitleMorph } from "@/shared/morph";
 import { useState } from "react";
 import "./create-poll-form.css";
+import { useShareDraft } from "./create-poll-draft";
 import { DatePicker, PendingDatePicker } from "./date-picker";
 import { HourRangePicker } from "./hour-range-picker";
 import { useCreatePoll } from "./use-create-poll";
@@ -18,6 +19,8 @@ export function CreatePollForm() {
   const hours = useHourRange();
   const [name, setName] = useOrganiserName();
   const { submit, status, isInvalid } = useCreatePoll({ title, dates, ...hours.range, organiserName: name });
+
+  useShareDraft(title, name);
 
   return (
     <form

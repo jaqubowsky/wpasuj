@@ -1,39 +1,28 @@
 import { productName } from "@/shared/brand";
+import { Grain } from "@/shared/ui/grain/grain";
 import { Text } from "@/shared/ui/text/text";
+import { WaveEdge } from "@/shared/ui/wave-edge/wave-edge";
 import type { ReactNode } from "react";
-import { headline, pitch } from "../domain/pitch";
 import { Faq } from "./faq/faq";
 import { Footer } from "./footer/footer";
 import { GoToFormButton } from "./go-to-form-button";
-import { LazyDemo, LazyStory } from "./lazy-sections";
+import { Hero } from "./hero/hero";
+import { Make } from "./make/make";
+import { Outro } from "./outro/outro";
+import { Quote } from "./quote/quote";
+import { TrySection } from "./try-poll/try-section";
+import { Wall } from "./wall/wall";
 import { WebApplicationJsonLd } from "./web-application-json-ld";
 
 const formId = "utworz";
 
-const reasons = [
-  {
-    figure: "0",
-    heading: "kont i maili",
-    body: "Nikt nie rejestruje się, żeby odpowiedzieć. Imię wystarczy, a telefon je zapamięta.",
-  },
-  {
-    figure: "20 s",
-    heading: "na odpowiedź",
-    body: "Link z Messengera, kilka tapnięć, gotowe. Szybciej niż przewinąć grupę.",
-  },
-  {
-    figure: "1",
-    heading: "najlepszy termin",
-    body: "Nie liczysz, kto kiedy może. Widzisz wynik od razu i dwa zapasowe terminy.",
-  },
-];
-
-export function Landing({ hero, home }: { hero: ReactNode; home: URL }) {
+export function Landing({ form, preview, home }: { form: ReactNode; preview: ReactNode; home: URL }) {
   return (
     <>
       <WebApplicationJsonLd home={home} />
+      <Grain />
       <header className="sticky top-0 z-1 box-border flex h-18 items-center justify-between bg-paper px-5 lg:px-12">
-        <div className="flex items-center gap-2.5">
+        <a href="#top" aria-label={`${productName}, na górę strony`} className="flex items-center gap-2.5 text-ink no-underline">
           <span aria-hidden className="grid grid-cols-[repeat(2,--spacing(2))] gap-0.5">
             <span className="h-2 rounded-[2px] bg-accent" />
             <span className="h-2 rounded-[2px] bg-tint-coral" />
@@ -41,68 +30,22 @@ export function Landing({ hero, home }: { hero: ReactNode; home: URL }) {
             <span className="h-2 rounded-[2px] bg-accent" />
           </span>
           <Text variant="wordmark">{productName}</Text>
-        </div>
+        </a>
         <GoToFormButton formId={formId}>Utwórz ankietę</GoToFormButton>
       </header>
       <main>
-        <section
-          className="mx-auto box-border flex max-w-wide flex-col gap-6 px-5 pt-4 pb-10 lg:grid lg:grid-cols-[minmax(0,1fr)_520px] lg:items-center lg:gap-16 lg:px-12 lg:pt-10"
-          aria-labelledby="hero-heading"
-        >
-          <div className="flex flex-col gap-3">
-            <span className="text-sm font-semibold text-accent-ink">{productName}</span>
-            <h1 id="hero-heading" className="m-0 font-display text-4xl font-extrabold tracking-tightest text-balance lg:text-7xl">
-              {headline}
-            </h1>
-            <p className="m-0 max-w-150 text-lg text-muted lg:text-xl">{pitch}</p>
-          </div>
-          <div id={formId} className="scroll-mt-18">
-            {hero}
-          </div>
-        </section>
-        <LazyStory />
-        <LazyDemo formId={formId} />
-        <section
-          className="mx-auto box-border max-w-wide px-5 py-20 [contain-intrinsic-size:auto_640px] [content-visibility:auto] lg:px-12"
-          aria-labelledby="reasons-heading"
-        >
-          <h2
-            id="reasons-heading"
-            className="m-0 mb-8 max-w-narrow animate-rise font-display text-3xl font-extrabold tracking-tightest text-balance [animation-range:entry_0%_cover_30%] [animation-timeline:view()] lg:mb-9 lg:text-5xl"
-          >
-            Zrobione pod paczkę znajomych, nie pod firmę.
-          </h2>
-          <ul className="m-0 grid list-none gap-4 p-0 lg:grid-cols-3">
-            {reasons.map((reason) => (
-              <li
-                key={reason.figure}
-                className="animate-rise rounded-card bg-surface p-6 [animation-range:entry_0%_cover_30%] [animation-timeline:view()] lg:p-8"
-              >
-                <b className="m-0 mb-4 block font-display text-6xl font-extrabold tracking-tightest text-balance text-accent-ink">
-                  {reason.figure}
-                </b>
-                <h3 className="m-0 mb-2 font-display text-2xl font-bold tracking-tighter text-balance">{reason.heading}</h3>
-                <p className="m-0 text-muted">{reason.body}</p>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <Hero formId={formId} />
+        <WaveEdge tone="ink" side="top" />
+        <Quote host={home.host} />
+        <WaveEdge tone="ink" side="bottom" />
+        <TrySection />
+        <WaveEdge tone="coral" side="top" />
+        <Wall />
+        <WaveEdge tone="coral" side="bottom" />
+        <Make formId={formId} form={form} preview={preview} />
         <Faq />
-        <section
-          className="mx-auto box-border flex max-w-wide flex-col gap-8 px-5 py-20 [contain-intrinsic-size:auto_640px] [content-visibility:auto] lg:grid lg:grid-cols-[minmax(0,1fr)_480px] lg:items-center lg:gap-16 lg:px-12 lg:py-30"
-          aria-labelledby="end-heading"
-        >
-          <h2
-            id="end-heading"
-            className="m-0 animate-rise font-display text-4xl font-extrabold tracking-tightest text-balance [animation-range:entry_0%_cover_30%] [animation-timeline:view()] lg:text-7xl"
-          >
-            To kiedy się widzicie?
-          </h2>
-          <div className="flex animate-rise flex-col gap-3 text-center [animation-range:entry_0%_cover_30%] [animation-timeline:view()]">
-            <GoToFormButton formId={formId}>Utwórz ankietę</GoToFormButton>
-            <Text variant="meta">Za darmo. Znajomi nie zakładają kont.</Text>
-          </div>
-        </section>
+        <WaveEdge tone="ink" side="top" />
+        <Outro formId={formId} />
       </main>
       <Footer />
     </>

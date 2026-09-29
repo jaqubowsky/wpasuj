@@ -49,6 +49,10 @@ body {
   animation-timing-function: var(--ease-out);
 }
 
+:root[data-motion="still"] [data-idle-motion] {
+  animation-play-state: paused !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

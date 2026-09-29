@@ -37,6 +37,9 @@
   --shadow-lift: 0 1px 2px rgba(30, 27, 24, 0.08);
   --shadow-sheet: 0 -8px 32px rgba(30, 27, 24, 0.12);
   --shadow-menu: 0 8px 32px rgba(30, 27, 24, 0.12);
+  --shadow-poster: 0 26px 50px -24px rgba(30, 27, 24, 0.45), 0 0 0 1px rgba(30, 27, 24, 0.06);
+  --shadow-ledge: 0 10px 0 -2px var(--color-heat-5);
+  --shadow-ledge-ink: 0 10px 0 -2px var(--color-ink);
 
   --font-sans: var(--font-onest);
   --font-display: var(--font-bricolage);
@@ -63,6 +66,10 @@
   --text-6xl--line-height: 62px;
   --text-7xl: 72px;
   --text-7xl--line-height: 72px;
+  --text-8xl: 96px;
+  --text-8xl--line-height: 96px;
+  --text-9xl: 128px;
+  --text-9xl--line-height: 128px;
 
   --tracking-tight: -0.01em;
   --tracking-tighter: -0.02em;
@@ -81,16 +88,33 @@
   --duration-menu: 140ms;
   --duration-sheet: 200ms;
   --duration-pop: 320ms;
+  --duration-turn: 350ms;
+  --duration-swing: 500ms;
+  --duration-reveal: 700ms;
+  --duration-burst: 800ms;
+  --duration-drift: 3600ms;
+  --duration-marquee: 110s;
+  --duration-marquee-slow: 130s;
 
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ease-pop: cubic-bezier(0.3, 1.5, 0.5, 1);
+  --ease-spring: cubic-bezier(0.2, 1.4, 0.4, 1);
+  --ease-sway: cubic-bezier(0.37, 0, 0.63, 1);
 
-  --animate-rise: rise linear both;
+  --animate-swap: swap-in var(--duration-swing) var(--ease-spring) both;
+  --animate-pulse: pulse var(--duration-swing) var(--ease-out);
 
-  @keyframes rise {
+  @keyframes swap-in {
     from {
-      opacity: 0.25;
-      transform: translateY(56px) scale(0.97);
+      opacity: 0;
+      transform: translateY(0.35em) rotate(-4deg);
+    }
+  }
+
+  @keyframes pulse {
+    50% {
+      transform: scale(1.03);
+      background-color: var(--color-heat-5);
     }
   }
 }

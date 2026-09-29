@@ -7,7 +7,9 @@ it("keeps the later of two steps from the theme's own scales", () => {
   expect(cn("rounded-cell", "rounded-pill")).toBe("rounded-pill");
   expect(cn("font-regular", "font-semibold")).toBe("font-semibold");
   expect(cn("ease-pop", "ease-out")).toBe("ease-out");
-  expect(cn("animate-rise", "animate-none")).toBe("animate-none");
+  expect(cn("ease-spring", "ease-sway")).toBe("ease-sway");
+  expect(cn("animate-swap", "animate-pulse")).toBe("animate-pulse");
+  expect(cn("animate-pulse", "animate-none")).toBe("animate-none");
   expect(cn("shadow-lift", "shadow-sheet")).toBe("shadow-sheet");
   expect(cn("shadow-sheet", "shadow-menu")).toBe("shadow-menu");
 });

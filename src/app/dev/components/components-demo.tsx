@@ -7,10 +7,14 @@ import { Card } from "@/shared/ui/card/card";
 import { Cell } from "@/shared/ui/cell/cell";
 import { Chip } from "@/shared/ui/chip/chip";
 import { Input } from "@/shared/ui/input/input";
+import { LinkCard } from "@/shared/ui/link-card/link-card";
+import { MotionToggle } from "@/shared/ui/motion-toggle/motion-toggle";
+import { PosterCard } from "@/shared/ui/poster-card/poster-card";
 import { Segment } from "@/shared/ui/segment/segment";
 import { Status } from "@/shared/ui/status/status";
 import { Stepper } from "@/shared/ui/stepper/stepper";
 import { Text } from "@/shared/ui/text/text";
+import { WaveEdge } from "@/shared/ui/wave-edge/wave-edge";
 import { useState, type ReactNode } from "react";
 
 const views = ["Moje", "Wszyscy"] as const;
@@ -59,6 +63,7 @@ export function ComponentsDemo() {
         </Button>
         <Button>Przypomnij</Button>
         <Button size="small">Więcej</Button>
+        <Button variant="loud">Utwórz ankietę</Button>
         <Button variant="text">Nie mogę w żadnym terminie</Button>
         <Button variant="primary" disabled>
           Wyłączony
@@ -67,6 +72,7 @@ export function ComponentsDemo() {
           <Button variant="on-dark" block>
             Ustal ten termin
           </Button>
+          <Button variant="loud-light">Utwórz ankietę</Button>
         </Card>
       </Section>
       <Section name="Chip">
@@ -127,6 +133,29 @@ export function ComponentsDemo() {
         <Status state="saving" />
         <Status state="saved" />
         <Status state="failed" />
+      </Section>
+      <Section name="PosterCard">
+        <PosterCard title="Grill u Oli" when="sb 3.10" people="6 osób" tone="coral" heat={[1, 2, 4, 0, 3, 5, 4, 1, 0, 2]} />
+        <PosterCard title="Kino" when="czw 9, 19:30" people="4 osoby" tone="paper" heat={[0, 2, 3, 5, 1, 4, 0, 2, 3, 1]} size="small" />
+      </Section>
+      <Section name="LinkCard">
+        <LinkCard
+          asker="Kuba pyta, kiedy możesz"
+          title="Grill na działce u Oli"
+          tone="coral"
+          host="wpasuj.pl"
+          note="jeden link zamiast wszystkiego"
+        />
+        <LinkCard asker="Ty pytasz, kiedy możesz" title="Wasz plan" tone="ink" host="wpasuj.pl" />
+      </Section>
+      <Section name="WaveEdge">
+        <div className="w-full">
+          <WaveEdge tone="ink" side="top" />
+          <WaveEdge tone="coral" side="bottom" />
+        </div>
+      </Section>
+      <Section name="MotionToggle">
+        <MotionToggle />
       </Section>
     </main>
   );

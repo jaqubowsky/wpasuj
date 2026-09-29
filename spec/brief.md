@@ -146,7 +146,7 @@ Where a mockup and this document differ, this document wins; screens without a m
 
 **Type**: Bricolage Grotesque for display (titles, the best time, day numbers, the wordmark), weights 700 and 800, tight tracking (−0.01 to −0.03em); Onest for everything else, weights 400, 500 and 600, tabular figures wherever a number can change.
 
-Sizes come from one scale in `tokens.css`, Tailwind's names with a paired line height: `xs` 12/16, `sm` 14/20, `base` 16/24, `lg` 18/28, `xl` 20/28, `2xl` 24/32, `3xl` 30/36, `4xl` 40/44, `5xl` 48/52, `6xl` 60/62, `7xl` 72/72. A role picks a step, and a desktop size is a responsive variant (`text-3xl lg:text-4xl`), never its own token.
+Sizes come from one scale in `tokens.css`, Tailwind's names with a paired line height: `xs` 12/16, `sm` 14/20, `base` 16/24, `lg` 18/28, `xl` 20/28, `2xl` 24/32, `3xl` 30/36, `4xl` 40/44, `5xl` 48/52, `6xl` 60/62, `7xl` 72/72, and on the landing `8xl` 96/96 and `9xl` 128/128 (ADR 0034). A role picks a step, and a desktop size is a responsive variant (`text-3xl lg:text-4xl`), never its own token.
 
 | Role | Font | Step | Weight |
 |---|---|---|---|
