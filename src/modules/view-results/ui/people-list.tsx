@@ -1,10 +1,11 @@
 import { Avatar } from "@/shared/ui/avatar/avatar";
 import { useId } from "react";
+import "./people-list.css";
 import type { Results } from "../server/results-schema";
 
 type Person = Pick<Results["respondents"][number], "name" | "normalisedName" | "slots">;
 
-type PeopleGroup = { label: string; people: Person[]; cannot?: boolean };
+type PeopleGroup = { label: string; people: Person[]; can?: boolean; cannot?: boolean };
 
 type PeopleListProps = {
   groups: PeopleGroup[];
@@ -29,7 +30,7 @@ export function PeopleList({ groups, you, organiserKey, arrived }: PeopleListPro
           </h3>
           <span>{group.people.length}</span>
         </div>
-        <ul className="m-0 list-none p-0" aria-label={group.label}>
+        <ul className="-mx-1.5 my-0 grid list-none gap-1 p-0" aria-label={group.label}>
           {group.people.map((person) => {
             const isYou = person.normalisedName === you;
             const isOrganiser = person.normalisedName === organiserKey;
@@ -39,7 +40,8 @@ export function PeopleList({ groups, you, organiserKey, arrived }: PeopleListPro
             return (
               <li
                 key={person.normalisedName}
-                className="flex h-11 items-center gap-3 text-base data-cannot:text-muted"
+                className="flex h-11 items-center gap-3 rounded-cell px-1.5 text-base transition-[background-color,translate] duration-(--duration-fill) ease-out data-can:translate-x-1 data-can:bg-heat-1 data-cannot:text-muted motion-safe:data-can:animate-[people-nudge_var(--duration-pop)_var(--ease-out)]"
+                data-can={group.can || undefined}
                 data-cannot={cannot || undefined}
               >
                 <Avatar

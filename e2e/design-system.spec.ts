@@ -20,17 +20,17 @@ const styleOf = (locator: Locator) =>
   });
 
 async function expectTargetsAtLeast44(page: Page) {
-  const targets = page.locator("button:visible, [role=tab]:visible");
+  await expect(page.locator("button:visible, [role=tab]:visible").first()).toBeVisible();
 
-  await expect(targets.first()).toBeVisible();
+  const tooSmall = await page.evaluate(() =>
+    [...document.querySelectorAll("button, [role=tab]")]
+      .filter((element) => element.checkVisibility({ visibilityProperty: true }))
+      .map((element) => ({ box: element.getBoundingClientRect(), html: element.outerHTML }))
+      .filter(({ box }) => box.width > 0 && box.height > 0 && (box.width < 44 || box.height < 44))
+      .map(({ box, html }) => `${Math.round(box.width)}×${Math.round(box.height)} ${html}`),
+  );
 
-  for (const target of await targets.all()) {
-    const box = await target.boundingBox();
-    const html = await target.evaluate((element) => element.outerHTML);
-
-    expect(box?.height, html).toBeGreaterThanOrEqual(44);
-    expect(box?.width, html).toBeGreaterThanOrEqual(44);
-  }
+  expect(tooSmall).toEqual([]);
 }
 
 async function expectSectionHeading(label: Locator) {

@@ -89,9 +89,9 @@ function OrganiserControls({ organiser }: { organiser: LiveOrganiser }) {
         <Sheet label={card.menu === "delete" ? "Usunąć ankietę?" : "Więcej"} menuBelow={more} onClose={card.closeMenu}>
           {card.menu === "delete" ? (
             <div className="grid gap-3 lg:p-2">
-              <h2 className="m-0 font-display text-2xl font-bold tracking-tighter">Usunąć ankietę?</h2>
-              <p className="m-0 text-base">{deleteWarning(results.respondents.length)}</p>
-              <div className="mt-1 grid gap-2">
+              <h2 className="m-0 font-display text-2xl font-extrabold tracking-tighter">Usunąć ankietę?</h2>
+              <p className="m-0 text-base text-muted">{deleteWarning(results.respondents.length)}</p>
+              <div className="mt-1 grid gap-4">
                 <Button variant="danger" block disabled={organiser.pending} onClick={organiser.deletePoll}>
                   Tak, usuń
                 </Button>
@@ -108,7 +108,7 @@ function OrganiserControls({ organiser }: { organiser: LiveOrganiser }) {
               <MenuItem icon="phone" onClick={card.copyOrganiserLink}>
                 Link organizatora na inny telefon
               </MenuItem>
-              <span className="my-1 block h-px bg-line" aria-hidden="true" />
+              <span className="mx-2 my-1 block h-px bg-line" aria-hidden="true" />
               <MenuItem icon="trash" danger onClick={card.askToDelete}>
                 Usuń ankietę
               </MenuItem>

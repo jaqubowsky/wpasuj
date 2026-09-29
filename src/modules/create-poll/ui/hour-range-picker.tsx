@@ -5,7 +5,7 @@ import type { HourRangeState } from "./use-hour-range";
 import { openHourSheet, useHourSheet, type HourSheetState } from "./use-hour-sheet";
 
 function Summary({ children }: { children: string }) {
-  return <p className="m-0 mt-3 grid h-12 place-items-center rounded-control bg-track font-display text-lg font-bold">{children}</p>;
+  return <p className="m-0 mt-3 grid h-12 place-items-center rounded-control bg-heat-1 font-display text-lg font-extrabold">{children}</p>;
 }
 
 function HourField({
@@ -92,12 +92,15 @@ function HourSheet({ hours, sheet }: { hours: HourRangeState; sheet: HourSheetSt
 }
 
 function HourTiles({ hours }: { hours: HourRangeState }) {
+  const { firstHour } = hours.range;
   const picked = hoursOf(hours.range).map(clockHour);
   const edges = [picked[0], picked.at(-1)];
 
+  const previewed = hours.preview ? hoursOf(hours.preview).slice(1).map(clockHour) : [];
+
   return (
     <>
-      <div role="group" aria-label="Godziny" className="grid grid-cols-8 gap-1.5">
+      <div role="group" aria-label="Godziny" className="grid grid-cols-8 gap-1.5" data-picking={hours.pickingEnd || undefined}>
         {startHours.map((hour) => (
           <button
             key={hour}
@@ -105,14 +108,34 @@ function HourTiles({ hours }: { hours: HourRangeState }) {
             aria-label={`${hour}:00`}
             aria-pressed={picked.includes(hour)}
             data-edge={edges.includes(hour) || undefined}
-            className="box-border h-14 cursor-pointer rounded-cell border-0 bg-surface font-sans text-lg font-semibold text-ink tabular-nums shadow-[inset_0_0_0_1px_var(--color-edge)] transition-transform duration-(--duration-fill) ease-out hover:shadow-[inset_0_0_0_2px_var(--color-ink)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink aria-pressed:bg-heat-2 aria-pressed:shadow-none data-edge:bg-ink data-edge:text-surface motion-safe:active:scale-96"
+            data-preview={previewed.includes(hour) || undefined}
+            data-start={(hours.pickingEnd && hour === firstHour) || undefined}
+            className="box-border h-11 cursor-pointer rounded-cell border-0 bg-surface font-sans text-base font-semibold text-ink tabular-nums shadow-[inset_0_0_0_1.5px_var(--color-edge)] transition-[background-color,translate,scale] duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink in-data-picking:shadow-[inset_0_0_0_1.5px_var(--color-heat-4)] in-data-picking:hover:bg-heat-1 aria-pressed:bg-heat-2 aria-pressed:shadow-none data-edge:bg-ink data-edge:text-paper data-edge:shadow-ledge-sm data-edge:shadow-heat-5 data-preview:bg-heat-2 data-preview:shadow-none motion-safe:active:scale-96 motion-safe:data-start:animate-[create-hour-pop_var(--duration-turn)_var(--ease-spring)]"
             onClick={() => hours.pickTile(hour)}
+            onPointerEnter={() => hours.hoverTile(hour)}
+            onPointerLeave={() => hours.hoverTile(undefined)}
           >
             {hour}
           </button>
         ))}
       </div>
-      <Summary>{hours.pickingEnd ? `Od ${hours.range.firstHour}:00, teraz kliknij koniec` : rangeSummary(hours.range)}</Summary>
+      {hours.pickingEnd ? (
+        <p className="m-0 mt-3 box-border flex min-h-12 flex-wrap items-baseline gap-x-2 rounded-control bg-ink px-4 py-3 font-display text-lg font-extrabold text-paper">
+          Od {firstHour}:00{" "}
+          <span className="font-sans text-base font-semibold text-heat-3">
+            kliknij ostatnią godzinę{" "}
+            <span
+              aria-hidden="true"
+              className="inline-block motion-safe:animate-[create-hour-nudge_1s_var(--ease-sway)_infinite]"
+              data-idle-motion
+            >
+              →
+            </span>
+          </span>
+        </p>
+      ) : (
+        <Summary>{rangeSummary(hours.range)}</Summary>
+      )}
     </>
   );
 }

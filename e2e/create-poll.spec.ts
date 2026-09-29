@@ -200,7 +200,7 @@ test("the organiser asks for 22:00 to 4:00 and a night run reads 23–1", async 
     const tiles = page.getByRole("group", { name: "Godziny" });
 
     await tiles.getByRole("button", { name: "22:00", exact: true }).click();
-    await expect(page.getByText("Od 22:00, teraz kliknij koniec").filter({ visible: true })).toBeVisible();
+    await expect(page.getByText("Od 22:00 kliknij ostatnią godzinę").filter({ visible: true })).toBeVisible();
     await tiles.getByRole("button", { name: "3:00", exact: true }).click();
     await expect(tiles.getByRole("button", { pressed: true })).toHaveText(["22", "23", "0", "1", "2", "3"]);
     await expect(page.getByText("22:00 → 4:00 · 6 godzin").filter({ visible: true })).toBeVisible();
@@ -252,9 +252,11 @@ test("on desktop the first tile shows as the start, and 2 then 8 runs to 9:00 th
 
   await expect(tiles.getByRole("button", { pressed: true })).toHaveText(["2"]);
   await expect(tiles.getByRole("button", { name: "2:00", exact: true })).toHaveCSS("background-color", "rgb(30, 27, 24)");
-  await expect(page.getByText("Od 2:00, teraz kliknij koniec").filter({ visible: true })).toBeVisible();
+  await expect(page.getByText("Od 2:00 kliknij ostatnią godzinę").filter({ visible: true })).toBeVisible();
   await saveScreenshot(page, testInfo, "create-hours-start");
 
+  await tiles.getByRole("button", { name: "8:00", exact: true }).hover();
+  await expect(tiles.getByRole("button", { name: "7:00", exact: true })).toHaveCSS("background-color", "rgb(250, 211, 195)");
   await tiles.getByRole("button", { name: "8:00", exact: true }).click();
 
   await expect(tiles.getByRole("button", { pressed: true })).toHaveText(["6", "7", "8", "2", "3", "4", "5"]);

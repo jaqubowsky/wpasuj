@@ -1,0 +1,32 @@
+<!-- @dsCard group="Display" height=420 subtitle="Rows with icon tiles, the delete confirm" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Menu</title>
+<style>
+  .menu { box-sizing: border-box; width: 320px; padding: 8px; border-radius: var(--radius-card); background: var(--surface); box-shadow: 0 26px 50px -24px rgba(30, 27, 24, 0.45), 0 0 0 1px rgba(30, 27, 24, 0.06); margin-bottom: 24px; }
+  .row { display: flex; align-items: center; gap: 12px; height: 58px; padding: 0 12px; border-radius: var(--radius-control); font: 600 16px/24px var(--font-sans); color: var(--ink); }
+  .row.hover { background: var(--heat-1); transform: translateX(4px); }
+  .row.danger { color: var(--accent-ink); }
+  .tile { display: grid; place-items: center; width: 34px; height: 34px; border-radius: var(--radius-cell); background: var(--track); }
+  .danger .tile { background: var(--heat-2); }
+  .tile svg { width: 18px; height: 18px; }
+  .rule { height: 1px; margin: 4px 8px; background: var(--line); }
+  .confirm { display: grid; gap: 12px; padding: 8px; }
+  .confirm h4 { margin: 0; font: 800 24px/32px var(--font-display); letter-spacing: -0.02em; }
+  .confirm p { margin: 0; color: var(--muted); }
+  .confirm .buttons { display: grid; gap: 16px; margin-top: 4px; }
+</style></head>
+<body>
+<div class="menu">
+  <div class="row hover"><span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></span>Kopiuj link do ankiety</div>
+  <div class="row"><span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg></span>Link organizatora na inny telefon</div>
+  <div class="rule"></div>
+  <div class="row danger"><span class="tile"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></span>Usuń ankietę</div>
+</div>
+<div class="menu confirm">
+  <h4>Usunąć ankietę?</h4>
+  <p>Odpowiedzi 5 osób znikną razem z nią.</p>
+  <div class="buttons"><button class="wp-button" data-variant="danger" data-block type="button">Tak, usuń</button><button class="wp-button" data-block type="button">Nie, zostaw</button></div>
+</div>
+</body>
+</html>

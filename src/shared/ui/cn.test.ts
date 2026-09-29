@@ -11,7 +11,7 @@ it("keeps the later of two steps from the theme's own scales", () => {
   expect(cn("animate-swap", "animate-pulse")).toBe("animate-pulse");
   expect(cn("animate-pulse", "animate-none")).toBe("animate-none");
   expect(cn("shadow-lift", "shadow-sheet")).toBe("shadow-sheet");
-  expect(cn("shadow-sheet", "shadow-menu")).toBe("shadow-menu");
+  expect(cn("shadow-sheet", "shadow-poster")).toBe("shadow-poster");
 });
 
 it("keeps a type size beside a text colour", () => {

@@ -120,7 +120,7 @@ test("the organiser creates a weekend poll, three friends answer, the organiser 
   );
 
   await zuza.getByRole("tab", { name: "Wszyscy" }).click();
-  await expect(zuza.getByRole("region", { name: "Najlepiej teraz" })).toHaveText("Najlepiej terazNiedziela 27.10, 19–21");
+  await expect(zuza.getByRole("region", { name: "Najlepiej teraz" })).toHaveText("Najlepiej terazNiedziela 27.10, 19–213 z 3 może");
 
   const handCount: Record<string, number[]> = {
     "pt 25": [0, 1, 0, 0, 0, 0],
@@ -164,7 +164,7 @@ test("the organiser creates a weekend poll, three friends answer, the organiser 
 
   await refreshNow(organiser);
   await organiser.getByRole("tab", { name: "Wszyscy" }).click();
-  await expect(organiser.getByRole("region", { name: "Najlepiej teraz" })).toHaveText("Najlepiej terazNiedziela 27.10, 19–21");
+  await expect(organiser.getByRole("region", { name: "Najlepiej teraz" })).toHaveText("Najlepiej terazNiedziela 27.10, 19–213 z 3 może");
   await organiser.getByRole("button", { name: "Przypomnij" }).click();
   await expect.poll(() => lastSent(organiser)).toBe(`Już są: Ola, Bartek i Zuza. Reszta, kiedy możecie? ${title} ${link}`);
 
