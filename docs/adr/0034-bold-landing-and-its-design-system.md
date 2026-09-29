@@ -21,7 +21,7 @@ The owner found the landing's first screen weak: the headline sat low against th
 - Hero posters sit fully inside the screen at 390 and 1440, clear of the headline and the call, and grow to their content rather than clipping it
 - Beyond the brief, the owner's pick also brings: `accent` as large display text (the swapped word, the quote marks), 3:1 and above; paper text on `coral` for the wall's large "wszystko", as the prototype draws it and the owner confirmed on PR #82; the best-time pulse animating its background, the questions animating their height and the wordmark tiles fading in their colours, where the brief animates only `transform` and `opacity`
 - The link card for `/` (`/og.png`) carries the headline "Kiedy się widzimy?", the owner's answer on PR #82; the page's h1 adds the swapped word ("…na grillu?")
-- The quote "„A może w piątek?”" is upright Onest 600: the app loads no Onest italic and the owner ruled out a synthesized one
+- The quote "„A może w piątek?”" is Onest 600 in a synthesized italic: the app loads no Onest italic, and the owner accepted the synthesized one on PR #82
 - The design system's content rules hold on the posters: their titles are in sentence case, not the prototype's capitals. The prototype's toast after creating a poll is not built, because the brief rules toasts out and the form already moves to the new poll
 - Everywhere else the brief holds: tokens, fonts, copy, and no shadows, hero or idle motion on the poll pages until WPA-86 decides otherwise
 
