@@ -180,7 +180,7 @@ test("the organiser creates a weekend poll, three friends answer, the organiser 
   await expect(setTime).toContainText("19:00–21:00");
   await expect(ola.getByRole("grid", { name: "Kiedy możesz?" })).toHaveCount(0);
 
-  await setTime.getByRole("button", { name: "Dodaj do kalendarza" }).click();
+  await ola.getByRole("button", { name: "Dodaj do kalendarza" }).click();
   const calendarMenu = ola.getByRole("dialog", { name: "Dodaj do kalendarza" });
 
   await expect(calendarMenu).toBeVisible();

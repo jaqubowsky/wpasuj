@@ -32,4 +32,16 @@ describe("PollPoster", () => {
     expect(coral).toHaveAttribute("data-tone", "coral");
     expect(coral.nextElementSibling).toHaveAttribute("data-tone", "coral");
   });
+
+  it("heads a settled poll with its day and hours instead of the title, stamped Widzimy się", () => {
+    render(
+      <PollPoster tone="coral" eyebrow="Grill u Oli" when={{ weekday: "Sobota", day: "3 października", hours: "19:00–21:00" }}>
+        Ustalone przez: Kuba
+      </PollPoster>,
+    );
+
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Sobota 3 października 19:00–21:00");
+    expect(screen.getByText("Widzimy się")).toBeVisible();
+    expect(screen.getByText("Ustalone przez: Kuba")).toBeVisible();
+  });
 });

@@ -162,6 +162,20 @@ export function ComponentsDemo() {
             </PollPoster>
           </div>
         ))}
+        <div className="w-full">
+          <PollPoster
+            tone="coral"
+            eyebrow={
+              <>
+                <Avatar name="Kuba" tintKey="kuba" />
+                <span>Grill u Oli na działce</span>
+              </>
+            }
+            when={{ weekday: "Sobota", day: "3 października", hours: "19:00–21:00" }}
+          >
+            <span className="text-base font-semibold">Ustalone przez: Kuba</span>
+          </PollPoster>
+        </div>
       </Section>
       <Section name="LinkCard">
         <LinkCard asker="Kuba pyta, kiedy możesz" title="Grill na działce u Oli" host="wpasuj.pl" note="jeden link zamiast wszystkiego" />

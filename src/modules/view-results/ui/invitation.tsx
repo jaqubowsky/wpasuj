@@ -4,7 +4,7 @@ import { Text } from "@/shared/ui/text/text";
 import { AllVotes } from "./all-votes";
 import { OrganiserCard } from "./organiser-card";
 import { useResultsContext } from "./results-provider";
-import { SetTime } from "./set-time";
+import { SetActions } from "./set-time";
 import { WhoComes } from "./who-comes";
 
 export function Invitation({ title, timeZone }: { title: string; timeZone: string }) {
@@ -16,11 +16,11 @@ export function Invitation({ title, timeZone }: { title: string; timeZone: strin
   return (
     <>
       <div className="lg:col-start-1 lg:row-start-1">
-        <SetTime final={final} title={title} timeZone={timeZone} />
+        <WhoComes final={final} />
       </div>
       <div className="contents lg:col-start-2 lg:row-start-1 lg:flex lg:flex-col lg:gap-4">
+        <SetActions final={final} title={title} timeZone={timeZone} />
         <OrganiserCard />
-        <WhoComes final={final} />
       </div>
       <div className="grid gap-3 lg:col-span-2">
         <AllVotes />

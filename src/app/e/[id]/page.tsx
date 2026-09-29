@@ -12,6 +12,7 @@ import {
   ResultsBody,
   ResultsProvider,
   SetBadge,
+  SettledPoster,
   UntilSet,
   WhilePollLives,
 } from "@/modules/view-results/client";
@@ -91,25 +92,33 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
           }
         >
           <main>
-            <PollPoster
-              tone={tone}
-              eyebrow={
-                <>
-                  <Avatar name={poll.organiserName} tintKey={nameKey(poll.organiserName)} />
-                  <span>
-                    <UntilSet invitation={token ? "Ustalone przez Ciebie" : `Ustalone przez: ${poll.organiserName}`}>
-                      {token ? `Pytasz jako ${poll.organiserName}` : `${poll.organiserName} pyta`}
-                    </UntilSet>
-                  </span>
-                </>
+            <UntilSet
+              invitation={
+                <SettledPoster
+                  eyebrow={
+                    <>
+                      <Avatar name={poll.organiserName} tintKey={nameKey(poll.organiserName)} />
+                      <span>{poll.title}</span>
+                    </>
+                  }
+                  setBy={token ? "Ustalone przez Ciebie" : `Ustalone przez: ${poll.organiserName}`}
+                />
               }
-              title={poll.title}
-              morph={pollTitleMorph}
             >
-              <UntilSet invitation={null}>
+              <PollPoster
+                tone={tone}
+                eyebrow={
+                  <>
+                    <Avatar name={poll.organiserName} tintKey={nameKey(poll.organiserName)} />
+                    <span>{token ? `Pytasz jako ${poll.organiserName}` : `${poll.organiserName} pyta`}</span>
+                  </>
+                }
+                title={poll.title}
+                morph={pollTitleMorph}
+              >
                 <RespondentCount ground={tone} />
-              </UntilSet>
-            </PollPoster>
+              </PollPoster>
+            </UntilSet>
             <PageFrame wide>
               <div className="grid gap-2 pt-1 pb-3 empty:hidden lg:pb-5">
                 <ZoneNote pollZone={poll.timeZone} />
