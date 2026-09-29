@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/shared/ui/button/button";
+import { Icon } from "@/shared/ui/icon/icon";
 import { MenuItem } from "@/shared/ui/menu-item/menu-item";
 import { Sheet } from "@/shared/ui/sheet/sheet";
 import { useId, useRef } from "react";
@@ -72,11 +73,7 @@ function OrganiserControls({ organiser }: { organiser: LiveOrganiser }) {
           aria-expanded={card.menu !== undefined}
           onClick={card.openMenu}
         >
-          <svg className="size-4.5 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-            <circle cx="5" cy="12" r="1.5" />
-            <circle cx="12" cy="12" r="1.5" />
-            <circle cx="19" cy="12" r="1.5" />
-          </svg>
+          <Icon name="more" />
         </Button>
       </div>
       {card.notice && (

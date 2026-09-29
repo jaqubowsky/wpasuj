@@ -40,6 +40,20 @@ const moduleBlocks = (name) => {
   ];
 };
 
+const classNameJoins = [
+  { selector: "JSXAttribute[name.name='className'] TemplateLiteral", message: "Combine classes with cn() from @/shared/ui/cn" },
+  {
+    selector: "JSXAttribute[name.name='className'] BinaryExpression[operator='+']",
+    message: "Combine classes with cn() from @/shared/ui/cn",
+  },
+  {
+    selector: "JSXAttribute[name.name='className'] CallExpression[callee.property.name='join']",
+    message: "Combine classes with cn() from @/shared/ui/cn",
+  },
+];
+
+const inlineSvg = { selector: "JSXOpeningElement[name.name='svg']", message: "Draw an icon with Icon from @/shared/ui/icon/icon" };
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
@@ -103,19 +117,12 @@ const eslintConfig = defineConfig([
       "shadcn/no-inline-styles": "error",
       "shadcn/no-restyle": "error",
       "shadcn/require-static-classes": "error",
-      "no-restricted-syntax": [
-        "error",
-        { selector: "JSXAttribute[name.name='className'] TemplateLiteral", message: "Combine classes with cn() from @/shared/ui/cn" },
-        {
-          selector: "JSXAttribute[name.name='className'] BinaryExpression[operator='+']",
-          message: "Combine classes with cn() from @/shared/ui/cn",
-        },
-        {
-          selector: "JSXAttribute[name.name='className'] CallExpression[callee.property.name='join']",
-          message: "Combine classes with cn() from @/shared/ui/cn",
-        },
-      ],
+      "no-restricted-syntax": ["error", ...classNameJoins, inlineSvg],
     },
+  },
+  {
+    files: ["src/shared/ui/icon/icon.tsx", "src/shared/ui/wave-edge/wave-edge.tsx", "src/modules/landing/ui/try-poll/try-poll.tsx"],
+    rules: { "no-restricted-syntax": ["error", ...classNameJoins] },
   },
   {
     files: [

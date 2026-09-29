@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Icon } from "../icon/icon";
 
 const words = {
   saving: "Zapisuję",
@@ -7,15 +8,10 @@ const words = {
 };
 
 const glyphs = {
-  saving: <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" strokeWidth="1.5" strokeDasharray="28 10" />,
-  saved: <path d="M3.5 8.5l3 3 6-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />,
-  failed: (
-    <>
-      <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" strokeWidth="1.5" />
-      <path d="M8 5v3.5M8 11h.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </>
-  ),
-};
+  saving: "pending",
+  saved: "check-status",
+  failed: "alert",
+} as const;
 
 const savedFor = 1600;
 
@@ -55,9 +51,7 @@ export function Status({ state }: StatusProps) {
     >
       {state && (
         <>
-          <svg className="size-4 flex-none" viewBox="0 0 16 16" aria-hidden="true">
-            {glyphs[state]}
-          </svg>
+          <Icon name={glyphs[state]} size={16} />
           {words[state]}
         </>
       )}
