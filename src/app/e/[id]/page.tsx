@@ -17,6 +17,7 @@ import {
   WhilePollLives,
 } from "@/modules/view-results/client";
 import { Avatar } from "@/shared/ui/avatar/avatar";
+import { PageFrame } from "@/shared/ui/page-frame/page-frame";
 import { PollPoster } from "@/shared/ui/poll-poster/poll-poster";
 import { TextLink } from "@/shared/ui/text-link/text-link";
 import { pollTitleMorph } from "@/shared/morph";
@@ -25,7 +26,6 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { AppHeader } from "../../app-header";
-import { PageFrame } from "../../page-frame";
 import { PollGone } from "./poll-gone";
 import { PollTabs } from "./poll-tabs";
 import { RefreshAfterSave } from "./refresh-after-save";
@@ -130,27 +130,29 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
               </PollPoster>
             </UntilSet>
             <PageFrame wide>
-              <div className="grid gap-2 pt-1 pb-3 empty:hidden lg:pb-5">
-                <ZoneNote pollZone={poll.timeZone} />
-                <UntilSet invitation={null}>
-                  <InviteCard pollId={id} title={poll.title} />
-                </UntilSet>
-              </div>
-              <div className="flex flex-col gap-4 pt-1 pb-8 lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-x-10 lg:gap-y-6">
-                <UntilSet invitation={<Invitation title={poll.title} timeZone={poll.timeZone} />}>
-                  <div className="contents lg:col-start-2 lg:row-start-1 lg:flex lg:flex-col lg:gap-4" data-poll-panel>
-                    <BestNow />
-                    <OrganiserCard />
-                    <PeoplePanel />
-                  </div>
-                  <div className="lg:col-start-1 lg:row-start-1">
-                    <PollTabs
-                      opening={mine ? "Wszyscy" : "Moje"}
-                      leads={{ Moje: <AnswerLead /> }}
-                      bodies={{ Moje: <AnswerBody />, Wszyscy: <ResultsBody /> }}
-                    />
-                  </div>
-                </UntilSet>
+              <div className="lg:pt-8">
+                <div className="grid gap-2 pt-1 pb-3 empty:hidden lg:pb-5">
+                  <ZoneNote pollZone={poll.timeZone} />
+                  <UntilSet invitation={null}>
+                    <InviteCard pollId={id} title={poll.title} />
+                  </UntilSet>
+                </div>
+                <div className="flex flex-col gap-4 pt-1 pb-8 lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-x-10 lg:gap-y-6">
+                  <UntilSet invitation={<Invitation title={poll.title} timeZone={poll.timeZone} />}>
+                    <div className="contents lg:col-start-2 lg:row-start-1 lg:flex lg:flex-col lg:gap-4" data-poll-panel>
+                      <BestNow />
+                      <OrganiserCard />
+                      <PeoplePanel />
+                    </div>
+                    <div className="lg:col-start-1 lg:row-start-1">
+                      <PollTabs
+                        opening={mine ? "Wszyscy" : "Moje"}
+                        leads={{ Moje: <AnswerLead /> }}
+                        bodies={{ Moje: <AnswerBody />, Wszyscy: <ResultsBody /> }}
+                      />
+                    </div>
+                  </UntilSet>
+                </div>
               </div>
             </PageFrame>
           </main>

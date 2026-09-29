@@ -23,7 +23,7 @@ After the bold landing (ADR 0034) the app looked like a different product: a fri
 - The grain covers every app page. Avatars are rounded squares at every size
 - The phone hour picker keeps its Od/Do fields and hour sheet in the new look: tiles at 390 would be about 38px wide, under ADR 0009's 44px. From `lg:` the first hour click marks one tile and the summary turns `ink` and reads "Od N:00 kliknij ostatnią godzinę →"; the second click is the last hour, as the brief's rule keeps it (decision list; the owner's copy change of the same day)
 - "Twoja kolej" is variant B: the title field (`TitleInput`, Bricolage 800 at `text-5xl`, `lg:text-8xl`, wrapping, line breaks folded into spaces, the placeholder asking "Co robimy?" with the label left to screen readers) is the section headline, the rest of the form sits in one card below, and the link preview beside it goes (decision list)
-- Every new look is a token or a `src/shared/ui` component with its page in `spec/design/system/components/`, as ADR 0034 set; no role token is added (ADR 0019 holds)
+- Every new look is a token or a `src/shared/ui` component with its page in `spec/design/system/components/`, as ADR 0034 set, or a module component when its look carries domain (the people list's who-can highlight, the hour picker's tiles), still with its page there; no role token is added (ADR 0019 holds; module exception by the host, WPA-90)
 - Not built: a create page on its own route (a new feature), a restyled link card image (the prototype does not draw it), the drag demo, the chat preview and the tilted link card (removed by the owner after review)
 
 ## Consequences

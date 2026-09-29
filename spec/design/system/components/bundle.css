@@ -69,7 +69,7 @@ body { margin: 0; padding: 16px; background: var(--paper); color: var(--ink); fo
 .wp-segment { position: relative; display: flex; background: var(--track); border-radius: 12px; padding: 4px; }
 .wp-segment::before { content: ""; position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 9px; background: var(--ink); transition: transform var(--duration-turn) var(--ease-spring); }
 .wp-segment:has(button:last-child[aria-selected="true"])::before { transform: translateX(100%); }
-.wp-segment button { position: relative; flex: 1; height: 44px; border: 0; background: none; border-radius: 9px; font: 700 16px/1 var(--font-sans); color: var(--muted); cursor: pointer; transition: color var(--duration-turn); }
+.wp-segment button { position: relative; flex: 1; height: 44px; border: 0; background: none; border-radius: 9px; font: 600 16px/1 var(--font-sans); color: var(--muted); cursor: pointer; transition: color var(--duration-turn); }
 .wp-segment button[aria-selected="true"] { color: var(--paper); }
 .wp-segment button:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
 

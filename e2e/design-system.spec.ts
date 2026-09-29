@@ -180,6 +180,12 @@ test("the ink pill slides under the selected Segment tab", async ({ page }) => {
   }
 });
 
+test("Segment tabs ask for an Onest weight the app loads", async ({ page }) => {
+  await page.goto("/dev/components");
+
+  await expect(page.getByRole("region", { name: "Segment" }).getByRole("tab", { name: "Moje" })).toHaveCSS("font-weight", "600");
+});
+
 test("Button, Chip and Segment show the ink focus ring from the keyboard", async ({ page }, testInfo) => {
   await page.goto("/dev/components");
 

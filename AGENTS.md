@@ -68,7 +68,7 @@ Each module in `src/modules/` has `domain/` (pure functions and tests, no import
 
 ## Styling
 
-Tailwind v4 utilities written inline in `className`; `src/app/` is the reference (`app-header.tsx`, `page-frame.tsx`, `e/[id]/not-found.tsx`).
+Tailwind v4 utilities written inline in `className`; `src/app/` is the reference (`app-header.tsx`, `e/[id]/not-found.tsx`).
 
 - `src/app/tokens.css` is the `@theme static` with the default theme reset: a small scale, not one token per place of use. It holds the only colours, radii, shadows, fonts, weights, breakpoint (`lg:` = 1024px), easings and durations, plus:
   - type: `text-xs` … `text-9xl`, each with its paired line height (the table in `spec/brief.md`, "Type"). A desktop size is a responsive variant (`text-3xl lg:text-4xl`); `leading-none` (static in Tailwind) and a spacing step (`leading-3.5` is 14px) are the only other line heights
