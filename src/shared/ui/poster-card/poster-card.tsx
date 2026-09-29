@@ -19,11 +19,12 @@ export function PosterCard({ title, when, people, tone, heat, size }: PosterCard
   return (
     <button
       type="button"
-      className="group relative box-border flex aspect-4/5 w-27 cursor-pointer flex-col justify-between overflow-hidden rounded-card border-0 p-3.5 text-left font-sans text-ink shadow-poster focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink data-[size=large]:w-55 data-[size=small]:w-35 data-[tone=coral]:bg-accent data-[tone=deep]:bg-heat-5 data-[tone=deep]:text-surface data-[tone=ink]:bg-ink data-[tone=ink]:text-paper data-[tone=paper]:bg-surface data-[tone=peach]:bg-heat-2 data-[tone=pink]:bg-heat-1 lg:w-47"
+      className="group relative box-border flex aspect-4/5 w-27 cursor-pointer flex-col justify-between rounded-card border-0 p-3.5 text-left font-sans text-ink shadow-poster focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink data-[size=large]:w-55 data-[size=small]:w-35 data-[tone=coral]:bg-accent data-[tone=deep]:bg-heat-5 data-[tone=deep]:text-surface data-[tone=ink]:bg-ink data-[tone=ink]:text-paper data-[tone=paper]:bg-surface data-[tone=peach]:bg-heat-2 data-[tone=pink]:bg-heat-1 lg:w-47"
       aria-label={`${title}, ${when}`}
       aria-pressed={flipped}
       data-tone={tone}
       data-size={size}
+      data-poster-card
       onClick={(event) => {
         if (!flipped) burst(event.currentTarget);
 

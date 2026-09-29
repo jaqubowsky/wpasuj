@@ -18,8 +18,10 @@ The owner found the landing's first screen weak: the headline sat low against th
   - type steps `text-8xl` (96/96) for section headlines and `text-9xl` (128/128) for the hero and the quote, Tailwind's own names
   - durations `turn` (350ms), `swing` (500ms), `reveal`, `burst`, `drift`, `marquee` and `marquee-slow`, one per value, and easings `ease-spring` and `ease-sway`
   - in `src/shared/ui`: `PosterCard`, `LinkCard`, `WaveEdge`, `Grain`, `MotionToggle` with `useMotion`, `useTileBurst`, and the `loud` and `loud-light` button variants, each with its page in `spec/design/system/components/`
-- Beyond the brief, the owner's pick also brings: `accent` as large display text (the swapped word, the quote marks), 3:1 and above; paper text on `coral` for the wall's large "wszystko", as the prototype draws it; the best-time pulse animating its background, the questions animating their height and the wordmark tiles fading in their colours, where the brief animates only `transform` and `opacity`
-- The link card for `/` keeps its headline "Kiedy się widzimy? Ustalcie to w minutę.": the page's h1 is now "Kiedy się widzimy na grillu?", and the owner has not asked to change the card
+- Hero posters sit fully inside the screen at 390 and 1440, clear of the headline and the call, and grow to their content rather than clipping it
+- Beyond the brief, the owner's pick also brings: `accent` as large display text (the swapped word, the quote marks), 3:1 and above; paper text on `coral` for the wall's large "wszystko", as the prototype draws it and the owner confirmed on PR #82; the best-time pulse animating its background, the questions animating their height and the wordmark tiles fading in their colours, where the brief animates only `transform` and `opacity`
+- The link card for `/` (`/og.png`) carries the headline "Kiedy się widzimy?", the owner's answer on PR #82; the page's h1 adds the swapped word ("…na grillu?")
+- The quote "„A może w piątek?”" is upright Onest 600: the app loads no Onest italic and the owner ruled out a synthesized one
 - The design system's content rules hold on the posters: their titles are in sentence case, not the prototype's capitals. The prototype's toast after creating a poll is not built, because the brief rules toasts out and the form already moves to the new poll
 - Everywhere else the brief holds: tokens, fonts, copy, and no shadows, hero or idle motion on the poll pages until WPA-86 decides otherwise
 

@@ -39,7 +39,7 @@ export function Quote({ host }: { host: string }) {
         ))}
       </div>
       <div className="relative mx-auto max-w-wide">
-        <h2 id="quote-heading" className="m-0 font-sans text-6xl font-semibold tracking-tightest italic lg:text-9xl">
+        <h2 id="quote-heading" className="m-0 font-sans text-6xl font-semibold tracking-tightest lg:text-9xl">
           <span className="text-accent">„</span>A może w piątek?<span className="text-accent">”</span>
         </h2>
         <p className="mx-auto mt-8.5 mb-0 max-w-150 text-lg text-balance text-on-dark-muted lg:text-xl">

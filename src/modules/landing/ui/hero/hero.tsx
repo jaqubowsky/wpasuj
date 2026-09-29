@@ -8,7 +8,7 @@ import { SwapWord } from "./swap-word";
 export function Hero({ formId }: { formId: string }) {
   return (
     <section
-      className="relative box-border grid place-content-center justify-items-center overflow-hidden px-4 pt-44 pb-40 text-center lg:pt-10 lg:pb-30"
+      className="relative box-border grid place-content-center justify-items-center overflow-hidden px-4 pt-52 pb-56 text-center lg:pt-10 lg:pb-30"
       aria-labelledby="hero-heading"
       data-hero
     >

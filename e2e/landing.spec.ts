@@ -116,6 +116,40 @@ test("the hero's posters follow the pointer and drift", async ({ page }, testInf
   ).toBeGreaterThan(0);
 });
 
+test("every hero poster sits inside the screen, clear of the headline and the call", async ({ page }) => {
+  const viewport = page.viewportSize()!;
+
+  await page.goto("/");
+  const headline = (await hero(page).getByRole("heading", { level: 1 }).boundingBox())!;
+  const call = (await hero(page).getByRole("button", { name: "Utwórz ankietę" }).boundingBox())!;
+
+  const overlaps = (a: typeof headline, b: typeof headline) =>
+    a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+
+  for (const poster of await heroPosters(page).filter({ visible: true }).all()) {
+    const box = (await poster.boundingBox())!;
+
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
+    expect(overlaps(box, headline)).toBe(false);
+    expect(overlaps(box, call)).toBe(false);
+  }
+});
+
+test("no poster clips its own content", async ({ page }) => {
+  await page.goto("/");
+
+  const clipped = await page
+    .locator("[data-poster-card]")
+    .evaluateAll((posters) =>
+      posters
+        .filter((poster) => poster.scrollHeight > poster.clientHeight || poster.scrollWidth > poster.clientWidth)
+        .map((poster) => poster.getAttribute("aria-label")),
+    );
+
+  expect(clipped).toEqual([]);
+});
+
 test("a poster flips to its settled time", async ({ page }) => {
   await page.goto("/");
   const poster = hero(page).getByRole("button", { name: "Grill u Oli, sb 3.10" });

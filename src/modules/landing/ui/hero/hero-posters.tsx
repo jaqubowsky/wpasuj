@@ -6,10 +6,10 @@ import { posters } from "../../domain/posters";
 import { usePointerFollow } from "./use-pointer-follow";
 
 const spots = [
-  { phone: ["-4%", "3%"], desktop: ["2%", "8%"], turn: -7 },
-  { phone: ["-5%", "87%"], desktop: ["3%", "52%"], turn: 5 },
-  { phone: ["76%", "2%"], desktop: ["82%", "6%"], turn: 6 },
-  { phone: ["76%", "86%"], desktop: ["83%", "50%"], turn: -5 },
+  { phone: ["4%", "1%"], desktop: ["2%", "8%"], turn: -7 },
+  { phone: ["7%", "calc(100% - 190px)"], desktop: ["3%", "52%"], turn: 5 },
+  { phone: ["60%", "3%"], desktop: ["82%", "6%"], turn: 6 },
+  { phone: ["58%", "calc(100% - 200px)"], desktop: ["83%", "50%"], turn: -5 },
   { phone: ["16%", "70%"], desktop: ["16%", "70%"], turn: 4, size: "small" },
   { phone: ["68%", "70%"], desktop: ["68%", "70%"], turn: -4, size: "small" },
 ] as const;
