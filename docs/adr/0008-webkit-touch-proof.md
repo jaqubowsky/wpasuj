@@ -4,6 +4,7 @@
 - **Date:** 2026-09-27
 - **Owner:** container
 - **Replaces:** `webkit-touch-proof` (former decision entries)
+- **Amended by:** ADR 0036 (the hold on phone-webkit is proven with dispatched pointer and touchmove events)
 
 ## Context
 

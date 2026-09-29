@@ -1,6 +1,6 @@
 import type { Locator, Page } from "@playwright/test";
 import { expect, test } from "./fixtures";
-import { saveScreenshot } from "./screenshot";
+import { saveScreenshot, settleAnimations } from "./screenshot";
 import { seedAnswer, seedPoll } from "./seed";
 
 const ink = "rgb(30, 27, 24)";
@@ -53,6 +53,7 @@ test("every button, chip and tab is at least 44px tall and wide", async ({ page 
 
   if (testInfo.project.name.startsWith("phone")) {
     await page.getByRole("button", { name: "Od 17:00" }).click();
+    await settleAnimations(page);
     await expectTargetsAtLeast44(page);
   }
 });

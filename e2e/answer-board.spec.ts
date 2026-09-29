@@ -1,6 +1,6 @@
 import type { Browser, Locator, Page, TestInfo } from "@playwright/test";
 import { expect, test } from "./fixtures";
-import { centreOf, mouseDrag, touchDrag } from "./pointer";
+import { centreOf, mouseDrag, touchHoldDrag } from "./pointer";
 import { settleAnimations } from "./screenshot";
 import { seedAnswer, seedPoll } from "./seed";
 
@@ -57,7 +57,7 @@ test("Board: a stroke ripples from its first cell, Zapisane flashes and fades", 
   await page.getByRole("textbox", { name: "Twoje imię" }).fill("Zuza");
   await board(page).evaluate((element) => element.scrollIntoView({ block: "center" }));
 
-  const dragWith = testInfo.project.name === "phone-chromium" ? touchDrag : mouseDrag;
+  const dragWith = testInfo.project.name === "phone-chromium" ? touchHoldDrag : mouseDrag;
 
   await dragWith(page, await centreOf(cellAt(page, 1, 0)), await centreOf(cellAt(page, 3, 1)), async () => {
     await expect(page.locator('[data-state="adding"]')).toHaveCount(6);

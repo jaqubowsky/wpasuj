@@ -1,6 +1,6 @@
 import type { Browser, Locator, Page, TestInfo } from "@playwright/test";
 import { expect, test } from "./fixtures";
-import { centresOf, mouseDrag, touchDrag } from "./pointer";
+import { centresOf, mouseDrag, touchHoldDrag } from "./pointer";
 import { saveScreenshot } from "./screenshot";
 
 declare global {
@@ -86,7 +86,7 @@ test("the organiser creates a weekend poll, three friends answer, the organiser 
   await expect.poll(() => lastSent(organiser)).toBe(`Kiedy możecie? ${title} ${link}`);
 
   const ola = await openAsNewDevice(browser, link);
-  const dragWith = testInfo.project.name === "phone-chromium" ? touchDrag : mouseDrag;
+  const dragWith = testInfo.project.name === "phone-chromium" ? touchHoldDrag : mouseDrag;
 
   await ola.getByRole("textbox", { name: "Twoje imię" }).fill("Ola");
   await dragWith(ola, ...(await centresOf(cellAt(ola, "sb 26", 19), cellAt(ola, "nd 27", 21))));
