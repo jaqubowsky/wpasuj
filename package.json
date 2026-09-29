@@ -15,7 +15,8 @@
     "e2e": "playwright test",
     "db:generate": "drizzle-kit generate",
     "prepare": "husky",
-    "perf": "playwright test -c playwright.perf.config.ts"
+    "perf": "playwright test -c playwright.perf.config.ts",
+    "readme:shots": "npm run build && playwright test -c playwright.readme.config.ts"
   },
   "dependencies": {
     "@tanstack/react-query": "5.103.1",
@@ -53,6 +54,7 @@
     "lint-staged": "17.5.1",
     "prettier": "3.9.8",
     "prettier-plugin-tailwindcss": "0.8.1",
+    "sharp": "0.35.4",
     "tailwindcss": "4.3.3",
     "typescript": "5.9.3",
     "vitest": "5.0.1"
