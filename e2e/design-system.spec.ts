@@ -157,6 +157,29 @@ test("every button and chip stands on a ledge, and a press drops it onto the led
   await page.mouse.up();
 });
 
+const backdropOf = (tab: Locator) =>
+  tab.evaluate((element) => {
+    const { x, y, width, height } = element.getBoundingClientRect();
+    const beneath = document.elementsFromPoint(x + width / 2, y + height / 2);
+
+    return beneath.map((layer) => getComputedStyle(layer).backgroundColor).find((color) => color !== "rgba(0, 0, 0, 0)");
+  });
+
+test("the ink pill slides under the selected Segment tab", async ({ page }) => {
+  await page.goto("/dev/components");
+  const segment = page.getByRole("region", { name: "Segment" });
+
+  for (const [picked, other] of [
+    ["Wszyscy", "Moje"],
+    ["Moje", "Wszyscy"],
+  ] as const) {
+    await segment.getByRole("tab", { name: picked }).click();
+
+    await expect.poll(() => backdropOf(segment.getByRole("tab", { name: picked }))).toBe(ink);
+    await expect.poll(() => backdropOf(segment.getByRole("tab", { name: other }))).not.toBe(ink);
+  }
+});
+
 test("Button, Chip and Segment show the ink focus ring from the keyboard", async ({ page }, testInfo) => {
   await page.goto("/dev/components");
 
