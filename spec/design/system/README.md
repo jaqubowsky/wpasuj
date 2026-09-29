@@ -31,7 +31,7 @@ Wpasuj finds a time for a group of friends: one link in the group chat, everyone
 - Radii by role: `radius-cell` on cells, `radius-control` on buttons and inputs, `radius-card` on cards, `radius-pill` on chips and avatars.
 - Every tappable thing is at least `size-target`; grid cells `size-cell`; phone buttons `size-button`, the main action full width in a sticky bottom bar above the home indicator.
 - No shadows except `shadow-lift` on the selected segment and `shadow-sheet` on the bottom sheet. Cards separate by ground colour, not borders.
-- The landing adds `shadow-poster` on posters, link cards and its try-it board, and a `shadow-ledge` under its loud buttons (ADR 0034). The app pages take the same: `shadow-poster` on the grid board, and `shadow-ledge` or `shadow-ledge-ink` under every button, chip, your own cells and the best-time card (ADR 0035).
+- The landing adds `shadow-poster` on posters, link cards and its try-it board, and a `shadow-ledge` under its loud buttons (ADR 0034). The app pages take the same: `shadow-poster` on the grid board, and the `shadow-ledge` steps under every button, chip, your own cells and the best-time card, coloured by a shadow colour utility (ADR 0035).
 
 ## Motion
 
