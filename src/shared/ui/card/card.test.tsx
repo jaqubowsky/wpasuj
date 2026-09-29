@@ -21,4 +21,18 @@ describe("Card", () => {
     expect(screen.getByText("Jeden na ekran")).toHaveAttribute("data-tone", "ink");
     expect(screen.getByText("pt 17.10, 18–20")).toHaveAttribute("data-size", "compact");
   });
+
+  it("pulses once when asked, and only then", () => {
+    render(
+      <>
+        <Card tone="ink" pulse>
+          Sobota 19.10
+        </Card>
+        <Card tone="ink">Niedziela 20.10</Card>
+      </>,
+    );
+
+    expect(screen.getByText("Sobota 19.10")).toHaveAttribute("data-pulse");
+    expect(screen.getByText("Niedziela 20.10")).not.toHaveAttribute("data-pulse");
+  });
 });
