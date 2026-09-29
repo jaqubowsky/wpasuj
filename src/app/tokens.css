@@ -44,6 +44,7 @@
   --shadow-ledge-sm: 0 5px 0 -1px var(--color-ink);
   --shadow-ledge-sm-up: 0 7px 0 -1px var(--color-ink);
   --shadow-ledge-sm-down: 0 1px 0 -1px var(--color-ink);
+  --shadow-ledge-xs: 0 4px 0 -1px var(--color-ink);
 
   --font-sans: var(--font-onest);
   --font-display: var(--font-bricolage);
@@ -96,6 +97,7 @@
   --duration-swing: 500ms;
   --duration-reveal: 700ms;
   --duration-burst: 800ms;
+  --duration-ripple: 55ms;
   --duration-drift: 3600ms;
   --duration-marquee: 110s;
   --duration-marquee-slow: 130s;
@@ -107,11 +109,18 @@
 
   --animate-swap: swap-in var(--duration-swing) var(--ease-spring) both;
   --animate-pulse: pulse var(--duration-swing) var(--ease-out);
+  --animate-pop: pop var(--duration-turn) var(--ease-spring) both;
 
   @keyframes swap-in {
     from {
       opacity: 0;
       transform: translateY(0.35em) rotate(-4deg);
+    }
+  }
+
+  @keyframes pop {
+    50% {
+      transform: scale(1.12) rotate(-3deg);
     }
   }
 

@@ -126,7 +126,6 @@ test("CantMake: Nie mogę and Cofnij move nothing above the grid", async ({ brow
     page.getByRole("heading", { level: 1 }),
     page.getByRole("textbox", { name: "Twoje imię" }),
     page.getByRole("tablist"),
-    cant(page),
     grid.getByRole("columnheader").first(),
   ];
 

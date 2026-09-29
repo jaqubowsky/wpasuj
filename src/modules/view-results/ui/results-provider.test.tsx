@@ -89,12 +89,14 @@ describe("Results", () => {
     expect(screen.getByRole("button", { name: "sb 19, 17:00, 1 z 3 może" })).toHaveAttribute("data-heat", "2");
   });
 
-  it("shows who can and who can't for a tapped hour in a sheet, and closes again", async () => {
+  it("rings a tapped hour and shows who can and who can't in a sheet, and closes again", async () => {
     renderResults(threeAnswers);
 
     await userEvent.click(screen.getByRole("button", { name: "nd 20, 18:00, 2 z 3 może" }));
 
     const details = screen.getByRole("dialog", { name: "Niedziela 20.10, 18:00" });
+
+    expect(screen.getByRole("button", { name: "nd 20, 18:00, 2 z 3 może" })).toHaveAttribute("data-selected");
 
     expect(
       within(within(details).getByRole("list", { name: "Może" }))

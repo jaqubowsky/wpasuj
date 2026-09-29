@@ -12,15 +12,16 @@ type HeatmapProps = {
 
 type HeatCellProps = ReturnType<typeof heatCellOf> & {
   label: string;
+  selected: boolean;
   tabIndex: 0 | -1;
   respondentCount: number;
 };
 
-function HeatCell({ count, heat, label, tabIndex, respondentCount }: HeatCellProps) {
+function HeatCell({ count, heat, label, selected, tabIndex, respondentCount }: HeatCellProps) {
   const ref = useBumpOnRise<HTMLButtonElement>(count);
 
   return (
-    <Cell ref={ref} heat={heat} aria-label={`${label}, ${count} z ${respondentCount} może`} tabIndex={tabIndex}>
+    <Cell ref={ref} heat={heat} selected={selected} aria-label={`${label}, ${count} z ${respondentCount} może`} tabIndex={tabIndex}>
       {count > 0 && count}
     </Cell>
   );
@@ -33,10 +34,11 @@ export function Heatmap({ results, isSelected, onCellTap }: HeatmapProps) {
       dates={results.dates}
       hours={results.hours}
       isSelected={isSelected}
-      renderCell={({ label, tabIndex, date, hour }) => (
+      renderCell={({ label, selected, tabIndex, date, hour }) => (
         <HeatCell
           {...heatCellOf(results.respondents, { date, hour })}
           label={label}
+          selected={selected}
           tabIndex={tabIndex}
           respondentCount={results.respondents.length}
         />

@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { stubReducedMotion } from "@/shared/testing/motion";
 import { claimName, saveAnswer } from "../server/answer-actions";
 import { AnswerBody } from "./answer-body";
 import { AnswerLead } from "./answer-lead";
@@ -34,10 +35,6 @@ const cell = (name: string) => screen.getByRole("button", { name });
 const slot = (name: string) => cell(name).closest("[role=gridcell]");
 const nameField = () => screen.getByRole("textbox", { name: "Twoje imię" });
 const cantButton = () => screen.getByRole("button", { name: "Nie mogę w żadnym terminie" });
-
-function stubReducedMotion(reduced: boolean) {
-  vi.stubGlobal("matchMedia", (query: string) => ({ matches: reduced && query === "(prefers-reduced-motion: reduce)" }));
-}
 
 async function afterQuiet() {
   await act(async () => vi.advanceTimersByTime(500));
@@ -88,10 +85,16 @@ describe("the Moje lead and body", () => {
     expect(await screen.findByRole("link", { name: "Zrób własną ankietę" })).toHaveAttribute("href", "/");
   });
 
-  it("says how to answer under the grid", () => {
+  it("says how to answer above the grid and offers Nie mogę under it", () => {
     renderPanel();
 
-    expect(screen.getByText("Kliknij godziny, kiedy możesz. Możesz przeciągnąć.")).toBeInTheDocument();
+    const grid = screen.getByRole("grid", { name: "Kiedy możesz?" });
+
+    expect(screen.getByText("Kliknij godziny, kiedy możesz. Możesz przeciągnąć.").compareDocumentPosition(grid)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
+
+    expect(grid.compareDocumentPosition(cantButton())).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 
   it("prefills the name last used on this device", () => {
@@ -146,8 +149,7 @@ describe("the Moje lead and body", () => {
     await afterQuiet();
     expect(saveAnswer).toHaveBeenCalledExactlyOnceWith(pollId, { name: "Ola", slots: [] });
     expect(await screen.findByRole("status")).toHaveTextContent("Zapisane");
-    expect(screen.getByRole("button", { name: "Cofnij" })).toBeInTheDocument();
-    expect(screen.queryByText("Kliknij godziny, kiedy możesz. Możesz przeciągnąć.")).not.toBeInTheDocument();
+    expect(cantButton().compareDocumentPosition(screen.getByRole("button", { name: "Cofnij" }))).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
   });
 
   it("clears the hours at once under reduced motion", async () => {

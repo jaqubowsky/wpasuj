@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { AnswerBody, AnswerProvider } from "@/modules/answer-poll/client";
 import { PeoplePanel, ResultsProvider } from "@/modules/view-results/client";
+import { stubReducedMotion } from "@/shared/testing/motion";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { RefreshAfterSave } from "./refresh-after-save";
 
@@ -28,7 +29,7 @@ function renderPage(mine?: { name: string; slots: (typeof olasSlot)[] }) {
 beforeEach(() => {
   vi.useFakeTimers({ shouldAdvanceTime: true });
   vi.stubGlobal("fetch", fetchResults);
-  vi.stubGlobal("matchMedia", () => ({ matches: false }));
+  stubReducedMotion(false);
 });
 
 afterEach(() => {
