@@ -202,14 +202,26 @@ test("Button, Chip and Segment show the ink focus ring from the keyboard", async
   }
 });
 
-test("the create form's questions are section headings", async ({ page }, testInfo) => {
+test("the create form's title is its headline and its questions are section headings", async ({ page }, testInfo) => {
   await page.goto("/");
 
-  for (const question of ["Co robimy?", "Twoje imię"]) await expectSectionHeading(page.locator("label", { hasText: question }));
+  await expectSectionHeading(page.locator("label", { hasText: "Twoje imię" }));
   for (const question of ["Kiedy?", "O której?"]) await expectSectionHeading(page.locator("legend", { hasText: question }));
-  const titleSize = testInfo.project.name.startsWith("desktop") ? "40px" : "30px";
+  const titleSize = testInfo.project.name.startsWith("desktop") ? "96px" : "48px";
 
-  expect(await styleOf(page.getByRole("textbox", { name: "Co robimy?" }))).toMatchObject({ fontSize: titleSize });
+  expect(await styleOf(page.getByRole("textbox", { name: "Co robimy?" }))).toMatchObject({ fontSize: titleSize, fontWeight: "800" });
+});
+
+test("a long title wraps onto more lines instead of scrolling", async ({ page }) => {
+  await page.goto("/");
+  const title = page.getByRole("textbox", { name: "Co robimy?" });
+
+  await title.fill("Grill");
+  const oneLine = (await title.boundingBox())!.height;
+
+  await title.fill("Grill na działce u Oli i Marka w sobotę");
+
+  expect((await title.boundingBox())!.height).toBeGreaterThan(oneLine * 1.5);
 });
 
 test("day numbers are tracked tight", async ({ page }) => {

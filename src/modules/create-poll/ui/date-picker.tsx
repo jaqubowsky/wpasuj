@@ -27,11 +27,7 @@ export function DatePicker({ dates, picker }: DatePickerProps) {
           </Chip>
         ))}
       </div>
-      <div
-        className="-mx-3 mt-4 grid grid-cols-[repeat(7,minmax(--spacing(11),1fr))] gap-1.5 rounded-card bg-surface p-3"
-        role="group"
-        aria-label="Dni"
-      >
+      <div className="mt-4 grid grid-cols-[repeat(7,minmax(--spacing(11),1fr))] gap-1.5" role="group" aria-label="Dni">
         {picker.strip.slice(0, 7).map((date) => (
           <span key={date} className="text-center text-sm font-medium text-muted" aria-hidden="true">
             {shortWeekday(date)}
@@ -89,10 +85,7 @@ export function PendingDatePicker() {
           </Chip>
         ))}
       </div>
-      <div
-        className="-mx-3 mt-4 grid grid-cols-[repeat(7,minmax(--spacing(11),1fr))] gap-1.5 rounded-card bg-surface p-3"
-        aria-hidden="true"
-      >
+      <div className="mt-4 grid grid-cols-[repeat(7,minmax(--spacing(11),1fr))] gap-1.5" aria-hidden="true">
         {Array.from({ length: pendingStripCells }, (_, index) => (
           <span
             key={index}

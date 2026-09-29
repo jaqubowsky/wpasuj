@@ -195,16 +195,6 @@ test("the wall of posters runs and pauses under the pointer", async ({ page }, t
   expect(await wallPlayStates(page)).toEqual(["paused", "paused"]);
 });
 
-test("the link preview beside the form follows what the organiser types", async ({ page }) => {
-  await page.goto("/");
-  await expect(make(page).getByRole("figure", { name: "Wasz plan" })).toContainText("Ty pytasz, kiedy możesz");
-
-  await titleField(page).fill("Grill u Oli");
-  await page.getByRole("textbox", { name: "Twoje imię" }).fill("Kuba");
-
-  await expect(make(page).getByRole("figure", { name: "Grill u Oli" })).toContainText("Kuba pyta, kiedy możesz");
-});
-
 test("stopping the motion holds every idle loop and is remembered", async ({ page }) => {
   const idleStates = () =>
     page

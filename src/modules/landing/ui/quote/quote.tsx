@@ -55,13 +55,7 @@ export function Quote({ host }: { host: string }) {
           className="mx-auto mt-11.5 flex max-w-105 -rotate-2 justify-center opacity-0 transition-[scale,opacity] duration-(--duration-reveal) ease-spring data-seen:opacity-100 motion-safe:scale-60 motion-safe:data-seen:scale-100"
           data-seen={count === messages || undefined}
         >
-          <LinkCard
-            asker="Kuba pyta, kiedy możesz"
-            title="Grill na działce u Oli"
-            tone="coral"
-            host={host}
-            note="jeden link zamiast wszystkiego"
-          />
+          <LinkCard asker="Kuba pyta, kiedy możesz" title="Grill na działce u Oli" host={host} note="jeden link zamiast wszystkiego" />
         </div>
       </div>
     </section>

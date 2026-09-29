@@ -32,7 +32,7 @@ The phone at 390px is the primary device; the desktop at 1440px must look delibe
 
 The home page is the create form; there is no separate landing page on the app's own route (the marketing site is a later phase of `~/.sandboxes/wpasuj/plan.md`; nothing from that plan beyond this document is built now). One screen, four things:
 
-1. **Co robimy?** A single line, required, 1 to 60 characters, placeholder "Piwo, planszówki, kino…".
+1. **Co robimy?** One line of text that wraps on screen as the section headline, line breaks folded into spaces, required, 1 to 60 characters, placeholder "Co robimy?" (ADR 0035).
 2. **Kiedy?** Chips "Dziś", "Jutro", "Ten weekend", "Przyszły tydzień" above a two-week strip of dates starting this week, with "Pokaż cały miesiąc" expanding it to a month calendar. A tap on a date toggles it; 1 to 10 dates, none in the past.
    - "Dziś" and "Jutro" are those dates. "Ten weekend" is this week's Friday to Sunday, without past days. "Przyszły tydzień" is next Monday to Sunday.
    - A chip adds its dates; tapping a lit chip removes them. A chip is lit while all its dates are selected. A tap that would go past 10 dates changes nothing and says "Maksymalnie 10 dni".
@@ -150,7 +150,7 @@ Sizes come from one scale in `tokens.css`, Tailwind's names with a paired line h
 
 | Role | Font | Step | Weight |
 |---|---|---|---|
-| Title | Bricolage | `3xl` phone, `4xl` desktop | 700; the poll poster's `4xl` phone, `8xl` desktop, 800 (ADR 0035) |
+| Title | Bricolage | `3xl` phone, `4xl` desktop | 700; the poll poster's `4xl` phone, `8xl` desktop, 800, and the create form's title `5xl` phone, `8xl` desktop, 800 (ADR 0035) |
 | Best time | Bricolage | `3xl` | 700 |
 | Day number | Bricolage | `xl` | 700 |
 | Section heading | Bricolage | `lg` | 700 |

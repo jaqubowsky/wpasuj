@@ -1,22 +1,24 @@
 import { useImperativeHandle, useLayoutEffect, useRef, type Ref } from "react";
 
-function replayTypingFromBeforeHydration(input: HTMLInputElement) {
-  const typed = input.value;
+type Field = HTMLInputElement | HTMLTextAreaElement;
 
-  if (typed === input.defaultValue) return;
+function replayTypingFromBeforeHydration(field: Field) {
+  const typed = field.value;
 
-  const nativeValueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!;
+  if (typed === field.defaultValue) return;
 
-  input.value = input.defaultValue;
-  nativeValueSetter.call(input, typed);
-  input.dispatchEvent(new Event("input", { bubbles: true }));
+  const nativeValueSetter = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(field), "value")!.set!;
+
+  field.value = field.defaultValue;
+  nativeValueSetter.call(field, typed);
+  field.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
-export function useTypingBeforeHydration(ref: Ref<HTMLInputElement> | undefined) {
-  const input = useRef<HTMLInputElement>(null);
+export function useTypingBeforeHydration<T extends Field>(ref: Ref<T> | undefined) {
+  const field = useRef<T>(null);
 
-  useImperativeHandle(ref, () => input.current!, []);
-  useLayoutEffect(() => replayTypingFromBeforeHydration(input.current!), []);
+  useImperativeHandle(ref, () => field.current!, []);
+  useLayoutEffect(() => replayTypingFromBeforeHydration(field.current!), []);
 
-  return input;
+  return field;
 }

@@ -15,7 +15,7 @@ import { WebApplicationJsonLd } from "./web-application-json-ld";
 
 const formId = "utworz";
 
-export function Landing({ form, preview, home }: { form: ReactNode; preview: ReactNode; home: URL }) {
+export function Landing({ form, home }: { form: ReactNode; home: URL }) {
   return (
     <>
       <WebApplicationJsonLd home={home} />
@@ -33,7 +33,7 @@ export function Landing({ form, preview, home }: { form: ReactNode; preview: Rea
         <WaveEdge tone="coral" side="top" />
         <Wall />
         <WaveEdge tone="coral" side="bottom" />
-        <Make formId={formId} form={form} preview={preview} />
+        <Make formId={formId} form={form} />
         <Faq />
         <WaveEdge tone="ink" side="top" />
         <Outro formId={formId} />

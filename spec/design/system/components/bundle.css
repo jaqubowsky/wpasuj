@@ -85,7 +85,10 @@ body { margin: 0; padding: 16px; background: var(--paper); color: var(--ink); fo
 .wp-input::placeholder { color: var(--muted); }
 .wp-input:focus { outline: none; box-shadow: inset 0 0 0 2px var(--ink); }
 .wp-input[aria-invalid="true"] { box-shadow: inset 0 0 0 2px var(--accent-ink); }
-.wp-input[data-variant="title"] { height: auto; padding: 12px 0; border-radius: 0; background: none; box-shadow: inset 0 -2px 0 var(--ink); font: 700 30px/36px var(--font-display); letter-spacing: -0.025em; }
+.wp-title-input { display: block; box-sizing: border-box; width: 100%; margin: 0; padding: 0 0 12px; border: 0; border-radius: 0; background: none; resize: none; overflow: hidden; field-sizing: content; box-shadow: inset 0 -5px 0 var(--ink); font: 800 48px/52px var(--font-display); letter-spacing: -0.03em; color: var(--ink); }
+.wp-title-input::placeholder { color: var(--muted); }
+.wp-title-input:focus { outline: none; box-shadow: inset 0 -7px 0 var(--ink); }
+.wp-title-input[aria-invalid="true"]:not(:focus) { box-shadow: inset 0 -5px 0 var(--accent-ink); }
 .wp-field { display: flex; flex-direction: column; gap: 8px; }
 .wp-field > span { font: 600 15px/20px var(--font-sans); }
 .wp-field > small { font-size: 13px; line-height: 18px; font-weight: 500; color: var(--muted); }

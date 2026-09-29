@@ -7,7 +7,7 @@ function goToForm(formId: string) {
   const form = document.getElementById(formId)!;
 
   form.scrollIntoView({ block: "start" });
-  form.querySelector("input")!.focus({ preventScroll: true });
+  form.querySelector<HTMLElement>("textarea, input")!.focus({ preventScroll: true });
 }
 
 export function GoToFormButton({

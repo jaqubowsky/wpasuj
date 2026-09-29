@@ -29,12 +29,6 @@ describe("Input", () => {
     expect(name).toHaveAttribute("autocomplete", "given-name");
   });
 
-  it("offers the big title field of the create form", () => {
-    render(<Input label="Co robimy?" variant="title" defaultValue="Planszówki u Michała" />);
-
-    expect(screen.getByRole("textbox", { name: "Co robimy?" })).toHaveAttribute("data-variant", "title");
-  });
-
   it("marks itself invalid and says why", () => {
     render(<Input label="Jak masz na imię?" defaultValue="Ola" error="To imię już jest w tej ankiecie." />);
 
