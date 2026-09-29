@@ -103,11 +103,16 @@ test("the hero's posters follow the pointer and drift", async ({ page }, testInf
   const viewport = page.viewportSize()!;
 
   await page.goto("/");
-  await page.mouse.move(0, viewport.height / 2);
-  await expect.poll(() => horizontalShift(heroPosters(page).first())).toBeLessThan(-3);
 
-  await page.mouse.move(viewport.width - 1, viewport.height / 2);
-  await expect.poll(() => horizontalShift(heroPosters(page).first())).toBeGreaterThan(3);
+  await expect(async () => {
+    await page.mouse.move(0, viewport.height / 2);
+    expect(await horizontalShift(heroPosters(page).first())).toBeLessThan(-3);
+  }).toPass();
+
+  await expect(async () => {
+    await page.mouse.move(viewport.width - 1, viewport.height / 2);
+    expect(await horizontalShift(heroPosters(page).first())).toBeGreaterThan(3);
+  }).toPass();
 
   expect(
     await heroPosters(page)
