@@ -1,5 +1,4 @@
 import { BrandMark } from "@/shared/ui/brand-mark/brand-mark";
-import { Grain } from "@/shared/ui/grain/grain";
 import { WaveEdge } from "@/shared/ui/wave-edge/wave-edge";
 import type { ReactNode } from "react";
 import { Faq } from "./faq/faq";
@@ -19,7 +18,6 @@ export function Landing({ form, home }: { form: ReactNode; home: URL }) {
   return (
     <>
       <WebApplicationJsonLd home={home} />
-      <Grain />
       <header className="sticky top-0 z-1 box-border flex h-18 items-center justify-between bg-paper px-5 lg:px-12">
         <BrandMark />
         <GoToFormButton formId={formId}>Utwórz ankietę</GoToFormButton>

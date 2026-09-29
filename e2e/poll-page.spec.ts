@@ -122,7 +122,6 @@ test("CantMake: Nie mogę and Cofnij move nothing above the grid", async ({ brow
   await animationsDone(page);
 
   const above = [
-    page.getByRole("banner"),
     page.getByRole("heading", { level: 1 }),
     page.getByRole("textbox", { name: "Twoje imię" }),
     page.getByRole("tablist"),

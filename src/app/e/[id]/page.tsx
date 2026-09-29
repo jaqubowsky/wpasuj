@@ -16,9 +16,9 @@ import {
   WhilePollLives,
 } from "@/modules/view-results/client";
 import { Avatar } from "@/shared/ui/avatar/avatar";
-import { Text } from "@/shared/ui/text/text";
+import { PollPoster } from "@/shared/ui/poll-poster/poll-poster";
 import { TextLink } from "@/shared/ui/text-link/text-link";
-import { Morph, pollTitleMorph } from "@/shared/morph";
+import { pollTitleMorph } from "@/shared/morph";
 import { siteUrl } from "@/shared/site-url";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -71,72 +71,75 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
 
   const hours = Array.from({ length: poll.hourCount }, (_, index) => poll.firstHour + index);
 
+  const tone = token ? "ink" : "coral";
+
   return (
-    <PageFrame wide>
-      <AnswerProvider pollId={id} dates={poll.dates} hours={hours} mine={mine} fixedName={token && poll.organiserName}>
-        <ResultsProvider
-          pollId={id}
-          initial={readResults(id, poll, now, (await cookies()).get(id)?.value)}
-          organiser={organiser}
-          organiserKey={nameKey(poll.organiserName)}
+    <AnswerProvider pollId={id} dates={poll.dates} hours={hours} mine={mine} fixedName={token && poll.organiserName}>
+      <ResultsProvider
+        pollId={id}
+        initial={readResults(id, poll, now, (await cookies()).get(id)?.value)}
+        organiser={organiser}
+        organiserKey={nameKey(poll.organiserName)}
+      >
+        <RefreshAfterSave />
+        <AppHeader aside={<UntilSet invitation={<SetBadge />}>{token && <AnswerStatus />}</UntilSet>} />
+        <WhilePollLives
+          gone={
+            <PageFrame>
+              <PollGone />
+            </PageFrame>
+          }
         >
-          <RefreshAfterSave />
-          <AppHeader
-            aside={
-              <UntilSet invitation={<SetBadge />}>
-                <RespondentCount />
-              </UntilSet>
-            }
-          />
-          <WhilePollLives gone={<PollGone />}>
-            <main className="flex flex-col gap-4 pt-1 pb-8 lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-x-10 lg:gap-y-6">
-              <div className="grid gap-2 lg:col-span-2">
-                <div className="flex min-h-8 items-center justify-between gap-3">
-                  <div className="flex items-center gap-2">
-                    <Avatar name={poll.organiserName} tintKey={nameKey(poll.organiserName)} />
-                    <Text variant="meta">
-                      <UntilSet invitation={token ? "Ustalone przez Ciebie" : `Ustalone przez: ${poll.organiserName}`}>
-                        {token ? `Pytasz jako ${poll.organiserName}` : `${poll.organiserName} pyta`}
-                      </UntilSet>
-                    </Text>
-                  </div>
-                  {token && (
-                    <UntilSet invitation={null}>
-                      <AnswerStatus />
+          <main>
+            <PollPoster
+              tone={tone}
+              eyebrow={
+                <>
+                  <Avatar name={poll.organiserName} tintKey={nameKey(poll.organiserName)} />
+                  <span>
+                    <UntilSet invitation={token ? "Ustalone przez Ciebie" : `Ustalone przez: ${poll.organiserName}`}>
+                      {token ? `Pytasz jako ${poll.organiserName}` : `${poll.organiserName} pyta`}
                     </UntilSet>
-                  )}
-                </div>
-                <Morph name={pollTitleMorph}>
-                  <Text as="h1" variant="title">
-                    {poll.title}
-                  </Text>
-                </Morph>
+                  </span>
+                </>
+              }
+              title={poll.title}
+              morph={pollTitleMorph}
+            >
+              <UntilSet invitation={null}>
+                <RespondentCount ground={tone} />
+              </UntilSet>
+            </PollPoster>
+            <PageFrame wide>
+              <div className="grid gap-2 pt-1 pb-3 empty:hidden lg:pb-5">
                 <ZoneNote pollZone={poll.timeZone} />
                 <UntilSet invitation={null}>
                   <InviteCard pollId={id} title={poll.title} />
                 </UntilSet>
               </div>
-              <UntilSet invitation={<Invitation title={poll.title} timeZone={poll.timeZone} />}>
-                <div className="contents lg:col-start-2 lg:row-start-2 lg:flex lg:flex-col lg:gap-4" data-poll-panel>
-                  <BestNow />
-                  <OrganiserCard />
-                  <PeoplePanel />
-                </div>
-                <div className="lg:col-start-1 lg:row-start-2">
-                  <PollTabs
-                    opening={mine ? "Wszyscy" : "Moje"}
-                    leads={{ Moje: <AnswerLead /> }}
-                    bodies={{ Moje: <AnswerBody />, Wszyscy: <ResultsBody /> }}
-                  />
-                </div>
-              </UntilSet>
-            </main>
-            <footer className="flex justify-center pb-8">
-              <TextLink href="/">Zrób własną ankietę</TextLink>
-            </footer>
-          </WhilePollLives>
-        </ResultsProvider>
-      </AnswerProvider>
-    </PageFrame>
+              <div className="flex flex-col gap-4 pt-1 pb-8 lg:grid lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:gap-x-10 lg:gap-y-6">
+                <UntilSet invitation={<Invitation title={poll.title} timeZone={poll.timeZone} />}>
+                  <div className="contents lg:col-start-2 lg:row-start-1 lg:flex lg:flex-col lg:gap-4" data-poll-panel>
+                    <BestNow />
+                    <OrganiserCard />
+                    <PeoplePanel />
+                  </div>
+                  <div className="lg:col-start-1 lg:row-start-1">
+                    <PollTabs
+                      opening={mine ? "Wszyscy" : "Moje"}
+                      leads={{ Moje: <AnswerLead /> }}
+                      bodies={{ Moje: <AnswerBody />, Wszyscy: <ResultsBody /> }}
+                    />
+                  </div>
+                </UntilSet>
+              </div>
+            </PageFrame>
+          </main>
+          <footer className="flex justify-center pb-8">
+            <TextLink href="/">Zrób własną ankietę</TextLink>
+          </footer>
+        </WhilePollLives>
+      </ResultsProvider>
+    </AnswerProvider>
   );
 }

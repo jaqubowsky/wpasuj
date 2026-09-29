@@ -10,6 +10,12 @@ export async function centreOf(locator: Locator) {
   return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
 }
 
+export async function centresOf(from: Locator, to: Locator) {
+  await to.evaluate((element) => element.scrollIntoView({ block: "center" }));
+
+  return [await centreOf(from), await centreOf(to)] as const;
+}
+
 function stepsBetween(from: Point, to: Point) {
   return Array.from({ length: 10 }, (_, step) => ({
     x: from.x + ((to.x - from.x) * (step + 1)) / 10,

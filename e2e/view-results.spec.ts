@@ -182,7 +182,8 @@ test("the best time leads the page on a phone and sits beside the heatmap on a d
   expect(grid.y - (tabs.y + tabs.height)).toBeLessThan(120);
   await page.getByRole("button", { name: "nd 20, 18:00, 2 z 3 może" }).click();
   const details = (await page.getByRole("region", { name: "Niedziela 20.10, 18:00" }).boundingBox())!;
+  const bestAfterScroll = (await page.getByRole("region", { name: "Najlepiej teraz" }).boundingBox())!;
 
-  expect(details.x).toBeGreaterThanOrEqual(best.x);
-  expect(details.y).toBeGreaterThan(best.y + best.height);
+  expect(details.x).toBeGreaterThanOrEqual(bestAfterScroll.x);
+  expect(details.y).toBeGreaterThan(bestAfterScroll.y + bestAfterScroll.height);
 });

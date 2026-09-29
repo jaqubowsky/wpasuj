@@ -15,10 +15,10 @@ export function Invitation({ title, timeZone }: { title: string; timeZone: strin
 
   return (
     <>
-      <div className="lg:col-start-1 lg:row-start-2">
+      <div className="lg:col-start-1 lg:row-start-1">
         <SetTime final={final} title={title} timeZone={timeZone} />
       </div>
-      <div className="contents lg:col-start-2 lg:row-start-2 lg:flex lg:flex-col lg:gap-4">
+      <div className="contents lg:col-start-2 lg:row-start-1 lg:flex lg:flex-col lg:gap-4">
         <OrganiserCard />
         <WhoComes final={final} />
       </div>

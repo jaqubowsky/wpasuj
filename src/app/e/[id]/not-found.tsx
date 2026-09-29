@@ -4,9 +4,11 @@ import { PollGone } from "./poll-gone";
 
 export default function PollNotFound() {
   return (
-    <PageFrame>
+    <>
       <AppHeader />
-      <PollGone />
-    </PageFrame>
+      <PageFrame>
+        <PollGone />
+      </PageFrame>
+    </>
   );
 }

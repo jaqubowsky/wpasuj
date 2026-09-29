@@ -73,7 +73,7 @@ body { margin: 0; padding: 16px; background: var(--paper); color: var(--ink); fo
 .wp-segment button[aria-selected="true"] { color: var(--paper); }
 .wp-segment button:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
 
-.wp-avatar { box-sizing: border-box; width: 32px; height: 32px; border-radius: var(--radius-pill); display: inline-grid; place-items: center; font: 600 13px/1 var(--font-sans); color: var(--ink); background: var(--tint-coral); }
+.wp-avatar { box-sizing: border-box; width: 32px; height: 32px; border-radius: var(--radius-cell); display: inline-grid; place-items: center; font: 600 13px/1 var(--font-sans); color: var(--ink); background: var(--tint-coral); }
 .wp-avatar[data-tint="lilac"] { background: var(--tint-lilac); }
 .wp-avatar[data-tint="mint"] { background: var(--tint-mint); }
 .wp-avatar[data-tint="butter"] { background: var(--tint-butter); }

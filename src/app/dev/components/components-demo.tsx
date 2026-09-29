@@ -10,6 +10,7 @@ import { Input } from "@/shared/ui/input/input";
 import { TitleInput } from "@/shared/ui/title-input/title-input";
 import { LinkCard } from "@/shared/ui/link-card/link-card";
 import { MotionToggle } from "@/shared/ui/motion-toggle/motion-toggle";
+import { PollPoster } from "@/shared/ui/poll-poster/poll-poster";
 import { PosterCard } from "@/shared/ui/poster-card/poster-card";
 import { Segment } from "@/shared/ui/segment/segment";
 import { Status } from "@/shared/ui/status/status";
@@ -138,6 +139,29 @@ export function ComponentsDemo() {
       <Section name="PosterCard">
         <PosterCard title="Grill u Oli" when="sb 3.10" people="6 osób" tone="coral" heat={[1, 2, 4, 0, 3, 5, 4, 1, 0, 2]} />
         <PosterCard title="Kino" when="czw 9, 19:30" people="4 osoby" tone="paper" heat={[0, 2, 3, 5, 1, 4, 0, 2, 3, 1]} size="small" />
+      </Section>
+      <Section name="PollPoster">
+        {(["coral", "ink"] as const).map((tone) => (
+          <div key={tone} className="w-full">
+            <PollPoster
+              tone={tone}
+              eyebrow={
+                <>
+                  <Avatar name="Kuba" tintKey="kuba" />
+                  <span>{tone === "ink" ? "Pytasz jako Kuba" : "Kuba pyta"}</span>
+                </>
+              }
+              title="Grill u Oli na działce"
+            >
+              <span className="text-base font-semibold">5 osób już odpowiedziało</span>
+              <span className="inline-flex">
+                {people.map(({ name, key }) => (
+                  <Avatar key={key} name={name} tintKey={key} stack={tone} />
+                ))}
+              </span>
+            </PollPoster>
+          </div>
+        ))}
       </Section>
       <Section name="LinkCard">
         <LinkCard asker="Kuba pyta, kiedy możesz" title="Grill na działce u Oli" host="wpasuj.pl" note="jeden link zamiast wszystkiego" />
