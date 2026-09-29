@@ -57,7 +57,7 @@ test("three answers agree with a hand count", async ({ page }, testInfo) => {
 
   await openResults(page, pollId);
 
-  await expect(page.getByRole("region", { name: "Najlepiej teraz" })).toHaveText("Najlepiej terazSobota 19.10, 18–20");
+  await expect(page.getByRole("region", { name: "Najlepiej teraz" })).toHaveText("Najlepiej terazSobota 19.10, 18–203 z 3 może");
 
   const handCount: [string, number][] = [
     ["sb 19, 17:00", 1],
@@ -102,7 +102,7 @@ test("an answer written elsewhere shows within 10 seconds", async ({ page }) => 
   seedAnswer(pollId, "Zosia", Date.now(), []);
 
   await expect(counted(page, "4 osoby")).toBeVisible({ timeout: 10_000 });
-  await expect(page.getByRole("region", { name: "Najlepiej teraz" })).toHaveText("Najlepiej terazSobota 19.10, 18–20");
+  await expect(page.getByRole("region", { name: "Najlepiej teraz" })).toHaveText("Najlepiej terazSobota 19.10, 18–203 z 4 może");
 });
 
 test("the heatmap lets the page scroll under a finger", async ({ page }) => {

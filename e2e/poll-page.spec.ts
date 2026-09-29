@@ -106,7 +106,7 @@ test("Answer: a participant's Moje with the best time, the name and the Nie mog�
 
   await tab(page, "Moje").click();
 
-  await expect(best(page)).toHaveText("Najlepiej terazSobota 18.10, 19–21");
+  await expect(best(page)).toHaveText("Najlepiej terazSobota 18.10, 19–214 z 5 może");
   await expect(page.getByRole("textbox", { name: "Twoje imię" })).toHaveValue("Zuza");
   await expect(page.getByText("Kliknij godziny, kiedy możesz. Możesz przeciągnąć.")).toBeVisible();
   await expect(page.getByRole("grid", { name: "Kiedy możesz?" }).getByRole("gridcell", { selected: true })).toHaveCount(5);
