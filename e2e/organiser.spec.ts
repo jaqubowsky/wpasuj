@@ -218,6 +218,8 @@ test("after Ustal termin a participant sees the invitation with no grid, and can
       .evaluateAll((avatars) => avatars.map((avatar) => avatar.getAttribute("aria-label"))),
   ).toEqual(["Ola", "Michał", "Zuza", "Kuba"]);
 
+  await expect(whoComes.getByRole("listitem").filter({ hasText: "organizator" }).getByRole("img")).toHaveAccessibleName("Kuba");
+
   await expect(whoComes).toContainText("Bartek nie może.");
   await expect(participant.getByRole("button", { name: "Zmień termin" })).toHaveCount(0);
   await saveScreenshot(participant, testInfo, "set-participant");

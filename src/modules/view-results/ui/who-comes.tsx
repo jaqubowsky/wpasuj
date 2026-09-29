@@ -26,6 +26,7 @@ export function WhoComes({ final }: { final: FinalTime }) {
                 stack="paper"
                 mark={person.normalisedName === organiserKey ? "organiser" : undefined}
               />
+              {person.normalisedName === organiserKey && <span className="sr-only">, organizator</span>}
             </li>
           ))}
         </ul>

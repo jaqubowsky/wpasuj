@@ -83,7 +83,17 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
         organiserKey={nameKey(poll.organiserName)}
       >
         <RefreshAfterSave />
-        <AppHeader aside={<UntilSet invitation={<SetBadge />}>{token && <AnswerStatus />}</UntilSet>} />
+        <AppHeader
+          aside={
+            <UntilSet invitation={<SetBadge />}>
+              {token && (
+                <WhilePollLives gone={null}>
+                  <AnswerStatus />
+                </WhilePollLives>
+              )}
+            </UntilSet>
+          }
+        />
         <WhilePollLives
           gone={
             <PageFrame>
