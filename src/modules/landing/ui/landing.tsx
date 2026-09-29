@@ -1,6 +1,5 @@
-import { productName } from "@/shared/brand";
+import { BrandMark } from "@/shared/ui/brand-mark/brand-mark";
 import { Grain } from "@/shared/ui/grain/grain";
-import { Text } from "@/shared/ui/text/text";
 import { WaveEdge } from "@/shared/ui/wave-edge/wave-edge";
 import type { ReactNode } from "react";
 import { Faq } from "./faq/faq";
@@ -22,15 +21,7 @@ export function Landing({ form, preview, home }: { form: ReactNode; preview: Rea
       <WebApplicationJsonLd home={home} />
       <Grain />
       <header className="sticky top-0 z-1 box-border flex h-18 items-center justify-between bg-paper px-5 lg:px-12">
-        <a href="#top" aria-label={`${productName}, na górę strony`} className="flex items-center gap-2.5 text-ink no-underline">
-          <span aria-hidden className="grid grid-cols-[repeat(2,--spacing(2))] gap-0.5">
-            <span className="h-2 rounded-[2px] bg-accent" />
-            <span className="h-2 rounded-[2px] bg-tint-coral" />
-            <span className="h-2 rounded-[2px] bg-tint-coral" />
-            <span className="h-2 rounded-[2px] bg-accent" />
-          </span>
-          <Text variant="wordmark">{productName}</Text>
-        </a>
+        <BrandMark />
         <GoToFormButton formId={formId}>Utwórz ankietę</GoToFormButton>
       </header>
       <main>

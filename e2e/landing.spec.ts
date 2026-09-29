@@ -77,7 +77,7 @@ test("the logo takes the reader back to the top", async ({ page }) => {
   await page.goto("/");
   await faq(page).scrollIntoViewIfNeeded();
 
-  await page.getByRole("link", { name: "Wpasuj, na górę strony" }).click();
+  await page.getByRole("button", { name: "Wpasuj, na górę strony" }).click();
 
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
 });

@@ -175,7 +175,7 @@ Sentence case everywhere; no all-caps labels, no letter-spaced eyebrows.
 | `muted` | `#72695F` | secondary text (5.0:1 on paper) |
 | `line` | `#EDE6DC` | decorative hairlines only |
 | `edge` | `#958A7E` | 1px border that marks a control: free cells, unselected chips, inputs (3.4:1) |
-| `accent` | `#F0603F` | your own slots, selected dates, the wordmark's mark; never text |
+| `accent` | `#F0603F` | your own slots, selected dates; never text |
 | `accent-ink` | `#B8401F` | accent as text |
 | `on-dark-muted` | `#CFC7BC` | labels on the ink card |
 | `heat-1` … `heat-5` | `#FDEDE6`, `#FAD3C3`, `#F6AE93`, `#F18463`, `#CC4420` | share free: ≤20%, ≤40%, ≤60%, ≤80%, >80% |
