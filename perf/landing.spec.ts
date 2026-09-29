@@ -133,7 +133,7 @@ async function measure(page: Page, slowdown: number) {
   return { lcp: lcp.startTime, element: lcp.element, tbt, cls: cumulativeLayoutShift(shifts) };
 }
 
-test("the landing holds LCP, TBT and CLS on a throttled phone, story included", async ({ browser, page }, testInfo) => {
+test("the landing holds LCP, TBT and CLS on a throttled phone, scrolled to its end", async ({ browser, page }, testInfo) => {
   test.setTimeout(runs * 60_000);
   const index = await page.evaluate(benchmarkIndex);
   const slowdown = midTierMobileSlowdown(index);
@@ -156,7 +156,7 @@ test("the landing holds LCP, TBT and CLS on a throttled phone, story included", 
   const cls = median(results.map((result) => result.cls));
 
   console.log(
-    `LCP ${Math.round(lcp)} ms, TBT ${Math.round(tbt)} ms, CLS ${cls.toFixed(3)}, medians of ${runs} runs with the story scrolled through (benchmark index ${Math.round(index)}, CPU ${slowdown}x)`,
+    `LCP ${Math.round(lcp)} ms, TBT ${Math.round(tbt)} ms, CLS ${cls.toFixed(3)}, medians of ${runs} runs scrolled to the end (benchmark index ${Math.round(index)}, CPU ${slowdown}x)`,
   );
 
   expect.soft(lcp).toBeLessThanOrEqual(2500);

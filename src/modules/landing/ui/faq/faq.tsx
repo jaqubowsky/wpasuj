@@ -1,3 +1,4 @@
+import "./faq.css";
 import { productName } from "@/shared/brand";
 
 const questions = [
@@ -21,23 +22,28 @@ const questions = [
 
 export function Faq() {
   return (
-    <section
-      aria-labelledby="faq-heading"
-      className="mx-auto box-border flex max-w-wide flex-col gap-6 px-5 py-20 lg:grid lg:grid-cols-[360px_minmax(0,1fr)] lg:gap-14 lg:px-12 lg:py-15"
-    >
-      <h2
-        id="faq-heading"
-        className="m-0 animate-rise font-display text-3xl font-extrabold tracking-tightest [animation-range:entry_0%_cover_30%] [animation-timeline:view()] lg:text-4xl"
-      >
+    <section aria-labelledby="faq-heading" className="mx-auto box-border max-w-wide px-5 pt-10 pb-15 lg:px-12">
+      <h2 id="faq-heading" className="m-0 mb-9 text-center font-display text-5xl font-extrabold tracking-tighter lg:text-8xl">
         Pytania
       </h2>
-      <div className="animate-rise [animation-range:entry_0%_cover_30%] [animation-timeline:view()]">
+      <div className="mx-auto grid max-w-190 gap-3">
         {questions.map(({ question, answer }) => (
-          <details key={question} className="group border-t border-line last:border-b">
-            <summary className="cursor-pointer py-4.5 font-display text-xl font-bold tracking-tightest group-open:pb-2.5">
-              {question}
+          <details
+            key={question}
+            className="group rounded-card bg-surface px-5 py-4.5 shadow-[0_0_0_1px_var(--color-line)] open:shadow-[0_0_0_2px_var(--color-ink)]"
+            data-faq
+          >
+            <summary className="flex cursor-pointer list-none justify-between gap-4 text-lg font-semibold">
+              <span>{question}</span>
+              <span
+                aria-hidden="true"
+                className="font-display text-2xl leading-none font-extrabold text-accent-ink transition-transform duration-(--duration-turn) ease-out group-open:rotate-180"
+              >
+                <span className="group-open:hidden">+</span>
+                <span className="hidden group-open:inline">−</span>
+              </span>
             </summary>
-            <p className="m-0 max-w-165 pb-4.5 text-base text-muted">{answer}</p>
+            <p className="m-0 pt-2.5 text-base text-muted">{answer}</p>
           </details>
         ))}
       </div>

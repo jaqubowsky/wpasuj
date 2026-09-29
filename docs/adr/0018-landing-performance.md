@@ -4,6 +4,7 @@
 - **Date:** 2026-09-28
 - **Owner:** host; owner (`landing-perf-gate`)
 - **Replaces:** `landing-story-pin`, `landing-perf-gate` (former decision entries)
+- **Amended by:** ADR 0034 (the story and the lazy sections are gone; the budget stays)
 
 ## Context
 

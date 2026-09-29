@@ -1,0 +1,6 @@
+[data-quote-ghost] {
+  position: absolute;
+  top: var(--ghost-top);
+  left: var(--ghost-left);
+  rotate: var(--ghost-turn);
+}

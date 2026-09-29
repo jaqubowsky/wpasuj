@@ -1,0 +1,20 @@
+<!-- @dsCard group="Landing" height=300 subtitle="Coral, ink, peach, deep, paper, pink; front and back" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>PosterCard</title>
+<style>
+  .pc { position: relative; box-sizing: border-box; width: 150px; aspect-ratio: 4 / 5; border-radius: var(--radius-card); padding: 14px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 26px 50px -24px rgba(30,27,24,.45), 0 0 0 1px rgba(30,27,24,.06); font-family: var(--font-sans); }
+  .pc b.t { font: 800 20px/1.05 var(--font-display); letter-spacing: -0.01em; }
+  .pc .g { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
+  .pc .g i { aspect-ratio: 1; border-radius: 4px; }
+  .pc .d { font: 700 12px/1.2 var(--font-sans); display: grid; gap: 6px; justify-items: start; }
+  .pc .d span { background: var(--surface); color: var(--ink); border-radius: 999px; padding: 4px 9px; }
+</style></head>
+<body>
+<div class="wp-row" style="gap:20px">
+  <div class="pc" style="background:var(--accent);color:var(--ink)"><b class="t">Grill u Oli</b><div class="g"><i style="background:var(--heat-1)"></i><i style="background:var(--heat-2)"></i><i style="background:var(--heat-4)"></i><i style="background:var(--surface);opacity:.25"></i><i style="background:var(--heat-3)"></i><i style="background:var(--heat-5)"></i><i style="background:var(--heat-4)"></i><i style="background:var(--heat-1)"></i><i style="background:var(--surface);opacity:.25"></i><i style="background:var(--heat-2)"></i></div><div class="d">6 osób<span>sb 3.10</span></div></div>
+  <div class="pc" style="background:var(--ink);color:var(--paper)"><b class="t">Planszówki</b><div class="g"><i style="background:var(--heat-2)"></i><i style="background:var(--heat-3)"></i><i style="background:var(--heat-5)"></i><i style="background:var(--heat-1)"></i><i style="background:var(--heat-4)"></i><i style="background:var(--heat-3)"></i><i style="background:var(--surface);opacity:.25"></i><i style="background:var(--heat-2)"></i><i style="background:var(--heat-5)"></i><i style="background:var(--heat-1)"></i></div><div class="d">5 osób<span>pt 17, 20:00</span></div></div>
+  <div class="pc" style="background:var(--ink);color:var(--paper);display:grid;align-content:center;justify-items:start;gap:8px"><small style="color:var(--on-dark-muted);font-size:12px">Najlepiej</small><b style="font:800 20px/1.1 var(--font-display)">sb 3.10</b><span style="background:var(--accent);color:var(--ink);border-radius:999px;padding:4px 10px;font:700 12px/1.2 var(--font-sans)">Ustalone</span></div>
+</div>
+</body>
+</html>

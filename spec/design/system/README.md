@@ -31,6 +31,7 @@ Wpasuj finds a time for a group of friends: one link in the group chat, everyone
 - Radii by role: `radius-cell` on cells, `radius-control` on buttons and inputs, `radius-card` on cards, `radius-pill` on chips and avatars.
 - Every tappable thing is at least `size-target`; grid cells `size-cell`; phone buttons `size-button`, the main action full width in a sticky bottom bar above the home indicator.
 - No shadows except `shadow-lift` on the selected segment and `shadow-sheet` on the bottom sheet. Cards separate by ground colour, not borders.
+- The landing adds `shadow-poster` on posters, link cards and its try-it board, and a `shadow-ledge` under its loud buttons (ADR 0034); the poll pages keep the two above.
 
 ## Motion
 
@@ -38,6 +39,7 @@ Wpasuj finds a time for a group of friends: one link in the group chat, everyone
 - A heat count that rises bumps for `duration-bump`; a newly arrived respondent's avatar pops in with `ease-pop`, the only overshoot.
 - The bottom sheet slides up in `duration-sheet` with `ease-out`; the best-time text cross-fades when it changes; setting the final time fills the chosen cells in sequence.
 - Nothing animates on load. Only `transform` and `opacity` move. `prefers-reduced-motion` removes all of it.
+- The landing is the exception (ADR 0034): posters drift and follow the pointer, a word swaps, a count runs and a wall of posters scrolls, all under `MotionToggle` ("Zatrzymaj ruch") and gone under reduced motion. New idle motion reads `useMotion().moving`, or marks its element `data-idle-motion` so `data-motion="still"` pauses it; motion that plays once never opts in.
 
 ## Icons
 

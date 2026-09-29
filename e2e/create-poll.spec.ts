@@ -345,6 +345,7 @@ test("inputs render at 16px or more", async ({ page }) => {
 test("the create button sits above the safe area", async ({ page }, testInfo) => {
   test.skip(!testInfo.project.name.startsWith("phone"), "the sticky bar is a phone layout");
   await page.goto("/");
+  await page.getByRole("textbox", { name: "Co robimy?" }).scrollIntoViewIfNeeded();
 
   const bar = createButton(page).locator("..");
 

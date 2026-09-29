@@ -1,0 +1,22 @@
+[data-faq] {
+  interpolate-size: allow-keywords;
+}
+
+[data-faq]::details-content {
+  block-size: 0;
+  overflow: clip;
+  opacity: 0;
+  transition:
+    block-size var(--duration-turn) var(--ease-out),
+    opacity var(--duration-turn) var(--ease-out),
+    content-visibility var(--duration-turn) allow-discrete;
+}
+
+[data-faq][open]::details-content {
+  block-size: auto;
+  opacity: 1;
+}
+
+[data-faq] > summary::-webkit-details-marker {
+  display: none;
+}

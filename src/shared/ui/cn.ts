@@ -8,8 +8,8 @@ const twMerge = extendTailwindMerge({
       container: ["narrow", "wide"],
       radius: ["cell", "control", "card", "pill"],
       "font-weight": ["regular"],
-      ease: ["pop"],
-      animate: ["rise"],
+      ease: ["pop", "spring", "sway"],
+      animate: ["swap", "pulse"],
     },
   },
 });

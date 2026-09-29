@@ -1,0 +1,25 @@
+[data-wall-lane] {
+  animation: wall-lane var(--duration-marquee) linear infinite;
+}
+
+[data-wall-lane="back"] {
+  animation-duration: var(--duration-marquee-slow);
+  animation-direction: reverse;
+}
+
+[data-wall]:hover [data-wall-lane],
+[data-wall]:focus-within [data-wall-lane] {
+  animation-play-state: paused;
+}
+
+@media (width < 1024px) {
+  [data-wall-lane="back"] {
+    display: none;
+  }
+}
+
+@keyframes wall-lane {
+  to {
+    transform: translateX(-50%);
+  }
+}

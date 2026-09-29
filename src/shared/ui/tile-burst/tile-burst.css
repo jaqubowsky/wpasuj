@@ -1,0 +1,42 @@
+[data-tile-burst] {
+  position: fixed;
+  top: var(--burst-top);
+  left: var(--burst-left);
+  z-index: 3;
+  width: calc(var(--spacing) * 3.5);
+  height: calc(var(--spacing) * 3.5);
+  border-radius: var(--spacing);
+  pointer-events: none;
+  animation: tile-burst-fly var(--duration-burst) var(--ease-out) both;
+}
+
+[data-tile-burst="2"] {
+  background: var(--color-heat-2);
+}
+
+[data-tile-burst="3"] {
+  background: var(--color-heat-3);
+}
+
+[data-tile-burst="4"] {
+  background: var(--color-heat-4);
+}
+
+[data-tile-burst="5"] {
+  background: var(--color-heat-5);
+}
+
+[data-tile-burst="ink"] {
+  background: var(--color-ink);
+}
+
+@keyframes tile-burst-fly {
+  from {
+    transform: translate(-50%, -50%);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(calc(-50% + var(--burst-x)), calc(-50% + var(--burst-y))) rotate(var(--burst-turn)) scale(0.4);
+  }
+}

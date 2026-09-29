@@ -10,9 +10,17 @@ function goToForm(formId: string) {
   form.querySelector("input")!.focus({ preventScroll: true });
 }
 
-export function GoToFormButton({ formId, children }: { formId: string; children: ReactNode }) {
+export function GoToFormButton({
+  formId,
+  variant = "primary",
+  children,
+}: {
+  formId: string;
+  variant?: "primary" | "loud" | "loud-light";
+  children: ReactNode;
+}) {
   return (
-    <Button variant="primary" onClick={() => goToForm(formId)}>
+    <Button variant={variant} onClick={() => goToForm(formId)}>
       {children}
     </Button>
   );
