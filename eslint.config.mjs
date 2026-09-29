@@ -16,18 +16,27 @@ const moduleBlocks = (name) => {
     message: "A module never imports another module",
   };
 
+  const app = { group: ["@/app", "@/app/**", "../**/app", "../**/app/**"], message: "A module never imports the app" };
+  const ownUi = { group: ["../ui/**", `@/modules/${name}/ui/**`] };
+
   const restrict = (options) => ({ "@typescript-eslint/no-restricted-imports": ["error", options] });
 
   return [
-    { files: [`src/modules/${name}/**`], rules: restrict({ patterns: [otherModules] }) },
+    { files: [`src/modules/${name}/**`], rules: restrict({ patterns: [otherModules, app] }) },
     {
       files: [`src/modules/${name}/domain/**`],
       rules: restrict({
-        paths: ["react", "react-dom"],
-        patterns: [otherModules, { group: ["next/*"] }, { group: ["../server/**"], allowTypeImports: true }, { group: ["../ui/**"] }],
+        paths: ["react", "react-dom", "better-sqlite3"],
+        patterns: [
+          otherModules,
+          app,
+          { group: ["next/*", "node:*"] },
+          { group: ["../server/**", `@/modules/${name}/server/**`], allowTypeImports: true },
+          ownUi,
+        ],
       }),
     },
-    { files: [`src/modules/${name}/server/**`], rules: restrict({ patterns: [otherModules, { group: ["../ui/**"] }] }) },
+    { files: [`src/modules/${name}/server/**`], rules: restrict({ patterns: [otherModules, app, ownUi] }) },
   ];
 };
 

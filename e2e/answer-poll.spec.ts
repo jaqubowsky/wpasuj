@@ -1,6 +1,6 @@
 import type { Browser, Locator, Page, Request, TestInfo } from "@playwright/test";
 import { expect, test } from "./fixtures";
-import { centresOf, mouseDrag, touchDrag } from "./pointer";
+import { centresOf, mouseDrag, touchHoldDrag } from "./pointer";
 import { saveScreenshot } from "./screenshot";
 import { seedAnswer, seedPoll } from "./seed";
 
@@ -45,7 +45,7 @@ function cellAt(page: Page, hourIndex: number, dateIndex: number) {
 }
 
 async function drag(page: Page, testInfo: TestInfo, from: Locator, to: Locator, beforeRelease?: () => Promise<void>) {
-  const dragWith = testInfo.project.name === "phone-chromium" ? touchDrag : mouseDrag;
+  const dragWith = testInfo.project.name === "phone-chromium" ? touchHoldDrag : mouseDrag;
 
   await dragWith(page, ...(await centresOf(from, to)), beforeRelease);
 }
@@ -84,6 +84,27 @@ test("a fresh participant answers with a name and one drag and sees Zapisane", a
   await page.getByRole("tab", { name: "Moje" }).click();
   await expect(nameField(page)).toHaveValue("Zuza");
   await expect(selected(page)).toHaveCount(9);
+});
+
+test("a drag, held first on touch, marks its hours under the hint for this pointer", async ({ browser }, testInfo) => {
+  const { link } = await createPoll(browser);
+  const page = await openAsNewDevice(browser, link);
+
+  await nameField(page).fill("Zuza");
+  await drag(page, testInfo, cellAt(page, 1, 0), cellAt(page, 3, 0));
+
+  await expect(status(page)).toHaveText("Zapisane");
+  await expect(selected(page)).toHaveCount(3);
+
+  await expect(page.getByText(/^Kliknij godziny/)).toHaveText(
+    testInfo.project.use.hasTouch
+      ? "Kliknij godziny, kiedy możesz. Przytrzymaj, żeby przeciągnąć."
+      : "Kliknij godziny, kiedy możesz. Możesz przeciągnąć.",
+    { useInnerText: true },
+  );
+
+  await page.getByText(/^Kliknij godziny/).evaluate((element) => element.scrollIntoView({ block: "start" }));
+  await page.screenshot({ path: `e2e/screenshots/answer-after-drag-viewport-${testInfo.project.name}.png` });
 });
 
 test("a fresh participant answers with taps only", async ({ browser }, testInfo) => {
@@ -184,7 +205,14 @@ test("the organiser answers on Moje under the name from create, with no name fie
   await expect(organiser.getByRole("tab", { name: "Moje", selected: true })).toBeVisible();
   await expect(organiser.getByText("Pytasz jako Kuba")).toBeVisible();
   await expect(organiser.getByText("Zaznacz też swoje godziny.")).toBeVisible();
-  await expect(organiser.getByText("Kliknij godziny, kiedy możesz. Możesz przeciągnąć.")).toBeVisible();
+
+  await expect(organiser.getByText(/^Kliknij godziny/)).toHaveText(
+    testInfo.project.use.hasTouch
+      ? "Kliknij godziny, kiedy możesz. Przytrzymaj, żeby przeciągnąć."
+      : "Kliknij godziny, kiedy możesz. Możesz przeciągnąć.",
+    { useInnerText: true },
+  );
+
   await expect(organiser.getByRole("textbox", { name: "Twoje imię" })).toHaveCount(0);
 
   await tap(cellAt(organiser, 0, 0), testInfo);

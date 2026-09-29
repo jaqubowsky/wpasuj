@@ -125,7 +125,14 @@ test("Answer: a participant's Moje with the best time, the name and the Nie mog�
 
   await expect(best(page)).toHaveText("Najlepiej terazSobota 18.10, 19–214 z 5 może");
   await expect(page.getByRole("textbox", { name: "Twoje imię" })).toHaveValue("Zuza");
-  await expect(page.getByText("Kliknij godziny, kiedy możesz. Możesz przeciągnąć.")).toBeVisible();
+
+  await expect(page.getByText(/^Kliknij godziny/)).toHaveText(
+    testInfo.project.use.hasTouch
+      ? "Kliknij godziny, kiedy możesz. Przytrzymaj, żeby przeciągnąć."
+      : "Kliknij godziny, kiedy możesz. Możesz przeciągnąć.",
+    { useInnerText: true },
+  );
+
   await expect(page.getByRole("grid", { name: "Kiedy możesz?" }).getByRole("gridcell", { selected: true })).toHaveCount(5);
   await saveScreenshot(page, testInfo, "v3-answer");
 });
