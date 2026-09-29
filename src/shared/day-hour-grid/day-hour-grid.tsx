@@ -77,7 +77,7 @@ export function DayHourGrid({
         role="grid"
         aria-label={label}
         aria-multiselectable={onStroke && true}
-        className="grid snap-x snap-mandatory scroll-pl-[calc(var(--hour-column)+--spacing(1.5))] [scrollbar-width:none] auto-rows-12 grid-cols-[var(--hour-column)_repeat(var(--date-count),minmax(56px,1fr))] grid-rows-[auto] gap-1.5 overflow-x-auto overscroll-x-contain [--hour-column:--spacing(12)] @max-grid-fit:data-scrolls:grid-cols-[var(--hour-column)_repeat(var(--date-count),max(56px,calc((100cqi_-_var(--hour-column)_-_5_*_--spacing(1.5))_/_4.4)))] [&::-webkit-scrollbar]:hidden"
+        className="grid snap-x snap-mandatory scroll-pl-[calc(var(--hour-column)+--spacing(1.5))] [scrollbar-width:none] auto-rows-12 grid-cols-[var(--hour-column)_repeat(var(--date-count),minmax(56px,1fr))] grid-rows-[auto] gap-1.5 overflow-x-auto overscroll-x-contain pb-1 [--hour-column:--spacing(12)] @max-grid-fit:data-scrolls:grid-cols-[var(--hour-column)_repeat(var(--date-count),max(56px,calc((100cqi_-_var(--hour-column)_-_5_*_--spacing(1.5))_/_4.4)))] [&::-webkit-scrollbar]:hidden"
         style={{ "--date-count": dates.length } as CSSProperties}
         data-scrolls={dates.length > 4 || undefined}
         data-paints={onStroke && true}

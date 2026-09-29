@@ -83,6 +83,21 @@ describe("DayHourGrid", () => {
     expect(rippled(grid)).toEqual([]);
   });
 
+  it("drops a ripple the browser cancels, so a hidden grid does not replay it", () => {
+    stubReducedMotion(false);
+    renderGrid();
+
+    const grid = dragFrom("pt 16, 17:00", "sb 17, 18:00");
+
+    fireEvent.pointerUp(grid, { pointerId: 1 });
+
+    within(grid)
+      .getAllByRole("gridcell")
+      .forEach((cell) => fireEvent(cell, new Event("animationcancel")));
+
+    expect(rippled(grid)).toEqual([]);
+  });
+
   it("keeps a committed drag still under reduced motion", () => {
     stubReducedMotion(true);
     renderGrid();

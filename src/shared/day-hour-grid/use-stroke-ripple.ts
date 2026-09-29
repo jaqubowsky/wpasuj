@@ -19,7 +19,10 @@ export function useStrokeRipple(gridRef: RefObject<HTMLDivElement | null>) {
 
       slot.style.setProperty("--ripple-step", String(Math.abs(column - fromColumn) + Math.abs(row - fromRow)));
       slot.dataset.ripple = "";
-      slot.addEventListener("animationend", () => delete slot.dataset.ripple, { once: true });
+
+      for (const done of ["animationend", "animationcancel"]) {
+        slot.addEventListener(done, () => delete slot.dataset.ripple, { once: true });
+      }
     });
   };
 }

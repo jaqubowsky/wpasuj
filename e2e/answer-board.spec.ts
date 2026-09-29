@@ -59,7 +59,7 @@ test("Board: a stroke ripples from its first cell, Zapisane flashes and fades", 
 
   const dragWith = testInfo.project.name === "phone-chromium" ? touchDrag : mouseDrag;
 
-  await dragWith(page, await centreOf(cellAt(page, 0, 0)), await centreOf(cellAt(page, 2, 1)), async () => {
+  await dragWith(page, await centreOf(cellAt(page, 1, 0)), await centreOf(cellAt(page, 3, 1)), async () => {
     await expect(page.locator('[data-state="adding"]')).toHaveCount(6);
     await page.screenshot({ path: `e2e/screenshots/board-answer-stroke-${testInfo.project.name}.png` });
   });
@@ -71,13 +71,18 @@ test("Board: a stroke ripples from its first cell, Zapisane flashes and fades", 
     );
 
   expect(ripple).toEqual([
-    [dates[0], "18", "0"],
-    [dates[1], "18", "1"],
-    [dates[0], "19", "1"],
-    [dates[1], "19", "2"],
-    [dates[0], "20", "2"],
-    [dates[1], "20", "3"],
+    [dates[0], "19", "0"],
+    [dates[1], "19", "1"],
+    [dates[0], "20", "1"],
+    [dates[1], "20", "2"],
+    [dates[0], "21", "2"],
+    [dates[1], "21", "3"],
   ]);
+
+  const lastRowCell = await cellAt(page, 3, 0).boundingBox();
+  const grid = await board(page).boundingBox();
+
+  expect(grid!.y + grid!.height).toBeGreaterThanOrEqual(lastRowCell!.y + lastRowCell!.height + 3);
 
   await expect(status).toHaveText("Zapisane");
   await expect(status).not.toHaveAttribute("data-faded");
