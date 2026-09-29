@@ -6,6 +6,7 @@ import { Text } from "@/shared/ui/text/text";
 import { dateMorph, Morph } from "@/shared/morph";
 import { useGridKeyboard } from "./use-grid-keyboard";
 import { usePaintStroke, type GridCell, type PaintedRectangle } from "./use-paint-stroke";
+import { useStrokeRipple } from "./use-stroke-ripple";
 
 export type { GridCell };
 
@@ -53,7 +54,20 @@ export function DayHourGrid({
   morphDates,
 }: DayHourGridProps) {
   const gridRef = useRef<HTMLDivElement>(null);
-  const stroke = usePaintStroke({ dates, hours, onStroke, onTap: onCellTap });
+  const ripple = useStrokeRipple(gridRef);
+
+  const stroke = usePaintStroke({
+    dates,
+    hours,
+    onStroke:
+      onStroke &&
+      ((rectangle, from) => {
+        onStroke(rectangle);
+        ripple(rectangle, from);
+      }),
+    onTap: onCellTap,
+  });
+
   const keyboard = useGridKeyboard({ gridRef, dates, hours, onStroke, firstRow: onDateTap ? 0 : 1, firstColumn: onHourTap ? 0 : 1 });
 
   return (
@@ -63,7 +77,7 @@ export function DayHourGrid({
         role="grid"
         aria-label={label}
         aria-multiselectable={onStroke && true}
-        className="grid snap-x snap-mandatory scroll-pl-[calc(var(--hour-column)+--spacing(1.5))] [scrollbar-width:none] auto-rows-12 grid-cols-[var(--hour-column)_repeat(var(--date-count),minmax(56px,1fr))] grid-rows-[auto] gap-1.5 overflow-x-auto overscroll-x-contain [--hour-column:--spacing(12)] @max-grid-fit:data-scrolls:grid-cols-[var(--hour-column)_repeat(var(--date-count),max(56px,calc((100cqi_-_var(--hour-column)_-_5_*_--spacing(1.5))_/_4.4)))] [&::-webkit-scrollbar]:hidden"
+        className="grid snap-x snap-mandatory scroll-pl-[calc(var(--hour-column)+--spacing(1.5))] [scrollbar-width:none] auto-rows-12 grid-cols-[var(--hour-column)_repeat(var(--date-count),minmax(56px,1fr))] grid-rows-[auto] gap-1.5 overflow-x-auto overscroll-x-contain pb-1 [--hour-column:--spacing(12)] @max-grid-fit:data-scrolls:grid-cols-[var(--hour-column)_repeat(var(--date-count),max(56px,calc((100cqi_-_var(--hour-column)_-_5_*_--spacing(1.5))_/_4.4)))] [&::-webkit-scrollbar]:hidden"
         style={{ "--date-count": dates.length } as CSSProperties}
         data-scrolls={dates.length > 4 || undefined}
         data-paints={onStroke && true}
@@ -148,7 +162,7 @@ export function DayHourGrid({
                     role="gridcell"
                     aria-colindex={position.column + 1}
                     aria-selected={selected}
-                    className="grid in-data-paints:touch-none [&>:first-child]:w-full"
+                    className="grid in-data-paints:touch-none data-ripple:animate-pop data-ripple:[animation-delay:calc(var(--ripple-step)*var(--duration-ripple))] [&>:first-child]:w-full"
                     data-row={position.row}
                     data-column={position.column}
                     data-date={date}

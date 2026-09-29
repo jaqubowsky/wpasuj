@@ -31,7 +31,7 @@ export function Input({ label, labelAside, variant, error, morph, ref, ...props 
         <input
           ref={input}
           id={inputId}
-          className="box-border h-14 w-full rounded-control border-0 bg-surface px-4 py-0 font-sans text-base font-medium text-ink shadow-[inset_0_0_0_1px_var(--color-edge)] placeholder:text-muted focus:shadow-[inset_0_0_0_2px_var(--color-ink)] focus:outline-none aria-invalid:not-focus:shadow-[inset_0_0_0_2px_var(--color-accent-ink)] data-[variant=compact]:h-13"
+          className="box-border h-14 w-full rounded-control border-0 bg-surface px-4 py-0 font-sans text-base font-medium text-ink not-data-[variant=compact]:shadow-[inset_0_0_0_1px_var(--color-edge)] placeholder:text-muted focus:outline-none not-data-[variant=compact]:focus:shadow-[inset_0_0_0_2px_var(--color-ink)] not-data-[variant=compact]:aria-invalid:not-focus:shadow-[inset_0_0_0_2px_var(--color-accent-ink)] data-[variant=compact]:h-13 data-[variant=compact]:rounded-none data-[variant=compact]:bg-transparent data-[variant=compact]:px-0 data-[variant=compact]:font-display data-[variant=compact]:text-2xl data-[variant=compact]:font-extrabold data-[variant=compact]:tracking-tight data-[variant=compact]:shadow-[inset_0_-3px_0_var(--color-ink)] data-[variant=compact]:focus:shadow-[inset_0_-5px_0_var(--color-ink)] data-[variant=compact]:aria-invalid:not-focus:shadow-[inset_0_-3px_0_var(--color-accent-ink)] lg:data-[variant=compact]:text-3xl"
           data-variant={variant}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}

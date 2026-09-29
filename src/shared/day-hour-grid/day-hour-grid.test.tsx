@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { stubReducedMotion } from "@/shared/testing/motion";
 import { Cell } from "@/shared/ui/cell/cell";
 import { DayHourGrid } from "./day-hour-grid";
 
@@ -36,7 +37,18 @@ function dragFrom(fromLabel: string, toLabel: string) {
   return screen.getByRole("grid");
 }
 
+function rippled(grid: HTMLElement) {
+  return within(grid)
+    .getAllByRole("gridcell")
+    .filter((cell) => cell.hasAttribute("data-ripple"))
+    .map((cell) => [cell.dataset.date, cell.dataset.hour, cell.style.getPropertyValue("--ripple-step")]);
+}
+
 describe("DayHourGrid", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it("paints the rectangle of a drag", () => {
     const { onStroke } = renderGrid();
 
@@ -45,6 +57,56 @@ describe("DayHourGrid", () => {
     fireEvent.pointerUp(grid, { pointerId: 1 });
 
     expect(onStroke).toHaveBeenCalledExactlyOnceWith({ dates: ["2026-10-16", "2026-10-17"], hours: [17, 18], mode: "add" });
+  });
+
+  it("ripples a committed drag out from its first cell, farther cells later", () => {
+    stubReducedMotion(false);
+    renderGrid();
+
+    const grid = dragFrom("sb 17, 18:00", "pt 16, 17:00");
+
+    expect(rippled(grid)).toEqual([]);
+
+    fireEvent.pointerUp(grid, { pointerId: 1 });
+
+    expect(rippled(grid)).toEqual([
+      ["2026-10-16", "17", "2"],
+      ["2026-10-17", "17", "1"],
+      ["2026-10-16", "18", "1"],
+      ["2026-10-17", "18", "0"],
+    ]);
+
+    within(grid)
+      .getAllByRole("gridcell")
+      .forEach((cell) => fireEvent.animationEnd(cell));
+
+    expect(rippled(grid)).toEqual([]);
+  });
+
+  it("drops a ripple the browser cancels, so a hidden grid does not replay it", () => {
+    stubReducedMotion(false);
+    renderGrid();
+
+    const grid = dragFrom("pt 16, 17:00", "sb 17, 18:00");
+
+    fireEvent.pointerUp(grid, { pointerId: 1 });
+
+    within(grid)
+      .getAllByRole("gridcell")
+      .forEach((cell) => fireEvent(cell, new Event("animationcancel")));
+
+    expect(rippled(grid)).toEqual([]);
+  });
+
+  it("keeps a committed drag still under reduced motion", () => {
+    stubReducedMotion(true);
+    renderGrid();
+
+    const grid = dragFrom("pt 16, 17:00", "sb 17, 18:00");
+
+    fireEvent.pointerUp(grid, { pointerId: 1 });
+
+    expect(rippled(grid)).toEqual([]);
   });
 
   it("drops a drag the browser cancels", () => {

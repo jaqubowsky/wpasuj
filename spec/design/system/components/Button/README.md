@@ -10,6 +10,7 @@ An action, labelled with what it does: "Utwórz i wyślij na grupę", "Ustal ten
 - `loud`: `ink` with white text, 56px tall at `text-lg`, on a `heat-5` ledge. The landing's calls to create a poll (ADR 0034).
 - `loud-light`: the same on `paper` with an `accent` ledge, for an `ink` section, where an `ink` ledge would vanish.
 - `danger`: `accent-ink` with white text on an `ink` ledge.
+- `aria-pressed`: a toggle ("Nie mogę w żadnym terminie" under the grid). Unpressed it is the default look; pressed it turns `ink` with white text on a `heat-5` ledge, like a pressed Chip.
 - `text`: a quiet underlined action in `muted`; still `size-target` of hit area.
 - `data-size="small"`: 44px on the smaller ledge (`shadow-ledge-sm`, `-sm-up`, `-sm-down`: 5, 7 and 1px), desktop toolbars only; on the phone buttons are `size-button` tall.
 - Disabled buttons are avoided: explain what is missing instead. Where unavoidable, 40% opacity.

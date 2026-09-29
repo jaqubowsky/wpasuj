@@ -1,5 +1,6 @@
 "use client";
 
+import { Board } from "@/shared/ui/board/board";
 import { Sheet } from "@/shared/ui/sheet/sheet";
 import { Text } from "@/shared/ui/text/text";
 import { useMediaQuery } from "@/shared/use-media-query";
@@ -21,16 +22,16 @@ export function ResultsBody() {
 
   if (respondents.length === 0) {
     return (
-      <section className="grid gap-3 rounded-card bg-surface p-5">
+      <Board>
         <Text variant="body">Nikt jeszcze nie odpowiedział. Wyślij link na grupę.</Text>
         {refreshProblem}
-      </section>
+      </Board>
     );
   }
 
   return (
-    <section className="grid gap-3 rounded-card bg-surface p-4 lg:gap-4 lg:p-6">
-      <p className="m-0 flex h-12 items-center text-base text-muted">Kliknij godzinę, żeby zobaczyć, kto może.</p>
+    <Board>
+      <p className="m-0 text-base text-muted">Kliknij godzinę, żeby zobaczyć, kto może.</p>
       <Heatmap results={results} isSelected={selection.isSelected} onCellTap={selection.toggle} />
       {refreshProblem}
       {selection.selected && !desktop && (
@@ -38,6 +39,6 @@ export function ResultsBody() {
           <CellSheetContent cell={selection.selected} results={results} organiserKey={organiserKey} />
         </Sheet>
       )}
-    </section>
+    </Board>
   );
 }
