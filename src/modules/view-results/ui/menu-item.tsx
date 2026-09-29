@@ -31,7 +31,7 @@ const icons = {
 type Icon = keyof typeof icons;
 
 const itemLook =
-  "group/item box-border flex h-14.5 w-full cursor-pointer items-center gap-3 rounded-control border-0 bg-transparent px-3 text-left font-sans text-base font-bold text-ink no-underline transition-[background-color,translate] duration-(--duration-fill) ease-out hover:bg-heat-1 focus-visible:outline-2 focus-visible:outline-ink data-danger:text-accent-ink motion-safe:hover:translate-x-1";
+  "group/item box-border flex h-14.5 w-full cursor-pointer items-center gap-3 rounded-control border-0 bg-transparent px-3 text-left font-sans text-base font-semibold text-ink no-underline transition-[background-color,translate] duration-(--duration-fill) ease-out hover:bg-heat-1 focus-visible:outline-2 focus-visible:outline-ink data-danger:text-accent-ink motion-safe:hover:translate-x-1";
 
 function ItemIcon({ icon }: { icon: Icon }) {
   return (

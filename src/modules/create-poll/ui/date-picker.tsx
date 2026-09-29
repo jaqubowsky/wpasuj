@@ -37,7 +37,7 @@ export function DatePicker({ dates, picker }: DatePickerProps) {
           <Morph key={date} name={dates.includes(date) ? dateMorph(date) : undefined}>
             <button
               type="button"
-              className="flex h-11 cursor-pointer flex-col items-center justify-center rounded-cell border-0 bg-surface font-sans text-base font-extrabold text-ink tabular-nums shadow-[inset_0_0_0_1px_var(--color-edge)] transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink disabled:cursor-default disabled:bg-transparent disabled:text-muted disabled:shadow-none aria-pressed:shadow-none aria-pressed:enabled:bg-accent aria-pressed:enabled:shadow-ledge-sm aria-pressed:enabled:shadow-heat-5 data-today:not-aria-pressed:shadow-[inset_0_0_0_2px_var(--color-ink)] motion-safe:active:scale-96"
+              className="flex h-11 cursor-pointer flex-col items-center justify-center rounded-cell border-0 bg-surface font-sans text-base font-semibold text-ink tabular-nums shadow-[inset_0_0_0_1px_var(--color-edge)] transition-transform duration-(--duration-fill) ease-out focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink disabled:cursor-default disabled:bg-transparent disabled:text-muted disabled:shadow-none aria-pressed:shadow-none aria-pressed:enabled:bg-accent aria-pressed:enabled:shadow-ledge-sm aria-pressed:enabled:shadow-heat-5 data-today:not-aria-pressed:shadow-[inset_0_0_0_2px_var(--color-ink)] motion-safe:active:scale-96"
               aria-label={fullDate(date)}
               aria-pressed={dates.includes(date)}
               data-today={date === picker.today || undefined}
