@@ -19,6 +19,7 @@ export async function landingCardImage() {
       style={{
         width: "100%",
         height: "100%",
+        position: "relative",
         display: "flex",
         alignItems: "center",
         gap: 64,
@@ -28,15 +29,15 @@ export async function landingCardImage() {
         fontFamily: "Onest",
       }}
     >
-      <div style={{ flex: 1, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <div style={{ display: "flex", flexWrap: "wrap", width: 34, gap: 4 }}>
-            {[accent, tintCoral, tintCoral, accent].map((colour, index) => (
-              <div key={index} style={{ width: 15, height: 15, borderRadius: 4, background: colour }} />
-            ))}
-          </div>
-          <div style={{ fontFamily: "Bricolage Grotesque", fontWeight: 800, fontSize: 34, letterSpacing: "-0.03em" }}>{productName}</div>
+      <div style={{ position: "absolute", top: 56, left: 72, display: "flex", alignItems: "center", gap: 14 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", width: 34, gap: 4 }}>
+          {[accent, tintCoral, tintCoral, accent].map((colour, index) => (
+            <div key={index} style={{ width: 15, height: 15, borderRadius: 4, background: colour }} />
+          ))}
         </div>
+        <div style={{ fontFamily: "Bricolage Grotesque", fontWeight: 800, fontSize: 34, letterSpacing: "-0.03em" }}>{productName}</div>
+      </div>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 24 }}>
         <div style={{ fontFamily: "Bricolage Grotesque", fontWeight: 800, fontSize: 76, lineHeight: "80px", letterSpacing: "-0.03em" }}>
           {headline}
         </div>
