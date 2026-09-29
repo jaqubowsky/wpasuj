@@ -30,7 +30,7 @@ export function PeopleList({ groups, you, organiserKey, arrived }: PeopleListPro
           </h3>
           <span>{group.people.length}</span>
         </div>
-        <ul className="-mx-1.5 my-0 list-none p-0" aria-label={group.label}>
+        <ul className="-mx-1.5 my-0 grid list-none gap-1 p-0" aria-label={group.label}>
           {group.people.map((person) => {
             const isYou = person.normalisedName === you;
             const isOrganiser = person.normalisedName === organiserKey;
