@@ -8,6 +8,7 @@ import { ResultsBody } from "./results-body";
 import { ResultsProvider } from "./results-provider";
 import { WhilePollLives } from "./while-poll-lives";
 import type { Results } from "../server/results-schema";
+import { stubReducedMotion } from "@/shared/testing/motion";
 
 const saturday = "2030-10-19";
 const sunday = "2030-10-20";
@@ -72,10 +73,10 @@ const answered = () =>
     .map((row) => row.textContent);
 
 describe("Results", () => {
-  it("shows only the best time, never who cannot make it", () => {
+  it("shows only the best time and how many of everyone can make it, never who cannot", () => {
     renderResults({ ...threeAnswers, respondents: [...threeAnswers.respondents, answer("Zosia", minutesBefore(5), [])] });
 
-    expect(screen.getByRole("region", { name: "Najlepiej teraz" })).toHaveTextContent(/^Najlepiej terazSobota 19\.10, 18–20$/);
+    expect(screen.getByRole("region", { name: "Najlepiej teraz" })).toHaveTextContent(/^Najlepiej terazSobota 19\.10, 18–203 z 4 może$/);
   });
 
   it("counts who can in every hour and marks neither the best time nor where everyone can", () => {
@@ -109,6 +110,14 @@ describe("Results", () => {
         .getAllByRole("listitem")
         .map((item) => item.textContent),
     ).toEqual(["OOla, organizator, nie może"]);
+
+    expect(
+      within(within(details).getByRole("list", { name: "Może" }))
+        .getAllByRole("listitem")
+        .map((item) => item.hasAttribute("data-can")),
+    ).toEqual([true, true]);
+
+    expect(within(within(details).getByRole("list", { name: "Nie może" })).getByRole("listitem")).not.toHaveAttribute("data-can");
 
     fireEvent.click(details);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -181,6 +190,8 @@ describe("Results refreshing", () => {
   afterEach(() => {
     vi.useRealTimers();
     vi.unstubAllGlobals();
+    Reflect.deleteProperty(HTMLElement.prototype, "animate");
+    document.querySelectorAll("[data-tile-burst]").forEach((tile) => tile.remove());
   });
 
   it("shows another answer within 10 seconds, the request included", async () => {
@@ -218,6 +229,38 @@ describe("Results refreshing", () => {
 
     expect(fetch).toHaveBeenCalledOnce();
     expect(answered()).toHaveLength(4);
+  });
+
+  it("pulses the best time and throws tiles only when it changes, not on load", async () => {
+    vi.useFakeTimers();
+    stubReducedMotion(false);
+    HTMLElement.prototype.animate = vi.fn();
+
+    const sundayOnly = {
+      ...threeAnswers,
+      respondents: [
+        answer("Ola", minutesBefore(0), [[sunday, 17]]),
+        answer("Bartek", minutesBefore(0), [[sunday, 17]]),
+        answer("Kasia", minutesBefore(0), []),
+      ],
+    };
+
+    answerWith(Response.json(threeAnswers), Response.json(sundayOnly), Response.json(sundayOnly));
+    renderResults(threeAnswers);
+    const best = () => within(screen.getByRole("region", { name: "Najlepiej teraz" })).getByText("Najlepiej teraz").parentElement;
+
+    expect(best()).not.toHaveAttribute("data-pulse");
+
+    await wait(9_000);
+
+    expect(best()).not.toHaveAttribute("data-pulse");
+    expect(document.querySelectorAll("[data-tile-burst]")).toHaveLength(0);
+
+    await wait(9_000);
+
+    expect(best()).toHaveTextContent("Niedziela 20.10, 17–182 z 3 może");
+    expect(best()).toHaveAttribute("data-pulse");
+    expect(document.querySelectorAll("[data-tile-burst]")).not.toHaveLength(0);
   });
 
   it("says the poll is gone once the read answers 404, and stops asking", async () => {

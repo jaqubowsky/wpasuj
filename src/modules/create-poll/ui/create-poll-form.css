@@ -28,3 +28,15 @@
     transform: translateY(100%);
   }
 }
+
+@keyframes create-hour-pop {
+  50% {
+    transform: scale(1.12) rotate(-3deg);
+  }
+}
+
+@keyframes create-hour-nudge {
+  50% {
+    transform: translateX(calc(var(--spacing) * 1));
+  }
+}

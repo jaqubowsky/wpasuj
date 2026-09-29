@@ -37,7 +37,7 @@ The home page is the create form; there is no separate landing page on the app's
    - "Dziś" and "Jutro" are those dates. "Ten weekend" is this week's Friday to Sunday, without past days. "Przyszły tydzień" is next Monday to Sunday.
    - A chip adds its dates; tapping a lit chip removes them. A chip is lit while all its dates are selected. A tap that would go past 10 dates changes nothing and says "Maksymalnie 10 dni".
    - "Today" and "past" use the organiser's device date.
-3. **O której?** "Od" and "Do", always visible, 17:00 to 23:00 by default, any whole-hour range of 1 to 24 hours (WPA-44). On the phone each field opens a bottom sheet with two hour columns; on desktop 24 hour tiles in rows of eight, ordered 6 to 5, the hour number only. A first click marks its tile in `ink` as the start and the summary reads "Od 2:00, teraz kliknij koniec"; a second click makes the clicked tile the last hour, counting on past 5 into the next morning when it comes earlier in that order, so 2 then 8 is 2:00 → 9:00 · 7 godzin. The ends are `ink`, the hours between `heat-2`. A summary under both reads "22:00 → 4:00 · 6 godzin". No presets, no "rano" or "następnego dnia" labels: the order carries it.
+3. **O której?** "Od" and "Do", always visible, 17:00 to 23:00 by default, any whole-hour range of 1 to 24 hours (WPA-44). On the phone each field opens a bottom sheet with two hour columns; on desktop 24 hour tiles in rows of eight, ordered 6 to 5, the hour number only. A first click marks its tile in `ink` as the start and the summary turns `ink` and reads "Od 2:00 kliknij ostatnią godzinę →" (ADR 0035); a second click makes the clicked tile the last hour, counting on past 5 into the next morning when it comes earlier in that order, so 2 then 8 is 2:00 → 9:00 · 7 godzin. The ends are `ink`, the hours between `heat-2`. A summary under both reads "22:00 → 4:00 · 6 godzin". No presets, no "rano" or "następnego dnia" labels: the order carries it.
 4. **Twoje imię**, prefilled with the last name used on this device. It becomes the organiser's answer name and is shown as "{imię} pyta".
 
 A sticky bottom button "Utwórz i wyślij na grupę". On the phone it opens the native share sheet (`navigator.share`) with "Kiedy możecie? {title} {link}"; where sharing is unavailable it copies the link and says "Link skopiowany". The organiser then lands on the poll page on "Moje".
@@ -191,7 +191,7 @@ Counts on heat cells are `ink`, white only on `heat-5`. Avatars take their tint 
 - A tapped cell fills in 120 ms with a 0.96 press scale.
 - A heat cell whose count rises bumps to 1.08 scale for 180 ms.
 - A new respondent's avatar pops in with a slight overshoot (320 ms, `cubic-bezier(.3,1.5,.5,1)`).
-- The best-time card cross-fades its text when the best time changes.
+- The best-time card pulses once and throws a tile burst when the best time changes (ADR 0035).
 - The "Moje" and "Wszyscy" switch uses a View Transition where the browser has one.
 - The bottom sheet slides up in 200 ms ease-out.
 - Only `transform` and `opacity` animate; no confetti; `prefers-reduced-motion` removes all of it.

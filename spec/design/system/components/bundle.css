@@ -113,7 +113,7 @@ body { margin: 0; padding: 16px; background: var(--paper); color: var(--ink); fo
 .wp-stepper output { min-width: 64px; text-align: center; font: 700 22px/26px var(--font-display); }
 
 .wp-card { background: var(--surface); border-radius: var(--radius-card); padding: var(--space-5); color: var(--ink); }
-.wp-card[data-tone="ink"] { background: var(--ink); color: #fff; }
+.wp-card[data-tone="ink"] { background: var(--ink); color: #fff; box-shadow: 0 8px 0 -1px var(--heat-5); }
 .wp-card[data-tone="ink"] .wp-card-label { color: var(--on-dark-muted); }
 .wp-card[data-size="compact"] { border-radius: var(--radius-control); padding: 12px 16px; }
 .wp-card-label { display: block; font-size: 13px; line-height: 18px; font-weight: 500; color: var(--muted); }

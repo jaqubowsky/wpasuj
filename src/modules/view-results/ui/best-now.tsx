@@ -4,17 +4,14 @@ import { Card } from "@/shared/ui/card/card";
 import { Text } from "@/shared/ui/text/text";
 import { bestTimes } from "../domain/best-time";
 import { longRunLabel, runParts } from "../domain/time-label";
-import "./best-now.css";
 import { useResultsContext } from "./results-provider";
+import { useBurstOnChange } from "./use-burst-on-change";
 
-function BestTime({ run, changed }: { run: Parameters<typeof runParts>[0]; changed?: boolean }) {
+function BestTime({ run }: { run: Parameters<typeof runParts>[0] }) {
   const { day, hours } = runParts(run);
 
   return (
-    <p
-      className="m-0 mt-1 data-changed:animate-[best-now-cross-fade_var(--duration-sheet)_var(--ease-out)]"
-      data-changed={changed || undefined}
-    >
+    <p className="m-0">
       <Text variant="best-time">
         {day}, <span className="whitespace-nowrap">{hours}</span>
       </Text>
@@ -24,17 +21,24 @@ function BestTime({ run, changed }: { run: Parameters<typeof runParts>[0]; chang
 
 export function BestNow() {
   const { results, previous } = useResultsContext();
+  const [best] = bestTimes(results.dates, results.hours, results.respondents);
+  const [previousBest] = previous ? bestTimes(previous.dates, previous.hours, previous.respondents) : [];
+  const bestLabel = best && longRunLabel(best);
+  const section = useBurstOnChange<HTMLElement>(bestLabel);
 
   if (results.respondents.length === 0) return null;
 
-  const [best] = bestTimes(results.dates, results.hours, results.respondents);
-  const [previousBest] = previous ? bestTimes(previous.dates, previous.hours, previous.respondents) : [];
-
   return (
-    <section aria-label="Najlepiej teraz">
-      <Card tone="ink" label="Najlepiej teraz">
+    <section ref={section} aria-label="Najlepiej teraz">
+      <Card key={bestLabel} tone="ink" label="Najlepiej teraz" pulse={!!previousBest && !!best && longRunLabel(previousBest) !== bestLabel}>
         {best ? (
-          <BestTime key={longRunLabel(best)} run={best} changed={previousBest && longRunLabel(previousBest) !== longRunLabel(best)} />
+          <div className="mt-1 flex items-end justify-between gap-3">
+            <BestTime run={best} />
+            <span className="font-display text-lg font-extrabold whitespace-nowrap text-heat-3">
+              {best.free.length} z {results.respondents.length}
+              <span className="sr-only"> może</span>
+            </span>
+          </div>
         ) : (
           <p className="m-0 mt-1">
             <Text variant="body">Na razie nikt nie może w żadnym terminie.</Text>
