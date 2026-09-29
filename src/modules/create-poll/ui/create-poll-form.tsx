@@ -18,7 +18,7 @@ export function CreatePollForm() {
   const { dates, picker } = useDateSelection();
   const hours = useHourRange();
   const [name, setName] = useOrganiserName();
-  const { submit, status, isInvalid } = useCreatePoll({ title, dates, ...hours.range, organiserName: name });
+  const { submit, status, isInvalid, fieldRef } = useCreatePoll({ title, dates, ...hours.range, organiserName: name });
 
   return (
     <form
@@ -34,12 +34,13 @@ export function CreatePollForm() {
         placeholder="Co robimy?"
         maxLength={60}
         morph={pollTitleMorph}
+        ref={fieldRef("title")}
         value={title}
         onChange={(event) => setTitle(event.target.value)}
         error={isInvalid("title") ? "Wpisz, co robicie" : undefined}
       />
       <div className="-mx-3 flex flex-col gap-6 rounded-card bg-surface p-3 pb-0 shadow-poster lg:mx-0 lg:p-6">
-        <fieldset className="m-0 min-w-0 border-0 p-0">
+        <fieldset ref={fieldRef("dates")} className="m-0 min-w-0 border-0 p-0">
           <legend className="mb-3 p-0 font-display text-lg font-bold tracking-tight normal-nums">Kiedy?</legend>
           {picker ? <DatePicker dates={dates} picker={picker} /> : <PendingDatePicker />}
           {isInvalid("dates") && <p className="mt-2 mb-0 text-sm font-medium text-accent-ink">Wybierz co najmniej jeden dzień</p>}
@@ -53,6 +54,7 @@ export function CreatePollForm() {
           autoComplete="given-name"
           enterKeyHint="done"
           maxLength={30}
+          ref={fieldRef("organiserName")}
           value={name}
           onChange={(event) => setName(event.target.value)}
           error={isInvalid("organiserName") ? "Wpisz swoje imię" : undefined}

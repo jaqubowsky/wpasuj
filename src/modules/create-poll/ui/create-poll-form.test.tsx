@@ -29,6 +29,7 @@ function date(name: RegExp) {
 }
 
 beforeEach(() => {
+  Element.prototype.scrollIntoView = () => {};
   vi.useFakeTimers({ toFake: ["Date"] });
   vi.setSystemTime(thursdayMorning);
   localStorage.clear();
@@ -200,6 +201,24 @@ describe("Utwórz i wyślij na grupę", () => {
     expect(screen.getByText("Wybierz co najmniej jeden dzień")).toBeInTheDocument();
     expect(screen.getByText("Wpisz swoje imię")).toBeInTheDocument();
     expect(createPoll).not.toHaveBeenCalled();
+  });
+
+  it("moves focus into the first field that is missing", async () => {
+    render(<CreatePollForm />);
+
+    await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
+
+    expect(screen.getByRole("textbox", { name: "Co robimy?" })).toHaveFocus();
+
+    await userEvent.type(screen.getByRole("textbox", { name: "Co robimy?" }), "Kino");
+    await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
+
+    expect(screen.getByRole("group", { name: "Kiedy?" })).toContainElement(document.activeElement as HTMLElement);
+
+    await userEvent.click(screen.getByRole("button", { name: "Jutro" }));
+    await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
+
+    expect(screen.getByRole("textbox", { name: "Twoje imię" })).toHaveFocus();
   });
 
   it("creates the poll and lands on it marked as fresh, without opening the share sheet", async () => {

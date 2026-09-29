@@ -276,6 +276,39 @@ test("a create that fails says the poll was not created and to check the connect
   await saveScreenshot(page, testInfo, "create-failed");
 });
 
+const scrollToCreateBar = (page: Page) =>
+  page
+    .getByRole("region", { name: "Twoja kolej" })
+    .locator("form")
+    .evaluate((form) => form.scrollIntoView({ block: "end" }));
+
+const titleError = (page: Page) => page.getByText("Wpisz, co robicie");
+
+test("a submit with no title brings the title and its error into view, clear of the header and the create bar", async ({
+  page,
+}, testInfo) => {
+  await page.goto("/");
+  await expect(days(page).first()).toBeVisible();
+  await scrollToCreateBar(page);
+  await expect(titleError(page)).toHaveCount(0);
+
+  await createButton(page).click();
+
+  await expect(page.getByRole("textbox", { name: "Co robimy?" })).toBeFocused();
+
+  await expect(async () => {
+    const error = (await titleError(page).boundingBox())!;
+    const header = (await page.getByRole("banner").boundingBox())!;
+    const bar = (await createButton(page).locator("..").boundingBox())!;
+
+    expect(error.y).toBeGreaterThanOrEqual(header.y + header.height);
+    expect(error.y + error.height).toBeLessThanOrEqual(Math.min(bar.y, page.viewportSize()!.height));
+  }).toPass();
+
+  await settleAnimations(page);
+  await page.screenshot({ path: `e2e/screenshots/create-invalid-title-${testInfo.project.name}.png` });
+});
+
 test("the month and the 10-day limit", async ({ page }, testInfo) => {
   await page.goto("/");
 
@@ -433,5 +466,22 @@ test.describe("with reduced motion", () => {
 
     expect(await moved()).toEqual([]);
     expect(await page.evaluate(() => document.getAnimations().length)).toBe(0);
+  });
+
+  test("a submit with no title jumps to the title instead of scrolling there", async ({ page }, testInfo) => {
+    test.skip(!testInfo.project.name.startsWith("phone"), "on the desktop the title is on screen before the submit");
+    await page.goto("/");
+    await expect(days(page).first()).toBeVisible();
+    await scrollToCreateBar(page);
+
+    await createButton(page).click();
+
+    const shown = await titleError(page).evaluate((error) => {
+      const { top, bottom } = error.getBoundingClientRect();
+
+      return top >= 0 && bottom <= innerHeight;
+    });
+
+    expect(shown).toBe(true);
   });
 });
