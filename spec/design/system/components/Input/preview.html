@@ -1,4 +1,4 @@
-<!-- @dsCard group="Inputs" height=300 subtitle="Text field, error" -->
+<!-- @dsCard group="Inputs" height=300 subtitle="Text field, error, compact name" -->
 <!doctype html>
 <html>
 <head><meta charset="utf-8"><title>Input</title></head>
@@ -6,6 +6,7 @@
 <div class="wp-stack" style="gap:20px;max-width:358px">
   <label class="wp-field"><span>Jak masz na imię?</span><input class="wp-input" placeholder="Twoje imię" autocomplete="given-name"></label>
   <label class="wp-field"><span>Jak masz na imię?</span><input class="wp-input" value="Ola" aria-invalid="true"><small data-error>To imię już jest w tej ankiecie.</small></label>
+  <label class="wp-field"><span>Twoje imię</span><input class="wp-input" data-variant="compact" value="Zuza" autocomplete="given-name"></label>
 </div>
 </body>
 </html>

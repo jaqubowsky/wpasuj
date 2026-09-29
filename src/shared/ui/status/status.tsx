@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 const words = {
   saving: "Zapisuję",
   saved: "Zapisane",
@@ -15,16 +17,41 @@ const glyphs = {
   ),
 };
 
+const savedFor = 1600;
+
 type StatusProps = {
   state?: keyof typeof words;
 };
 
+function useFadesWhenSaved(state: StatusProps["state"]) {
+  const [shown, setShown] = useState(state);
+  const [faded, setFaded] = useState(false);
+
+  if (shown !== state) {
+    setShown(state);
+    setFaded(false);
+  }
+
+  useEffect(() => {
+    if (state !== "saved") return;
+
+    const timer = setTimeout(() => setFaded(true), savedFor);
+
+    return () => clearTimeout(timer);
+  }, [state]);
+
+  return faded;
+}
+
 export function Status({ state }: StatusProps) {
+  const faded = useFadesWhenSaved(state);
+
   return (
     <span
-      className="inline-flex items-center gap-1.5 text-sm font-medium text-muted data-[state=failed]:text-accent-ink"
+      className="inline-flex items-center gap-1.5 text-sm font-medium text-muted transition-opacity duration-(--duration-turn) ease-out data-faded:opacity-0 data-[state=failed]:text-accent-ink data-[state=saved]:font-bold data-[state=saved]:text-accent-ink"
       role="status"
       data-state={state}
+      data-faded={faded || undefined}
     >
       {state && (
         <>
