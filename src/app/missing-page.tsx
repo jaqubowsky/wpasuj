@@ -3,7 +3,7 @@ import { GridMark } from "@/shared/ui/grid-mark/grid-mark";
 
 export function MissingPage({ heading, line }: { heading: string; line: string }) {
   return (
-    <main className="flex flex-col items-center justify-center gap-4 pt-24 pb-8 text-center">
+    <main className="flex flex-col items-center justify-center gap-4 pt-24 pb-8 text-center lg:pt-32">
       <GridMark />
       <h1 className="m-0 font-display text-3xl font-bold tracking-tighter text-balance lg:text-4xl">{heading}</h1>
       <p className="m-0 text-base text-muted">{line}</p>

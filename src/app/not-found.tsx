@@ -1,6 +1,6 @@
+import { PageFrame } from "@/shared/ui/page-frame/page-frame";
 import { AppHeader } from "./app-header";
 import { MissingPage } from "./missing-page";
-import { PageFrame } from "./page-frame";
 
 export default function NotFound() {
   return (

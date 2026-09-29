@@ -374,3 +374,12 @@ test("a cell reached by the keyboard is never hidden under the sticky top bar", 
 
   expect(cell!.y).toBeGreaterThanOrEqual(bar!.y + bar!.height);
 });
+
+test("the top bar, the poster and the page body start at one left edge", async ({ browser }) => {
+  const page = await openAs(browser, seedBoardPoll().pollId);
+  const starts = [page.getByRole("button", { name: /na górę strony/ }), page.getByRole("heading", { level: 1 }), page.getByRole("tablist")];
+
+  const lefts = await Promise.all(starts.map(async (start) => Math.round((await start.boundingBox())!.x)));
+
+  expect(new Set(lefts).size, lefts.join(", ")).toBe(1);
+});
