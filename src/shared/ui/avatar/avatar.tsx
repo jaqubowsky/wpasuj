@@ -1,10 +1,11 @@
 import { tintOf } from "@/shared/tint";
+import { Icon } from "../icon/icon";
 import "./avatar.css";
 
 const badges = {
-  organiser: <path d="M3 7l4.5 4L12 4l4.5 7L21 7l-2 12H5z" fill="currentColor" />,
-  cannot: <path d="M18 6 6 18M6 6l12 12" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />,
-};
+  organiser: "crown",
+  cannot: "cross",
+} as const;
 
 type AvatarProps = {
   name: string;
@@ -35,9 +36,7 @@ export function Avatar({ name, tintKey, pop, you, mark, stack }: AvatarProps) {
           className="absolute -right-0.5 -bottom-0.5 z-1 box-border grid size-3.5 place-items-center rounded-pill border-2 border-solid border-surface bg-ink text-surface"
           aria-hidden="true"
         >
-          <svg className="size-2" viewBox="0 0 24 24">
-            {badges[mark]}
-          </svg>
+          <Icon name={badges[mark]} size={8} />
         </span>
       )}
     </span>

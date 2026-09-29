@@ -4,6 +4,7 @@ import { DayHourGrid } from "@/shared/day-hour-grid/day-hour-grid";
 import { Board } from "@/shared/ui/board/board";
 import { Button } from "@/shared/ui/button/button";
 import { Cell } from "@/shared/ui/cell/cell";
+import { Icon } from "@/shared/ui/icon/icon";
 import { useAnswerContext } from "./answer-provider";
 
 export function AnswerBody() {
@@ -39,20 +40,7 @@ export function AnswerBody() {
       </div>
       {!answer.asksToMark && (
         <Button block aria-pressed={answer.saidCant} onClick={answer.saidCant ? answer.undoCant : answer.cantMakeAny}>
-          {answer.saidCant && (
-            <svg
-              className="size-4.5 flex-none"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M20 6 9 17l-5-5" />
-            </svg>
-          )}
+          {answer.saidCant && <Icon name="check" />}
           Nie mogę w żadnym terminie
         </Button>
       )}

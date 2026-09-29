@@ -1,5 +1,6 @@
 "use client";
 
+import { Icon } from "@/shared/ui/icon/icon";
 import { Sheet } from "@/shared/ui/sheet/sheet";
 import { useMediaQuery } from "@/shared/use-media-query";
 import { useState } from "react";
@@ -48,19 +49,9 @@ export function AllVotes() {
           ))}
         </span>
         <span className="grow">Zobacz wszystkie głosy</span>
-        <svg
-          className="size-4.5 flex-none data-open:rotate-90 motion-safe:transition-transform"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-          data-open={(desktop && open) || undefined}
-        >
-          <path d="m9 18 6-6-6-6" />
-        </svg>
+        <span className="flex flex-none data-open:rotate-90 motion-safe:transition-transform" data-open={(desktop && open) || undefined}>
+          <Icon name="chevron-right" />
+        </span>
       </button>
       {open &&
         (desktop ? (

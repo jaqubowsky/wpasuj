@@ -1,4 +1,5 @@
 import { productName } from "@/shared/brand";
+import { Icon } from "@/shared/ui/icon/icon";
 import { accent, heat, ink, muted, ogCardSize, ogFont, onDarkMuted, paper, surface, tints } from "@/shared/og-card";
 import { ImageResponse } from "next/og";
 import type { ReactElement } from "react";
@@ -13,26 +14,6 @@ export const linkPreviewSize = ogCardSize;
 
 const avatarSize = 68;
 const longTitle = 34;
-
-const calendarIcon = "M4 6h16v14H4zM4 10h16M8 3v4M16 3v4";
-const clockIcon = "M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18M12 7v5l3 2";
-
-function Icon({ path }: { path: string }) {
-  return (
-    <svg
-      width="32"
-      height="32"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={accent}
-      strokeWidth="2.25"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d={path} />
-    </svg>
-  );
-}
 
 function AvatarRow({ avatars, more, label, onInk }: Pick<Avatars, "avatars" | "more"> & { label: string; onInk?: boolean }) {
   const avatarStyle = {
@@ -128,13 +109,15 @@ function OpenCard(poll: PreviewedPoll) {
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 14, fontSize: 32, lineHeight: "40px", fontWeight: 500 }}>
         <div style={{ display: "flex", alignItems: "flex-start", gap: 16 }}>
-          <div style={{ display: "flex", paddingTop: 4 }}>
-            <Icon path={calendarIcon} />
+          <div style={{ display: "flex", paddingTop: 4, color: accent }}>
+            <Icon name="calendar-square" size={32} stroke={2.25} />
           </div>
           <div style={{ display: "block", lineClamp: 2, flex: 1 }}>{days}</div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <Icon path={clockIcon} />
+          <div style={{ display: "flex", color: accent }}>
+            <Icon name="clock" size={32} stroke={2.25} />
+          </div>
           {hours}
         </div>
       </div>
@@ -178,18 +161,7 @@ function SetCard({ final, ...poll }: PreviewedPoll & { final: FinalTime }) {
             fontWeight: 600,
           }}
         >
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke={ink}
-            strokeWidth="2.75"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M20 6 9 17l-5-5" />
-          </svg>
+          <Icon name="check" size={24} stroke={2.75} />
           Ustalone
         </div>
         <div style={{ display: "block", lineClamp: 1, flex: 1, fontSize: 28, fontWeight: 600, color: onDarkMuted }}>{setBy}</div>

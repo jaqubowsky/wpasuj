@@ -45,4 +45,5 @@ Wpasuj finds a time for a group of friends: one link in the group chat, everyone
 ## Icons
 
 - Lucide at 18px with a 1.5 stroke, always beside a word; no icon-only buttons. The save states use their own 16px check, ring and alert glyphs in the text colour.
+- Every icon is a named drawing in `Icon` (components/Icon), the one place an icon is drawn.
 - No logo file exists yet: set the name "Wpasuj" in `wordmark`.
