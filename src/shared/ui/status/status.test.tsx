@@ -61,4 +61,11 @@ describe("Status", () => {
 
     expect(screen.getByRole("status")).not.toHaveAttribute("data-faded");
   });
+
+  it("opens on an answer saved earlier with Zapisane already faded, so nothing moves on load", () => {
+    render(<Status state="saved" />);
+
+    expect(screen.getByRole("status")).toHaveAttribute("data-faded");
+    expect(screen.getByRole("status")).toHaveTextContent("Zapisane");
+  });
 });

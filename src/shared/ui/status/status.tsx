@@ -25,7 +25,7 @@ type StatusProps = {
 
 function useFadesWhenSaved(state: StatusProps["state"]) {
   const [shown, setShown] = useState(state);
-  const [faded, setFaded] = useState(false);
+  const [faded, setFaded] = useState(state === "saved");
 
   if (shown !== state) {
     setShown(state);
