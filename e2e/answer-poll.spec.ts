@@ -1,6 +1,6 @@
 import type { Browser, Locator, Page, Request, TestInfo } from "@playwright/test";
 import { expect, test } from "./fixtures";
-import { centreOf, mouseDrag, touchDrag } from "./pointer";
+import { centresOf, mouseDrag, touchDrag } from "./pointer";
 import { saveScreenshot } from "./screenshot";
 import { seedAnswer, seedPoll } from "./seed";
 
@@ -47,7 +47,7 @@ function cellAt(page: Page, hourIndex: number, dateIndex: number) {
 async function drag(page: Page, testInfo: TestInfo, from: Locator, to: Locator, beforeRelease?: () => Promise<void>) {
   const dragWith = testInfo.project.name === "phone-chromium" ? touchDrag : mouseDrag;
 
-  await dragWith(page, await centreOf(from), await centreOf(to), beforeRelease);
+  await dragWith(page, ...(await centresOf(from, to)), beforeRelease);
 }
 
 async function tap(cell: Locator, testInfo: TestInfo) {

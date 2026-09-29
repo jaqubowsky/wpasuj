@@ -1,6 +1,6 @@
 import type { Browser, Locator, Page, TestInfo } from "@playwright/test";
 import { expect, test } from "./fixtures";
-import { centreOf, mouseDrag, touchDrag } from "./pointer";
+import { centresOf, mouseDrag, touchDrag } from "./pointer";
 import { saveScreenshot } from "./screenshot";
 
 declare global {
@@ -89,7 +89,7 @@ test("the organiser creates a weekend poll, three friends answer, the organiser 
   const dragWith = testInfo.project.name === "phone-chromium" ? touchDrag : mouseDrag;
 
   await ola.getByRole("textbox", { name: "Twoje imię" }).fill("Ola");
-  await dragWith(ola, await centreOf(cellAt(ola, "sb 26", 19)), await centreOf(cellAt(ola, "nd 27", 21)));
+  await dragWith(ola, ...(await centresOf(cellAt(ola, "sb 26", 19), cellAt(ola, "nd 27", 21))));
   await expect(ola.getByRole("status")).toHaveText("Zapisane");
   await expect(ola.getByRole("gridcell", { selected: true })).toHaveCount(6);
 
@@ -180,7 +180,7 @@ test("the organiser creates a weekend poll, three friends answer, the organiser 
   await expect(setTime).toContainText("19:00–21:00");
   await expect(ola.getByRole("grid", { name: "Kiedy możesz?" })).toHaveCount(0);
 
-  await setTime.getByRole("button", { name: "Dodaj do kalendarza" }).click();
+  await ola.getByRole("button", { name: "Dodaj do kalendarza" }).click();
   const calendarMenu = ola.getByRole("dialog", { name: "Dodaj do kalendarza" });
 
   await expect(calendarMenu).toBeVisible();

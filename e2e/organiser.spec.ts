@@ -207,18 +207,24 @@ test("after Ustal termin a participant sees the invitation with no grid, and can
   await expect(setTime).toContainText("19:00–21:00");
   await expect(participant.getByText("Ustalone przez: Kuba")).toBeVisible();
 
-  await expect(participant.getByRole("list", { name: "Będzie" }).getByRole("listitem")).toHaveText([
-    "OOla",
-    "MMichał",
-    "ZZuza, to Ty",
-    "KKuba, organizator",
-  ]);
+  const whoComes = participant.getByRole("region", { name: "Kto będzie" });
 
-  await expect(participant.getByRole("list", { name: "Nie może" }).getByRole("listitem")).toHaveText(["BBartek, nie może"]);
+  await expect(whoComes).toContainText("Będą 4 osoby");
+
+  expect(
+    await whoComes
+      .getByRole("list", { name: "Będzie" })
+      .getByRole("img")
+      .evaluateAll((avatars) => avatars.map((avatar) => avatar.getAttribute("aria-label"))),
+  ).toEqual(["Ola", "Michał", "Zuza", "Kuba"]);
+
+  await expect(whoComes.getByRole("listitem").filter({ hasText: "organizator" }).getByRole("img")).toHaveAccessibleName("Kuba");
+
+  await expect(whoComes).toContainText("Bartek nie może.");
   await expect(participant.getByRole("button", { name: "Zmień termin" })).toHaveCount(0);
   await saveScreenshot(participant, testInfo, "set-participant");
 
-  await setTime.getByRole("button", { name: "Dodaj do kalendarza" }).click();
+  await participant.getByRole("button", { name: "Dodaj do kalendarza" }).click();
   const calendarMenu = participant.getByRole("dialog", { name: "Dodaj do kalendarza" });
 
   await expect(calendarMenu).toBeVisible();
@@ -258,27 +264,25 @@ test("after Ustal termin a participant sees the invitation with no grid, and can
     .toBe(`Planszówki u Michała: Sobota 26 października, 19:00–21:00. http://localhost:3000/e/${pollId}`);
 });
 
-test("on a desktop the calendar menu drops from its button and stays inside the card", async ({ browser }, testInfo) => {
+test("on a desktop the calendar menu drops from its button at its width", async ({ browser }, testInfo) => {
   test.skip(testInfo.project.name.startsWith("phone"), "the calendar menu is a bottom sheet on a phone");
   const { pollId } = seedBoardPoll(saturdayEvening);
 
   for (const width of [1024, 1440]) {
     for (const asOrganiserOf of [undefined, pollId]) {
       const page = await openAsNewDevice(browser, `/e/${pollId}`, asOrganiserOf);
-      const setTime = page.getByRole("region", { name: "Termin" });
-      const opener = setTime.getByRole("button", { name: "Dodaj do kalendarza" });
+      const opener = page.getByRole("button", { name: "Dodaj do kalendarza" });
       const menu = page.getByRole("dialog", { name: "Dodaj do kalendarza" });
 
       await page.setViewportSize({ width, height: 900 });
       await opener.click({ delay: 300 });
       await expect(menu).toBeVisible();
       await settleAnimations(page);
-      const [button, card, box] = await Promise.all([opener.boundingBox(), setTime.boundingBox(), menu.boundingBox()]);
+      const [button, box] = await Promise.all([opener.boundingBox(), menu.boundingBox()]);
 
       expect(box!.x).toBeCloseTo(button!.x, 0);
       expect(box!.width).toBeCloseTo(button!.width, 0);
-      expect(box!.x).toBeGreaterThanOrEqual(card!.x);
-      expect(box!.x + box!.width).toBeLessThanOrEqual(card!.x + card!.width);
+      expect(box!.y).toBeGreaterThan(button!.y + button!.height);
       await saveScreenshot(page, testInfo, `set-calendar-menu-${width}${asOrganiserOf ? "-organiser" : ""}`);
       await page.context().close();
     }

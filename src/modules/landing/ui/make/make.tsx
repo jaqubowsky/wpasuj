@@ -9,9 +9,7 @@ export function Make({ formId, form }: { formId: string; form: ReactNode }) {
       <h2 id="form-heading" className="m-0 font-sans text-base font-semibold">
         Twoja kolej
       </h2>
-      <div id={formId} className="scroll-mt-18">
-        {form}
-      </div>
+      <div id={formId}>{form}</div>
     </section>
   );
 }

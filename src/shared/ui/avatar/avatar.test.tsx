@@ -38,6 +38,12 @@ describe("Avatar", () => {
     expect(screen.getByRole("img", { name: "Bartek" })).toHaveAttribute("data-pop");
   });
 
+  it("stacks over the ground it sits on", () => {
+    render(<Avatar name="Bartek" tintKey="bartek" stack="ink" />);
+
+    expect(screen.getByRole("img", { name: "Bartek" })).toHaveAttribute("data-stack", "ink");
+  });
+
   it("carries the organiser's crown, the cross of someone who cannot and the ring around you", () => {
     render(
       <>

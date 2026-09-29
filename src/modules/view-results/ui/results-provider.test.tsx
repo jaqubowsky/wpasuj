@@ -53,7 +53,7 @@ const threeAnswers: Results = {
 function Tabs({ results, panel = true }: { results: Results; panel?: boolean }) {
   return (
     <ResultsProvider pollId="Pl4nszowki" initial={results} organiserKey="ola">
-      <RespondentCount />
+      <RespondentCount ground="coral" />
       <WhilePollLives gone={<h1>Tej ankiety już nie ma</h1>}>
         {panel && <BestNow />}
         {panel && <PeoplePanel />}

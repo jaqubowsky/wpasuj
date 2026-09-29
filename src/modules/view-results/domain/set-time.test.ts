@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { setTimeMessage, whoComes } from "./set-time";
+import { cannotLine, comingLine, setTimeMessage, whoComes } from "./set-time";
 
 const saturday = "2030-10-19";
 const saturdayEvening = { date: saturday, firstHour: 19, lastHour: 21 };
@@ -59,5 +59,33 @@ describe("setTimeMessage", () => {
     expect(setTimeMessage(saturdayEvening, { title: "Planszówki u Michała", link: "https://wpasuj.pl/e/Pl4nszowki" })).toBe(
       "Planszówki u Michała: Sobota 19 października, 19:00–21:00. https://wpasuj.pl/e/Pl4nszowki",
     );
+  });
+});
+
+describe("comingLine", () => {
+  it.each([
+    [0, "Będzie 0 osób"],
+    [1, "Będzie 1 osoba"],
+    [2, "Będą 2 osoby"],
+    [4, "Będą 4 osoby"],
+    [5, "Będzie 5 osób"],
+    [12, "Będzie 12 osób"],
+    [22, "Będą 22 osoby"],
+  ])("says %i people will come with the Polish plural", (count, line) => {
+    expect(comingLine(count)).toBe(line);
+  });
+});
+
+describe("cannotLine", () => {
+  it.each([
+    [["Bartek"], "Bartek nie może."],
+    [["Bartek", "Ola"], "Bartek i Ola nie mogą."],
+    [["Bartek", "Ola", "Zuza"], "Bartek, Ola i Zuza nie mogą."],
+  ])("names who cannot come: %j", (names, line) => {
+    expect(cannotLine(names)).toBe(line);
+  });
+
+  it("says nothing when everyone can come", () => {
+    expect(cannotLine([])).toBeUndefined();
   });
 });

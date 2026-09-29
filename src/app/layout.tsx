@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { productName } from "@/shared/brand";
+import { cn } from "@/shared/ui/cn";
+import { Grain } from "@/shared/ui/grain/grain";
 import { fontVariables } from "./fonts";
 import "./globals.css";
 
@@ -13,8 +15,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pl" className={fontVariables}>
-      <body>{children}</body>
+    <html lang="pl" className={cn(fontVariables, "scroll-pt-18")}>
+      <body>
+        <Grain />
+        {children}
+      </body>
     </html>
   );
 }

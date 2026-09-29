@@ -89,6 +89,23 @@ async function tapOn(target: Locator, testInfo: TestInfo) {
   else await target.click();
 }
 
+async function settledBoxes(locators: Locator[]) {
+  let previous = await boxes(locators);
+
+  await expect
+    .poll(async () => {
+      const next = await boxes(locators);
+      const same = JSON.stringify(next) === JSON.stringify(previous);
+
+      previous = next;
+
+      return same;
+    })
+    .toBe(true);
+
+  return previous;
+}
+
 async function boxes(locators: Locator[]) {
   return Promise.all(
     locators.map((locator) =>
@@ -122,14 +139,13 @@ test("CantMake: Nie mogę and Cofnij move nothing above the grid", async ({ brow
   await animationsDone(page);
 
   const above = [
-    page.getByRole("banner"),
     page.getByRole("heading", { level: 1 }),
     page.getByRole("textbox", { name: "Twoje imię" }),
     page.getByRole("tablist"),
     grid.getByRole("columnheader").first(),
   ];
 
-  const before = await boxes(above);
+  const before = await settledBoxes(above);
 
   await cant(page).click();
 
@@ -337,4 +353,24 @@ test.describe("with reduced motion", () => {
     await expect(moreDialog(page)).toBeVisible();
     expect(await page.evaluate(() => document.getAnimations().length)).toBe(0);
   });
+});
+
+test("a cell reached by the keyboard is never hidden under the sticky top bar", async ({ browser }) => {
+  const pollId = seedPoll({ dates: [friday, saturday, sunday], firstHour: 8, hourCount: 14, organiserToken });
+  const page = await openAs(browser, pollId);
+
+  await page.setViewportSize({ width: page.viewportSize()!.width, height: 480 });
+  const cellAt = (row: number) => page.getByRole("grid", { name: "Kiedy możesz?" }).getByRole("row").nth(row).getByRole("button").nth(1);
+
+  await expect(page.getByRole("textbox", { name: "Twoje imię" })).toBeFocused();
+  await cellAt(10).focus();
+  await cellAt(10).evaluate((cell) => scrollBy(0, cell.getBoundingClientRect().top - 8));
+  await page.keyboard.press("ArrowUp");
+
+  const focused = page.locator(":focus");
+
+  await expect(focused).toHaveAccessibleName(/, 16:00/);
+  const [bar, cell] = await Promise.all([page.getByRole("banner").boundingBox(), focused.boundingBox()]);
+
+  expect(cell!.y).toBeGreaterThanOrEqual(bar!.y + bar!.height);
 });

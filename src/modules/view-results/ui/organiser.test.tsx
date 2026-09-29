@@ -2,7 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Invitation } from "./invitation";
-import { SetBadge } from "./set-time";
+import { SetBadge, SettledPoster } from "./set-time";
 import { OrganiserCard } from "./organiser-card";
 import { ResultsBody } from "./results-body";
 import { ResultsProvider } from "./results-provider";
@@ -67,6 +67,7 @@ function renderPage(results: Results, asOrganiser?: Organiser) {
   return render(
     <ResultsProvider pollId="Pl4nszowki" initial={results} organiser={asOrganiser} organiserKey="kuba">
       <UntilSet invitation={<SetBadge />}>{null}</UntilSet>
+      <UntilSet invitation={<SettledPoster eyebrow="Planszówki" setBy="Ustalone przez: Kuba" />}>{null}</UntilSet>
       <WhilePollLives gone={<h1>Tej ankiety już nie ma</h1>}>
         <UntilSet invitation={<Invitation title="Planszówki" timeZone="Europe/Warsaw" />}>
           <OrganiserCard />
@@ -125,7 +126,8 @@ describe("a participant", () => {
     expect(setTime).toHaveTextContent("Sobota");
     expect(setTime).toHaveTextContent("19 października");
     expect(setTime).toHaveTextContent("18:00–20:00");
-    expect(within(setTime).getByRole("button", { name: "Dodaj do kalendarza" })).toBeVisible();
+    expect(setTime).toHaveTextContent("Ustalone przez: Kuba");
+    expect(screen.getByRole("button", { name: "Dodaj do kalendarza" })).toBeVisible();
     expect(screen.queryByRole("button", { name: "Zmień termin" })).not.toBeInTheDocument();
     expect(screen.queryByRole("grid")).not.toBeInTheDocument();
   });
@@ -159,13 +161,13 @@ describe("a participant", () => {
 
     const people = screen.getByRole("region", { name: "Kto będzie" });
 
-    const names = (list: string) =>
-      within(within(people).getByRole("list", { name: list }))
-        .getAllByRole("img")
-        .map((avatar) => avatar.getAttribute("aria-label"));
+    const coming = within(within(people).getByRole("list", { name: "Będzie" }))
+      .getAllByRole("img")
+      .map((avatar) => avatar.getAttribute("aria-label"));
 
-    expect(names("Będzie")).toEqual(["Ola", "Michał"]);
-    expect(names("Nie może")).toEqual(["Bartek"]);
+    expect(people).toHaveTextContent("Będą 2 osoby");
+    expect(coming).toEqual(["Ola", "Michał"]);
+    expect(people).toHaveTextContent("Bartek nie może.");
   });
 
   it("sends the set time to the group", async () => {
@@ -274,7 +276,7 @@ describe("the organiser", () => {
   it("reaches the send action before the calendar, in the order it sees them", () => {
     renderPage(withFinal(saturdayEvening), organiser());
 
-    const actions = Array.from(screen.getByRole("region", { name: "Termin" }).querySelectorAll("a, button"));
+    const actions = screen.getAllByRole("button", { name: /^(Wyślij termin na grupę|Dodaj do kalendarza)$/ });
 
     expect(actions.map((action) => action.textContent)).toEqual(["Wyślij termin na grupę", "Dodaj do kalendarza"]);
   });
