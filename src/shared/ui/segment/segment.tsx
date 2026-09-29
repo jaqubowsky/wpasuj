@@ -43,7 +43,7 @@ export function Segment<Option extends string>({ label, options, selected, onSel
               key={option}
               id={tabId(option)}
               type="button"
-              className="relative h-11 flex-1 cursor-pointer rounded-cell border-0 bg-transparent font-sans text-base leading-none font-bold text-muted transition-colors duration-(--duration-turn) focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ink aria-selected:text-paper"
+              className="relative h-11 flex-1 cursor-pointer rounded-cell border-0 bg-transparent font-sans text-base leading-none font-semibold text-muted transition-colors duration-(--duration-turn) focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ink aria-selected:text-paper"
               role="tab"
               aria-selected={option === selected}
               aria-controls={panelId(option)}
