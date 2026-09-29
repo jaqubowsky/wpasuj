@@ -184,6 +184,7 @@ test("the organiser answers on Moje under the name from create, with no name fie
   await expect(organiser.getByRole("tab", { name: "Moje", selected: true })).toBeVisible();
   await expect(organiser.getByText("Pytasz jako Kuba")).toBeVisible();
   await expect(organiser.getByText("Zaznacz też swoje godziny.")).toBeVisible();
+  await expect(organiser.getByText("Kliknij godziny, kiedy możesz. Możesz przeciągnąć.")).toBeVisible();
   await expect(organiser.getByRole("textbox", { name: "Twoje imię" })).toHaveCount(0);
 
   await tap(cellAt(organiser, 0, 0), testInfo);

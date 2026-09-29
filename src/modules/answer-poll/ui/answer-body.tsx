@@ -11,9 +11,10 @@ export function AnswerBody() {
 
   return (
     <Board>
-      <p className="m-0 text-base text-muted">
-        {answer.asksToMark ? "Zaznacz też swoje godziny." : "Kliknij godziny, kiedy możesz. Możesz przeciągnąć."}
-      </p>
+      <div className="grid text-base text-muted">
+        {answer.asksToMark && <p className="m-0">Zaznacz też swoje godziny.</p>}
+        <p className="m-0">Kliknij godziny, kiedy możesz. Możesz przeciągnąć.</p>
+      </div>
       <div
         className="transition-opacity duration-(--duration-fill) ease-out data-faded:opacity-45"
         data-faded={answer.saidCant || undefined}
