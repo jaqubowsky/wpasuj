@@ -13,7 +13,7 @@ function CellPeople({ cell, results, organiserKey }: CellDetailsProps) {
   const free = freeAt(respondents, cell);
 
   const groups = [
-    { label: "Może", people: free },
+    { label: "Może", people: free, can: true },
     {
       label: "Nie może",
       people: cannotMake(

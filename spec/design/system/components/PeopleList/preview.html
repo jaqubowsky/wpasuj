@@ -1,0 +1,23 @@
+<!-- @dsCard group="Display" height=280 subtitle="Who can at a tapped hour" -->
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>PeopleList</title>
+<style>
+  .panel { box-sizing: border-box; width: 320px; padding: 8px 20px 12px; border-radius: var(--radius-card); background: var(--surface); }
+  .head { display: flex; justify-content: space-between; height: 36px; padding-top: 8px; box-sizing: border-box; font: 600 14px/20px var(--font-sans); }
+  ul { margin: 0 -6px; padding: 0; list-style: none; }
+  li { display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 6px; border-radius: var(--radius-cell); font: 400 16px/24px var(--font-sans); }
+  li.can { background: var(--heat-1); transform: translateX(4px); }
+  li.cannot { color: var(--muted); }
+  .av { display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 999px; background: var(--track); font: 600 14px/1 var(--font-sans); }
+  .rule { border-top: 1px solid var(--line); margin-top: 8px; }
+</style></head>
+<body>
+<div class="panel">
+  <div class="head"><span>Może</span><span>2</span></div>
+  <ul><li class="can"><span class="av" style="background:var(--tint-mint)">K</span>Kasia</li><li class="can"><span class="av" style="background:var(--tint-sky)">B</span>Bartek</li></ul>
+  <div class="rule"><div class="head"><span>Nie może</span><span>1</span></div></div>
+  <ul><li class="cannot"><span class="av">O</span>Ola</li></ul>
+</div>
+</body>
+</html>

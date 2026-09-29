@@ -109,6 +109,14 @@ describe("Results", () => {
         .map((item) => item.textContent),
     ).toEqual(["OOla, organizator, nie może"]);
 
+    expect(
+      within(within(details).getByRole("list", { name: "Może" }))
+        .getAllByRole("listitem")
+        .map((item) => item.hasAttribute("data-can")),
+    ).toEqual([true, true]);
+
+    expect(within(within(details).getByRole("list", { name: "Nie może" })).getByRole("listitem")).not.toHaveAttribute("data-can");
+
     fireEvent.click(details);
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });

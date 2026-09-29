@@ -1,0 +1,9 @@
+@keyframes people-nudge {
+  from {
+    translate: 0;
+  }
+
+  60% {
+    translate: calc(var(--spacing) * 2.5);
+  }
+}

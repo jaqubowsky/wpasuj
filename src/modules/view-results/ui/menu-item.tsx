@@ -31,22 +31,24 @@ const icons = {
 type Icon = keyof typeof icons;
 
 const itemLook =
-  "box-border flex h-13 w-full cursor-pointer items-center gap-3 rounded-cell border-0 bg-transparent px-0 text-left font-sans text-base text-ink no-underline focus-visible:outline-2 focus-visible:outline-ink data-danger:font-semibold data-danger:text-accent-ink lg:h-11 lg:px-3";
+  "group/item box-border flex h-14.5 w-full cursor-pointer items-center gap-3 rounded-control border-0 bg-transparent px-3 text-left font-sans text-base font-bold text-ink no-underline transition-[background-color,translate] duration-(--duration-fill) ease-out hover:bg-heat-1 focus-visible:outline-2 focus-visible:outline-ink data-danger:text-accent-ink motion-safe:hover:translate-x-1";
 
 function ItemIcon({ icon }: { icon: Icon }) {
   return (
-    <svg
-      className="size-4.5 flex-none"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      {icons[icon]}
-    </svg>
+    <span className="grid size-8.5 flex-none place-items-center rounded-cell bg-track group-data-danger/item:bg-heat-2">
+      <svg
+        className="size-4.5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        {icons[icon]}
+      </svg>
+    </span>
   );
 }
 
