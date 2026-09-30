@@ -1,3 +1,4 @@
+import { ReportProblem } from "@/modules/report-problem/client";
 import type { Metadata, Viewport } from "next";
 import { productName } from "@/shared/brand";
 import { cn } from "@/shared/ui/cn";
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body>
         <Grain />
         {children}
+        <ReportProblem />
       </body>
     </html>
   );

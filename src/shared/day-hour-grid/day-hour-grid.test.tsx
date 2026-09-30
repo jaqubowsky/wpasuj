@@ -29,7 +29,7 @@ function dragFrom(fromLabel: string, toLabel: string) {
   const from = screen.getByRole("button", { name: fromLabel });
   const to = screen.getByRole("button", { name: toLabel });
 
-  document.elementFromPoint = () => to;
+  document.elementsFromPoint = () => [to];
   Element.prototype.setPointerCapture ??= () => {};
   fireEvent.pointerDown(from, { button: 0, buttons: 1, pointerId: 1, isPrimary: true });
   fireEvent.pointerMove(from, { buttons: 1, pointerId: 1, isPrimary: true });
@@ -55,6 +55,21 @@ describe("DayHourGrid", () => {
     const grid = dragFrom("pt 16, 17:00", "sb 17, 18:00");
 
     fireEvent.pointerUp(grid, { pointerId: 1 });
+
+    expect(onStroke).toHaveBeenCalledExactlyOnceWith({ dates: ["2026-10-16", "2026-10-17"], hours: [17, 18], mode: "add" });
+  });
+
+  it("keeps painting under an element that floats over the grid", () => {
+    const { onStroke } = renderGrid();
+    const floating = document.body.appendChild(document.createElement("button"));
+    const to = screen.getByRole("button", { name: "sb 17, 18:00" });
+
+    const grid = dragFrom("pt 16, 17:00", "pt 16, 17:00");
+
+    document.elementsFromPoint = () => [floating, to];
+    fireEvent.pointerMove(to, { buttons: 1, pointerId: 1, isPrimary: true });
+    fireEvent.pointerUp(grid, { pointerId: 1 });
+    floating.remove();
 
     expect(onStroke).toHaveBeenCalledExactlyOnceWith({ dates: ["2026-10-16", "2026-10-17"], hours: [17, 18], mode: "add" });
   });
