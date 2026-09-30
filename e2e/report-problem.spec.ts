@@ -50,6 +50,33 @@ async function saveViewport(page: Page, testInfo: TestInfo, screen: string) {
   await page.screenshot({ path: `e2e/screenshots/${screen}-${testInfo.project.name}.png` });
 }
 
+function pillWhileScrolling(page: Page) {
+  return page.evaluate(async () => {
+    const frame = () => new Promise((resolve) => requestAnimationFrame(() => setTimeout(() => requestAnimationFrame(resolve))));
+    const rect = (selector: string) => document.querySelector(selector)?.getBoundingClientRect().toJSON() ?? null;
+    const steps = [];
+
+    for (let top = 0; top <= document.documentElement.scrollHeight - innerHeight + 40; top += 40) {
+      window.scrollTo({ top, behavior: "instant" });
+      await frame();
+      await frame();
+
+      const bar = rect("[data-bottom-bar]");
+
+      steps.push({
+        pill: rect("[data-report-pill] button"),
+        pinnedButton: bar && Math.abs(bar.bottom - document.documentElement.clientHeight) <= 1 ? rect("[data-bottom-bar] button") : null,
+      });
+    }
+
+    return steps;
+  });
+}
+
+function places(steps: Awaited<ReturnType<typeof pillWhileScrolling>>) {
+  return new Set(steps.map((step) => JSON.stringify(step.pill)));
+}
+
 function seedLongPoll() {
   const pollId = seedPoll({ dates: ["2031-10-17", "2031-10-18", "2031-10-19", "2031-10-20"], firstHour: 8, hourCount: 14 });
 
@@ -74,6 +101,25 @@ test("the pill stays in view on the landing and clears the sticky create button"
   await expect(pill(page)).toBeInViewport();
   await expectPillClear(page, create);
   await saveViewport(page, testInfo, "report-pill-above-create-bar");
+});
+
+test("the pill stays still while the landing scrolls, apart from rising above the pinned create bar", async ({ page }, testInfo) => {
+  await page.goto("/");
+
+  const steps = await pillWhileScrolling(page);
+
+  expect(places(steps).size).toBeLessThanOrEqual(isPhone(testInfo) ? 2 : 1);
+
+  for (const { pill: pillBox, pinnedButton } of steps) {
+    if (pillBox && pinnedButton) expect(overlap(pillBox, pinnedButton)).toBe(false);
+  }
+});
+
+test("the pill stays still while the poll page scrolls", async ({ page }) => {
+  await page.goto(`/e/${seedLongPoll()}`);
+  await expect(page.getByRole("gridcell").first()).toBeVisible();
+
+  expect(places(await pillWhileScrolling(page)).size).toBe(1);
 });
 
 for (const tab of ["Moje", "Wszyscy"] as const) {

@@ -73,13 +73,14 @@ test("the header button and the outro's call scroll to the form and focus its fi
   await expect(titleField(page)).toBeInViewport();
 });
 
-test("the logo takes the reader back to the top", async ({ page }) => {
+test("the logo takes the reader back to the top and stays on the landing", async ({ page }) => {
   await page.goto("/");
   await faq(page).scrollIntoViewIfNeeded();
 
   await page.getByRole("button", { name: "Wpasuj, na górę strony" }).click();
 
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  await expect(page).toHaveURL("/");
 });
 
 test("the headline's word swaps once through the list and stops on grillu", async ({ page }) => {

@@ -4,6 +4,7 @@
 - **Date:** 2026-09-29
 - **Owner:** owner (WPA-86)
 - **Replaces:** ADR 0034's "no shadows, hero or idle motion on the poll pages until WPA-86 decides otherwise" for shadows and the poster header; ADR 0021's "Nie mogę" at the top of the Moje card; the brief's role table for the poll title, the create form's title and the settled date, its create title placeholder and single-line field, its permanent "Zapisane", its "no shadows" and "a hero on the app's own pages", its `accent` wordmark mark (the brand mark draws heat tiles), and its best-time cross-fade (the card pulses instead)
+- **Amended by:** ADR 0038 (outside the landing the logo is a link to `/`)
 
 ## Context
 

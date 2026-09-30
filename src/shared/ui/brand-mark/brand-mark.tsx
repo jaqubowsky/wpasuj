@@ -1,7 +1,8 @@
 "use client";
 
 import { productName } from "@/shared/brand";
-import { useState } from "react";
+import Link from "next/link";
+import { useState, type MouseEvent } from "react";
 import { useMotion } from "../motion-toggle/use-motion";
 import { Text } from "../text/text";
 import { useTileBurst } from "../tile-burst/tile-burst";
@@ -20,22 +21,21 @@ function shuffled(tiles: number[]) {
   return next;
 }
 
-export function BrandMark() {
+export function BrandMark({ href }: { href?: string }) {
   const [tiles, setTiles] = useState(heats);
   const { moving } = useMotion();
   const burst = useTileBurst();
 
-  return (
-    <button
-      type="button"
-      aria-label={`${productName}, na górę strony`}
-      className="group m-0 flex min-h-11 cursor-pointer items-center gap-2.5 border-0 bg-transparent p-0 text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
-      onClick={(event) => {
-        window.scrollTo({ top: 0, behavior: moving ? "smooth" : "auto" });
-        setTiles(shuffled);
-        burst(event.currentTarget, 8);
-      }}
-    >
+  const className =
+    "group m-0 flex min-h-11 cursor-pointer items-center gap-2.5 border-0 bg-transparent p-0 text-ink no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink";
+
+  function celebrate(event: MouseEvent<HTMLElement>) {
+    setTiles(shuffled);
+    burst(event.currentTarget, 8);
+  }
+
+  const mark = (
+    <>
       <span aria-hidden className="grid grid-cols-[repeat(3,--spacing(2))] gap-0.5">
         {tiles.map((heat, index) => (
           <i
@@ -46,6 +46,28 @@ export function BrandMark() {
         ))}
       </span>
       <Text variant="wordmark">{productName}</Text>
+    </>
+  );
+
+  if (href) {
+    return (
+      <Link href={href} aria-label={`${productName}, strona główna`} className={className} onClick={celebrate}>
+        {mark}
+      </Link>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      aria-label={`${productName}, na górę strony`}
+      className={className}
+      onClick={(event) => {
+        window.scrollTo({ top: 0, behavior: moving ? "smooth" : "auto" });
+        celebrate(event);
+      }}
+    >
+      {mark}
     </button>
   );
 }

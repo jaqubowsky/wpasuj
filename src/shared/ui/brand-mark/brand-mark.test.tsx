@@ -33,6 +33,22 @@ describe("BrandMark", () => {
     expect(bursts().length).toBeGreaterThan(0);
   });
 
+  it("with an address, links there, reshuffles its tiles and bursts instead of scrolling", async () => {
+    stubReducedMotion(false);
+    render(<BrandMark href="/" />);
+    const before = heats();
+    const link = screen.getByRole("link", { name: "Wpasuj, strona główna" });
+
+    link.addEventListener("click", (event) => event.preventDefault());
+    vi.spyOn(Math, "random").mockReturnValue(0);
+    await userEvent.click(link);
+
+    expect(link).toHaveAttribute("href", "/");
+    expect(window.scrollTo).not.toHaveBeenCalled();
+    expect(heats()).not.toEqual(before);
+    expect(bursts().length).toBeGreaterThan(0);
+  });
+
   it("jumps to the top without a burst once the motion is stopped", async () => {
     stubReducedMotion(false);
     localStorage.setItem("still-motion", "1");
