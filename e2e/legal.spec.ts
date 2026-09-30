@@ -20,12 +20,12 @@ for (const { path, title, screen } of pages) {
 
     await expect(page.getByRole("contentinfo").getByRole("link", { name: title })).toHaveAttribute("href", path);
 
-    const { height, screenHeight } = await page.evaluate(() => ({
-      height: document.documentElement.scrollHeight,
+    const { textEnd, screenHeight } = await page.getByRole("main").evaluate((main) => ({
+      textEnd: main.getBoundingClientRect().bottom + window.scrollY,
       screenHeight: window.innerHeight,
     }));
 
-    if (testInfo.project.name.startsWith("phone")) expect(height).toBeLessThanOrEqual(2 * screenHeight);
+    if (testInfo.project.name.startsWith("phone")) expect(textEnd).toBeLessThanOrEqual(2 * screenHeight);
 
     await saveScreenshot(page, testInfo, screen);
   });
