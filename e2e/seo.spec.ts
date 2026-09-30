@@ -48,11 +48,16 @@ test("the home page describes the app as a free web application", async ({ page 
   });
 });
 
-test("the sitemap lists the home page and robots points to it", async ({ request }) => {
+test("the sitemap lists the home page, the privacy policy and the terms, and robots points to it", async ({ request }) => {
   const sitemap = await (await request.get("/sitemap.xml")).text();
   const robots = await (await request.get("/robots.txt")).text();
 
-  expect([...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1])).toEqual([`${siteUrl}/`]);
+  expect([...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1])).toEqual([
+    `${siteUrl}/`,
+    `${siteUrl}/polityka-prywatnosci`,
+    `${siteUrl}/regulamin`,
+  ]);
+
   expect(robots).toContain("User-Agent: *\nAllow: /\nDisallow: /api/");
   expect(robots).toContain(`Sitemap: ${siteUrl}/sitemap.xml`);
 });

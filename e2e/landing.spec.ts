@@ -282,11 +282,14 @@ test("each question opens with the keyboard", async ({ page }) => {
   }
 });
 
-test("the footer names the product and links nowhere", async ({ page }) => {
+test("the footer names the product and links the privacy policy, the terms and the contact address", async ({ page }, testInfo) => {
   await page.goto("/");
+  const footer = page.getByRole("contentinfo");
 
-  await expect(page.getByRole("contentinfo")).toHaveText("Wpasuj, darmowe ankiety terminów dla znajomych");
-  await expect(page.getByRole("contentinfo").getByRole("link")).toHaveCount(0);
+  await expect(footer.getByText("Wpasuj, darmowe ankiety terminów dla znajomych")).toBeVisible();
+  await expect(footer.getByRole("link")).toHaveText(["Polityka prywatności", "Regulamin", "Kontakt"]);
+  await footer.scrollIntoViewIfNeeded();
+  await footer.screenshot({ path: `e2e/screenshots/landing-footer-${testInfo.project.name}.png` });
 });
 
 test.describe("with reduced motion", () => {

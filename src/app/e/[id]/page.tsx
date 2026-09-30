@@ -19,6 +19,7 @@ import {
 import { Avatar } from "@/shared/ui/avatar/avatar";
 import { PageFrame } from "@/shared/ui/page-frame/page-frame";
 import { PollPoster } from "@/shared/ui/poll-poster/poll-poster";
+import { SiteLinks } from "@/shared/ui/site-links/site-links";
 import { TextLink } from "@/shared/ui/text-link/text-link";
 import { pollTitleMorph } from "@/shared/morph";
 import { siteUrl } from "@/shared/site-url";
@@ -156,8 +157,9 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
               </div>
             </PageFrame>
           </main>
-          <footer className="flex justify-center pb-8">
+          <footer className="flex flex-col items-center gap-2 pb-8">
             <TextLink href="/">Zrób własną ankietę</TextLink>
+            <SiteLinks />
           </footer>
         </WhilePollLives>
       </ResultsProvider>

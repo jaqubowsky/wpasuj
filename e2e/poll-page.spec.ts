@@ -390,3 +390,16 @@ test("the top bar, the poster and the page body start at one left edge", async (
 
   expect(new Set(lefts).size, lefts.join(", ")).toBe(1);
 });
+
+test("the footer links a new poll, the privacy policy, the terms and the contact address", async ({ browser }, testInfo) => {
+  const page = await openAs(browser, seedBoardPoll().pollId);
+  const footer = page.getByRole("contentinfo");
+
+  await expect(footer.getByRole("link", { name: "Zrób własną ankietę" })).toHaveAttribute("href", "/");
+  await expect(footer.getByRole("link", { name: "Polityka prywatności" })).toHaveAttribute("href", "/polityka-prywatnosci");
+  await expect(footer.getByRole("link", { name: "Regulamin" })).toHaveAttribute("href", "/regulamin");
+  await expect(footer.getByRole("link", { name: "Kontakt" })).toHaveAttribute("href", "mailto:kontakt@wpasuj.pl");
+  await footer.scrollIntoViewIfNeeded();
+  await settleAnimations(page);
+  await page.screenshot({ path: `e2e/screenshots/poll-footer-${testInfo.project.name}.png` });
+});
