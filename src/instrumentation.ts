@@ -1,4 +1,5 @@
 import { writeLogLine } from "@/shared/log-line";
+import { maskedPath } from "@/shared/masked-path";
 import type { Instrumentation } from "next";
 
 export async function register() {
@@ -13,7 +14,7 @@ export const onRequestError: Instrumentation.onRequestError = (error, request, c
   writeLogLine({
     level: "error",
     message: error instanceof Error ? error.message : String(error),
-    path: request.path.split("?")[0].replace(/^(\/e\/[^/]+\/organizator\/)[^/]+/, "$1[token]"),
+    path: maskedPath(request.path),
     digest: typeof error === "object" && error !== null && "digest" in error ? String(error.digest) : undefined,
     routeType: context.routeType,
   });
