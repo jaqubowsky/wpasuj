@@ -1,25 +1,20 @@
 "use client";
 
 import { Icon } from "@/shared/ui/icon/icon";
-import { lazy, Suspense, useRef, type CSSProperties } from "react";
-import { useBottomBarLift } from "./use-bottom-bar-lift";
+import { lazy, Suspense, useRef } from "react";
 import { useReportProblem } from "./use-report-problem";
+import "./report-problem.css";
 
 const ReportForm = lazy(() => import("./report-form"));
 
 export function ReportProblem() {
   const report = useReportProblem();
-  const lift = useBottomBarLift();
   const pill = useRef<HTMLButtonElement>(null);
 
   return (
     <>
       <div className="pb-[calc(--spacing(19)+env(safe-area-inset-bottom))]" aria-hidden="true" data-report-room />
-      <div
-        className="fixed right-4 bottom-(--report-bottom) z-2 flex flex-col items-end gap-2"
-        style={{ "--report-bottom": `max(calc(var(--spacing) * 4 + env(safe-area-inset-bottom)), ${lift + 12}px)` } as CSSProperties}
-        data-report-pill
-      >
+      <div className="fixed right-4 z-2 flex flex-col items-end gap-2" data-report-pill>
         {report.status === "thanked" && (
           <p className="m-0 rounded-control bg-ink px-4 py-3 text-sm font-semibold text-surface" role="status">
             Dzięki, zgłoszenie dotarło.

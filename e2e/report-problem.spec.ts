@@ -73,7 +73,35 @@ function pillWhileScrolling(page: Page) {
   });
 }
 
-function places(steps: Awaited<ReturnType<typeof pillWhileScrolling>>) {
+function pillThroughJumps(page: Page) {
+  return page.evaluate(async () => {
+    const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+    const rect = (selector: string) => document.querySelector(selector)?.getBoundingClientRect().toJSON() ?? null;
+    const form = document.querySelector("[data-bottom-bar]")!.closest("form")!.getBoundingClientRect();
+    const tops = [];
+    const samples = [];
+
+    for (let top = scrollY + form.top - innerHeight; top <= scrollY + form.bottom + 600; top += 600) tops.push(Math.max(0, top));
+
+    for (const top of [...tops, ...tops.toReversed()]) {
+      window.scrollTo({ top, behavior: "instant" });
+
+      for (let sample = 0; sample < 4; sample++) {
+        await frame();
+        const bar = rect("[data-bottom-bar]")!;
+
+        samples.push({
+          pill: rect("[data-report-pill] button"),
+          pinnedButton: Math.abs(bar.bottom - document.documentElement.clientHeight) <= 1 ? rect("[data-bottom-bar] button") : null,
+        });
+      }
+    }
+
+    return samples;
+  });
+}
+
+function places(steps: { pill: unknown }[]) {
   return new Set(steps.map((step) => JSON.stringify(step.pill)));
 }
 
@@ -103,16 +131,46 @@ test("the pill stays in view on the landing and clears the sticky create button"
   await saveViewport(page, testInfo, "report-pill-above-create-bar");
 });
 
-test("the pill stays still while the landing scrolls, apart from rising above the pinned create bar", async ({ page }, testInfo) => {
+test("the pill stays still while the landing scrolls and clears the pinned create bar", async ({ page }) => {
   await page.goto("/");
 
   const steps = await pillWhileScrolling(page);
 
-  expect(places(steps).size).toBeLessThanOrEqual(isPhone(testInfo) ? 2 : 1);
+  expect(places(steps).size).toBe(1);
 
   for (const { pill: pillBox, pinnedButton } of steps) {
     if (pillBox && pinnedButton) expect(overlap(pillBox, pinnedButton)).toBe(false);
   }
+});
+
+test("the pill neither moves nor meets the pinned create button when the landing jumps through the form", async ({ page }, testInfo) => {
+  test.skip(!isPhone(testInfo), "the create bar is sticky on the phone only");
+  await page.goto("/");
+
+  const samples = await pillThroughJumps(page);
+
+  for (const { pill: pillBox, pinnedButton } of samples) {
+    if (pillBox && pinnedButton) expect(overlap(pillBox, pinnedButton)).toBe(false);
+  }
+
+  expect(places(samples).size).toBe(1);
+});
+
+test("the pill clears the create bar's error when creating fails", async ({ page }, testInfo) => {
+  test.skip(!isPhone(testInfo), "the create bar is sticky on the phone only");
+  await page.goto("/");
+  await page.route("/", (route) => (route.request().method() === "POST" ? route.abort() : route.continue()));
+  await page.getByRole("textbox", { name: "Co robimy?" }).fill("Planszówki");
+  await page.getByRole("button", { name: "Ten weekend" }).click();
+  await page.getByRole("textbox", { name: "Twoje imię" }).fill("Kuba");
+  await page.getByRole("button", { name: "Utwórz i wyślij na grupę" }).click();
+
+  const failed = page.getByRole("alert").filter({ hasText: "Nie udało się utworzyć ankiety." });
+
+  await expect(failed).toBeVisible();
+  await page.evaluate(() => window.scrollBy({ top: -300, behavior: "instant" }));
+  await expectPillClear(page, failed);
+  await saveViewport(page, testInfo, "report-pill-above-create-error");
 });
 
 test("the pill stays still while the poll page scrolls", async ({ page }) => {
