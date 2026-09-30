@@ -33,8 +33,11 @@ function dayOf(date: string) {
   return { weekday: weekdays[day.getUTCDay()], number: day.getUTCDate() };
 }
 
-function cellUnder(event: PointerEvent): GridCell | undefined {
-  const slot = document.elementFromPoint(event.clientX, event.clientY)?.closest<HTMLElement>("[data-date]");
+function cellUnder(event: PointerEvent<HTMLElement>): GridCell | undefined {
+  const slot = document
+    .elementsFromPoint(event.clientX, event.clientY)
+    .find((element) => event.currentTarget.contains(element))
+    ?.closest<HTMLElement>("[data-date]");
 
   if (!slot?.dataset.date) return undefined;
 
