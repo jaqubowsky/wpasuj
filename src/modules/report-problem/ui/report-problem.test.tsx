@@ -12,7 +12,7 @@ vi.mock("../server/report-action", () => ({ reportProblem: (input: unknown) => r
 async function openForm() {
   await userEvent.click(screen.getByRole("button", { name: "Zgłoś problem" }));
 
-  return within(screen.getByRole("dialog", { name: "Zgłoś problem" }));
+  return within(await screen.findByRole("dialog", { name: "Zgłoś problem" }));
 }
 
 beforeEach(() => {
