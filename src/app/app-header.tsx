@@ -7,7 +7,7 @@ export function AppHeader({ aside }: { aside?: ReactNode }) {
     <header className="sticky top-0 z-2 bg-paper">
       <PageFrame wide>
         <div className="flex h-16 items-center justify-between lg:h-18">
-          <BrandMark />
+          <BrandMark href="/" />
           {aside}
         </div>
       </PageFrame>
