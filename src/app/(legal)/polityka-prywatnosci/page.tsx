@@ -23,17 +23,18 @@ export default function PrivacyPolicyPage() {
       </LegalSection>
       <LegalSection title="Ciasteczka i jak długo">
         <p className="m-0">
-          Dwa niezbędne ciasteczka na rok, z kluczem do Twojej odpowiedzi i ankiety. Przeglądarka pamięta też imię i zatrzymany ruch. Bez
-          analityki, reklam i kont. Ankieta znika 60 dni po swoim ostatnim dniu (z bazy przy kolejnym sprzątaniu) albo gdy organizator ją
-          usunie.
+          Dwa niezbędne ciasteczka na rok z kluczem do Twojej odpowiedzi i ankiety. Przeglądarka pamięta też Twoje imię i to, czy wyłączasz
+          animacje. Bez analityki, reklam i kont. Ankieta znika 60 dni po ostatnim dniu (z bazy przy kolejnym sprzątaniu) albo po „Usuń
+          ankietę”.
         </p>
       </LegalSection>
       <LegalSection title="Logi, zgłoszenia i kto je widzi">
         <p className="m-0">
-          Logi serwera, bez imion, tytułów i kluczy, leżą do 30 dni. „Zgłoś problem” wysyła opis, kontakt, jeśli go podasz, adres strony,
-          godzinę, przeglądarkę i rozmiar okna. IP trzymamy godzinę w pamięci przeciw spamowi, zgłoszenia i maile do końca sprawy, w naszym
-          uzasadnionym interesie (art. 6 ust. 1 lit. f RODO). Na nasze zlecenie widzą je Railway (serwer w UE), Linear Orbit, Inc. z USA
-          (zgłoszenia) i Cloudflare (poczta). [podstawa transferu do USA: uzupełni właściciel]
+          Logi serwera bez imion, tytułów i kluczy leżą do 7 dni. „Zgłoś problem” wysyła opis, kontakt (jeśli podasz), adres strony,
+          godzinę, przeglądarkę i rozmiar okna. IP trzymamy godzinę w pamięci przeciw spamowi, zgłoszenia i maile do końca sprawy
+          (uzasadniony interes, art. 6 ust. 1 lit. f RODO). Na nasze zlecenie widzą je Railway (serwer w UE), Linear (zgłoszenia) i
+          Cloudflare (poczta). To firmy z USA, dane dostają na podstawie standardowych klauzul umownych UE albo EU‑US Data Privacy
+          Framework, jak mówią ich umowy powierzenia.
         </p>
       </LegalSection>
       <LegalSection title="Twoje prawa">

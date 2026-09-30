@@ -8,7 +8,7 @@ export function LegalPage({ title, children }: { title: string; children: ReactN
     <>
       <PollPoster tone="ink" eyebrow={<span className="pl-2.5">{edition}</span>} title={title} />
       <PageFrame>
-        <main className="grid gap-5 pt-3 pb-8 lg:pt-8">{children}</main>
+        <main className="grid gap-4 pt-3 pb-4 lg:pt-8">{children}</main>
       </PageFrame>
     </>
   );
