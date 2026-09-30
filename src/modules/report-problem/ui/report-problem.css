@@ -1,0 +1,3 @@
+[data-report-pill] {
+  bottom: max(calc(var(--spacing) * 4 + env(safe-area-inset-bottom)), calc(var(--report-lift) + var(--spacing) * 3));
+}
