@@ -1,8 +1,6 @@
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const pillZone = 76;
-
 export function useBottomBarLift() {
   const path = usePathname();
   const [lift, setLift] = useState(0);
@@ -11,11 +9,11 @@ export function useBottomBarLift() {
     function measure() {
       const height = document.documentElement.clientHeight;
 
-      const covering = [...document.querySelectorAll("[data-bottom-bar]")]
-        .map((bar) => bar.getBoundingClientRect())
-        .filter((box) => box.top < height && box.bottom > height - pillZone);
+      const pinned = [...document.querySelectorAll("[data-bottom-bar]")]
+        .map((bar) => ({ bar, box: bar.getBoundingClientRect() }))
+        .filter(({ bar, box }) => getComputedStyle(bar).position === "sticky" && Math.abs(box.bottom - height) <= 1);
 
-      setLift(Math.max(0, ...covering.map((box) => height - box.top)));
+      setLift(Math.max(0, ...pinned.map(({ box }) => box.height)));
     }
 
     measure();
