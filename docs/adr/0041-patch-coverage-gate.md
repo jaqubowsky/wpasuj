@@ -11,12 +11,13 @@ The owner asked for every free check that catches an AI agent's mistakes. `npm t
 ## Decision
 
 - `npm test` collects V8 coverage of `src/**/*.{ts,tsx}`, without tests, `src/app/dev/` and `src/shared/testing/`, into `coverage/lcov.info`. That exclusion list in `vitest.config.mts` is the gate's scope
-- CI's `test` job runs `diff-cover` over that file against the pull request's base and fails under 80% of the changed lines covered. Lines V8 does not count (JSX attributes, types, CSS) are not in the diff it measures, so a markup-only or dependency-only pull request passes
+- CI's `coverage` job runs `diff-cover` over that file against the pull request's base and fails under 80% of the changed lines covered. Lines V8 does not count (JSX attributes, types, CSS) are not in the diff it measures, so a markup-only or dependency-only pull request passes
 - `diff-cover` runs in CI, not as a service: no Codecov app or token on the repository, and the job keeps `contents: read`. It reports through annotations on the uncovered lines and the job summary, not a pull request comment, because Dependabot's and forks' tokens cannot write one
 - e2e does not count: a line only Playwright reaches needs a unit or component test to pass the gate
 
 ## Consequences
 
-- Lowering 80, widening the exclusions or moving `npm test` back to `quick` without this job reverses this ADR
+- Lowering 80 or widening the exclusions reverses this ADR
+- `coverage` is its own job, so the units run twice per pull request (in `quick` and here); it blocks a merge only once the ruleset on `main` requires it beside `quick`
 - A pull request that adds route or markup code with statements only e2e reaches fails until a component test reaches it
 - `diff-cover` is pinned in `ci.yml`, where Dependabot does not look; it is bumped by hand
