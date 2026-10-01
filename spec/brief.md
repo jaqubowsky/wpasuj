@@ -221,3 +221,5 @@ Accounts and sign-in, notifications of any kind, calendar integrations beyond th
 ## Environment
 
 The repository is empty; the first push creates `main`, which has no branch protection. This session holds a token scoped to this repository in `GH_TOKEN`; a Touch ID, password or 1Password prompt during the run is a harness fault. Deploys and repository settings stay with the user. Finish with a report in Polish: what shipped with its pull requests, every decision you took, and every point where the harness got in your way or needed the user.
+
+Scratch line for WPA-124 criterion 1; this pull request is never merged.
