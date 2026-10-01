@@ -10,6 +10,10 @@ reviews:
   sequence_diagrams: false
   suggested_labels: false
   suggested_reviewers: false
+  auto_review:
+    auto_incremental_review: false
+    ignore_usernames:
+      - "dependabot[bot]"
   path_filters:
     - "!package-lock.json"
     - "!spec/design/**"
