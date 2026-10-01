@@ -31,6 +31,7 @@ import { PollGone } from "./poll-gone";
 import { PollTabs } from "./poll-tabs";
 import { RefreshAfterSave } from "./refresh-after-save";
 import { ZoneNote } from "./zone-note";
+import "./poll-page.css";
 
 const unlisted = { index: false, follow: false };
 
@@ -158,7 +159,9 @@ export default async function PollPage({ params }: PageProps<"/e/[id]">) {
             </PageFrame>
           </main>
           <footer className="flex flex-col items-center gap-2 pb-8">
-            <TextLink href="/">Zrób własną ankietę</TextLink>
+            <div className="flex" data-poll-footer-invite>
+              <TextLink href="/">Zrób własną ankietę</TextLink>
+            </div>
             <SiteLinks />
           </footer>
         </WhilePollLives>
