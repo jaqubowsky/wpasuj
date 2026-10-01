@@ -18,6 +18,6 @@ The create action deleted expired polls inside every create transaction, scannin
 
 ## Consequences
 
-- Moving the app to a serverless or edge runtime, or to several processes, drops or repeats the cleanup; the interval assumes the one long-lived process `AGENTS.md` "System" describes
+- Moving the app to a serverless or edge runtime, or to several processes, drops or repeats the cleanup; the interval assumes the one long-lived process `docs/operations.md` "System" describes
 - An expired poll stays in the database at most a day past its 60 days, longer only when the server is down or a run fails (`cleanup_failed`, logged; the next run comes a day later); pages already treat it as gone through `isExpired`
 - A Drizzle insert without `lastDate` fails `typecheck`. A raw SQL insert without `last_date` stores the migration's default `''`, which sorts before every date, so the next cleanup deletes it
