@@ -35,7 +35,7 @@ export function participantNamed(pollId: string, normalisedName: string) {
     .get();
 }
 
-export function participantCount(pollId: string) {
+function participantCount(pollId: string) {
   const [{ participantCount }] = getDb()
     .select({ participantCount: count() })
     .from(participants)
@@ -54,10 +54,21 @@ export function slotsOf(participantId: number) {
     .all();
 }
 
-export function saveAnswerOf(pollId: string, participant: { id: number } | undefined, answer: Answer, newcomerToken: string, now: Date) {
+type Save = { answer: Answer; newcomerToken: string; now: Date };
+
+export function saveAnswerOf<Refusal>(
+  pollId: string,
+  participant: { id: number } | undefined,
+  { answer, newcomerToken, now }: Save,
+  refusalAt: (participantCount: number) => Refusal | undefined,
+) {
   const { name, normalisedName, slots: mySlots } = answer;
 
-  getDb().transaction((tx) => {
+  return getDb().transaction((tx) => {
+    const refusal = refusalAt(participantCount(pollId));
+
+    if (refusal) return refusal;
+
     const id = participant
       ? tx
           .update(participants)
@@ -76,6 +87,8 @@ export function saveAnswerOf(pollId: string, participant: { id: number } | undef
       tx.insert(slots)
         .values(mySlots.map((slot) => ({ participantId: id, ...slot })))
         .run();
+
+    return undefined;
   });
 }
 
