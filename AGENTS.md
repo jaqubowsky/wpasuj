@@ -42,7 +42,7 @@ Declared in `package.json` by WPA-10; a change passes all of them:
 - `npm run typecheck`
 - `npm run knip` (unused files, exports and dependencies; config in `knip.json`)
 - `npm run duplicates` (jscpd over `src/` without tests; fails on a clone missing from `.jscpd-baseline.json`)
-- `npm run semgrep` (Semgrep CE from a Docker image pinned by digest, rules in `.semgrep/`; the code rules ESLint cannot express, ADR 0017)
+- `npm run semgrep` (Semgrep CE from a Docker image pinned by digest, rules in `.semgrep/`: the server action shape and a try/catch in server timer callbacks, the code rules ESLint cannot express; `console`, `eval` and `new Function`, `dangerouslySetInnerHTML` and the clock in `domain/` are ESLint's, ADR 0017)
 - `npm test` (Vitest, units, components and actions, with V8 coverage of `src/` into `coverage/lcov.info`)
 - `npm run build`
 - `npm run e2e` (Playwright: phone 390 in Chromium and WebKit, desktop 1440 in Chromium)

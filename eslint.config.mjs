@@ -52,6 +52,8 @@ const classNameJoins = [
   },
 ];
 
+const domainClock = "A domain function takes the clock as an argument; read the time in server/ or ui/ and pass it in";
+
 const inlineSvg = { selector: "JSXOpeningElement[name.name='svg']", message: "Draw an icon with Icon from @/shared/ui/icon/icon" };
 
 const eslintConfig = defineConfig([
@@ -70,8 +72,13 @@ const eslintConfig = defineConfig([
         { blankLine: "always", prev: ["multiline-block-like", "multiline-expression", "multiline-const", "multiline-let"], next: "*" },
         { blankLine: "always", prev: "*", next: "return" },
       ],
+      "no-eval": "error",
+      "no-new-func": "error",
     },
   },
+  { files: ["**/*.{js,jsx,mjs,ts,tsx,mts,cts}"], rules: { "react/no-danger": ["error", { customComponentNames: ["*"] }] } },
+  { files: ["src/**"], ignores: ["src/shared/log-line.ts"], rules: { "no-console": "error" } },
+  { files: ["src/modules/landing/ui/web-application-json-ld.tsx"], rules: { "react/no-danger": "off" } },
   {
     files: ["src/**/*.tsx"],
     plugins: { "better-tailwindcss": betterTailwindcss, shadcn },
@@ -165,6 +172,17 @@ const eslintConfig = defineConfig([
     },
   },
   ...modules.flatMap(moduleBlocks),
+  {
+    files: ["src/modules/*/domain/**"],
+    ignores: ["**/*.test.ts"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        { selector: "CallExpression[callee.object.name='Date'][callee.property.name='now']", message: domainClock },
+        { selector: "NewExpression[callee.name='Date'][arguments.length=0]", message: domainClock },
+      ],
+    },
+  },
   {
     files: ["src/**"],
     ignores: ["src/**/*-store.ts", "src/**/*.test.{ts,tsx}", "src/shared/db/**", "src/shared/testing/**", "src/app/api/health/**"],
