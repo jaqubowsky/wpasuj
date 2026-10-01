@@ -1,6 +1,8 @@
 import { participants, polls, slots } from "@/shared/db/schema";
 import { fakeCookies } from "@/shared/testing/fake-cookies";
+import { loggedLines } from "@/shared/testing/logged-lines";
 import { openTestDatabase } from "@/shared/testing/test-database";
+import Database from "better-sqlite3";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 
 vi.mock("next/headers", () => ({ cookies: async () => fakeCookies(), headers: async () => new Headers() }));
@@ -88,4 +90,26 @@ it("never deletes a poll its own zone still shows", async () => {
   await cleanup();
 
   expect(remaining().polls).toEqual([western]);
+});
+
+it("logs a failed daily cleanup with its SQLite code and deletes on the next day", async () => {
+  const expired = await pollOn(["2026-10-17"]);
+  const lines = loggedLines("error");
+
+  vi.setSystemTime(new Date("2026-12-16T14:00:00Z"));
+  await cleanup();
+  db.$client.pragma("busy_timeout = 0");
+  const writer = new Database(db.$client.name);
+
+  writer.exec("BEGIN IMMEDIATE");
+
+  expect(() => vi.advanceTimersByTime(day)).not.toThrow();
+  expect(remaining().polls).toEqual([expired]);
+  expect(lines().map((line) => JSON.parse(line))).toEqual([{ level: "error", message: "cleanup_failed", code: "SQLITE_BUSY" }]);
+
+  writer.exec("ROLLBACK");
+  writer.close();
+  vi.advanceTimersByTime(day);
+
+  expect(remaining().polls).toEqual([]);
 });
