@@ -22,7 +22,7 @@ export function Hero({ formId }: { formId: string }) {
           </span>
         </h1>
         <p className="m-0 max-w-90 text-lg text-balance text-muted lg:text-xl">{pitch}</p>
-        <GoToFormButton formId={formId} variant="loud">
+        <GoToFormButton formId={formId} variant="loud" data-report-pill-clear>
           Utwórz ankietę <span aria-hidden="true">→</span>
         </GoToFormButton>
         <span className="text-sm text-muted">Za darmo. Znajomi nie zakładają kont.</span>

@@ -1,21 +1,3 @@
 [data-report-pill] {
   bottom: calc(var(--spacing) * 4 + env(safe-area-inset-bottom));
 }
-
-@media (width < 1024px) {
-  body:has([data-bottom-bar]) [data-report-pill] {
-    bottom: calc(var(--spacing) * 22 + env(safe-area-inset-bottom));
-  }
-
-  body:has([data-bottom-bar]) [data-report-room] {
-    padding-bottom: calc(var(--spacing) * 37 + env(safe-area-inset-bottom));
-  }
-
-  body:has([data-bottom-bar] [role="alert"]) [data-report-pill] {
-    bottom: calc(var(--spacing) * 34 + env(safe-area-inset-bottom));
-  }
-
-  body:has([data-bottom-bar] [role="alert"]) [data-report-room] {
-    padding-bottom: calc(var(--spacing) * 49 + env(safe-area-inset-bottom));
-  }
-}
