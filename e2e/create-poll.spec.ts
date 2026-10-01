@@ -2,6 +2,7 @@ import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures";
 import { stubClipboardWithoutShareSheet, stubShareSheet } from "./clipboard";
 import { saveScreenshot, settleAnimations } from "./screenshot";
+import { expectAccessible } from "./accessibility";
 
 async function holdCreateAction(page: Page) {
   let release = () => {};
@@ -257,6 +258,7 @@ test("a create that fails says the poll was not created and to check the connect
 
   await expect(page).toHaveURL("/");
   await saveScreenshot(page, testInfo, "create-failed");
+  await expectAccessible(page);
 });
 
 const scrollToCreateBar = (page: Page) =>
@@ -290,6 +292,7 @@ test("a submit with no title brings the title and its error into view, clear of 
 
   await settleAnimations(page);
   await page.screenshot({ path: `e2e/screenshots/create-invalid-title-${testInfo.project.name}.png` });
+  await expectAccessible(page);
 });
 
 test("the month and the 10-day limit", async ({ page }, testInfo) => {
@@ -403,6 +406,7 @@ test("a poll that does not exist says it is gone and links to a new one", async 
 
   await expect(page.getByRole("heading", { name: "Tej ankiety już nie ma" })).toBeVisible();
   await saveScreenshot(page, testInfo, "poll-gone");
+  await expectAccessible(page);
   await page.getByRole("link", { name: "Zrób własną ankietę" }).click();
 
   await expect(page.getByRole("textbox", { name: "Co robimy?" })).toBeVisible();

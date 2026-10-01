@@ -1,5 +1,6 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { saveScreenshot } from "./screenshot";
+import { expectAccessible } from "./accessibility";
 
 const titleField = (page: Page) => page.getByRole("textbox", { name: "Co robimy?" });
 const hero = (page: Page) => page.getByRole("region", { name: "Kiedy się widzimy na grillu?" });
@@ -314,6 +315,8 @@ test.describe("with reduced motion", () => {
     await expect(outro(page).getByRole("img", { name: "Wpasuj" })).toHaveAttribute("data-lit");
 
     await saveScreenshot(page, testInfo, "landing");
+    await make(page).getByRole("group", { name: "Dni" }).scrollIntoViewIfNeeded();
+    await expectAccessible(page);
 
     for (const [name, section] of [
       ["hero", hero(page)],
