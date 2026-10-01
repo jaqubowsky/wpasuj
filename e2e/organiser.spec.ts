@@ -3,6 +3,7 @@ import { expect, test } from "./fixtures";
 import { stubClipboardWithoutShareSheet, stubShareSheet } from "./clipboard";
 import { saveScreenshot, settleAnimations } from "./screenshot";
 import { seedAnswer, seedPoll } from "./seed";
+import { expectAccessible } from "./accessibility";
 
 const saturday = "2030-10-26";
 const sunday = "2030-10-27";
@@ -75,6 +76,7 @@ test("the organiser reminds and sets the time", async ({ browser }, testInfo) =>
   await organiser.getByRole("button", { name: "Więcej" }).click();
   await expect(organiser.getByRole("dialog", { name: "Więcej" })).toBeVisible();
   await saveScreenshot(organiser, testInfo, "organiser-menu");
+  await expectAccessible(organiser);
   await organiser.getByRole("button", { name: "Usuń ankietę" }).click();
   await saveScreenshot(organiser, testInfo, "organiser-delete-confirm");
   await organiser.getByRole("button", { name: "Nie, zostaw" }).click();
@@ -223,6 +225,7 @@ test("after Ustal termin a participant sees the invitation with no grid, and can
   await expect(whoComes).toContainText("Bartek nie może.");
   await expect(participant.getByRole("button", { name: "Zmień termin" })).toHaveCount(0);
   await saveScreenshot(participant, testInfo, "set-participant");
+  await expectAccessible(participant);
 
   await participant.getByRole("button", { name: "Dodaj do kalendarza" }).click();
   const calendarMenu = participant.getByRole("dialog", { name: "Dodaj do kalendarza" });
@@ -337,6 +340,7 @@ test("Zobacz wszystkie głosy shows every vote read-only to a participant", asyn
   await expect(heatmap.getByRole("button", { name: "sb 26, 19:00, 4 z 5 może" })).not.toHaveAttribute("data-best");
   await expect(participant.getByRole("textbox", { name: "Twoje imię" })).toHaveCount(0);
   await saveScreenshot(participant, testInfo, "set-votes");
+  await expectAccessible(participant);
 });
 
 test("a tap opens the votes sheet without a focus ring", async ({ browser }, testInfo) => {
@@ -374,6 +378,7 @@ test("Zmień termin returns the organiser and a participant to the open poll", a
 
   await expect(organiser.getByText("Ustalone przez Ciebie")).toBeVisible();
   await saveScreenshot(organiser, testInfo, "set-organiser");
+  await expectAccessible(organiser);
 
   await organiser.getByRole("region", { name: "Twoja ankieta" }).getByRole("button", { name: "Zmień termin" }).click();
 
