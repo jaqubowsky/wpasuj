@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { serverLogPath } from "../playwright.config";
 import { expect, test } from "./fixtures";
 import { saveScreenshot } from "./screenshot";
+import { expectAccessible } from "./accessibility";
 
 const clientRenderFailures = () =>
   readFileSync(serverLogPath, "utf8")
@@ -14,6 +15,7 @@ test("a server error shows the Polish error page, and trying again renders the p
 
   await expect(page.getByRole("heading", { name: "Coś poszło nie tak" })).toBeVisible();
   await saveScreenshot(page, testInfo, "error-page");
+  await expectAccessible(page);
   await page.getByRole("button", { name: "Spróbuj ponownie" }).click();
 
   await expect(page.getByRole("heading", { name: "Druga próba działa" })).toBeVisible();

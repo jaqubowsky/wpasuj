@@ -3,6 +3,7 @@ import { expect, test } from "./fixtures";
 import { stubClipboardWithoutShareSheet } from "./clipboard";
 import { saveScreenshot, settleAnimations } from "./screenshot";
 import { seedAnswer, seedPoll } from "./seed";
+import { expectAccessible } from "./accessibility";
 
 const friday = "2031-10-17";
 const saturday = "2031-10-18";
@@ -135,6 +136,7 @@ test("Answer: a participant's Moje with the best time, the name and the Nie mog�
 
   await expect(page.getByRole("grid", { name: "Kiedy możesz?" }).getByRole("gridcell", { selected: true })).toHaveCount(5);
   await saveScreenshot(page, testInfo, "v3-answer");
+  await expectAccessible(page);
 });
 
 test("CantMake: Nie mogę and Cofnij move nothing above the grid", async ({ browser }, testInfo) => {
