@@ -7,6 +7,7 @@ type SheetProps = {
   menuBelow?: RefObject<HTMLElement | null>;
   menuAbove?: RefObject<HTMLElement | null>;
   menuFitsAnchor?: boolean;
+  sidePanel?: boolean;
   children: ReactNode;
 };
 
@@ -26,7 +27,7 @@ function restingBox(element: HTMLElement) {
   };
 }
 
-export function Sheet({ onClose, label, menuBelow, menuAbove, menuFitsAnchor, children }: SheetProps) {
+export function Sheet({ onClose, label, menuBelow, menuAbove, menuFitsAnchor, sidePanel, children }: SheetProps) {
   const menuAnchor = menuBelow ?? menuAbove;
   const ref = useRef<HTMLDialogElement>(null);
 
@@ -61,18 +62,22 @@ export function Sheet({ onClose, label, menuBelow, menuAbove, menuFitsAnchor, ch
   return (
     <dialog
       ref={ref}
-      className="group/sheet fixed inset-x-0 top-auto bottom-0 m-0 box-border max-h-[60dvh] w-full max-w-none overflow-y-auto rounded-t-card border-0 bg-surface p-0 text-ink shadow-sheet backdrop:bg-ink/30 open:animate-[sheet-up_var(--duration-sheet)_var(--ease-out)] open:backdrop:animate-[sheet-fade_var(--duration-sheet)_var(--ease-out)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink lg:data-menu:top-(--sheet-top) lg:data-menu:bottom-(--sheet-bottom) lg:data-menu:rounded-card lg:data-menu:shadow-poster lg:data-menu:backdrop:bg-transparent lg:data-menu:open:animate-[sheet-menu-in_var(--duration-pop)_var(--ease-spring)] lg:data-[menu=above]:right-(--sheet-right) lg:data-[menu=above]:left-auto lg:data-[menu=above]:w-80 lg:data-[menu=above]:origin-bottom-right lg:data-[menu=fit]:right-auto lg:data-[menu=fit]:left-(--sheet-left) lg:data-[menu=fit]:w-(--sheet-width) lg:data-[menu=fit]:origin-top-left lg:data-[menu=right]:right-(--sheet-right) lg:data-[menu=right]:left-auto lg:data-[menu=right]:w-80 lg:data-[menu=right]:origin-top-right"
+      className="group/sheet fixed inset-x-0 top-auto bottom-0 m-0 box-border max-h-[60dvh] w-full max-w-none overflow-y-auto rounded-t-card border-0 bg-surface p-0 text-ink shadow-sheet backdrop:bg-ink/30 open:animate-[sheet-up_var(--duration-sheet)_var(--ease-out)] open:backdrop:animate-[sheet-fade_var(--duration-sheet)_var(--ease-out)] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink lg:data-menu:top-(--sheet-top) lg:data-menu:bottom-(--sheet-bottom) lg:data-menu:rounded-card lg:data-menu:shadow-poster lg:data-menu:backdrop:bg-transparent lg:data-menu:open:animate-[sheet-menu-in_var(--duration-pop)_var(--ease-spring)] lg:data-side-panel:top-0 lg:data-side-panel:right-0 lg:data-side-panel:left-auto lg:data-side-panel:h-dvh lg:data-side-panel:max-h-none lg:data-side-panel:w-105 lg:data-side-panel:rounded-none lg:data-side-panel:rounded-l-card lg:data-side-panel:open:animate-[sheet-side-in_var(--duration-sheet)_var(--ease-out)] lg:data-[menu=above]:right-(--sheet-right) lg:data-[menu=above]:left-auto lg:data-[menu=above]:w-80 lg:data-[menu=above]:origin-bottom-right lg:data-[menu=fit]:right-auto lg:data-[menu=fit]:left-(--sheet-left) lg:data-[menu=fit]:w-(--sheet-width) lg:data-[menu=fit]:origin-top-left lg:data-[menu=right]:right-(--sheet-right) lg:data-[menu=right]:left-auto lg:data-[menu=right]:w-80 lg:data-[menu=right]:origin-top-right"
       aria-label={label}
       tabIndex={-1}
       data-sheet
+      data-side-panel={sidePanel || undefined}
       data-menu={menuBelow ? (menuFitsAnchor ? "fit" : "right") : menuAbove && "above"}
       onClose={onClose}
       onClick={(event) => {
         if (event.target === event.currentTarget) event.currentTarget.close();
       }}
     >
-      <div className="grid gap-1 px-5 pt-3 pb-[calc(--spacing(8)+env(safe-area-inset-bottom))] lg:group-data-menu/sheet:p-2">
-        <span className="mx-auto mb-2 block h-1 w-10 rounded-pill bg-line lg:group-data-menu/sheet:hidden" aria-hidden="true" />
+      <div className="grid gap-1 px-5 pt-3 pb-[calc(--spacing(8)+env(safe-area-inset-bottom))] lg:group-data-menu/sheet:p-2 lg:group-data-side-panel/sheet:box-border lg:group-data-side-panel/sheet:min-h-full lg:group-data-side-panel/sheet:content-start lg:group-data-side-panel/sheet:p-6">
+        <span
+          className="mx-auto mb-2 block h-1 w-10 rounded-pill bg-line lg:group-data-menu/sheet:hidden lg:group-data-side-panel/sheet:hidden"
+          aria-hidden="true"
+        />
         {children}
       </div>
     </dialog>

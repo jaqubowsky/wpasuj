@@ -6,6 +6,8 @@ import { Footer } from "./footer/footer";
 import { GoToFormButton } from "./go-to-form-button";
 import { Hero } from "./hero/hero";
 import { Make } from "./make/make";
+import { MyPolls } from "./my-polls/my-polls";
+import type { FindPolls } from "./my-polls/use-my-polls";
 import { Outro } from "./outro/outro";
 import { Quote } from "./quote/quote";
 import { TrySection } from "./try-poll/try-section";
@@ -14,13 +16,20 @@ import { WebApplicationJsonLd } from "./web-application-json-ld";
 
 const formId = "utworz";
 
-export function Landing({ form, home }: { form: ReactNode; home: URL }) {
+export function Landing({ form, home, findPolls }: { form: ReactNode; home: URL; findPolls: FindPolls }) {
   return (
     <>
       <WebApplicationJsonLd home={home} />
-      <header className="sticky top-0 z-1 box-border flex h-18 items-center justify-between bg-paper px-5 lg:px-12">
+      <header className="group/header sticky top-0 z-1 box-border flex h-18 items-center justify-between gap-2 bg-paper px-5 lg:px-12">
         <BrandMark />
-        <GoToFormButton formId={formId}>Utwórz ankietę</GoToFormButton>
+        <div className="flex items-center gap-2 lg:gap-3">
+          <MyPolls findPolls={findPolls} />
+          <GoToFormButton formId={formId}>
+            <span>
+              Utwórz<span className="max-lg:group-has-[[data-my-polls]]/header:hidden"> ankietę</span>
+            </span>
+          </GoToFormButton>
+        </div>
       </header>
       <main>
         <Hero formId={formId} />

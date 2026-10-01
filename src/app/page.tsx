@@ -1,3 +1,4 @@
+import { findPolls } from "@/modules/create-poll";
 import { CreatePollForm } from "@/modules/create-poll/client";
 import { Landing, landingMetadata } from "@/modules/landing";
 import { siteUrl } from "@/shared/site-url";
@@ -13,5 +14,5 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   await connection();
 
-  return <Landing form={<CreatePollForm />} home={new URL("/", siteUrl())} />;
+  return <Landing form={<CreatePollForm />} home={new URL("/", siteUrl())} findPolls={findPolls} />;
 }
