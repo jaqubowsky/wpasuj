@@ -158,6 +158,7 @@ export function useAnswer({ pollId, dates, hours, mine, fixedName }: AnswerOptio
     problem,
     asksName: fixedName === undefined,
     asksToMark: fixedName !== undefined && !holdsRow,
+    invitesOwnPoll: fixedName === undefined && holdsRow,
     saidCant: beforeCant !== undefined || (holdsRow && mySlots.size === 0 && !cantTurnedOff),
     justSaidCant: beforeCant !== undefined,
     isMine: (cell: GridCell) => mySlots.has(keyOf(cell)),
