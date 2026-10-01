@@ -7,7 +7,7 @@ import { cookies } from "next/headers";
 import { fitsPoll, refusalOf, takesOrganiserName } from "../domain/answer-rules";
 import { answerSchema, type AnswerInput, type Slot } from "./answer-schema";
 import { isOrganiserDevice } from "./answer-queries";
-import { claimParticipant, livePoll, participantByToken, participantCount, participantNamed, saveAnswerOf, slotsOf } from "./answer-store";
+import { claimParticipant, livePoll, participantByToken, participantNamed, saveAnswerOf, slotsOf } from "./answer-store";
 import { nameKey } from "../domain/name-rules";
 
 type NameTaken = { name: string; hours: number; yours?: { name: string; hours: number } };
@@ -51,19 +51,23 @@ export async function saveAnswer(pollId: string, answer: AnswerInput): Promise<S
   const yours = participant && { yours: { name: participant.name, hours: slotsOf(participant.id).length } };
   const nameHeldByOther = holder && !ownsName ? { name: holder.name, hours: slotsOf(holder.id).length, ...yours } : undefined;
   const organiserDevice = await isOrganiserDevice(poll);
+  const newcomerToken = newToken();
 
-  const refusal = refusalOf({
-    takesOrganiserName: takesOrganiserName({ name, organiserName: poll.organiserName, organiserDevice, ownsName }),
-    nameHeldByOther,
-    newcomer: !participant,
-    participantCount: participantCount(pollId),
-  });
+  const refusal = saveAnswerOf(
+    pollId,
+    participant,
+    { answer: { name, normalisedName, slots: mySlots }, newcomerToken, now: new Date() },
+    (participantCount) =>
+      refusalOf({
+        takesOrganiserName: takesOrganiserName({ name, organiserName: poll.organiserName, organiserDevice, ownsName }),
+        nameHeldByOther,
+        newcomer: !participant,
+        participantCount,
+      }),
+  );
 
   if (refusal) return { ok: false, ...refusal };
 
-  const newcomerToken = newToken();
-
-  saveAnswerOf(pollId, participant, { name, normalisedName, slots: mySlots }, newcomerToken, new Date());
   writeLogLine({ level: "info", message: "answer_saved", pollId });
   if (!participant) cookieStore.set(pollId, newcomerToken, await tokenCookieOptions());
 

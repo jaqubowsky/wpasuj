@@ -30,6 +30,21 @@ function onAnotherDevice() {
   cookieJar = fakeCookies();
 }
 
+function withParticipants(howMany: number) {
+  db.insert(participants)
+    .values(
+      Array.from({ length: howMany }, (_, friend) => ({
+        pollId,
+        name: `Osoba ${friend + 1}`,
+        normalisedName: `osoba ${friend + 1}`,
+        tokenHash: hashToken(`osoba-${friend + 1}`),
+        createdAt: thursdayNoonInWarsaw,
+        updatedAt: thursdayNoonInWarsaw,
+      })),
+    )
+    .run();
+}
+
 const organiserToken = "organiser-token";
 
 function onOrganiserDevice() {
@@ -243,18 +258,7 @@ describe("saveAnswer", () => {
   it("accepts a 30th participant and refuses a 31st", async () => {
     const { saveAnswer } = await actions();
 
-    db.insert(participants)
-      .values(
-        Array.from({ length: 29 }, (_, friend) => ({
-          pollId,
-          name: `Osoba ${friend + 1}`,
-          normalisedName: `osoba ${friend + 1}`,
-          tokenHash: hashToken(`osoba-${friend + 1}`),
-          createdAt: thursdayNoonInWarsaw,
-          updatedAt: thursdayNoonInWarsaw,
-        })),
-      )
-      .run();
+    withParticipants(29);
 
     onAnotherDevice();
 
@@ -263,6 +267,24 @@ describe("saveAnswer", () => {
     onAnotherDevice();
 
     expect(await saveAnswer(pollId, { name: "Bartek", slots: [friday19] })).toEqual({ ok: false, reason: "full" });
+  });
+
+  it("lets only one of two newcomers saving at once take the 30th place", async () => {
+    const { saveAnswer } = await actions();
+
+    withParticipants(29);
+
+    onAnotherDevice();
+    const olaSaves = saveAnswer(pollId, { name: "Ola", slots: [friday19] });
+
+    onAnotherDevice();
+    const bartekSaves = saveAnswer(pollId, { name: "Bartek", slots: [friday19] });
+
+    const results = await Promise.all([olaSaves, bartekSaves]);
+
+    expect(results).toContainEqual({ ok: false, reason: "full" });
+    expect(results).toContainEqual({ ok: true });
+    expect(db.select().from(participants).where(eq(participants.pollId, pollId)).all()).toHaveLength(30);
   });
 
   it("says gone for a deleted, expired or malformed poll", async () => {
