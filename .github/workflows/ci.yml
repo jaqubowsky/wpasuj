@@ -26,6 +26,7 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      - run: npm audit signatures
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run knip
