@@ -1,6 +1,7 @@
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, fireEvent, render, renderHook, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { useDevicePolls } from "@/shared/device-polls";
 import { isFreshPoll } from "@/shared/fresh-poll";
 import { CreatePollForm } from "./create-poll-form";
 
@@ -247,6 +248,26 @@ describe("Utwórz i wyślij na grupę", () => {
     expect(push).toHaveBeenCalledWith("/e/abcdefghij");
     expect(share).not.toHaveBeenCalled();
     expect(isFreshPoll("abcdefghij")).toBe(true);
+  });
+
+  it("keeps the created poll on this device as the organiser's, with its last date", async () => {
+    createPoll.mockResolvedValue({ ok: true, id: "abcdefghij" });
+    render(<CreatePollForm />);
+    await fillIn("Ten weekend");
+
+    await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
+
+    expect(renderHook(() => useDevicePolls()).result.current).toEqual([{ id: "abcdefghij", role: "organiser", lastDate: "2026-10-18" }]);
+  });
+
+  it("keeps nothing on this device when the server refuses the poll", async () => {
+    createPoll.mockResolvedValue({ ok: false, reason: "invalid" });
+    render(<CreatePollForm />);
+    await fillIn("Dziś");
+
+    await act(() => userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" })));
+
+    expect(renderHook(() => useDevicePolls()).result.current).toEqual([]);
   });
 
   it("answers the tap at once with Tworzę ankietę… and creates nothing on a second tap", async () => {

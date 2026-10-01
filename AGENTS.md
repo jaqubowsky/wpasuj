@@ -30,7 +30,7 @@ A no-account availability poll for a group of friends: one link in the group cha
 ```
 
 - The organiser creates a poll at `/` and keeps an organiser cookie for it; `/e/[id]/organizator/[token]` grants that cookie on another device. Participants answer at `/e/[id]` under a per-poll cookie; the organiser sets the final time there, exported at `/e/[id]/termin.ics`
-- Mutations are server actions; the only client-side server state is the results query (TanStack Query in `view-results`), refetched every 8 s from `/api/polls/[id]`
+- Mutations are server actions; client-side server state is the results query (TanStack Query in `view-results`), refetched every 8 s from `/api/polls/[id]`, and the landing's "Moje ankiety" query, which calls the `findPolls` server action when the list opens (ADR 0043)
 - One process owns the database file and deletes expired polls from it on start and every 24 h (ADR 0039), so nothing may assume a serverless or edge runtime. A run the database refuses writes `{"level":"error","message":"cleanup_failed","code"}` (the SQLite error code) through `writeLogLine` and the server keeps serving; the next run tries again
 
 ## Scripts
