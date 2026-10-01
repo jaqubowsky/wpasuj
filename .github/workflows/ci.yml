@@ -2,16 +2,35 @@ name: CI
 
 on:
   pull_request:
-    paths-ignore: ["**/*.md"]
   push:
     branches: [main]
-    paths-ignore: ["**/*.md"]
 
 permissions:
   contents: read
 
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.diff.outputs.code }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - id: diff
+        run: |
+          if git diff --quiet "$BASE" HEAD -- ':(exclude)*.md'; then
+            echo code=false >> "$GITHUB_OUTPUT"
+          else
+            echo code=true >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+
   quick:
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -33,7 +52,8 @@ jobs:
       - run: npm test
 
   coverage:
-    if: ${{ github.event_name == 'pull_request' }}
+    needs: changes
+    if: ${{ github.event_name == 'pull_request' && needs.changes.outputs.code == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -52,6 +72,8 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
 
   build:
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -71,7 +93,8 @@ jobs:
           retention-days: 1
 
   e2e:
-    needs: build
+    needs: [changes, build]
+    if: ${{ !cancelled() && !failure() }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -84,38 +107,45 @@ jobs:
           - project: desktop-chromium
             browser: chromium
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - if: ${{ needs.changes.outputs.code == 'true' }}
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      - if: ${{ needs.changes.outputs.code == 'true' }}
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
-      - run: npx playwright install --with-deps ${{ matrix.browser }}
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+      - if: ${{ needs.changes.outputs.code == 'true' }}
+        run: npm ci
+      - if: ${{ needs.changes.outputs.code == 'true' }}
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+      - if: ${{ needs.changes.outputs.code == 'true' }}
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: build
-      - run: tar -xf build.tar
-      - run: |
+      - if: ${{ needs.changes.outputs.code == 'true' }}
+        run: tar -xf build.tar
+      - if: ${{ needs.changes.outputs.code == 'true' }}
+        run: |
           .github/scripts/memory-monitor.sh memory.log &
           trap 'kill $!' EXIT
           npm run e2e -- --project=${{ matrix.project }}
-      - if: ${{ always() }}
+      - if: ${{ always() && needs.changes.outputs.code == 'true' }}
         run: sudo dmesg -T | grep -iE 'oom|killed process' || echo 'no oom-kill in dmesg'
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        if: ${{ always() }}
+        if: ${{ always() && needs.changes.outputs.code == 'true' }}
         with:
           name: memory-${{ matrix.project }}
           path: memory.log
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && needs.changes.outputs.code == 'true' }}
         with:
           name: screenshots-${{ matrix.project }}
           path: e2e/screenshots/
           if-no-files-found: error
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        if: ${{ failure() }}
+        if: ${{ failure() && needs.changes.outputs.code == 'true' }}
         with:
           name: test-results-${{ matrix.project }}
           path: test-results/
@@ -140,6 +170,8 @@ jobs:
       - run: npm run perf
 
   docker:
+    needs: changes
+    if: ${{ needs.changes.outputs.code == 'true' }}
     runs-on: ubuntu-latest
     env:
       URL: http://localhost:3000
