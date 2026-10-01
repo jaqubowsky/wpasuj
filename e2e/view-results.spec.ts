@@ -1,5 +1,5 @@
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
-import { saveScreenshot } from "./screenshot";
+import { saveScreenshot, settleAnimations } from "./screenshot";
 import { seedAnswer, seedPoll } from "./seed";
 
 declare global {
@@ -186,4 +186,49 @@ test("the best time leads the page on a phone and sits beside the heatmap on a d
 
   expect(details.x).toBeGreaterThanOrEqual(bestAfterScroll.x);
   expect(details.y).toBeGreaterThan(bestAfterScroll.y + bestAfterScroll.height);
+});
+
+test("a 30-character name stays on one line in the phone's sheets", async ({ page }, testInfo) => {
+  test.skip(!isPhone(testInfo), "the sheets open on a phone");
+  const longName = "Magdalena Nowakowska-Zielińska";
+  const open = seedPoll({ dates: [saturday, sunday], firstHour: 17, hourCount: 4 });
+  const set = seedPoll({ dates: [saturday, sunday], firstHour: 17, hourCount: 4, final: { date: saturday, firstHour: 18, lastHour: 19 } });
+
+  seedAnswer(open, longName, minutesAgo(0), [[saturday, 18]]);
+  seedAnswer(set, longName, minutesAgo(0), [[saturday, 18]]);
+
+  const sheets = [
+    { pollId: open, taps: ["1 osoba"], sheet: "Odpowiedzieli", list: "Zaznaczyli godziny" },
+    { pollId: open, taps: ["sb 19, 18:00, 1 z 1 może"], sheet: "Sobota 19.10, 18:00", list: "Może" },
+    { pollId: set, taps: ["Zobacz wszystkie głosy", "sb 19, 18:00, 1 z 1 może"], sheet: "Wszystkie głosy", list: "Może" },
+  ];
+
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+
+    for (const { pollId, taps, sheet: sheetName, list } of sheets) {
+      await page.goto(`/e/${pollId}`);
+      if (pollId === open) await page.getByRole("tab", { name: "Wszyscy" }).click();
+
+      for (const tap of taps) await page.getByRole("button", { name: tap }).click();
+
+      const sheet = page.getByRole("dialog", { name: sheetName });
+      const row = sheet.getByRole("list", { name: list, exact: true }).getByRole("listitem");
+
+      await expect(row).toHaveText(`M${longName}`);
+      await settleAnimations(page);
+
+      const [rowBox, sheetBox, overflow] = await Promise.all([
+        row.boundingBox(),
+        sheet.boundingBox(),
+        row.evaluate((element) => ({ x: element.scrollWidth - element.clientWidth, y: element.scrollHeight - element.clientHeight })),
+      ]);
+
+      expect(overflow).toEqual({ x: 0, y: 0 });
+      expect(rowBox!.height).toBe(44);
+      expect(rowBox!.x).toBeGreaterThanOrEqual(sheetBox!.x);
+      expect(rowBox!.x + rowBox!.width).toBeLessThanOrEqual(sheetBox!.x + sheetBox!.width);
+      if (sheetName === "Odpowiedzieli") await saveScreenshot(page, testInfo, `results-long-name-${width}`);
+    }
+  }
 });

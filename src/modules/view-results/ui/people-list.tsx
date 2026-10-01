@@ -22,7 +22,7 @@ export function PeopleList({ groups, you, organiserKey, arrived }: PeopleListPro
     .map((group, index) => (
       <div
         key={group.label}
-        className="not-first-of-type:mt-2 not-first-of-type:border-0 not-first-of-type:border-t not-first-of-type:border-solid not-first-of-type:border-line"
+        className="min-w-0 not-first-of-type:mt-2 not-first-of-type:border-0 not-first-of-type:border-t not-first-of-type:border-solid not-first-of-type:border-line"
       >
         <div className="flex h-9 items-baseline justify-between pt-2 text-sm font-semibold">
           <h3 id={`${id}-${index}`} className="m-0 text-sm font-semibold">
@@ -40,7 +40,7 @@ export function PeopleList({ groups, you, organiserKey, arrived }: PeopleListPro
             return (
               <li
                 key={person.normalisedName}
-                className="flex h-11 items-center gap-3 rounded-cell px-1.5 text-base transition-[background-color,translate] duration-(--duration-fill) ease-out data-can:translate-x-1 data-can:bg-heat-1 data-cannot:text-muted motion-safe:data-can:animate-[people-nudge_var(--duration-pop)_var(--ease-out)]"
+                className="flex h-11 min-w-0 items-center gap-3 rounded-cell px-1.5 text-base transition-[background-color,translate] duration-(--duration-fill) ease-out data-can:translate-x-1 data-can:bg-heat-1 data-cannot:text-muted motion-safe:data-can:animate-[people-nudge_var(--duration-pop)_var(--ease-out)]"
                 data-can={group.can || undefined}
                 data-cannot={cannot || undefined}
               >
@@ -51,7 +51,7 @@ export function PeopleList({ groups, you, organiserKey, arrived }: PeopleListPro
                   mark={cannot ? "cannot" : isOrganiser ? "organiser" : undefined}
                   pop={arrived?.(person)}
                 />
-                {person.name}
+                <span className="truncate">{person.name}</span>
                 {states.length > 0 && <span className="sr-only">, {states.join(", ")}</span>}
               </li>
             );
