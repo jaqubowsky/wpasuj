@@ -96,3 +96,4 @@ Tailwind v4 utilities written inline in `className`; `src/app/` is the reference
 - Work lives in the Linear team the project overlay names: one issue per ticket, one pull request per issue against `main`. The host plans there and decides what the brief leaves open
 - A decision a later change could undo unknowingly is an ADR in `docs/adr/` (`NNNN-<slug>.md`, the next number, the format of the ADRs there), proposed in the pull request that needs it; a decision that shapes only one issue's work goes into that issue
 - Done means a pull request with CI green for the host to merge; containers never merge
+- CodeRabbit is advisory, never a gate: its free plan is rate-limited, it skips Dependabot's pull requests and reviews a later push only on `@coderabbitai review`. When its review arrives before `ready-for-host`, a container answers each comment with a fix or a reply giving the reason; it never waits for one

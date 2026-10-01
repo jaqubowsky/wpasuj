@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: en-US
+tone_instructions: "Plain, short English. Name the rule you apply and its source (spec/brief.md section, ADR number or AGENTS.md section). No praise, no summaries of what the code already says."
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  in_progress_fortune: false
+  sequence_diagrams: false
+  suggested_labels: false
+  suggested_reviewers: false
+  auto_review:
+    auto_incremental_review: false
+    ignore_usernames:
+      - "dependabot[bot]"
+  path_filters:
+    - "!package-lock.json"
+    - "!spec/design/**"
+knowledge_base:
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - files: "spec/brief.md,docs/adr/*.md"
+        applyTo: "src/**,e2e/**"
