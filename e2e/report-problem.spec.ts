@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { expect, test } from "./fixtures";
 import { settleAnimations } from "./screenshot";
 import { seedAnswer, seedPoll } from "./seed";
+import { expectAccessible } from "./accessibility";
 
 const pill = (page: Page) => page.getByRole("button", { name: "Zgłoś problem" });
 const reportForm = (page: Page) => page.getByRole("dialog", { name: "Zgłoś problem" });
@@ -291,6 +292,7 @@ test("the pill opens the form, shows it sending and thanks the reporter", async 
   await pill(page).click();
   await expect(reportForm(page)).toBeVisible();
   await saveViewport(page, testInfo, "report-open");
+  await expectAccessible(page);
   await reportForm(page).getByRole("textbox", { name: "Co nie działa?" }).fill("Test z e2e, zatrzymany na pułapce");
   await reportForm(page).locator("input[name=website]").fill("https://bot.example", { force: true });
   await reportForm(page).getByRole("button", { name: "Wyślij zgłoszenie" }).click();
@@ -320,4 +322,5 @@ test("an empty report shows the field's error", async ({ page }, testInfo) => {
 
   await expect(reportForm(page).getByRole("textbox", { name: "Co nie działa?" })).toHaveAccessibleDescription("Napisz, co nie działa");
   await saveViewport(page, testInfo, "report-invalid");
+  await expectAccessible(page);
 });

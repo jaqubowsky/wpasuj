@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { saveScreenshot } from "./screenshot";
+import { expectAccessible } from "./accessibility";
 
 const pages = [
   { path: "/polityka-prywatnosci", title: "Polityka prywatności", screen: "privacy-policy" },
@@ -28,5 +29,6 @@ for (const { path, title, screen } of pages) {
     if (testInfo.project.name.startsWith("phone")) expect(textEnd).toBeLessThanOrEqual(2 * screenHeight);
 
     await saveScreenshot(page, testInfo, screen);
+    await expectAccessible(page);
   });
 }
