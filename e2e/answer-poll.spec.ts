@@ -34,6 +34,7 @@ const nameField = (page: Page) => page.getByRole("textbox", { name: "Twoje imię
 const status = (page: Page) => page.getByRole("status");
 const selected = (page: Page) => page.getByRole("gridcell", { selected: true });
 const cantButton = (page: Page) => page.getByRole("button", { name: "Nie mogę w żadnym terminie" });
+const invitation = (page: Page) => page.getByRole("link", { name: "Też coś planujesz? Zrób własną ankietę" });
 
 function cellAt(page: Page, hourIndex: number, dateIndex: number) {
   return page
@@ -219,6 +220,30 @@ test("the organiser answers on Moje under the name from create, with no name fie
 
   await expect(status(organiser)).toHaveText("Zapisane");
   await expect(cantButton(organiser)).toBeVisible();
+  await expect(invitation(organiser)).toHaveCount(0);
+});
+
+test("a participant is invited to make their own poll under the saved answer, again on return", async ({ browser }, testInfo) => {
+  const { link } = await createPoll(browser);
+  const page = await openAsNewDevice(browser, link);
+
+  await nameField(page).fill("Zuza");
+  await expect(invitation(page)).toHaveCount(0);
+  await tap(cellAt(page, 0, 0), testInfo);
+
+  await expect(status(page)).toHaveText("Zapisane");
+  await expect(invitation(page)).toBeVisible();
+  expect((await invitation(page).boundingBox())!.y).toBeGreaterThan((await cantButton(page).boundingBox())!.y);
+  await saveScreenshot(page, testInfo, "answer-invitation");
+
+  await page.reload();
+  await page.getByRole("tab", { name: "Moje" }).click();
+
+  await expect(invitation(page)).toBeVisible();
+
+  await invitation(page).click();
+
+  await expect(page).toHaveURL(/\/$/);
 });
 
 test("a returning device finds its last name prefilled and the field left alone", async ({ browser }) => {

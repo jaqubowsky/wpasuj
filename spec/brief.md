@@ -75,7 +75,7 @@ The organiser is whoever holds the organiser cookie, set on create. The results 
 
 - **Przypomnij**: a message that names who already answered, because a request addressed to named people gets more replies than one to everyone: "Już są: Bartek, Ola i Michał. Reszta, kiedy możecie? {title} {link}" ("Już jest: Ola." for one). With nobody answered: "Kiedy możecie? {title} {link}". Share sheet on the phone, copy elsewhere.
 - **Ustal termin**: on the best time. The page then leads with "Ustalone: sobota 18.10, 19:00" for everyone, with "Dodaj do kalendarza", a menu of Kalendarz Google and Outlook (their prefilled web editors) and Kalendarz Apple (an `.ics` served inline, DTSTART and DTEND in UTC), each carrying the poll link; answering closes. "Zmień" clears the final time and reopens answering.
-- **Zrób własną ankietę**: a quiet link at the bottom of every poll page, for everyone, because every participant who sees a poll is the next organiser.
+- **Zrób własną ankietę**: a quiet link at the bottom of every poll page, for everyone, because every participant who sees a poll is the next organiser. Besides it, a participant whose answer is saved, from the first save on and again on return, sees one line under their answer, "Też coś planujesz? Zrób własną ankietę →", linking to `/`: no card, no animation, never on the organiser's device (owner, 2026-10-01, WPA-116).
 - **Więcej** menu: "Kopiuj link", "Link organizatora" (a URL that sets the organiser cookie on another device, with one line saying to keep it private), and "Usuń ankietę", confirmed inline.
 
 The organiser also answers like anyone else.
