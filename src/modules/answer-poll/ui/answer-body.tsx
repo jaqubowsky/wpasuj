@@ -55,7 +55,7 @@ export function AnswerBody() {
         )}
       </Board>
       {answer.invitesOwnPoll && (
-        <p className="m-0 text-center">
+        <p className="m-0 text-center" data-answer-invite>
           <TextLink href="/">
             Też coś planujesz? Zrób własną ankietę
             <span aria-hidden className="ps-1">
