@@ -61,7 +61,7 @@ export function CreatePollForm() {
         />
         <div
           className="sticky bottom-0 -mx-3 flex flex-col gap-2 rounded-b-card border-t border-line bg-surface px-3 pt-3 pb-[calc(--spacing(3)+env(safe-area-inset-bottom))] lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:p-0"
-          data-bottom-bar
+          data-report-pill-clear
         >
           {status === "refused" && (
             <p className="m-0 text-sm font-medium text-accent-ink" role="alert">

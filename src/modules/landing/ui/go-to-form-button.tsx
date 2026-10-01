@@ -14,13 +14,15 @@ export function GoToFormButton({
   formId,
   variant = "primary",
   children,
+  "data-report-pill-clear": reportPillClear,
 }: {
   formId: string;
   variant?: "primary" | "loud" | "loud-light";
   children: ReactNode;
+  "data-report-pill-clear"?: boolean;
 }) {
   return (
-    <Button variant={variant} onClick={() => goToForm(formId)}>
+    <Button variant={variant} onClick={() => goToForm(formId)} data-report-pill-clear={reportPillClear}>
       {children}
     </Button>
   );

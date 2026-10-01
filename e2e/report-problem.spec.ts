@@ -6,7 +6,10 @@ import { seedAnswer, seedPoll } from "./seed";
 
 const pill = (page: Page) => page.getByRole("button", { name: "Zgłoś problem" });
 const reportForm = (page: Page) => page.getByRole("dialog", { name: "Zgłoś problem" });
+const createButton = (page: Page) => page.getByRole("button", { name: "Utwórz i wyślij na grupę" });
 const isPhone = (testInfo: TestInfo) => testInfo.project.name.startsWith("phone");
+const cornerGap = 16;
+const roomForPill = 76;
 
 async function box(locator: Locator) {
   const found = await locator.boundingBox();
@@ -23,6 +26,38 @@ function overlap(a: { x: number; y: number; width: number; height: number }, b: 
 async function scrollToEnd(page: Page) {
   await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
   await page.waitForFunction(() => Math.ceil(window.scrollY + window.innerHeight) >= document.documentElement.scrollHeight);
+}
+
+async function settledPill(page: Page) {
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await settleAnimations(page);
+
+  return page.evaluate(() => {
+    const corner = document.querySelector("[data-report-pill]")!;
+    const button = corner.querySelector("button")!.getBoundingClientRect();
+    const style = getComputedStyle(corner);
+
+    return {
+      hidden: style.opacity === "0" && style.pointerEvents === "none",
+      tapped: document.elementFromPoint(button.x + button.width / 2, button.y + button.height / 2)?.closest("button")?.textContent,
+    };
+  });
+}
+
+async function expectPillTappable(page: Page) {
+  expect(await settledPill(page)).toEqual({ hidden: false, tapped: "Zgłoś problem" });
+}
+
+async function expectPillOutOfTheWay(page: Page, others: Locator[]) {
+  if ((await settledPill(page)).hidden) return;
+
+  const pillBox = await box(pill(page));
+
+  for (const other of others) {
+    const otherBox = await other.boundingBox();
+
+    if (otherBox) expect(overlap(pillBox, otherBox), `pill over ${await other.textContent()}`).toBe(false);
+  }
 }
 
 async function expectPillClear(page: Page, others: Locator) {
@@ -52,20 +87,19 @@ async function saveViewport(page: Page, testInfo: TestInfo, screen: string) {
 
 function pillWhileScrolling(page: Page) {
   return page.evaluate(async () => {
-    const frame = () => new Promise((resolve) => requestAnimationFrame(() => setTimeout(() => requestAnimationFrame(resolve))));
-    const rect = (selector: string) => document.querySelector(selector)?.getBoundingClientRect().toJSON() ?? null;
+    const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
     const steps = [];
 
     for (let top = 0; top <= document.documentElement.scrollHeight - innerHeight + 40; top += 40) {
       window.scrollTo({ top, behavior: "instant" });
       await frame();
-      await frame();
 
-      const bar = rect("[data-bottom-bar]");
+      const corner = document.querySelector("[data-report-pill]")!;
 
       steps.push({
-        pill: rect("[data-report-pill] button"),
-        pinnedButton: bar && Math.abs(bar.bottom - document.documentElement.clientHeight) <= 1 ? rect("[data-bottom-bar] button") : null,
+        pill: corner.querySelector("button")!.getBoundingClientRect().toJSON(),
+        viewportBottom: document.documentElement.clientHeight,
+        hidden: getComputedStyle(corner).pointerEvents === "none",
       });
     }
 
@@ -76,8 +110,7 @@ function pillWhileScrolling(page: Page) {
 function pillThroughJumps(page: Page) {
   return page.evaluate(async () => {
     const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
-    const rect = (selector: string) => document.querySelector(selector)?.getBoundingClientRect().toJSON() ?? null;
-    const form = document.querySelector("[data-bottom-bar]")!.closest("form")!.getBoundingClientRect();
+    const form = document.querySelector("form [data-report-pill-clear]")!.closest("form")!.getBoundingClientRect();
     const tops = [];
     const samples = [];
 
@@ -85,16 +118,17 @@ function pillThroughJumps(page: Page) {
 
     for (const top of [...tops, ...tops.toReversed()]) {
       window.scrollTo({ top, behavior: "instant" });
+      await frame();
+      await frame();
 
-      for (let sample = 0; sample < 4; sample++) {
-        await frame();
-        const bar = rect("[data-bottom-bar]")!;
+      const corner = document.querySelector("[data-report-pill]")!;
 
-        samples.push({
-          pill: rect("[data-report-pill] button"),
-          pinnedButton: Math.abs(bar.bottom - document.documentElement.clientHeight) <= 1 ? rect("[data-bottom-bar] button") : null,
-        });
-      }
+      samples.push({
+        top,
+        pill: corner.querySelector("button")!.getBoundingClientRect().toJSON(),
+        hidden: getComputedStyle(corner).pointerEvents === "none",
+        createButton: document.querySelector("form [data-report-pill-clear] button")!.getBoundingClientRect().toJSON(),
+      });
     }
 
     return samples;
@@ -105,6 +139,12 @@ function places(steps: { pill: unknown }[]) {
   return new Set(steps.map((step) => JSON.stringify(step.pill)));
 }
 
+async function openLandingWithPillClear(page: Page) {
+  await page.goto("/");
+  await page.evaluate(() => window.scrollBy({ top: 160, behavior: "instant" }));
+  await expectPillTappable(page);
+}
+
 function seedLongPoll() {
   const pollId = seedPoll({ dates: ["2031-10-17", "2031-10-18", "2031-10-19", "2031-10-20"], firstHour: 8, hourCount: 14 });
 
@@ -113,47 +153,73 @@ function seedLongPoll() {
   return pollId;
 }
 
-test("the pill stays in view on the landing and clears the sticky create button", async ({ page }, testInfo) => {
+test("the pill is tappable at the landing's footer, on the hero at 1440, and the page ends in room for the pill alone", async ({
+  page,
+}, testInfo) => {
   await page.goto("/");
 
+  if (!isPhone(testInfo)) await expectPillTappable(page);
+
   await expectPillInViewAtTopAndEnd(page);
+  await expectPillTappable(page);
+  expect(await page.locator("[data-report-room]").evaluate((room) => room.getBoundingClientRect().height)).toBe(roomForPill);
   await saveViewport(page, testInfo, "report-pill-landing-end");
-
-  if (!isPhone(testInfo)) return;
-
-  const create = page.getByRole("button", { name: "Utwórz i wyślij na grupę" });
-
-  await page.getByRole("textbox", { name: "Co robimy?" }).scrollIntoViewIfNeeded();
-  await page.evaluate(() => window.scrollBy({ top: 120, behavior: "instant" }));
-  await expect(create).toBeInViewport();
-  await expect(pill(page)).toBeInViewport();
-  await expectPillClear(page, create);
-  await saveViewport(page, testInfo, "report-pill-above-create-bar");
 });
 
-test("the pill stays still while the landing scrolls and clears the pinned create bar", async ({ page }) => {
+test("at 390×664 the pill hides over the hero's create button and comes back once the button scrolls above it", async ({
+  page,
+}, testInfo) => {
+  test.skip(!isPhone(testInfo), "the pill hides on the phone only");
+  await page.setViewportSize({ width: 390, height: 664 });
+  await page.goto("/");
+
+  const heroCreate = page.locator("[data-hero]").getByRole("button", { name: "Utwórz ankietę" });
+
+  expect(overlap(await box(pill(page)), await box(heroCreate))).toBe(true);
+  expect((await settledPill(page)).hidden).toBe(true);
+  await saveViewport(page, testInfo, "report-pill-over-hero-create");
+  await page.evaluate(() => window.scrollBy({ top: 160, behavior: "instant" }));
+  await expectPillTappable(page);
+  expect(overlap(await box(pill(page)), await box(heroCreate))).toBe(false);
+  await saveViewport(page, testInfo, "report-pill-landing-hero");
+});
+
+test("the pill keeps its corner while the landing scrolls", async ({ page }, testInfo) => {
+  test.slow(true, "a frame per 40px step over the whole landing");
   await page.goto("/");
 
   const steps = await pillWhileScrolling(page);
 
   expect(places(steps).size).toBe(1);
+  expect(steps[0].viewportBottom - steps[0].pill.bottom).toBe(cornerGap);
 
-  for (const { pill: pillBox, pinnedButton } of steps) {
-    if (pillBox && pinnedButton) expect(overlap(pillBox, pinnedButton)).toBe(false);
-  }
+  if (!isPhone(testInfo)) expect(steps.filter((step) => step.hidden)).toEqual([]);
 });
 
-test("the pill neither moves nor meets the pinned create button when the landing jumps through the form", async ({ page }, testInfo) => {
+test("the pill hides under the pinned create bar and a tap there creates the poll", async ({ page }, testInfo) => {
+  test.skip(!isPhone(testInfo), "the create bar is sticky on the phone only");
+  await page.goto("/");
+  await page.getByText("Kiedy?").scrollIntoViewIfNeeded();
+  await page.evaluate(() => window.scrollBy({ top: 120, behavior: "instant" }));
+
+  const bar = await box(page.locator("form [data-report-pill-clear]"));
+
+  expect(bar.y + bar.height).toBe(page.viewportSize()!.height);
+  expect(await settledPill(page)).toEqual({ hidden: true, tapped: "Utwórz i wyślij na grupę" });
+  await saveViewport(page, testInfo, "report-pill-under-create-bar");
+});
+
+test("two frames after each jump through the form the pill is hidden or clear of the create button", async ({ page }, testInfo) => {
   test.skip(!isPhone(testInfo), "the create bar is sticky on the phone only");
   await page.goto("/");
 
   const samples = await pillThroughJumps(page);
 
-  for (const { pill: pillBox, pinnedButton } of samples) {
-    if (pillBox && pinnedButton) expect(overlap(pillBox, pinnedButton)).toBe(false);
-  }
-
   expect(places(samples).size).toBe(1);
+
+  for (const { top, pill: pillBox, hidden, createButton: button } of samples) {
+    if (!hidden) expect(overlap(pillBox, button), `pill on the create button at ${top}`).toBe(false);
+  }
 });
 
 test("the pill clears the create bar's error when creating fails", async ({ page }, testInfo) => {
@@ -163,21 +229,24 @@ test("the pill clears the create bar's error when creating fails", async ({ page
   await page.getByRole("textbox", { name: "Co robimy?" }).fill("Planszówki");
   await page.getByRole("button", { name: "Ten weekend" }).click();
   await page.getByRole("textbox", { name: "Twoje imię" }).fill("Kuba");
-  await page.getByRole("button", { name: "Utwórz i wyślij na grupę" }).click();
+  await createButton(page).click();
 
   const failed = page.getByRole("alert").filter({ hasText: "Nie udało się utworzyć ankiety." });
 
   await expect(failed).toBeVisible();
   await page.evaluate(() => window.scrollBy({ top: -300, behavior: "instant" }));
-  await expectPillClear(page, failed);
-  await saveViewport(page, testInfo, "report-pill-above-create-error");
+  await expectPillOutOfTheWay(page, [failed, createButton(page)]);
+  await saveViewport(page, testInfo, "report-pill-create-error");
 });
 
-test("the pill stays still while the poll page scrolls", async ({ page }) => {
+test("the pill stays still and visible while the poll page scrolls", async ({ page }) => {
   await page.goto(`/e/${seedLongPoll()}`);
   await expect(page.getByRole("gridcell").first()).toBeVisible();
 
-  expect(places(await pillWhileScrolling(page)).size).toBe(1);
+  const steps = await pillWhileScrolling(page);
+
+  expect(places(steps).size).toBe(1);
+  expect(steps.filter((step) => step.hidden)).toEqual([]);
 });
 
 for (const tab of ["Moje", "Wszyscy"] as const) {
@@ -216,7 +285,7 @@ test("the pill opens the form, shows it sending and thanks the reporter", async 
     await route.continue();
   });
 
-  await page.goto("/");
+  await openLandingWithPillClear(page);
   await saveViewport(page, testInfo, "report-closed");
 
   await pill(page).click();
@@ -235,7 +304,7 @@ test("the pill opens the form, shows it sending and thanks the reporter", async 
 });
 
 test("without a Linear key the form points to the e-mail address", async ({ page }, testInfo) => {
-  await page.goto("/");
+  await openLandingWithPillClear(page);
   await pill(page).click();
   await reportForm(page).getByRole("textbox", { name: "Co nie działa?" }).fill("Test z e2e bez klucza Linear");
   await reportForm(page).getByRole("button", { name: "Wyślij zgłoszenie" }).click();
@@ -245,7 +314,7 @@ test("without a Linear key the form points to the e-mail address", async ({ page
 });
 
 test("an empty report shows the field's error", async ({ page }, testInfo) => {
-  await page.goto("/");
+  await openLandingWithPillClear(page);
   await pill(page).click();
   await reportForm(page).getByRole("button", { name: "Wyślij zgłoszenie" }).click();
 
