@@ -27,6 +27,7 @@ it("deletes a poll's answers with the poll", async () => {
     title: "Kino",
     organiserName: "Kuba",
     dates: ["2026-10-17"],
+    lastDate: "2026-10-17",
     firstHour: 17,
     hourCount: 6,
     timeZone: "Europe/Warsaw",

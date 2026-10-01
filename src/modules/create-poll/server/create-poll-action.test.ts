@@ -140,31 +140,17 @@ describe("createPoll", () => {
     expect(lines().map((line) => JSON.parse(line).createdByParticipant)).toEqual([false, false, true]);
   });
 
-  it("removes polls 60 days past their last date before it inserts", async () => {
+  it("deletes no poll, however long past its last date", async () => {
     const { createPoll } = await actions();
     const old = await createPoll({ ...input, dates: ["2026-10-15"] });
-    const recent = await createPoll({ ...input, dates: ["2026-10-16"] });
 
-    vi.setSystemTime(new Date("2026-12-16T10:00:00Z"));
-    await createPoll({ ...input, dates: ["2026-12-16"] });
+    vi.setSystemTime(new Date("2027-03-01T10:00:00Z"));
+    await createPoll({ ...input, dates: ["2027-03-01"] });
 
     const ids = (await db.select({ id: polls.id }).from(polls)).map((row) => row.id);
 
-    expect(ids).not.toContain(old.ok ? old.id : "");
-    expect(ids).toContain(recent.ok ? recent.id : "");
+    expect(ids).toContain(old.ok ? old.id : "");
     expect(ids).toHaveLength(2);
-  });
-
-  it("never removes a poll its own zone still shows", async () => {
-    const { createPoll } = await actions();
-    const { findPoll } = await queries();
-    const western = await createPoll({ ...input, dates: ["2026-10-16"], timeZone: "Pacific/Pago_Pago" });
-    const id = western.ok ? western.id : "";
-
-    vi.setSystemTime(new Date("2026-12-16T05:00:00Z"));
-    await createPoll({ ...input, dates: ["2026-12-16"] });
-
-    expect(findPoll(id, new Date())).toBeDefined();
   });
 
   it.each([

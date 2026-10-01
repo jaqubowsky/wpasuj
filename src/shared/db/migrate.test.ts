@@ -14,13 +14,13 @@ afterEach(() => {
   rmSync(directory, { recursive: true, force: true });
 });
 
-function firstMigrationOnly() {
-  const folder = join(directory, "first");
+function firstMigrations(count: number) {
+  const folder = join(directory, `first-${count}`);
 
   cpSync(migrations, folder, { recursive: true });
   const journal = JSON.parse(readFileSync(join(folder, "meta/_journal.json"), "utf8"));
 
-  journal.entries = journal.entries.slice(0, 1);
+  journal.entries = journal.entries.slice(0, count);
   writeFileSync(join(folder, "meta/_journal.json"), JSON.stringify(journal));
 
   return folder;
@@ -30,7 +30,7 @@ it("keeps a poll created before ranges could pass midnight", () => {
   const sqlite = new Database(join(directory, "old.db"));
   const db = drizzle(sqlite, { schema });
 
-  migrate(db, { migrationsFolder: firstMigrationOnly() });
+  migrate(db, { migrationsFolder: firstMigrations(1) });
 
   sqlite
     .prepare(
@@ -63,6 +63,31 @@ it("keeps a poll created before ranges could pass midnight", () => {
   expect(db.select().from(schema.slots).all()).toEqual([
     { participantId: 1, date: "2030-10-19", hour: 19 },
     { participantId: 1, date: "2030-10-19", hour: 22 },
+  ]);
+
+  sqlite.close();
+});
+
+it("gives each existing poll its last date", () => {
+  const before = firstMigrations(2);
+  const sqlite = new Database(join(directory, "dated.db"));
+  const db = drizzle(sqlite, { schema });
+
+  migrate(db, { migrationsFolder: before });
+
+  sqlite
+    .prepare(
+      `insert into polls (id, title, organiser_name, dates, first_hour, hour_count, time_zone, organiser_token_hash, created_by_participant, created_at)
+       values ('abcdefghij', 'Kino', 'Kuba', '["2030-10-19","2030-12-01","2030-10-18"]', 17, 6, 'Europe/Warsaw', 'hash', 0, 1),
+              ('bcdefghijk', 'Rower', 'Ola', '["2030-09-02"]', 9, 3, 'Europe/Warsaw', 'hash', 0, 1)`,
+    )
+    .run();
+
+  migrate(db, { migrationsFolder: migrations });
+
+  expect(db.select({ id: schema.polls.id, lastDate: schema.polls.lastDate }).from(schema.polls).all()).toEqual([
+    { id: "abcdefghij", lastDate: "2030-12-01" },
+    { id: "bcdefghijk", lastDate: "2030-09-02" },
   ]);
 
   sqlite.close();

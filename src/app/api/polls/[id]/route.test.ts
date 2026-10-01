@@ -27,6 +27,7 @@ async function seedPoll(dates: string[]) {
     title: "Planszówki u Michała",
     organiserName: "Kuba",
     dates,
+    lastDate: dates.at(-1) ?? "",
     firstHour: 17,
     hourCount: 3,
     timeZone: "Europe/Warsaw",

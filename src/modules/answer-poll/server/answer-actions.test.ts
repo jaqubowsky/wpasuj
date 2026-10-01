@@ -50,6 +50,7 @@ beforeEach(async () => {
       title: "Planszówki u Michała",
       organiserName: "Kuba",
       dates: ["2026-10-16", "2026-10-17"],
+      lastDate: "2026-10-17",
       firstHour: 17,
       hourCount: 6,
       timeZone: "Europe/Warsaw",
