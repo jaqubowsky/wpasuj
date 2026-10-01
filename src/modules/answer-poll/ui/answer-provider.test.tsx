@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { stubReducedMotion } from "@/shared/testing/motion";
 import { claimName, saveAnswer } from "../server/answer-actions";
 import { AnswerBody } from "./answer-body";
-import { AnswerLead } from "./answer-lead";
+import { AnswerLead, AnswerStatus } from "./answer-lead";
 import { AnswerProvider } from "./answer-provider";
 
 vi.mock("../server/answer-actions", () => ({ saveAnswer: vi.fn(), claimName: vi.fn() }));
@@ -396,5 +396,45 @@ describe("the Moje lead and body", () => {
 
     expect((await screen.findByRole("alert")).textContent).toBe(copy);
     expect(screen.getByRole("status")).toHaveTextContent("Nie zapisano");
+  });
+});
+
+describe("the invitation to make one's own poll", () => {
+  const invitation = () => screen.queryByRole("link", { name: "Też coś planujesz? Zrób własną ankietę" });
+
+  it("appears under the answer once the first save completes and links to the start", async () => {
+    const { user } = renderPanel();
+
+    await user.type(nameField(), "Ola");
+    fireEvent.click(cell("pt 16, 19:00"));
+
+    expect(invitation()).toBeNull();
+
+    await afterQuiet();
+
+    expect(await screen.findByRole("link", { name: "Też coś planujesz? Zrób własną ankietę" })).toHaveAttribute("href", "/");
+    expect(cantButton().compareDocumentPosition(invitation()!)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+
+  it("greets a participant who answered before", () => {
+    renderPanel({ name: "Ola", slots: [{ date: "2026-10-16", hour: 19 }] });
+
+    expect(invitation()).toHaveAttribute("href", "/");
+  });
+
+  it("never shows to the organiser", async () => {
+    render(
+      <AnswerProvider pollId={pollId} dates={dates} hours={hours} fixedName="Kuba">
+        <AnswerStatus />
+        <AnswerLead />
+        <AnswerBody />
+      </AnswerProvider>,
+    );
+
+    fireEvent.click(cell("pt 16, 19:00"));
+    await afterQuiet();
+
+    expect(await screen.findByRole("status")).toHaveTextContent("Zapisane");
+    expect(invitation()).toBeNull();
   });
 });
