@@ -21,6 +21,11 @@ const findPolls = vi.fn();
 const button = () => screen.getByRole("button", { name: /^Moje ankiety/ });
 const list = () => screen.getByRole("dialog", { name: "Twoje ankiety" });
 
+async function openList() {
+  await userEvent.click(button());
+  await screen.findByRole("dialog", { name: "Twoje ankiety" });
+}
+
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ["Date"] });
   vi.setSystemTime(thursdayNoon);
@@ -59,7 +64,7 @@ describe("Moje ankiety", () => {
     findPolls.mockReturnValue(new Promise((resolve) => (answer = resolve)));
     render(<MyPolls findPolls={findPolls} />);
 
-    await userEvent.click(button());
+    await openList();
 
     expect(within(list()).getByRole("heading", { name: "Twoje ankiety" })).toBeInTheDocument();
     expect(within(list()).getByText("Wczytuję")).toBeInTheDocument();
@@ -79,7 +84,7 @@ describe("Moje ankiety", () => {
     findPolls.mockResolvedValue({ ok: true, polls: [kino] });
     render(<MyPolls findPolls={findPolls} />);
 
-    await userEvent.click(button());
+    await openList();
 
     expect(within(list()).getByText("Widać je tylko na tym telefonie.")).toBeInTheDocument();
     expect(within(list()).getByText("Widać je tylko w tej przeglądarce.")).toBeInTheDocument();
@@ -91,7 +96,7 @@ describe("Moje ankiety", () => {
     findPolls.mockResolvedValue({ ok: true, polls: [kino] });
     render(<MyPolls findPolls={findPolls} />);
 
-    await userEvent.click(button());
+    await openList();
 
     expect(await within(list()).findAllByRole("link")).toHaveLength(1);
     expect(screen.getByRole("button", { name: "Moje ankiety, 1", hidden: true })).toBeInTheDocument();
@@ -102,7 +107,7 @@ describe("Moje ankiety", () => {
     findPolls.mockResolvedValue({ ok: true, polls: [] });
     render(<MyPolls findPolls={findPolls} />);
 
-    await userEvent.click(button());
+    await openList();
     expect(await within(list()).findByText("Tych ankiet już nie ma.")).toBeInTheDocument();
     await userEvent.click(within(list()).getByRole("button", { name: "Zamknij" }));
 
@@ -114,7 +119,7 @@ describe("Moje ankiety", () => {
     findPolls.mockRejectedValueOnce(new Error("offline")).mockResolvedValueOnce({ ok: true, polls: [kino] });
     render(<MyPolls findPolls={findPolls} />);
 
-    await userEvent.click(button());
+    await openList();
     expect(await within(list()).findByText("Nie udało się wczytać ankiet.")).toBeInTheDocument();
     await userEvent.click(within(list()).getByRole("button", { name: "Spróbuj ponownie" }));
 
@@ -127,7 +132,7 @@ describe("Moje ankiety", () => {
     findPolls.mockResolvedValue({ ok: false, reason: "invalid" });
     render(<MyPolls findPolls={findPolls} />);
 
-    await userEvent.click(button());
+    await openList();
 
     expect(await within(list()).findByText("Nie udało się wczytać ankiet.")).toBeInTheDocument();
   });
@@ -137,7 +142,7 @@ describe("Moje ankiety", () => {
     findPolls.mockResolvedValue({ ok: true, polls: [kino] });
     render(<MyPolls findPolls={findPolls} />);
 
-    await userEvent.click(button());
+    await openList();
     await within(list()).findByRole("link");
     await userEvent.click(within(list()).getByRole("button", { name: "Zamknij" }));
 
