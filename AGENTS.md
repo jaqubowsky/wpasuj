@@ -42,13 +42,13 @@ Declared in `package.json` by WPA-10; a change passes all of them:
 - `npm run typecheck`
 - `npm run knip` (unused files, exports and dependencies; config in `knip.json`)
 - `npm run duplicates` (jscpd over `src/` without tests; fails on a clone missing from `.jscpd-baseline.json`)
-- `npm test` (Vitest, units, components and actions)
+- `npm test` (Vitest, units, components and actions, with V8 coverage of `src/` into `coverage/lcov.info`)
 - `npm run build`
 - `npm run e2e` (Playwright: phone 390 in Chromium and WebKit, desktop 1440 in Chromium)
 
-CI (`.github/workflows/ci.yml`, skipped when a change touches only `*.md`): `quick` runs lint, typecheck, knip and test; `build` uploads the standalone build; an `e2e` matrix runs each Playwright project in its own job on that build and uploads `screenshots-<project>` and `memory-<project>` (memory sampled every 5 s); `perf` reuses the build; `docker` builds and runs the image, answers a poll against it, restarts it and reads the answer back from the volume, and fetches the poll's card.
+CI (`.github/workflows/ci.yml`, skipped when a change touches only `*.md`): `quick` runs lint, typecheck and knip; `test` runs `npm test` and, on a pull request, fails when under 80% of the changed `src/` lines that coverage counts are covered (`diff-cover`, ADR 0041), annotating each uncovered line and writing the report to the job summary; `build` uploads the standalone build; an `e2e` matrix runs each Playwright project in its own job on that build and uploads `screenshots-<project>` and `memory-<project>` (memory sampled every 5 s); `perf` reuses the build; `docker` builds and runs the image, answers a poll against it, restarts it and reads the answer back from the volume, and fetches the poll's card.
 
-`quick` starts with `actionlint` (syntax, expressions, shellcheck of `run:`) and `zizmor` (template injection, `permissions`, unpinned `uses:`, Dependabot cooldown) over `.github/`, each from a Docker image pinned by digest, and fails on any finding; locally, the same `docker run` lines from `ci.yml`, with `--offline` for zizmor without a GitHub token. Actions are pinned to a commit SHA with a `# vX.Y.Z` comment that Dependabot updates; the two images are bumped by hand.
+`quick` starts with `actionlint` (syntax, expressions, shellcheck of `run:`) and `zizmor` (template injection, `permissions`, unpinned `uses:`, Dependabot cooldown) over `.github/`, each from a Docker image pinned by digest, and fails on any finding; locally, the same `docker run` lines from `ci.yml`, with `--offline` for zizmor without a GitHub token. Actions are pinned to a commit SHA with a `# vX.Y.Z` comment that Dependabot updates; the two images and `diff-cover` are bumped by hand.
 
 Dependabot (`.github/dependabot.yml`) opens one grouped pull request a week per ecosystem, npm and GitHub Actions, with the minor and patch updates; majors, `@types/node` majors excepted (ignored, the runtime stays on Node 24), and every pre-1.0 package come as their own pull requests so their changelog is read first, and a new `0.x` dependency joins the group's `exclude-patterns`. Every version update, majors included, waits until its release is 7 days old (`cooldown`). CI on that pull request is the merge check. Security updates come as soon as GitHub has them, once the repository setting is on.
 
