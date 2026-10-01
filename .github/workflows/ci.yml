@@ -30,7 +30,7 @@ jobs:
 
   quick:
     needs: changes
-    if: ${{ needs.changes.outputs.code == 'true' }}
+    if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -53,7 +53,7 @@ jobs:
 
   coverage:
     needs: changes
-    if: ${{ github.event_name == 'pull_request' && needs.changes.outputs.code == 'true' }}
+    if: ${{ github.event_name == 'pull_request' && !cancelled() && needs.changes.outputs.code != 'false' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -73,7 +73,7 @@ jobs:
 
   build:
     needs: changes
-    if: ${{ needs.changes.outputs.code == 'true' }}
+    if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -94,7 +94,7 @@ jobs:
 
   e2e:
     needs: [changes, build]
-    if: ${{ !cancelled() && !failure() }}
+    if: ${{ !cancelled() && needs.build.result != 'failure' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -107,51 +107,52 @@ jobs:
           - project: desktop-chromium
             browser: chromium
     steps:
-      - if: ${{ needs.changes.outputs.code == 'true' }}
+      - if: ${{ needs.changes.outputs.code != 'false' }}
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - if: ${{ needs.changes.outputs.code == 'true' }}
+      - if: ${{ needs.changes.outputs.code != 'false' }}
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: .nvmrc
           cache: npm
-      - if: ${{ needs.changes.outputs.code == 'true' }}
+      - if: ${{ needs.changes.outputs.code != 'false' }}
         run: npm ci
-      - if: ${{ needs.changes.outputs.code == 'true' }}
+      - if: ${{ needs.changes.outputs.code != 'false' }}
         run: npx playwright install --with-deps ${{ matrix.browser }}
-      - if: ${{ needs.changes.outputs.code == 'true' }}
+      - if: ${{ needs.changes.outputs.code != 'false' }}
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: build
-      - if: ${{ needs.changes.outputs.code == 'true' }}
+      - if: ${{ needs.changes.outputs.code != 'false' }}
         run: tar -xf build.tar
-      - if: ${{ needs.changes.outputs.code == 'true' }}
+      - if: ${{ needs.changes.outputs.code != 'false' }}
         run: |
           .github/scripts/memory-monitor.sh memory.log &
           trap 'kill $!' EXIT
           npm run e2e -- --project=${{ matrix.project }}
-      - if: ${{ always() && needs.changes.outputs.code == 'true' }}
+      - if: ${{ always() && needs.changes.outputs.code != 'false' }}
         run: sudo dmesg -T | grep -iE 'oom|killed process' || echo 'no oom-kill in dmesg'
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        if: ${{ always() && needs.changes.outputs.code == 'true' }}
+        if: ${{ always() && needs.changes.outputs.code != 'false' }}
         with:
           name: memory-${{ matrix.project }}
           path: memory.log
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        if: ${{ !cancelled() && needs.changes.outputs.code == 'true' }}
+        if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
         with:
           name: screenshots-${{ matrix.project }}
           path: e2e/screenshots/
           if-no-files-found: error
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        if: ${{ failure() && needs.changes.outputs.code == 'true' }}
+        if: ${{ failure() && needs.changes.outputs.code != 'false' }}
         with:
           name: test-results-${{ matrix.project }}
           path: test-results/
 
   perf:
     needs: build
+    if: ${{ !cancelled() && needs.build.result == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -171,7 +172,7 @@ jobs:
 
   docker:
     needs: changes
-    if: ${{ needs.changes.outputs.code == 'true' }}
+    if: ${{ !cancelled() && needs.changes.outputs.code != 'false' }}
     runs-on: ubuntu-latest
     env:
       URL: http://localhost:3000
