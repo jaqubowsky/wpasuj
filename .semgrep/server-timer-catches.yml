@@ -1,0 +1,22 @@
+rules:
+  - id: server-timer-catches
+    languages: [typescript]
+    severity: ERROR
+    message: A throw inside a server timer callback ends the process; wrap the callback body in try/catch and log the failure through writeLogLine
+    paths:
+      include:
+        - "/src/modules/*/server/"
+      exclude:
+        - "*.test.ts"
+    patterns:
+      - pattern-either:
+          - pattern: setInterval($CALLBACK, ...)
+          - pattern: setTimeout($CALLBACK, ...)
+      - pattern-not: "$TIMER(() => { try { ... } catch { ... } }, ...)"
+      - pattern-not: "$TIMER(() => { try { ... } catch ($ERROR) { ... } }, ...)"
+      - pattern-not-inside: |
+          function $CALLBACK(...) { try { ... } catch ($ERROR) { ... } }
+          ...
+      - pattern-not-inside: |
+          function $CALLBACK(...) { try { ... } catch { ... } }
+          ...

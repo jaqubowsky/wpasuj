@@ -1,0 +1,26 @@
+rules:
+  - id: server-action-shape
+    languages: [typescript]
+    severity: ERROR
+    message: A server action opens with parse(schema, input) or a guard and returns its failure with `if (!found.ok) return found;` (ADR 0030)
+    paths:
+      include:
+        - "/src/modules/*/server/*-action.ts"
+        - "/src/modules/*/server/*-actions.ts"
+    patterns:
+      - pattern: |
+          export async function $ACTION(...) { ... }
+      - pattern-not: |
+          export async function $ACTION(...) {
+            const $X = $GUARD(...);
+            ...
+            if (!$X.ok) return $X;
+            ...
+          }
+      - pattern-not: |
+          export async function $ACTION(...) {
+            const $X = await $GUARD(...);
+            ...
+            if (!$X.ok) return $X;
+            ...
+          }

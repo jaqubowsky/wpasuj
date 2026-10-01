@@ -1,0 +1,13 @@
+rules:
+  - id: dangerously-set-inner-html
+    languages: [typescript]
+    severity: ERROR
+    message: Render text through JSX; the JSON-LD script with its escaped `<` is the one raw HTML sink
+    paths:
+      include:
+        - "/src/"
+      exclude:
+        - "/src/modules/landing/ui/web-application-json-ld.tsx"
+    pattern-either:
+      - pattern: <$ELEMENT dangerouslySetInnerHTML={...} />
+      - pattern: "{..., dangerouslySetInnerHTML: $HTML, ...}"

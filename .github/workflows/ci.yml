@@ -28,6 +28,7 @@ jobs:
       - run: npm ci
       - run: npm audit signatures
       - run: npm run lint
+      - run: npm run semgrep
       - run: npm run typecheck
       - run: npm run knip
       - run: npm test

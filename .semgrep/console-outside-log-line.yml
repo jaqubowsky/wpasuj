@@ -1,0 +1,13 @@
+rules:
+  - id: console-outside-log-line
+    languages: [typescript]
+    severity: ERROR
+    message: Write a log line through writeLogLine from src/shared/log-line.ts, the one place that touches console
+    paths:
+      include:
+        - "/src/"
+      exclude:
+        - "/src/shared/log-line.ts"
+        - "*.test.ts"
+        - "*.test.tsx"
+    pattern: console.$METHOD
