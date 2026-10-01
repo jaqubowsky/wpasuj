@@ -96,3 +96,4 @@ Tailwind v4 utilities written inline in `className`; `src/app/` is the reference
 - Work lives in the Linear team the project overlay names: one issue per ticket, one pull request per issue against `main`. The host plans there and decides what the brief leaves open
 - A decision a later change could undo unknowingly is an ADR in `docs/adr/` (`NNNN-<slug>.md`, the next number, the format of the ADRs there), proposed in the pull request that needs it; a decision that shapes only one issue's work goes into that issue
 - Done means a pull request with CI green for the host to merge; containers never merge
+- CodeRabbit reviews every pull request against the rules in `.coderabbit.yaml`; a container answers each CodeRabbit comment on its pull request, with a fix or a reply giving the reason, before `ready-for-host`
