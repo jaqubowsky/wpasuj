@@ -2,8 +2,7 @@
   animation: invite-pop var(--duration-pop) var(--ease-pop);
 }
 
-[data-invite-sent],
-[data-invite-copied] {
+[data-invite-sent] {
   animation: invite-rise var(--duration-sheet) var(--ease-out);
 }
 

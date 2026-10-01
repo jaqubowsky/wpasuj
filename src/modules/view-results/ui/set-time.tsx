@@ -9,13 +9,9 @@ import { useRef, useState, type ReactNode, type RefObject } from "react";
 import type { FinalTime } from "../server/results-schema";
 import { googleCalendarLink, outlookCalendarLink } from "../domain/calendar-links";
 import { setTimeShown } from "../domain/time-label";
+import { Copied } from "./copied";
 import { useResultsContext } from "./results-provider";
 import { useSendSetTime } from "./use-send-set-time";
-
-const notices = {
-  copied: "Wiadomość skopiowana. Wklej ją na grupę.",
-  "not-copied": "Nie udało się skopiować. Spróbuj jeszcze raz.",
-};
 
 export function SetBadge() {
   if (useResultsContext().gone) return null;
@@ -76,7 +72,7 @@ export function SettledPoster({ eyebrow, setBy }: { eyebrow: ReactNode; setBy: s
 
 export function SetActions({ final, title, timeZone }: { final: FinalTime; title: string; timeZone: string }) {
   const { pollId, organiser } = useResultsContext();
-  const { notice, send } = useSendSetTime(pollId, title, final);
+  const { copied, notCopied, send } = useSendSetTime(pollId, title, final);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const calendarOpener = useRef<HTMLButtonElement>(null);
 
@@ -95,7 +91,7 @@ export function SetActions({ final, title, timeZone }: { final: FinalTime; title
 
   const sendAction = (
     <Button variant={organiser ? "primary" : undefined} block onClick={send}>
-      Wyślij termin na grupę
+      <Copied when={copied}>Wyślij termin na grupę</Copied>
     </Button>
   );
 
@@ -114,9 +110,9 @@ export function SetActions({ final, title, timeZone }: { final: FinalTime; title
           onClose={() => setCalendarOpen(false)}
         />
       )}
-      {notice && (
-        <p className="m-0 text-sm text-muted" role="status">
-          {notices[notice]}
+      {notCopied && (
+        <p className="m-0 text-sm font-medium text-accent-ink" role="alert">
+          Nie udało się skopiować. Spróbuj jeszcze raz.
         </p>
       )}
     </div>

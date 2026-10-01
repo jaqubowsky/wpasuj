@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { act, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { Invitation } from "./invitation";
@@ -106,6 +106,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.useRealTimers();
 });
 
 describe("a participant", () => {
@@ -170,13 +171,29 @@ describe("a participant", () => {
     expect(people).toHaveTextContent("Bartek nie może.");
   });
 
-  it("sends the set time to the group", async () => {
+  it("sends the set time to the group and says Skopiowano for a moment", async () => {
+    renderPage(withFinal(saturdayEvening));
+    vi.useFakeTimers({ toFake: ["setTimeout"] });
+
+    await act(async () => screen.getByRole("button", { name: "Wyślij termin na grupę" }).click());
+
+    expect(clipboard).toBe(`Planszówki: Sobota 19 października, 18:00–20:00. ${location.origin}/e/Pl4nszowki`);
+    expect(screen.getByRole("button", { name: "Skopiowano" })).toBeInTheDocument();
+    await act(() => vi.advanceTimersByTimeAsync(1600));
+    expect(screen.getByRole("button", { name: "Wyślij termin na grupę" })).toBeInTheDocument();
+  });
+
+  it("hears that the set time was not copied", async () => {
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: async () => Promise.reject(new DOMException("denied", "NotAllowedError")) },
+    });
+
     renderPage(withFinal(saturdayEvening));
 
     await userEvent.click(screen.getByRole("button", { name: "Wyślij termin na grupę" }));
 
-    expect(clipboard).toBe(`Planszówki: Sobota 19 października, 18:00–20:00. ${location.origin}/e/Pl4nszowki`);
-    expect(screen.getByRole("status")).toHaveTextContent("Wiadomość skopiowana. Wklej ją na grupę.");
+    expect(await screen.findByRole("alert")).toHaveTextContent("Nie udało się skopiować. Spróbuj jeszcze raz.");
   });
 
   it("sees every vote read-only, the set hours unmarked", async () => {

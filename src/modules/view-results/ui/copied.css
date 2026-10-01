@@ -1,0 +1,10 @@
+[data-copied] {
+  animation: copied-rise var(--duration-sheet) var(--ease-out);
+}
+
+@keyframes copied-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}

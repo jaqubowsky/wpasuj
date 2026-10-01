@@ -2,7 +2,8 @@
 
 import { Button } from "@/shared/ui/button/button";
 import { Icon } from "@/shared/ui/icon/icon";
-import { useId, type ReactNode } from "react";
+import { useId } from "react";
+import { Check, Copied } from "./copied";
 import "./invite-card.css";
 import { useInviteCard } from "./use-invite-card";
 
@@ -10,25 +11,6 @@ const notCopied = {
   send: "Nie udało się wysłać. Skopiuj link przyciskiem „Kopiuj”.",
   link: "Nie udało się skopiować. Skopiuj link z paska adresu.",
 };
-
-function Check() {
-  return (
-    <span className="grid size-5 flex-none place-items-center rounded-pill bg-accent text-ink" aria-hidden="true">
-      <Icon name="check-badge" size={12} />
-    </span>
-  );
-}
-
-function Copied({ when, children }: { when: boolean; children: ReactNode }) {
-  if (!when) return children;
-
-  return (
-    <span className="inline-flex items-center gap-2" data-invite-copied>
-      <Check />
-      Skopiowano
-    </span>
-  );
-}
 
 export function InviteCard({ pollId, title }: { pollId: string; title: string }) {
   const card = useInviteCard(pollId, title);
