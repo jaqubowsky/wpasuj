@@ -2,11 +2,10 @@ import { forgetFreshPoll, isFreshPoll } from "@/shared/fresh-poll";
 import { shareOrCopy } from "@/shared/share-link";
 import { useEffect, useRef, useState } from "react";
 import { reminderText } from "../domain/reminder-text";
+import { copiedMs } from "./copied";
 
 type Stage = "closed" | "open" | "sent";
 type Copied = { from: "send" | "link"; outcome: "copied" | "not-copied" };
-
-const copiedMs = 1600;
 
 export function useInviteCard(pollId: string, title: string) {
   const [stage, setStage] = useState<Stage>(() => (typeof window !== "undefined" && isFreshPoll(pollId) ? "open" : "closed"));

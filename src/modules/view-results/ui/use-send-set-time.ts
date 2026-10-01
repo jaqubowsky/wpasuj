@@ -1,17 +1,21 @@
 import { shareOrCopy } from "@/shared/share-link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { FinalTime } from "../server/results-schema";
 import { setTimeMessage } from "../domain/set-time";
+import { copiedMs } from "./copied";
 
 export function useSendSetTime(pollId: string, title: string, final: FinalTime) {
-  const [notice, setNotice] = useState<"copied" | "not-copied">();
+  const [outcome, setOutcome] = useState<"copied" | "not-copied">();
+  const copiedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   async function send() {
     const message = setTimeMessage(final, { title, link: `${location.origin}/e/${pollId}` });
-    const outcome = await shareOrCopy({ text: message, link: message });
+    const sent = await shareOrCopy({ text: message, link: message });
 
-    setNotice(outcome === "copied" || outcome === "not-copied" ? outcome : undefined);
+    clearTimeout(copiedTimer.current);
+    setOutcome(sent === "copied" || sent === "not-copied" ? sent : undefined);
+    if (sent === "copied") copiedTimer.current = setTimeout(() => setOutcome(undefined), copiedMs);
   }
 
-  return { notice, send };
+  return { copied: outcome === "copied", notCopied: outcome === "not-copied", send };
 }

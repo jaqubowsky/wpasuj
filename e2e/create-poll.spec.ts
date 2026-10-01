@@ -1,24 +1,7 @@
 import type { Page } from "@playwright/test";
 import { expect, test } from "./fixtures";
-import { stubClipboardWithoutShareSheet } from "./clipboard";
+import { stubClipboardWithoutShareSheet, stubShareSheet } from "./clipboard";
 import { saveScreenshot, settleAnimations } from "./screenshot";
-
-declare global {
-  interface Window {
-    shared?: { data: ShareData; fromTap: boolean }[];
-  }
-}
-
-async function stubShareSheet(page: Page) {
-  await page.addInitScript(() => {
-    Object.defineProperty(navigator, "share", {
-      configurable: true,
-      value: async (data: ShareData) => {
-        window.shared = [...(window.shared ?? []), { data, fromTap: navigator.userActivation.isActive }];
-      },
-    });
-  });
-}
 
 async function holdCreateAction(page: Page) {
   let release = () => {};

@@ -1,6 +1,6 @@
 import type { Browser, Page } from "@playwright/test";
 import { expect, test } from "./fixtures";
-import { stubClipboardWithoutShareSheet } from "./clipboard";
+import { stubClipboardWithoutShareSheet, stubShareSheet } from "./clipboard";
 import { saveScreenshot, settleAnimations } from "./screenshot";
 import { seedAnswer, seedPoll } from "./seed";
 
@@ -287,6 +287,40 @@ test("on a desktop the calendar menu drops from its button at its width", async 
       await page.context().close();
     }
   }
+});
+
+test("on a phone the organiser sends the set time through the share sheet", async ({ browser }, testInfo) => {
+  test.skip(!testInfo.project.name.startsWith("phone"), "the share sheet is the phone's way to the group");
+  const { pollId, kuba } = seedBoardPoll(saturdayEvening);
+  const organiser = await openAsNewDevice(browser, `/e/${pollId}`, pollId, kuba);
+  const send = organiser.getByRole("button", { name: "Wyślij termin na grupę" });
+
+  await stubShareSheet(organiser);
+  await organiser.reload();
+  await send.click();
+
+  await expect
+    .poll(() => organiser.evaluate(() => window.shared))
+    .toEqual([
+      { data: { text: `Planszówki u Michała: Sobota 26 października, 19:00–21:00. http://localhost:3000/e/${pollId}` }, fromTap: true },
+    ]);
+
+  expect(await copied(organiser)).toBeUndefined();
+  await expect(send).toBeVisible();
+  await saveScreenshot(organiser, testInfo, "set-organiser-shared");
+});
+
+test("on a desktop the organiser copies the set time and sees Skopiowano", async ({ browser }, testInfo) => {
+  test.skip(testInfo.project.name.startsWith("phone"), "a desktop without the share sheet copies");
+  const { pollId, kuba } = seedBoardPoll(saturdayEvening);
+  const organiser = await openAsNewDevice(browser, `/e/${pollId}`, pollId, kuba);
+
+  await organiser.getByRole("button", { name: "Wyślij termin na grupę" }).click();
+
+  await expect(organiser.getByRole("button", { name: "Skopiowano" })).toBeVisible();
+  expect(await copied(organiser)).toBe(`Planszówki u Michała: Sobota 26 października, 19:00–21:00. http://localhost:3000/e/${pollId}`);
+  await saveScreenshot(organiser, testInfo, "set-organiser-copied");
+  await expect(organiser.getByRole("button", { name: "Wyślij termin na grupę" })).toBeVisible();
 });
 
 test("Zobacz wszystkie głosy shows every vote read-only to a participant", async ({ browser }, testInfo) => {
