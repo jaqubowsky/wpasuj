@@ -13,71 +13,9 @@ reviews:
   path_filters:
     - "!package-lock.json"
     - "!spec/design/**"
-  path_instructions:
-    - path: "src/**"
-      instructions: |
-        Rules from spec/brief.md "Code rules" that no tool checks (ADR 0017 lists them as review-only):
-        - "File and folder names in kebab-case". Next.js file conventions keep their names (page.tsx, route.ts, opengraph-image.tsx).
-        - "Minimal changes: a diff touches only what its ticket needs. No speculative options, no unused exports, no helper with one caller that reads worse than inline code (hooks and domain functions are exempt). Names carry the meaning, so code has no comments." Flag a new comment, and a new helper or file with exactly one caller.
-        - "One source per concept: tokens in tokens.css, types from schemas, copy strings next to the component that shows them, and the product name and wordmark in one constant."
-        - "Copy domain code, share technical code": a rule used in two modules is copied, not extracted, unless the two can never need different answers.
-    - path: "src/modules/*/domain/**"
-      instructions: |
-        spec/brief.md "Code rules", "Domain logic in pure functions": domain functions "take plain data and return plain data, with no React, no database, no Date.now() inside (the clock is an argument). They are tested directly."
-        Flag Date.now(), new Date() without an argument, Math.random(), I/O, or any import from React, next, server/ or ui/ (ESLint gates the imports; review holds the clock and randomness).
-    - path: "src/modules/*/server/**"
-      instructions: |
-        spec/brief.md "Code rules", "Server actions stay thin and return their failures": "parse with zod, call the domain, persist, and return { ok: true, … } | { ok: false, reason: … }, which the caller switches on exhaustively. An action throws only on a bug. No business rule lives in an action or a component."
-        AGENTS.md "Module layout" (ADR 0030): an action reads parse, guard, store, result. parse(schema, input) and each guard (organisersPoll, livePoll, openPoll) return a Result from src/shared/result.ts; the action goes on with `if (!found.ok) return found;` per step and ends in ok(…) or fail("<reason>"), the reason a string literal.
-        AGENTS.md "Module layout": one <name>-store.ts per module holds every getDb() call and every drizzle-orm import, its own live-poll lookup included (a copy per module, no shared repository).
-        Flag a condition that decides a product rule (limits, who may do what, time arithmetic) written inline in an action or a store instead of a domain/ function.
-    - path: "src/modules/*/ui/**"
-      instructions: |
-        spec/brief.md "Code rules", "UI logic in custom hooks (use-*.ts): painting, autosave, the organiser check. Components render props and call hooks; a component with logic in its body is split." Flag state, effects, derived calculations or event logic beyond a one-line handler in a component body.
-        "No business rule lives in an action or a component": a product rule belongs in domain/.
-        A failure reason is mapped in a switch whose default returns the value `satisfies never` (AGENTS.md "Module layout").
-        Styling follows AGENTS.md "Styling" (see the src/**/*.tsx instructions).
-    - path: "src/modules/*/*.ts"
-      instructions: |
-        spec/brief.md "Code rules": index.ts (server) and client.ts (client) are a module's only public entries, and index.ts starts with `import 'server-only'`. Keep the exports as narrow as the consumers need.
-        "A module asks, it does not reach": a need for something another module owns is declared as a narrow function type in this module's own vocabulary, supplied by the page that composes the modules. A module imports no other module.
-        "Deletable modules": deleting the module's folder breaks only the page that composes it.
-    - path: "src/shared/**"
-      instructions: |
-        spec/brief.md "Code rules": "src/shared holds technical code only: the database client, day-hour-grid, share sheet and clipboard, date formatting. Never a business rule." Flag poll limits, participant or organiser rules, best-time logic or any product wording that decides behaviour.
-        AGENTS.md "Styling": shared components in src/shared/ui/ own their look; a look reused across product screens is a component, never an exported class string.
-    - path: "src/app/**"
-      instructions: |
-        spec/brief.md "Code rules": pages compose modules through their public entries (index.ts, client.ts) and supply each module's declared needs; no business rule in a page, route or component here.
-        AGENTS.md "Styling": src/app/ is the styling reference (app-header.tsx, e/[id]/not-found.tsx).
-    - path: "src/**/*.tsx"
-      instructions: |
-        AGENTS.md "Styling" rules a lint gate does not fully cover:
-        - A length the scale has no step for is a design question for the host, not a bracket; a new entry in the shadcn/no-arbitrary-values allow list in eslint.config.mjs needs a host decision.
-        - No inline style except CSS custom properties; the link-preview card, the landing card and the apple icon are exempt because Satori reads only inline styles.
-        - Class lists combine through cn() from @/shared/ui/cn.
-        - No preflight: add m-0 or box-border where the browser default would change the box.
-        - A `(--name)` shorthand must name a variable that exists in src/app/tokens.css.
-    - path: "src/**/*.css"
-      instructions: |
-        AGENTS.md "Styling": CSS that className cannot carry goes in a plain <name>.css beside its component, selected by data-* attributes, tokens through var(--color-…) and calc(var(--spacing) * n). Every attribute and keyframe name carries the owner's prefix (data-sheet, sheet-up). Colours come only from tokens.
-    - path: "**/*.test.{ts,tsx}"
-      instructions: |
-        spec/brief.md "Code rules", "Red, then green": tests name behaviour the user or the domain cares about. "Action tests run against a real SQLite file per test with cookies() stubbed; only the clock, cookies and true externals are stubbed."
-        AGENTS.md "Testing": units and components sit beside the code they test.
-        Flag a stub of this repository's own code (a vi.mock of a module under src/) and a test named after a function rather than a behaviour.
-    - path: "e2e/**"
-      instructions: |
-        AGENTS.md "Testing": end to end tests live in e2e/ and run on phone 390 (Chromium and WebKit) and desktop 1440 (Chromium). A test that adds or changes a screen or state saves it at 390 and 1440 into e2e/screenshots/.
-        spec/brief.md "Ergonomics": tappable things are at least 44×44 px, grid cells 48 px, and every drag has a tap alternative (WCAG 2.5.7); a test asserting those values keeps them.
-    - path: "drizzle/**"
-      instructions: |
-        AGENTS.md "Stack": migrations in drizzle/ are applied on start against the production SQLite file on the Railway volume. ADR 0001: the tables live in one file, src/shared/db/schema.ts, with one migration history, so a migration and its schema change land in the same pull request.
-        ADR 0039: a new column existing rows need is filled by its migration, as 0002_last-date fills last_date from dates. Flag a migration that leaves existing polls with a default the app reads as real data.
 knowledge_base:
   code_guidelines:
     enabled: true
     filePatterns:
-      - "AGENTS.md"
-      - "spec/brief.md"
-      - "docs/adr/*.md"
+      - files: "spec/brief.md,docs/adr/*.md"
+        applyTo: "src/**,e2e/**"
