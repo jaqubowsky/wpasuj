@@ -10,6 +10,12 @@
   }
 }
 
+@keyframes sheet-side-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+
 @keyframes sheet-menu-in {
   from {
     opacity: 0;

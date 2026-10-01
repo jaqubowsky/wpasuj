@@ -1,4 +1,5 @@
 import { deviceTimeZone } from "@/shared/dates/use-device-time-zone";
+import { rememberPoll } from "@/shared/device-polls";
 import { reportFailedSave } from "@/shared/failed-save";
 import { markFreshPoll } from "@/shared/fresh-poll";
 import { rememberName } from "@/shared/last-name";
@@ -59,6 +60,7 @@ export function useCreatePoll(input: Omit<CreatePollInput, "timeZone">) {
 
     rememberName(parsed.data.organiserName);
     markFreshPoll(result.id);
+    rememberPoll({ id: result.id, role: "organiser", lastDate: parsed.data.dates.at(-1)! });
     router.push(`/e/${result.id}`);
   }
 

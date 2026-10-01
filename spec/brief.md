@@ -80,6 +80,10 @@ The organiser is whoever holds the organiser cookie, set on create. The results 
 
 The organiser also answers like anyone else.
 
+### Moje ankiety (landing header)
+
+Owner, 2026-10-01, WPA-63, except the 60-day window and the loading, failure and all-gone lines, which are the host's of the same day (storage: ADR 0043). A device that created or answered a poll, within 60 days of its last date, sees a ghost button between the brand mark and the create button: "Moje" on the phone, where the create button then reads "Utwórz", and "Moje ankiety" from `lg`, each with the count in an `ink` pill. It opens "Twoje ankiety" in a bottom sheet on the phone and a 420px side panel from `lg`, with "Zamknij" and "Widać je tylko na tym telefonie." (phone) or "Widać je tylko w tej przeglądarce." (desktop). Each poll, newest first, is a card linking to it: the title, "Twoja ankieta · sb 18.10 – nd 19.10" or "Odpowiadasz · …", and "Ustalone: sobota 18.10, 19–22" in `ink` or the answer count in muted ("6 osób odpowiedziało", "Nikt jeszcze nie odpowiedział"). While it loads: "Wczytuję"; when it fails: "Nie udało się wczytać ankiet." with "Spróbuj ponownie"; when every poll is gone: "Tych ankiet już nie ma.", and the button goes once the list closes. The browser keeps only each poll's id, role and last date; title, count and set time come from the server when the list opens, and a poll the server no longer has drops out.
+
 ### Errors and gone polls
 
 Every failure has Polish copy that says what happened and what to do. A deleted or expired poll shows "Tej ankiety już nie ma" with a link to create one.

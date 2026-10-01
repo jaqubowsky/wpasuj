@@ -1,6 +1,7 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, renderHook, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { useDevicePolls } from "@/shared/device-polls";
 import { stubReducedMotion } from "@/shared/testing/motion";
 import { claimName, saveAnswer } from "../server/answer-actions";
 import { AnswerBody } from "./answer-body";
@@ -73,6 +74,28 @@ describe("the Moje lead and body", () => {
 
     expect(await screen.findByRole("status")).toHaveTextContent("Zapisane");
     expect(localStorage.getItem("last-name")).toBe("Ola");
+  });
+
+  it("keeps the answered poll on this device with its last date", async () => {
+    const { user } = renderPanel();
+
+    await user.type(nameField(), "Ola");
+    fireEvent.click(cell("pt 16, 19:00"));
+    await afterQuiet();
+
+    expect(await screen.findByRole("status")).toHaveTextContent("Zapisane");
+    expect(renderHook(() => useDevicePolls()).result.current).toEqual([{ id: pollId, role: "participant", lastDate: "2026-10-17" }]);
+  });
+
+  it("keeps nothing on this device when the answer is not saved", async () => {
+    vi.mocked(saveAnswer).mockResolvedValueOnce({ ok: false, reason: "gone" });
+    renderPanel({ name: "Ola", slots: [] });
+
+    fireEvent.click(cell("pt 16, 19:00"));
+    await afterQuiet();
+
+    expect(await screen.findByRole("link", { name: "Zrób własną ankietę" })).toBeInTheDocument();
+    expect(renderHook(() => useDevicePolls()).result.current).toEqual([]);
   });
 
   it("links a gone poll to a new one", async () => {

@@ -1,4 +1,5 @@
 import type { GridCell, PaintedRectangle } from "@/shared/day-hour-grid/use-paint-stroke";
+import { rememberPoll } from "@/shared/device-polls";
 import { readLastName, rememberName, useLastName } from "@/shared/last-name";
 import { useEffect, useRef, useState } from "react";
 import { claimName, saveAnswer, type ClaimRefusal } from "../server/answer-actions";
@@ -73,6 +74,7 @@ export function useAnswer({ pollId, dates, hours, mine, fixedName }: AnswerOptio
       setHoldsRow(true);
       setProblem(undefined);
       rememberName(normaliseName(answer.name));
+      rememberPoll({ id: pollId, role: "participant", lastDate: dates.at(-1)! });
 
       return true;
     }
