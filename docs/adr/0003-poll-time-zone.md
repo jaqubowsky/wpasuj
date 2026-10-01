@@ -3,6 +3,7 @@
 - **Status:** Accepted
 - **Date:** 2026-09-27
 - **Owner:** host; container (`poll-expiry`, `zone-line-by-name`)
+- **Amended by:** ADR 0039 (the cleanup runs in the server on start and once a day, not in the create action)
 - **Replaces:** `past-dates-in-poll-zone`, `poll-expiry`, `zone-line-by-name` (former decision entries)
 
 ## Context

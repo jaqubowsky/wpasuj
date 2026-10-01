@@ -2,11 +2,11 @@ import { todayIn } from "@/shared/dates/iso-date";
 import { getDb } from "@/shared/db/client";
 import { participants, polls } from "@/shared/db/schema";
 import { fail, ok } from "@/shared/result";
-import { count, eq, getTableColumns, inArray, lt, sql } from "drizzle-orm";
+import { count, eq, getTableColumns, inArray, lt } from "drizzle-orm";
 import { cleanupCutoff, isExpired } from "../domain/poll-rules";
 import { isPollId } from "./poll-schema";
 
-type NewPoll = Omit<typeof polls.$inferInsert, "createdByParticipant" | "createdAt">;
+type NewPoll = Omit<typeof polls.$inferInsert, "lastDate" | "createdByParticipant" | "createdAt">;
 
 export function livePoll(id: string, now: Date) {
   if (!isPollId(id)) return fail("gone");
@@ -36,16 +36,19 @@ export function insertPoll(poll: NewPoll, heldTokenHashes: string[], now: Date) 
       heldTokenHashes.length > 0 &&
       tx.select({ id: participants.id }).from(participants).where(inArray(participants.tokenHash, heldTokenHashes)).get() !== undefined;
 
-    tx.delete(polls)
-      .where(lt(sql`(select max(value) from json_each(${polls.dates}))`, cleanupCutoff(now)))
-      .run();
-
     tx.insert(polls)
-      .values({ ...poll, createdByParticipant, createdAt: now })
+      .values({ ...poll, lastDate: poll.dates.reduce((last, date) => (date > last ? date : last)), createdByParticipant, createdAt: now })
       .run();
 
     return createdByParticipant;
   });
+}
+
+export function deleteExpiredPolls(now: Date) {
+  getDb()
+    .delete(polls)
+    .where(lt(polls.lastDate, cleanupCutoff(now)))
+    .run();
 }
 
 export function saveFinal(id: string, final: { date: string; firstHour: number; lastHour: number } | null) {

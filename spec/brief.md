@@ -116,11 +116,11 @@ Every failure has Polish copy that says what happened and what to do. A deleted 
 
 ## Data
 
-- `polls`: id (10-character URL-safe random), title, organiser name, dates (JSON array of ISO dates), first hour, hour count, time zone, organiser token hash, final date, final first hour and final last hour (nullable), created at.
+- `polls`: id (10-character URL-safe random), title, organiser name, dates (JSON array of ISO dates), last date (the latest of dates, indexed), first hour, hour count, time zone, organiser token hash, final date, final first hour and final last hour (nullable), created at.
 - `participants`: id, poll id, name, normalised name (unique per poll), token hash, created at, updated at.
 - `slots`: participant id, date, hour; the triple is the key.
 - Tokens are 32 random bytes, base64url, stored as SHA-256 hashes and looked up by hash.
-- Limits: 10 dates, 30 participants (`full` beyond), a first hour 0 to 23 and 1 to 24 hours. The create action deletes polls 60 days past their last date before it inserts.
+- Limits: 10 dates, 30 participants (`full` beyond), a first hour 0 to 23 and 1 to 24 hours. The server deletes polls 60 days past their last date on start and once a day (ADR 0039).
 - `polls.created_by_participant`: true when the creating device already held a participant cookie from another poll, so the share of participants who become organisers can be counted without analytics.
 
 ## Ergonomics (from UX research)

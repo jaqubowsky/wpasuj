@@ -36,14 +36,15 @@ export function seedPoll({
   write((database) =>
     database
       .prepare(
-        `insert into polls (id, title, organiser_name, dates, first_hour, hour_count, time_zone, organiser_token_hash, created_by_participant, created_at, final_date, final_first_hour, final_last_hour)
-         values (?, ?, ?, ?, ?, ?, 'Europe/Warsaw', ?, 0, ?, ?, ?, ?)`,
+        `insert into polls (id, title, organiser_name, dates, last_date, first_hour, hour_count, time_zone, organiser_token_hash, created_by_participant, created_at, final_date, final_first_hour, final_last_hour)
+         values (?, ?, ?, ?, ?, ?, ?, 'Europe/Warsaw', ?, 0, ?, ?, ?, ?)`,
       )
       .run(
         id,
         title,
         organiserName,
         JSON.stringify(dates),
+        dates.toSorted().at(-1),
         firstHour,
         hourCount,
         createHash("sha256").update(organiserToken).digest("hex"),

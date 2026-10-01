@@ -1,20 +1,25 @@
-import { integer, primaryKey, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { index, integer, primaryKey, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
-export const polls = sqliteTable("polls", {
-  id: text("id").primaryKey(),
-  title: text("title").notNull(),
-  organiserName: text("organiser_name").notNull(),
-  dates: text("dates", { mode: "json" }).$type<string[]>().notNull(),
-  firstHour: integer("first_hour").notNull(),
-  hourCount: integer("hour_count").notNull(),
-  timeZone: text("time_zone").notNull(),
-  organiserTokenHash: text("organiser_token_hash").notNull(),
-  finalDate: text("final_date"),
-  finalFirstHour: integer("final_first_hour"),
-  finalLastHour: integer("final_last_hour"),
-  createdByParticipant: integer("created_by_participant", { mode: "boolean" }).notNull(),
-  createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
-});
+export const polls = sqliteTable(
+  "polls",
+  {
+    id: text("id").primaryKey(),
+    title: text("title").notNull(),
+    organiserName: text("organiser_name").notNull(),
+    dates: text("dates", { mode: "json" }).$type<string[]>().notNull(),
+    lastDate: text("last_date").notNull(),
+    firstHour: integer("first_hour").notNull(),
+    hourCount: integer("hour_count").notNull(),
+    timeZone: text("time_zone").notNull(),
+    organiserTokenHash: text("organiser_token_hash").notNull(),
+    finalDate: text("final_date"),
+    finalFirstHour: integer("final_first_hour"),
+    finalLastHour: integer("final_last_hour"),
+    createdByParticipant: integer("created_by_participant", { mode: "boolean" }).notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" }).notNull(),
+  },
+  (table) => [index("polls_last_date").on(table.lastDate)],
+);
 
 export const participants = sqliteTable(
   "participants",
