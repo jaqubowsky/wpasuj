@@ -24,7 +24,7 @@ const steps = [
   {
     id: "zaloz-ankiete",
     title: "1. Zaproponuj dni i godziny",
-    text: "We Wpasuj wpisz, co robicie, na przykład Grill na działce u Oli. Zaznacz kilka dni, które naprawdę wchodzą w grę, i przedział godzin. Możesz wybrać Ten weekend albo kliknąć konkretne daty. Wpisz swoje imię. Przycisk Utwórz i wyślij na grupę tworzy ankietę i otwiera udostępnianie albo kopiuje link. Nikt nie musi zakładać konta. Zacznij od niewielu propozycji, zamiast pytać o cały miesiąc.",
+    text: "We Wpasuj wpisz, co robicie, na przykład Grill na działce u Oli. Zaznacz kilka dni, które naprawdę wchodzą w grę, i przedział godzin. Możesz wybrać Ten weekend albo kliknąć konkretne daty. Wpisz swoje imię. Przycisk Utwórz i wyślij na grupę tworzy ankietę i przenosi cię na jej stronę. Nikt nie musi zakładać konta. Zacznij od niewielu propozycji, zamiast pytać o cały miesiąc.",
     image: createScreenshot,
     alt: "Formularz Wpasuj z tytułem Grill na działce u Oli, wybranymi dniami i godzinami",
     caption: "Tworzenie ankiety. Najpierw wybierasz dni i zakres godzin.",
@@ -32,7 +32,7 @@ const steps = [
   {
     id: "wyslij-link",
     title: "2. Wyślij jeden link na grupę",
-    text: "Wklej link do czatu, w którym już rozmawiacie. Dopisz, do kiedy zbierasz odpowiedzi, na przykład: Zaznaczcie godziny do jutra wieczorem, potem wybierzemy termin. To wasza umowa, nie automatyczny termin zamknięcia ankiety. Nie wysyłaj każdemu innego zestawu dat. Link do odpowiadania jest wspólny, więc wszyscy widzą te same propozycje. Osobny link organizatora zachowaj dla siebie, bo daje możliwość ustalenia terminu i usunięcia ankiety.",
+    text: "Na stronie ankiety kliknij Wyślij na grupę. Otworzy się udostępnianie albo skopiuje się wiadomość z linkiem. Wklej link do czatu, w którym już rozmawiacie. Dopisz, do kiedy zbierasz odpowiedzi, na przykład: Zaznaczcie godziny do jutra wieczorem, potem wybierzemy termin. To wasza umowa, nie automatyczny termin zamknięcia ankiety. Nie wysyłaj każdemu innego zestawu dat. Link do odpowiadania jest wspólny, więc wszyscy widzą te same propozycje. Osobny link organizatora zachowaj dla siebie, bo daje możliwość ustalenia terminu i usunięcia ankiety.",
   },
   {
     id: "zaznacz-godziny",

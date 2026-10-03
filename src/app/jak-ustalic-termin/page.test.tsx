@@ -20,6 +20,18 @@ it("names the guide and its canonical on the current site", async () => {
   expect(metadata.alternates?.canonical).toBe("/jak-ustalic-termin");
 });
 
+it("explains sharing from the poll page after creation", async () => {
+  vi.stubEnv("SITE_URL", "https://guide.example");
+
+  render(await MeetingGuidePage());
+
+  expect(screen.getByText(/Przycisk Utwórz i wyślij na grupę tworzy ankietę/)).toHaveTextContent(
+    "tworzy ankietę i przenosi cię na jej stronę",
+  );
+
+  expect(screen.getByText(/Wklej link do czatu/)).toHaveTextContent("Na stronie ankiety kliknij Wyślij na grupę.");
+});
+
 it("shows the guide, screenshots and matching instructions for search engines", async () => {
   vi.stubEnv("SITE_URL", "https://guide.example");
 
