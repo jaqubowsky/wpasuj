@@ -11,3 +11,9 @@ it("links the privacy policy, the terms and the contact address", () => {
   expect(footer.getByRole("link", { name: "Regulamin" })).toHaveAttribute("href", "/regulamin");
   expect(footer.getByRole("link", { name: "Kontakt" })).toHaveAttribute("href", "mailto:kontakt@wpasuj.pl");
 });
+
+it("links the guide to agreeing a time", () => {
+  render(<Footer />);
+
+  expect(screen.getByRole("link", { name: "Jak ustalić termin" })).toHaveAttribute("href", "/jak-ustalic-termin");
+});
