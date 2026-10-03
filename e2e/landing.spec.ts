@@ -289,7 +289,7 @@ test("the footer names the product and links the privacy policy, the terms and t
   const footer = page.getByRole("contentinfo");
 
   await expect(footer.getByText("Wpasuj, darmowe ankiety terminów dla znajomych")).toBeVisible();
-  await expect(footer.getByRole("link")).toHaveText(["Polityka prywatności", "Regulamin", "Kontakt"]);
+  await expect(footer.getByRole("link")).toHaveText(["Jak ustalić termin", "Polityka prywatności", "Regulamin", "Kontakt"]);
   await footer.scrollIntoViewIfNeeded();
   await footer.screenshot({ path: `e2e/screenshots/landing-footer-${testInfo.project.name}.png` });
 });
