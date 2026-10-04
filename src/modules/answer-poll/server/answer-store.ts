@@ -69,31 +69,40 @@ export function saveAnswerOf<Refusal>(
 
     if (refusal) return { ok: false as const, refusal };
 
-    const previous =
-      participant && tx.select({ name: participants.name }).from(participants).where(eq(participants.id, participant.id)).get();
+    let change: "first" | "changed" | "unchanged";
+    let id: number;
 
-    const previousSlots = participant ? slotsOf(participant.id) : [];
+    if (participant) {
+      const previous = tx.select({ name: participants.name }).from(participants).where(eq(participants.id, participant.id)).get();
 
-    const change = !participant
-      ? ("first" as const)
-      : previous!.name !== name ||
-          previousSlots.length !== mySlots.length ||
-          previousSlots.some((slot) => !mySlots.some((next) => next.date === slot.date && next.hour === slot.hour))
-        ? ("changed" as const)
-        : ("unchanged" as const);
+      if (!previous) throw new Error("Existing participant row is missing");
 
-    const id = participant
-      ? tx
-          .update(participants)
-          .set({ name, normalisedName, updatedAt: now })
-          .where(eq(participants.id, participant.id))
-          .returning({ id: participants.id })
-          .get().id
-      : tx
-          .insert(participants)
-          .values({ pollId, name, normalisedName, tokenHash: hashToken(newcomerToken), createdAt: now, updatedAt: now })
-          .returning({ id: participants.id })
-          .get().id;
+      const previousSlots = slotsOf(participant.id);
+      const nameChanged = previous.name !== name;
+
+      const slotsChanged =
+        previousSlots.length !== mySlots.length ||
+        previousSlots.some((slot) => !mySlots.some((next) => next.date === slot.date && next.hour === slot.hour));
+
+      change = "unchanged";
+
+      if (nameChanged || slotsChanged) change = "changed";
+
+      id = tx
+        .update(participants)
+        .set({ name, normalisedName, updatedAt: now })
+        .where(eq(participants.id, participant.id))
+        .returning({ id: participants.id })
+        .get().id;
+    } else {
+      change = "first";
+
+      id = tx
+        .insert(participants)
+        .values({ pollId, name, normalisedName, tokenHash: hashToken(newcomerToken), createdAt: now, updatedAt: now })
+        .returning({ id: participants.id })
+        .get().id;
+    }
 
     tx.delete(slots).where(eq(slots.participantId, id)).run();
     if (mySlots.length > 0)
