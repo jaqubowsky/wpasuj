@@ -1,6 +1,7 @@
 "use client";
 
 import { useForgetTappedHour } from "@/modules/view-results/client";
+import { trackAnalyticsEvent } from "@/shared/analytics";
 import { withViewTransition } from "@/shared/view-transition";
 import { Segment } from "@/shared/ui/segment/segment";
 import { useState, type ReactNode } from "react";
@@ -20,6 +21,7 @@ export function PollTabs({ opening, leads, bodies }: PollTabsProps) {
   const forgetTappedHour = useForgetTappedHour();
 
   function show(next: View) {
+    if (next === "Wszyscy" && view !== "Wszyscy") trackAnalyticsEvent("results_opened", "/e/[id]");
     if (next === "Moje") forgetTappedHour();
 
     setView(next);

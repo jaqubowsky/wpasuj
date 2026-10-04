@@ -1,5 +1,6 @@
 "use client";
 
+import { trackAnalyticsEvent } from "@/shared/analytics";
 import { Button } from "@/shared/ui/button/button";
 import { SettledBadge } from "@/shared/ui/settled-badge/settled-badge";
 import { MenuLink } from "@/shared/ui/menu-item/menu-item";
@@ -83,7 +84,10 @@ export function SetActions({ final, title, timeZone }: { final: FinalTime; title
       block
       aria-haspopup="dialog"
       aria-expanded={calendarOpen}
-      onClick={() => setCalendarOpen(true)}
+      onClick={() => {
+        trackAnalyticsEvent("calendar_clicked", "/e/[id]");
+        setCalendarOpen(true);
+      }}
     >
       Dodaj do kalendarza
     </Button>

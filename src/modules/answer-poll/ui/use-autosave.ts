@@ -1,3 +1,4 @@
+import { trackAnalyticsEvent } from "@/shared/analytics";
 import { reportFailedSave } from "@/shared/failed-save";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 
@@ -40,8 +41,10 @@ export function useAutosave<Value>(send: (value: Value) => Promise<boolean>, ini
 
     current.inFlight = false;
     current.unsaved = saved ? undefined : { value };
-    if (!saved) setState("failed");
-    else setState(current.pending ? "saving" : "saved");
+    if (!saved) {
+      trackAnalyticsEvent("answer_save_failed", "/e/[id]");
+      setState("failed");
+    } else setState(current.pending ? "saving" : "saved");
     if (current.pending && current.timer === undefined) void flush();
   }
 

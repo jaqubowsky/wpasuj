@@ -12,7 +12,8 @@ import { nameKey } from "../domain/name-rules";
 
 type NameTaken = { name: string; hours: number; yours?: { name: string; hours: number } };
 type SaveResult =
-  Result<object, "invalid" | "organiser-name" | "not-yours" | "closed" | "full" | "gone"> | Failure<"name-taken", NameTaken>;
+  | Result<{ answerChange: "first" | "changed" | "unchanged" }, "invalid" | "organiser-name" | "not-yours" | "closed" | "full" | "gone">
+  | Failure<"name-taken", NameTaken>;
 type ClaimResult = Result<{ name: string; slots: Slot[] }, "invalid" | "organiser-name" | "closed" | "gone">;
 
 export type ClaimRefusal = Extract<ClaimResult, { ok: false }>["reason"];
@@ -53,7 +54,7 @@ export async function saveAnswer(pollId: string, answer: AnswerInput): Promise<S
   const organiserDevice = await isOrganiserDevice(poll);
   const newcomerToken = newToken();
 
-  const refusal = saveAnswerOf(
+  const saved = saveAnswerOf(
     pollId,
     participant,
     { answer: { name, normalisedName, slots: mySlots }, newcomerToken, now: new Date() },
@@ -66,12 +67,12 @@ export async function saveAnswer(pollId: string, answer: AnswerInput): Promise<S
       }),
   );
 
-  if (refusal) return { ok: false, ...refusal };
+  if (!saved.ok) return { ok: false, ...saved.refusal };
 
   writeLogLine({ level: "info", message: "answer_saved", pollId });
   if (!participant) cookieStore.set(pollId, newcomerToken, await tokenCookieOptions());
 
-  return ok();
+  return ok({ answerChange: saved.change });
 }
 
 export async function claimName(pollId: string, answer: AnswerInput): Promise<ClaimResult> {

@@ -1,3 +1,4 @@
+import { trackAnalyticsEvent } from "@/shared/analytics";
 import { deviceTimeZone } from "@/shared/dates/use-device-time-zone";
 import { rememberPoll } from "@/shared/device-polls";
 import { reportFailedSave } from "@/shared/failed-save";
@@ -24,9 +25,11 @@ export function useCreatePoll(input: Omit<CreatePollInput, "timeZone">) {
   const invalidFields = new Set(attempted && !parsed.success ? parsed.error.issues.map((issue) => issue.path[0] as Field) : []);
 
   async function submit() {
+    trackAnalyticsEvent("create_submitted");
     flushSync(() => setAttempted(true));
 
     if (!parsed.success) {
+      trackAnalyticsEvent("create_validation_failed");
       const field = fields.current[parsed.error.issues[0].path[0] as Field]!;
 
       field.scrollIntoView({ block: "center", behavior: moving ? "smooth" : "instant" });
@@ -50,6 +53,7 @@ export function useCreatePoll(input: Omit<CreatePollInput, "timeZone">) {
     if (!result.ok) {
       switch (result.reason) {
         case "invalid":
+          trackAnalyticsEvent("create_validation_failed");
           setStatus("refused");
 
           return;
@@ -58,6 +62,7 @@ export function useCreatePoll(input: Omit<CreatePollInput, "timeZone">) {
       }
     }
 
+    trackAnalyticsEvent("poll_created");
     rememberName(parsed.data.organiserName);
     markFreshPoll(result.id);
     rememberPoll({ id: result.id, role: "organiser", lastDate: parsed.data.dates.at(-1)! });
@@ -66,6 +71,7 @@ export function useCreatePoll(input: Omit<CreatePollInput, "timeZone">) {
 
   return {
     submit,
+    interact: () => trackAnalyticsEvent("create_started"),
     status,
     isInvalid: (field: Field) => invalidFields.has(field),
     fieldRef: (field: Field) => (element: HTMLElement | null) => {

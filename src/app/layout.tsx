@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { productName } from "@/shared/brand";
 import { cn } from "@/shared/ui/cn";
 import { Grain } from "@/shared/ui/grain/grain";
+import { Analytics } from "./analytics";
 import { fontVariables } from "./fonts";
 import "./globals.css";
 
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="pl" className={cn(fontVariables, "scroll-pt-18")}>
       <body>
+        <Analytics />
         <Grain />
         {children}
         <ReportProblem />

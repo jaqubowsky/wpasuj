@@ -67,7 +67,20 @@ export function saveAnswerOf<Refusal>(
   return getDb().transaction((tx) => {
     const refusal = refusalAt(participantCount(pollId));
 
-    if (refusal) return refusal;
+    if (refusal) return { ok: false as const, refusal };
+
+    const previous =
+      participant && tx.select({ name: participants.name }).from(participants).where(eq(participants.id, participant.id)).get();
+
+    const previousSlots = participant ? slotsOf(participant.id) : [];
+
+    const change = !participant
+      ? ("first" as const)
+      : previous!.name !== name ||
+          previousSlots.length !== mySlots.length ||
+          previousSlots.some((slot) => !mySlots.some((next) => next.date === slot.date && next.hour === slot.hour))
+        ? ("changed" as const)
+        : ("unchanged" as const);
 
     const id = participant
       ? tx
@@ -88,7 +101,7 @@ export function saveAnswerOf<Refusal>(
         .values(mySlots.map((slot) => ({ participantId: id, ...slot })))
         .run();
 
-    return undefined;
+    return { ok: true as const, change };
   });
 }
 

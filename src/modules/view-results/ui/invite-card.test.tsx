@@ -4,6 +4,11 @@ import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { markFreshPoll } from "@/shared/fresh-poll";
 import { InviteCard } from "./invite-card";
 
+vi.hoisted(() => {
+  process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL = "https://analytics.example/script.js";
+  process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID = "c98aed47-de54-4577-bde2-8f1133b5c5d5";
+});
+
 const pollId = "abcdefghij";
 const title = "Planszówki u Michała";
 const invite = `Kiedy możecie? Planszówki u Michała ${location.origin}/e/${pollId}`;
@@ -38,6 +43,51 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.unstubAllGlobals();
+});
+
+it.each(["shared", "cancelled", "failed", "copied"] as const)(
+  "counts the %s invitation observation without private data",
+  async (outcome) => {
+    const track = vi.fn().mockResolvedValue(undefined);
+
+    vi.stubGlobal("umami", { track });
+
+    stubSharing(
+      outcome === "copied"
+        ? undefined
+        : async () => {
+            if (outcome !== "shared") throw new DOMException("denied", outcome === "cancelled" ? "AbortError" : "NotAllowedError");
+          },
+    );
+
+    if (outcome === "failed") refuseClipboard();
+
+    renderFreshCard();
+
+    await userEvent.click(sendButton());
+
+    expect(track.mock.calls).toEqual([
+      [{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/e/[id]", name: "invite_share_clicked" }],
+      ...(outcome === "copied" ? [[{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/e/[id]", name: "invite_copied" }]] : []),
+    ]);
+  },
+);
+
+it.each([true, false])("counts a link copy only when the clipboard accepts it, success=%s", async (success) => {
+  const track = vi.fn().mockResolvedValue(undefined);
+
+  vi.stubGlobal("umami", { track });
+  stubSharing();
+  if (!success) refuseClipboard();
+
+  renderFreshCard();
+
+  await userEvent.click(screen.getByRole("button", { name: "Kopiuj" }));
+
+  expect(track.mock.calls).toEqual(
+    success ? [[{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/e/[id]", name: "invite_copied" }]] : [],
+  );
 });
 
 it("shows nothing on a poll this tab did not just create", () => {

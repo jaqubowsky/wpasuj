@@ -1,3 +1,4 @@
+import { trackAnalyticsEvent } from "@/shared/analytics";
 import { forgetFreshPoll, isFreshPoll } from "@/shared/fresh-poll";
 import { shareOrCopy } from "@/shared/share-link";
 import { useEffect, useRef, useState } from "react";
@@ -22,6 +23,7 @@ export function useInviteCard(pollId: string, title: string) {
   }
 
   async function send() {
+    trackAnalyticsEvent("invite_share_clicked", "/e/[id]");
     const invite = reminderText([], { title, link: link() });
     const outcome = await shareOrCopy({ text: invite, link: invite });
 
@@ -29,6 +31,9 @@ export function useInviteCard(pollId: string, title: string) {
       case "shared":
         return setStage("sent");
       case "copied":
+        trackAnalyticsEvent("invite_copied", "/e/[id]");
+
+        return showCopied({ from: "send", outcome });
       case "not-copied":
         return showCopied({ from: "send", outcome });
       case "cancelled":
@@ -39,6 +44,7 @@ export function useInviteCard(pollId: string, title: string) {
   async function copyLink() {
     try {
       await navigator.clipboard.writeText(link());
+      trackAnalyticsEvent("invite_copied", "/e/[id]");
       showCopied({ from: "link", outcome: "copied" });
     } catch {
       showCopied({ from: "link", outcome: "not-copied" });
