@@ -1,3 +1,4 @@
+import { trackAnalyticsEvent } from "@/shared/analytics";
 import { reportFailedSave } from "@/shared/failed-save";
 import type { Result } from "@/shared/result";
 import { useState } from "react";
@@ -27,7 +28,12 @@ export function useIsOrganiser(given: Organiser | undefined, refreshResults: () 
 
     setPending(false);
     if (!outcome) return setProblem("failed");
-    if (outcome.ok) return onDone();
+
+    if (outcome.ok) {
+      if (action === "setFinal") trackAnalyticsEvent("time_set", "/e/[id]");
+
+      return onDone();
+    }
 
     switch (outcome.reason) {
       case "invalid":

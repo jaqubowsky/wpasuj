@@ -1,3 +1,4 @@
+import { trackAnalyticsEvent } from "@/shared/analytics";
 import type { GridCell, PaintedRectangle } from "@/shared/day-hour-grid/use-paint-stroke";
 import { rememberPoll } from "@/shared/device-polls";
 import { readLastName, rememberName, useLastName } from "@/shared/last-name";
@@ -71,6 +72,9 @@ export function useAnswer({ pollId, dates, hours, mine, fixedName }: AnswerOptio
     }
 
     if (result.ok) {
+      if (result.answerChange === "first") trackAnalyticsEvent("answer_first_saved", "/e/[id]");
+      if (result.answerChange === "changed") trackAnalyticsEvent("answer_changed_saved", "/e/[id]");
+
       setHoldsRow(true);
       setProblem(undefined);
       rememberName(normaliseName(answer.name));
@@ -119,6 +123,7 @@ export function useAnswer({ pollId, dates, hours, mine, fixedName }: AnswerOptio
   }
 
   function paint(cells: GridCell[], add: boolean) {
+    trackAnalyticsEvent("availability_started", "/e/[id]");
     const next = new Set(slotsRef.current);
 
     for (const cell of cells) {
@@ -130,6 +135,7 @@ export function useAnswer({ pollId, dates, hours, mine, fixedName }: AnswerOptio
   }
 
   function cantMakeAny() {
+    trackAnalyticsEvent("availability_started", "/e/[id]");
     const before = slotsRef.current;
 
     replaceSlots(new Set());
@@ -177,7 +183,11 @@ export function useAnswer({ pollId, dates, hours, mine, fixedName }: AnswerOptio
         mode === "add",
       ),
     cantMakeAny,
-    undoCant: () => (beforeCant ? replaceSlots(beforeCant) : setCantTurnedOff(true)),
+    undoCant() {
+      trackAnalyticsEvent("availability_started", "/e/[id]");
+
+      return beforeCant ? replaceSlots(beforeCant) : setCantTurnedOff(true);
+    },
     retry: autosave.retry,
     async claim(heldName: string) {
       const result = await claimName(pollId, { name: heldName, slots: slotsOf(slotsRef.current) });

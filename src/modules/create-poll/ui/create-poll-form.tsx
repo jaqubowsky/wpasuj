@@ -18,12 +18,14 @@ export function CreatePollForm() {
   const { dates, picker } = useDateSelection();
   const hours = useHourRange();
   const [name, setName] = useOrganiserName();
-  const { submit, status, isInvalid, fieldRef } = useCreatePoll({ title, dates, ...hours.range, organiserName: name });
+  const { submit, interact, status, isInvalid, fieldRef } = useCreatePoll({ title, dates, ...hours.range, organiserName: name });
 
   return (
     <form
       className="flex flex-col gap-6 lg:pb-10"
       noValidate
+      onInputCapture={interact}
+      onClickCapture={interact}
       onSubmit={(event) => {
         event.preventDefault();
         submit();

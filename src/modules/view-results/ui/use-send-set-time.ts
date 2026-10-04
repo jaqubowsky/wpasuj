@@ -1,3 +1,4 @@
+import { trackAnalyticsEvent } from "@/shared/analytics";
 import { shareOrCopy } from "@/shared/share-link";
 import { useRef, useState } from "react";
 import type { FinalTime } from "../server/results-schema";
@@ -9,6 +10,7 @@ export function useSendSetTime(pollId: string, title: string, final: FinalTime) 
   const copiedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   async function send() {
+    trackAnalyticsEvent("settled_share_clicked", "/e/[id]");
     const message = setTimeMessage(final, { title, link: `${location.origin}/e/${pollId}` });
     const sent = await shareOrCopy({ text: message, link: message });
 

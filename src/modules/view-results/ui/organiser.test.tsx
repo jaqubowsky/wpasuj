@@ -11,6 +11,11 @@ import { WhilePollLives } from "./while-poll-lives";
 import type { FinalTime as FinalTimeValue, Results } from "../server/results-schema";
 import type { Organiser } from "./use-is-organiser";
 
+vi.hoisted(() => {
+  process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL = "https://analytics.example/script.js";
+  process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID = "c98aed47-de54-4577-bde2-8f1133b5c5d5";
+});
+
 const saturday = "2030-10-19";
 const sunday = "2030-10-20";
 const readAt = Date.parse("2030-10-15T18:00:00Z");
@@ -107,6 +112,85 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.useRealTimers();
+});
+
+describe("results analytics", () => {
+  it.each(["confirmed", "refused", "thrown"] as const)("counts a final time only when %s by the action", async (outcome) => {
+    const track = vi.fn().mockResolvedValue(undefined);
+
+    const setFinal =
+      outcome === "thrown"
+        ? vi.fn().mockRejectedValue(new TypeError("offline"))
+        : vi.fn().mockResolvedValue(outcome === "confirmed" ? { ok: true } : { ok: false, reason: "invalid" });
+
+    vi.stubGlobal("umami", { track });
+    renderPage(threeAnswers, organiser({ setFinal }));
+
+    await userEvent.click(within(screen.getByRole("region", { name: "Twoja ankieta" })).getByRole("button", { name: "Ustal termin" }));
+    window.dispatchEvent(new Event("focus"));
+    await act(async () => {});
+
+    expect(track.mock.calls).toEqual(
+      outcome === "confirmed"
+        ? [
+            [
+              {
+                website: "c98aed47-de54-4577-bde2-8f1133b5c5d5",
+                url: "/e/[id]",
+                name: "time_set",
+              },
+            ],
+          ]
+        : [],
+    );
+  });
+
+  it("counts opening the calendar without claiming an exported event", async () => {
+    const track = vi.fn().mockResolvedValue(undefined);
+
+    vi.stubGlobal("umami", { track });
+    renderPage(withFinal(saturdayEvening));
+
+    await userEvent.click(screen.getByRole("button", { name: "Dodaj do kalendarza" }));
+
+    expect(track).toHaveBeenCalledExactlyOnceWith({
+      website: "c98aed47-de54-4577-bde2-8f1133b5c5d5",
+      url: "/e/[id]",
+      name: "calendar_clicked",
+    });
+  });
+
+  it.each(["copied", "cancelled", "failed"] as const)("counts a settled share click even when %s", async (outcome) => {
+    const track = vi.fn().mockResolvedValue(undefined);
+
+    vi.stubGlobal("umami", { track });
+    if (outcome === "cancelled")
+      Object.defineProperty(navigator, "share", {
+        configurable: true,
+        value: async () => {
+          throw new DOMException("cancelled", "AbortError");
+        },
+      });
+    if (outcome === "failed")
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: {
+          writeText: async () => {
+            throw new DOMException("denied", "NotAllowedError");
+          },
+        },
+      });
+
+    renderPage(withFinal(saturdayEvening));
+
+    await userEvent.click(screen.getByRole("button", { name: "Wyślij termin na grupę" }));
+
+    expect(track).toHaveBeenCalledExactlyOnceWith({
+      website: "c98aed47-de54-4577-bde2-8f1133b5c5d5",
+      url: "/e/[id]",
+      name: "settled_share_clicked",
+    });
+  });
 });
 
 describe("a participant", () => {

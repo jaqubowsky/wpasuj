@@ -87,12 +87,73 @@ const friday20 = { date: "2026-10-16", hour: 20 };
 const saturday17 = { date: "2026-10-17", hour: 17 };
 
 describe("saveAnswer", () => {
+  it("acknowledges first answers, real edits and unchanged retries", async () => {
+    const { saveAnswer } = await actions();
+
+    const first = await saveAnswer(pollId, { name: "Ola", slots: [friday19] });
+    const edit = await saveAnswer(pollId, { name: "Ola", slots: [friday19, friday20] });
+    const retry = await saveAnswer(pollId, { name: "Ola", slots: [friday20, friday19] });
+
+    expect([first, edit, retry]).toEqual([
+      { ok: true, answerChange: "first" },
+      { ok: true, answerChange: "changed" },
+      { ok: true, answerChange: "unchanged" },
+    ]);
+  });
+
+  it("acknowledges a rename and an empty first answer", async () => {
+    const { saveAnswer } = await actions();
+
+    const first = await saveAnswer(pollId, { name: "Ola", slots: [] });
+    const renamed = await saveAnswer(pollId, { name: "Olaf", slots: [] });
+    const repeated = await saveAnswer(pollId, { name: " Olaf ", slots: [] });
+
+    expect([first, renamed, repeated]).toEqual([
+      { ok: true, answerChange: "first" },
+      { ok: true, answerChange: "changed" },
+      { ok: true, answerChange: "unchanged" },
+    ]);
+  });
+
+  it("acknowledges claimed hours as existing answers", async () => {
+    const { saveAnswer, claimName } = await actions();
+
+    await saveAnswer(pollId, { name: "Ola", slots: [friday19] });
+    onAnotherDevice();
+    await claimName(pollId, { name: "Ola", slots: [] });
+    const repeated = await saveAnswer(pollId, { name: "Ola", slots: [friday19] });
+    const changed = await saveAnswer(pollId, { name: "Ola", slots: [friday19, friday20] });
+
+    expect([repeated, changed]).toEqual([
+      { ok: true, answerChange: "unchanged" },
+      { ok: true, answerChange: "changed" },
+    ]);
+  });
+
+  it("does not acknowledge a lost row until the newcomer saves", async () => {
+    const { saveAnswer, claimName } = await actions();
+
+    await saveAnswer(pollId, { name: "Ola", slots: [friday19] });
+    const originalDevice = cookieJar;
+
+    onAnotherDevice();
+    await claimName(pollId, { name: "Ola", slots: [] });
+    cookieJar = originalDevice;
+    const lost = await saveAnswer(pollId, { name: "Bartek", slots: [friday20] });
+    const first = await saveAnswer(pollId, { name: "Bartek", slots: [friday20] });
+
+    expect([lost, first]).toEqual([
+      { ok: false, reason: "not-yours" },
+      { ok: true, answerChange: "first" },
+    ]);
+  });
+
   it("creates the participant on the first save and resumes it from the cookie", async () => {
     const { saveAnswer } = await actions();
 
     const result = await saveAnswer(pollId, { name: "  Ola  ", slots: [friday19, friday20] });
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ ok: true, answerChange: "first" });
     expect(await myAnswer()).toEqual({ name: "Ola", slots: [friday19, friday20] });
   });
 
@@ -137,7 +198,7 @@ describe("saveAnswer", () => {
 
     const result = await saveAnswer(pollId, { name: "Ola", slots: [] });
 
-    expect(result).toEqual({ ok: true });
+    expect(result).toEqual({ ok: true, answerChange: "changed" });
     expect(await myAnswer()).toEqual({ name: "Ola", slots: [] });
   });
 
@@ -244,7 +305,7 @@ describe("saveAnswer", () => {
 
     expect(await saveAnswer(pollId, { name: "kuba", slots: [friday19] })).toEqual({ ok: false, reason: "organiser-name" });
     onOrganiserDevice();
-    expect(await saveAnswer(pollId, { name: "Kuba", slots: [friday19] })).toEqual({ ok: true });
+    expect(await saveAnswer(pollId, { name: "Kuba", slots: [friday19] })).toEqual({ ok: true, answerChange: "first" });
   });
 
   it("refuses answers once the final time is set", async () => {
@@ -262,7 +323,7 @@ describe("saveAnswer", () => {
 
     onAnotherDevice();
 
-    expect(await saveAnswer(pollId, { name: "Ola", slots: [friday19] })).toEqual({ ok: true });
+    expect(await saveAnswer(pollId, { name: "Ola", slots: [friday19] })).toEqual({ ok: true, answerChange: "first" });
 
     onAnotherDevice();
 
@@ -283,7 +344,7 @@ describe("saveAnswer", () => {
     const results = await Promise.all([olaSaves, bartekSaves]);
 
     expect(results).toContainEqual({ ok: false, reason: "full" });
-    expect(results).toContainEqual({ ok: true });
+    expect(results).toContainEqual({ ok: true, answerChange: "first" });
     expect(db.select().from(participants).where(eq(participants.pollId, pollId)).all()).toHaveLength(30);
   });
 

@@ -17,24 +17,29 @@ export default function PrivacyPolicyPage() {
     <LegalPage title={title}>
       <LegalSection title="Kto i co zapisuje">
         <p className="m-0">
-          Administratorem jest {operator}. Zapisujemy ankietę (tytuł, imię organizatora, dni, godziny, termin), imiona, godziny i czas
-          odpowiedzi oraz skróty kluczy z ciasteczek, żeby ankieta działała (art. 6 ust. 1 lit. b RODO). Bez imienia nie odpowiesz.
+          Administratorem jest {operator}. Zapisujemy tytuł, imiona, dni, godziny, termin i czas odpowiedzi oraz skróty kluczy z ciasteczek,
+          żeby ankieta działała, art. 6 ust. 1 lit. b RODO. Bez imienia nie odpowiesz.
         </p>
       </LegalSection>
       <LegalSection title="Ciasteczka i jak długo">
         <p className="m-0">
-          Dwa niezbędne ciasteczka na rok z kluczem do Twojej odpowiedzi i ankiety. Przeglądarka pamięta też Twoje imię i to, czy wyłączasz
-          animacje. Bez analityki, reklam i kont. Ankieta znika 60 dni po ostatnim dniu (z bazy przy kolejnym sprzątaniu) albo po „Usuń
-          ankietę”.
+          Dwa niezbędne ciasteczka na rok z kluczem do odpowiedzi i ankiety. Przeglądarka pamięta imię i wybór animacji. Ankieta znika po
+          usunięciu albo przy sprzątaniu 60 dni po ostatnim dniu.
+        </p>
+      </LegalSection>
+      <LegalSection title="Statystyki">
+        <p className="m-0">
+          Włączone Umami liczy wizyty i kroki ankiety. Dostaje typ kroku, ogólną ścieżkę, zatwierdzone kampanie i domenę źródła, IP i dane
+          przeglądarki. Nie wysyłamy adresów ankiet, ich danych ani ciasteczek.
         </p>
       </LegalSection>
       <LegalSection title="Logi, zgłoszenia i kto je widzi">
         <p className="m-0">
-          Logi serwera bez imion, tytułów i kluczy leżą do 7 dni. „Zgłoś problem” wysyła opis, kontakt (jeśli podasz), adres strony,
-          godzinę, przeglądarkę i rozmiar okna. IP trzymamy godzinę w pamięci przeciw spamowi, zgłoszenia i maile do końca sprawy
-          (uzasadniony interes, art. 6 ust. 1 lit. f RODO). Na nasze zlecenie widzą je Railway (serwer w UE), Linear (zgłoszenia) i
-          Cloudflare (poczta). To firmy z USA, dane dostają na podstawie standardowych klauzul umownych UE albo EU‑US Data Privacy
-          Framework, jak mówią ich umowy powierzenia.
+          Logi bez imion, tytułów i kluczy leżą do 7 dni. „Zgłoś problem” wysyła opis, opcjonalny kontakt, adres strony, godzinę,
+          przeglądarkę i rozmiar okna. IP trzymamy godzinę w pamięci przeciw spamowi, zgłoszenia i maile do końca sprawy, z uzasadnionego
+          interesu, art. 6 ust. 1 lit. f RODO. Na nasze zlecenie Railway obsługuje serwer w UE, Linear zgłoszenia, a Cloudflare pocztę.
+          Firmy z USA dostają dane na podstawie standardowych klauzul umownych UE albo EU-US Data Privacy Framework, zgodnie z umowami
+          powierzenia.
         </p>
       </LegalSection>
       <LegalSection title="Twoje prawa">

@@ -1,12 +1,18 @@
 import { act, fireEvent, render, renderHook, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beginAnalyticsVisit } from "@/shared/analytics";
 import { useDevicePolls } from "@/shared/device-polls";
 import { stubReducedMotion } from "@/shared/testing/motion";
 import { claimName, saveAnswer } from "../server/answer-actions";
 import { AnswerBody } from "./answer-body";
 import { AnswerLead, AnswerStatus } from "./answer-lead";
 import { AnswerProvider } from "./answer-provider";
+
+vi.hoisted(() => {
+  process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL = "https://analytics.example/script.js";
+  process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID = "c98aed47-de54-4577-bde2-8f1133b5c5d5";
+});
 
 vi.mock("../server/answer-actions", () => ({ saveAnswer: vi.fn(), claimName: vi.fn() }));
 
@@ -43,8 +49,9 @@ async function afterQuiet() {
 
 beforeEach(() => {
   vi.useFakeTimers({ shouldAdvanceTime: true });
-  vi.mocked(saveAnswer).mockResolvedValue({ ok: true });
+  vi.mocked(saveAnswer).mockResolvedValue({ ok: true, answerChange: "first" });
   localStorage.clear();
+  beginAnalyticsVisit();
   stubReducedMotion(false);
 });
 
@@ -52,6 +59,137 @@ afterEach(() => {
   vi.useRealTimers();
   vi.resetAllMocks();
   vi.unstubAllGlobals();
+});
+
+describe("answer analytics", () => {
+  it.each(["changed", "unchanged"] as const)("uses the %s acknowledgement after claiming a name", async (answerChange) => {
+    const track = vi.fn().mockResolvedValue(undefined);
+
+    vi.stubGlobal("umami", { track });
+
+    vi.mocked(saveAnswer)
+      .mockResolvedValueOnce({ ok: false, reason: "name-taken", name: "Ola", hours: 1 })
+      .mockResolvedValueOnce({ ok: true, answerChange });
+
+    vi.mocked(claimName).mockResolvedValue({ ok: true, name: "Ola", slots: [{ date: "2026-10-17", hour: 21 }] });
+    const { user } = renderPanel();
+
+    await user.type(nameField(), "Ola");
+    fireEvent.click(cell("pt 16, 19:00"));
+    await afterQuiet();
+    await user.click(screen.getByRole("button", { name: "Tak, to ja" }));
+    await afterQuiet();
+
+    expect(track.mock.calls).toEqual([
+      [{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/e/[id]", name: "availability_started" }],
+      [{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/e/[id]", name: "answer_save_failed" }],
+      ...(answerChange === "changed"
+        ? [[{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/e/[id]", name: "answer_changed_saved" }]]
+        : []),
+    ]);
+  });
+
+  it("counts queued acknowledgements once and does not count an unchanged retry", async () => {
+    const track = vi.fn().mockResolvedValue(undefined);
+    let acknowledge: (result: Awaited<ReturnType<typeof saveAnswer>>) => void = () => {};
+
+    vi.stubGlobal("umami", { track });
+
+    vi.mocked(saveAnswer)
+      .mockReturnValueOnce(
+        new Promise((resolve) => {
+          acknowledge = resolve;
+        }),
+      )
+      .mockResolvedValueOnce({ ok: true, answerChange: "changed" })
+      .mockResolvedValueOnce({ ok: true, answerChange: "unchanged" });
+
+    const { user, rerender } = renderPanel();
+
+    await user.type(nameField(), "Ola");
+    fireEvent.click(cell("pt 16, 19:00"));
+    await afterQuiet();
+    fireEvent.click(cell("sb 17, 20:00"));
+    await afterQuiet();
+
+    expect(track.mock.calls).toEqual([[{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/e/[id]", name: "availability_started" }]]);
+
+    await act(async () => acknowledge({ ok: true, answerChange: "first" }));
+    await afterQuiet();
+    rerender(panel({ name: "Ola", slots: [] }));
+    fireEvent.input(nameField(), { target: { value: "Ola " } });
+    await afterQuiet();
+
+    expect(track.mock.calls).toEqual([
+      [{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/e/[id]", name: "availability_started" }],
+      [{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/e/[id]", name: "answer_first_saved" }],
+      [{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/e/[id]", name: "answer_changed_saved" }],
+    ]);
+
+    expect(saveAnswer).toHaveBeenCalledTimes(3);
+  });
+
+  it.each(["refused", "thrown"] as const)("counts a %s save failure without a success", async (failure) => {
+    const track = vi.fn().mockResolvedValue(undefined);
+
+    vi.stubGlobal("umami", { track });
+    if (failure === "refused") vi.mocked(saveAnswer).mockResolvedValue({ ok: false, reason: "gone" });
+    else vi.mocked(saveAnswer).mockRejectedValue(new TypeError("offline"));
+
+    renderPanel({ name: "Ola", slots: [] });
+
+    fireEvent.click(cell("pt 16, 19:00"));
+    await afterQuiet();
+
+    expect(track.mock.calls).toEqual([
+      [{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/e/[id]", name: "availability_started" }],
+      [{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/e/[id]", name: "answer_save_failed" }],
+    ]);
+  });
+
+  it("counts only the acknowledged newcomer after a lost row", async () => {
+    const track = vi.fn().mockResolvedValue(undefined);
+
+    vi.stubGlobal("umami", { track });
+
+    vi.mocked(saveAnswer)
+      .mockResolvedValueOnce({ ok: false, reason: "not-yours" })
+      .mockResolvedValueOnce({ ok: true, answerChange: "first" });
+
+    renderPanel({ name: "Ola", slots: [] });
+
+    fireEvent.click(cell("pt 16, 19:00"));
+    await afterQuiet();
+
+    expect(track.mock.calls).toEqual([
+      [{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/e/[id]", name: "availability_started" }],
+      [{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/e/[id]", name: "answer_first_saved" }],
+    ]);
+  });
+
+  it.each([
+    ["first", "answer_first_saved"],
+    ["changed", "answer_changed_saved"],
+    ["unchanged", undefined],
+  ] as const)("uses the acknowledged %s save, not the returning name", async (answerChange, event) => {
+    const track = vi.fn().mockResolvedValue(undefined);
+
+    vi.stubGlobal("umami", { track });
+    vi.mocked(saveAnswer).mockResolvedValue({ ok: true, answerChange });
+    const { rerender } = renderPanel({ name: "Ola", slots: [] });
+
+    fireEvent.click(cell("pt 16, 19:00"));
+    await afterQuiet();
+    rerender(panel({ name: "Ola", slots: [{ date: "2026-10-16", hour: 19 }] }));
+    await afterQuiet();
+
+    expect(track.mock.calls).toEqual([
+      [{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/e/[id]", name: "availability_started" }],
+      ...(event ? [[{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/e/[id]", name: event }]] : []),
+    ]);
+
+    expect(saveAnswer).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe("the Moje lead and body", () => {

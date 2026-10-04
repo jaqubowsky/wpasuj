@@ -210,7 +210,7 @@ A 1200×630 PNG under 1 MB, rendered by `next/og` with flexbox layout only, in o
 
 ## Out of scope
 
-Accounts and sign-in, notifications of any kind, calendar integrations beyond the prefilled links and the `.ics` file, time zones beyond the organiser's, per-person invite links, recurring polls, comments or chat, a description field, a per-name filter in results, dark theme, English, analytics inside the app, the marketing site.
+Accounts and sign-in, notifications of any kind, calendar integrations beyond the prefilled links and the `.ics` file, time zones beyond the organiser's, per-person invite links, recurring polls, comments or chat, a description field, a per-name filter in results, dark theme, English, analytics inside the app except the owner's optional self-hosted Umami measurement of public informational pageviews and the owner-approved bounded create, invitation, answer, results and settled-time funnel without poll data, the marketing site. ADR 0044 limits attribution to approved UTM labels and referrer hosts; poll and organiser pages have no automatic tracking. Railway usage logs stay as defined in ADR 0032.
 
 ## Acceptance
 

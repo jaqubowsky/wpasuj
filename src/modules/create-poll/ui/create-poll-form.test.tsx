@@ -1,9 +1,15 @@
 import { act, fireEvent, render, renderHook, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beginAnalyticsVisit } from "@/shared/analytics";
 import { useDevicePolls } from "@/shared/device-polls";
 import { isFreshPoll } from "@/shared/fresh-poll";
 import { CreatePollForm } from "./create-poll-form";
+
+vi.hoisted(() => {
+  process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL = "https://analytics.example/script.js";
+  process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID = "c98aed47-de54-4577-bde2-8f1133b5c5d5";
+});
 
 const push = vi.fn();
 
@@ -35,12 +41,46 @@ beforeEach(() => {
   vi.setSystemTime(thursdayMorning);
   localStorage.clear();
   sessionStorage.clear();
+  beginAnalyticsVisit();
   push.mockReset();
   createPoll.mockReset();
 });
 
 afterEach(() => {
   vi.useRealTimers();
+  vi.unstubAllGlobals();
+});
+
+describe("create interactions", () => {
+  it("keeps the first interaction once across remounts and resets on a new visit", async () => {
+    const track = vi.fn().mockResolvedValue(undefined);
+
+    vi.stubGlobal("umami", { track });
+    beginAnalyticsVisit("/");
+    const first = render(<CreatePollForm />);
+
+    await userEvent.type(screen.getByRole("textbox", { name: "Co robimy?" }), "Kino");
+    await userEvent.click(screen.getByRole("button", { name: "Jutro" }));
+    first.unmount();
+    beginAnalyticsVisit("/");
+    render(<CreatePollForm />);
+    await userEvent.type(screen.getByRole("textbox", { name: "Co robimy?" }), "Spacer");
+
+    expect(track).toHaveBeenCalledExactlyOnceWith({
+      website: "c98aed47-de54-4577-bde2-8f1133b5c5d5",
+      url: "/",
+      name: "create_started",
+    });
+
+    beginAnalyticsVisit("/jak-ustalic-termin");
+    beginAnalyticsVisit("/");
+    await userEvent.type(screen.getByRole("textbox", { name: "Co robimy?" }), " jutro");
+
+    expect(track.mock.calls).toEqual([
+      [{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/", name: "create_started" }],
+      [{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/", name: "create_started" }],
+    ]);
+  });
 });
 
 describe("Kiedy?", () => {
@@ -248,6 +288,64 @@ describe("Utwórz i wyślij na grupę", () => {
     expect(push).toHaveBeenCalledWith("/e/abcdefghij");
     expect(share).not.toHaveBeenCalled();
     expect(isFreshPoll("abcdefghij")).toBe(true);
+  });
+
+  it("counts a successful create once without poll data", async () => {
+    const track = vi.fn().mockResolvedValue(undefined);
+
+    vi.stubGlobal("umami", { track });
+    createPoll.mockResolvedValue({ ok: true, id: "abcdefghij" });
+    render(<CreatePollForm />);
+    await fillIn("Jutro");
+
+    await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
+
+    expect(track.mock.calls).toEqual([
+      [{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/", name: "create_started" }],
+      [{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/", name: "create_submitted" }],
+      [{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/", name: "poll_created" }],
+    ]);
+
+    expect(push).toHaveBeenCalledWith("/e/abcdefghij");
+  });
+
+  it.each(["refused", "failed"] as const)("does not count a %s create", async (failure) => {
+    const track = vi.fn().mockResolvedValue(undefined);
+
+    vi.stubGlobal("umami", { track });
+    if (failure === "refused") createPoll.mockResolvedValue({ ok: false, reason: "invalid" });
+    else createPoll.mockRejectedValue(new Error("offline"));
+
+    render(<CreatePollForm />);
+    await fillIn("Jutro");
+
+    await act(() => userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" })));
+
+    expect(track.mock.calls).toEqual([
+      [{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/", name: "create_started" }],
+      [{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/", name: "create_submitted" }],
+      ...(failure === "refused" ? [[{ website: "c98aed47-de54-4577-bde2-8f1133b5c5d5", url: "/", name: "create_validation_failed" }]] : []),
+    ]);
+
+    expect(push).not.toHaveBeenCalled();
+  });
+
+  it.each(["throws", "rejects"] as const)("still opens the created poll when analytics %s", async (failure) => {
+    const track =
+      failure === "throws"
+        ? vi.fn(() => {
+            throw new Error("analytics offline");
+          })
+        : vi.fn().mockRejectedValue(new Error("analytics offline"));
+
+    vi.stubGlobal("umami", { track });
+    createPoll.mockResolvedValue({ ok: true, id: "abcdefghij" });
+    render(<CreatePollForm />);
+    await fillIn("Jutro");
+
+    await userEvent.click(screen.getByRole("button", { name: "Utwórz i wyślij na grupę" }));
+
+    expect(push).toHaveBeenCalledWith("/e/abcdefghij");
   });
 
   it("keeps the created poll on this device as the organiser's, with its last date", async () => {
