@@ -29,6 +29,7 @@ Secret scanning and push protection are repository settings the owner keeps on.
 - `actionlint` checks syntax, expressions and shellcheck of `run:`; `zizmor` checks template injection, `permissions`, unpinned `uses:` and the Dependabot cooldown. Both fail on any finding. Run them locally with the same `docker run` lines from `ci.yml`, adding `--offline` to zizmor without a GitHub token
 - Actions are pinned to a commit SHA with a `# vX.Y.Z` comment that Dependabot updates
 - The actionlint, zizmor, gitleaks and semgrep images are pinned by digest and, with `diff-cover`, bumped by hand: Dependabot does not see them
+- Node is pinned to an exact release in `.nvmrc`, which every CI job reads, and in both `FROM` lines of the `Dockerfile`, which Railway builds. Both are bumped by hand, together, on each Node security release
 
 ## Dependabot
 

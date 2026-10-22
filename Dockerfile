@@ -1,4 +1,4 @@
-FROM node:24-slim AS build
+FROM node:24.22.1-slim AS build
 RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY package.json package-lock.json ./
@@ -9,7 +9,7 @@ ARG NEXT_PUBLIC_UMAMI_WEBSITE_ID
 ARG NEXT_PUBLIC_UMAMI_ATTRIBUTION
 RUN npm run build
 
-FROM node:24-slim
+FROM node:24.22.1-slim
 WORKDIR /app
 ENV NODE_ENV=production PORT=3000 HOSTNAME=0.0.0.0 DATABASE_PATH=/data/wpasuj.db
 COPY --from=build /app/.next/standalone ./
